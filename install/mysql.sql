@@ -105,7 +105,7 @@ CREATE TABLE `bl_Entry` (
   CONSTRAINT `FK_Entry_HostID` FOREIGN KEY (`HostID`) REFERENCES `bl_Host` (`HostID`),
   CONSTRAINT `FK_Entry_SeverityID` FOREIGN KEY (`SeverityID`) REFERENCES `bl_Severity` (`SeverityID`),
   CONSTRAINT `FK_Entry_SourceID` FOREIGN KEY (`SourceID`) REFERENCES `bl_Source` (`sourceID`),
-  CONSTRAINT `FK_Entry_ApplicationID` FOREIGN KEY (`ApplicationID`) REFERENCES `bl_Application` (`ApplicationID`),
+  CONSTRAINT `FK_Entry_ApplicationID` FOREIGN KEY (`ApplicationID`) REFERENCES `bl_Application` (`ApplicationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
