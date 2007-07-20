@@ -1,0 +1,1 @@
+<cflocation url="/bugLog/hq/">

@@ -1,0 +1,116 @@
+body {
+	margin:0px;
+	padding:0px;
+	//background-color:#F5F5F5;
+	background-color:#FFF;
+	font-family: "trebuchet MS", Arial, Helvetica, "Sans Serif";
+	color:#333;
+	font-size:12px;
+	background-image:url(../images/left_bg.gif);
+	background-repeat:repeat-y;	
+}
+
+a,
+a:link,
+a:hover,
+a:active,
+a:visited {
+    color:#43505a;
+}
+a:hover {
+    text-decoration:none;
+}
+
+h2 {
+    font-size:16px;
+    border-bottom:1px solid black;
+}
+
+.formField {
+    border:1px solid silver;
+    font-size:11px;
+    padding:1px;
+    width:300px;
+}
+
+#header {
+/*	height:	82px;
+	background-color:#6b8091;
+	border-bottom:2px solid #90a4b5;*/
+	color:#333;
+}
+#header td {
+	color:#333;
+
+}
+#mainBody {
+    vertical-align:top;
+    width:100%;
+    margin-top:10px;
+}
+
+#statusBar {
+    font-size:11px;
+    text-align:center;
+    line-height:22px;
+    height:22px;
+    background-color:#f5f5f5;
+    color:#de730c;
+    padding-right:20px;
+    font-weight:bold;
+}
+
+/***** data tables ******/
+.browseTable {
+	border-bottom:1px solid #333;
+	width:95%;
+	#width:750px;
+}
+
+.browseTable th {
+    background-color:#90A4B5;
+	line-height: 18px;
+	color: #FFFFFF;
+	padding: 3px 9px 3px 9px;
+	font-size:13px;
+	font-weight:bold;
+}
+.browseTable td {
+	line-height: 16px;
+	color: #333;
+	padding: 3px 3px 3px 9px;
+	font-size:11px;
+}
+
+.altRow {
+    background-color:#F6F6F6;
+}
+
+.listTI {
+    background-color:#6b8091;
+}
+.browseTable tr:hover {
+    background-color:#ebebeb;
+}
+.browseTable th a {
+    color:white;
+    text-decoration:none;
+}
+.browseTable th a:hover {
+    text-decoration:underline;
+}
+
+.criteriaTable {
+    background-color:#ebebeb;
+    font-size:12px;
+    border-bottom:1px solid silver;
+}
+.criteriaTable td {
+    padding:4px;
+}
+.criteriaTable select,
+.criteriaTable input,
+.criteriaTable textarea {
+     font-size:12px;
+     border:1px solid silver;
+}
