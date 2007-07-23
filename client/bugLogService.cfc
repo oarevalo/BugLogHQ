@@ -4,6 +4,7 @@
 	<cfset variables.bugLogListener = "">
 	<cfset variables.oBugLogListener = 0>
 	<cfset variables.protocol = "">
+	<cfset variables.useListener = true>
 	
 	<cfset variables.hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName()>
 	<cfset variables.appName = replace(application.applicationName," ","","all")>
@@ -36,11 +37,21 @@
 			// Instantiate appropriate reference to listener		
 			switch(variables.protocol) {
 				case "SOAP":
-					variables.oBugLogListener = createObject("webservice", variables.bugLogListener);
+					try {
+						variables.oBugLogListener = createObject("webservice", variables.bugLogListener);
+					} catch(any e) {
+						if(variables.bugEmailRecipients neq "") sendEmail("",e.detail,e.message);
+						variables.useListener = false;
+					}
 					break;
 					
 				case "CFC":
-					variables.oBugLogListener = createObject("component", variables.bugLogListener);
+					try {
+						variables.oBugLogListener = createObject("component", variables.bugLogListener);
+					} catch(any e) {
+						if(variables.bugEmailRecipients neq "") sendEmail("",e.detail,e.message);
+						variables.useListener = false;
+					}
 					break;
 				
 				case "REST":
@@ -72,38 +83,43 @@
 		
 		<!--- submit error --->
 		<cftry>
-			<cfif variables.protocol eq "REST">
-				<!--- send bug via a REST interface --->
-				<cfhttp method="post" throwonerror="false" timeout="0" url="#variables.bugLogListener#">
-					<cfhttpparam type="formfield" name="dateTime" value="#Now()#">
-					<cfhttpparam type="formfield" name="message" value="#arguments.message#">
-					<cfhttpparam type="formfield" name="applicationCode" value="#variables.appName#">
-					<cfhttpparam type="formfield" name="severityCode" value="ERROR">
-					<cfhttpparam type="formfield" name="hostName" value="#variables.hostName#">
-					<cfhttpparam type="formfield" name="exceptionMessage" value="#arguments.exception.message#">
-					<cfhttpparam type="formfield" name="exceptionDetails" value="#arguments.exception.detail#">
-					<cfhttpparam type="formfield" name="CFID" value="#CFID#">
-					<cfhttpparam type="formfield" name="CFTOKEN" value="#CFTOKEN#">
-					<cfhttpparam type="formfield" name="userAgent" value="#cgi.HTTP_USER_AGENT#">
-					<cfhttpparam type="formfield" name="templatePath" value="#GetBaseTemplatePath()#">
-					<cfhttpparam type="formfield" name="HTMLReport" value="#longMessage#">
-				</cfhttp>
+			<cfif variables.useListener>
+				<cfif variables.protocol eq "REST">
+					<!--- send bug via a REST interface --->
+					<cfhttp method="post" throwonerror="false" timeout="0" url="#variables.bugLogListener#">
+						<cfhttpparam type="formfield" name="dateTime" value="#Now()#">
+						<cfhttpparam type="formfield" name="message" value="#arguments.message#">
+						<cfhttpparam type="formfield" name="applicationCode" value="#variables.appName#">
+						<cfhttpparam type="formfield" name="severityCode" value="ERROR">
+						<cfhttpparam type="formfield" name="hostName" value="#variables.hostName#">
+						<cfhttpparam type="formfield" name="exceptionMessage" value="#arguments.exception.message#">
+						<cfhttpparam type="formfield" name="exceptionDetails" value="#arguments.exception.detail#">
+						<cfhttpparam type="formfield" name="CFID" value="#CFID#">
+						<cfhttpparam type="formfield" name="CFTOKEN" value="#CFTOKEN#">
+						<cfhttpparam type="formfield" name="userAgent" value="#cgi.HTTP_USER_AGENT#">
+						<cfhttpparam type="formfield" name="templatePath" value="#GetBaseTemplatePath()#">
+						<cfhttpparam type="formfield" name="HTMLReport" value="#longMessage#">
+					</cfhttp>
+				<cfelse>
+					<!--- send bug via a webservice (SOAP) --->
+					<cfset variables.oBugLogListener.logEntry(Now(), 
+																arguments.message, 
+																variables.appName, 
+																"ERROR",
+																variables.hostName,
+																arguments.exception.message,
+																arguments.exception.detail,
+																cfid,
+																cftoken,
+																cgi.HTTP_USER_AGENT,
+																GetBaseTemplatePath(),
+																longMessage	)>
+				</cfif>
 			<cfelse>
-				<!--- send bug via a webservice (SOAP) --->
-				<cfset variables.oBugLogListener.logEntry(Now(), 
-															arguments.message, 
-															variables.appName, 
-															"ERROR",
-															variables.hostName,
-															arguments.exception.message,
-															arguments.exception.detail,
-															cfid,
-															cftoken,
-															cgi.HTTP_USER_AGENT,
-															GetBaseTemplatePath(),
-															longMessage	)>
+				<cfif variables.bugEmailRecipients neq "">
+					<cfset sendEmail(arguments.message, longMessage, "BugLog listener not available")>
+				</cfif>
 			</cfif>
-
 
 			<cfcatch type="any">
 				<!--- an error ocurred, if there is an email address stored, then send details to that email, otherwise rethrow --->
