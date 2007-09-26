@@ -1,5 +1,5 @@
 /**************************************************************/	
-/* BugLogHQ  (v1.01)										  */
+/* BugLogHQ  (v1.1)										  */
 /* http://buglogHQ.riaforge.org
 /**************************************************************/	
 
@@ -77,7 +77,7 @@ data in different ways.
 
 Installation and Usage Notes:
 --------------------------------------------------------------------------------------
-* To install WSCandis just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be
+* To install BugLog just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be
 installed on a directory or mapping named /bugLog.
 
 * Run the corresponding SQL script for your database. The script can be found in the /install directory. This 
@@ -96,11 +96,21 @@ will create the necessary tables.
 		/bugLog/hq/config/config.xml (lines 5-6)
 
 
+Supported Databases:
+--------------------------------------------------------------------------------------
+Currently BugLogHQ supports the following databases:
+* MySQL
+* Microsoft SQL Server 2000
+* Microsoft SQL Server 2005
+* Microsoft Access
+
+
 Acknowledgements / Thanks / Credits
 ---------------------------------------------------------------------------
 * BugLogHQ uses rss.cfc by Raymond Camden (http://cfrss.riaforge.org/)
 * Lots of icons from the "Silk" icon set by Mark James (http://www.famfamfam.com/)
 * Thanks to Tom DeManincor for creating the SQL script for MSSQL
+* Thanks to Chuck Weidler for updating and providing the SQL scripts for Access, MS SQL Server 2000, MSSQL Server 2005
 
 Bugs, suggestions, criticisms, well-wishes, good vibrations, etc
 ---------------------------------------------------------------------------

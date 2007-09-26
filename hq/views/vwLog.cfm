@@ -11,8 +11,8 @@
 
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
-<cfparam name="sortBy" default="">
-<cfparam name="sortDir" default="ASC">
+<cfparam name="sortBy" default="mydatetime">
+<cfparam name="sortDir" default="DESC">
 
 
 <cfset stInfo = request.requestState.stInfo>
@@ -34,6 +34,7 @@
 <cfif endRow gt qryEntries.recordCount>
 	<cfset endRow = qryEntries.recordCount>
 </cfif>
+<cfset delta = 5>
 
 
 <!--- get the data for the filter dropdowns --->
@@ -136,11 +137,11 @@
 				</cfif>
 			</th>
 			<th width="110">
-				<cfif sortBy eq "dateTime">
-					<a href="#pageURL#&sortBy=dateTime&sortDir=#opSortDir#" title="Click to sort by bug date/time">Date/Time</a>
+				<cfif sortBy eq "mydateTime">
+					<a href="#pageURL#&sortBy=mydateTime&sortDir=#opSortDir#" title="Click to sort by bug date/time">Date/Time</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
 				<cfelse>
-					<a href="#pageURL#&sortBy=dateTime" title="Click to sort by bug date/time">Date/Time</a>
+					<a href="#pageURL#&sortBy=mydateTime" title="Click to sort by bug date/time">Date/Time</a>
 				</cfif>
 			</th>
 			<th width="120">
@@ -210,14 +211,18 @@
 			&nbsp;&nbsp;&middot;&nbsp;&nbsp;
 		</cfif>
 
+		<cfif currPage - delta gt 0>... &nbsp;&nbsp;</cfif>
 		<cfloop from="1" to="#numPages#" index="i">
-			<cfif i eq currPage>
-				<b>#i#</b>
-			<cfelse>						
-				<a href="#pageURL#&startRow=#(i-1)*rowsPerPage+1#">#i#</a>
+			<cfif i gte currPage-delta and i lte currPage+delta>
+				<cfif i eq currPage>
+					<b>#i#</b>
+				<cfelse>						
+					<a href="#pageURL#&startRow=#(i-1)*rowsPerPage+1#">#i#</a>
+				</cfif>
+				&nbsp;&nbsp;
 			</cfif>
-			&nbsp;&nbsp;
 		</cfloop>
+		<cfif currPage + delta lt numPages>... &nbsp;&nbsp;</cfif>
 	</div>
 	
 	<cfif refreshSeconds gt 0>

@@ -1,4 +1,3 @@
-
 -- BEGINNING TRANSACTION STRUCTURE
 PRINT 'Beginning transaction STRUCTURE'
 BEGIN TRANSACTION _STRUCTURE_
@@ -47,7 +46,7 @@ GO
 -- Add Primary Key PK_bl_Application to bl_Application
 Print 'Add Primary Key PK_bl_Application to bl_Application'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Application]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysindexes WHERE [name]=N'PK_bl_Application' AND id=OBJECT_ID(N'[dbo].[bl_Application]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Application]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.indexes WHERE [name]=N'PK_bl_Application' AND [object_id]=OBJECT_ID(N'[dbo].[bl_Application]')))
 ALTER TABLE [dbo].[bl_Application]
 	ADD
 	CONSTRAINT [PK_bl_Application]
@@ -61,7 +60,7 @@ GO
 -- Add Unique IX_bl_Application to bl_Application
 Print 'Add Unique IX_bl_Application to bl_Application'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Application]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysindexes WHERE [name]=N'IX_bl_Application' AND id=OBJECT_ID(N'[dbo].[bl_Application]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Application]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.indexes WHERE [name]=N'IX_bl_Application' AND [object_id]=OBJECT_ID(N'[dbo].[bl_Application]')))
 ALTER TABLE [dbo].[bl_Application]
 	ADD
 	CONSTRAINT [IX_bl_Application]
@@ -85,7 +84,7 @@ Print 'Create Table bl_Entry'
 GO
 CREATE TABLE [dbo].[bl_Entry] (
 		[EntryID]              char(35) NOT NULL,
-		[DateTime]             datetime NOT NULL,
+		[myDateTime]           datetime NOT NULL,
 		[Message]              varchar(250) NOT NULL,
 		[ApplicationID]        char(35) NOT NULL,
 		[SourceID]             char(35) NOT NULL,
@@ -109,7 +108,7 @@ GO
 -- Add Primary Key PK_bl_Entry to bl_Entry
 Print 'Add Primary Key PK_bl_Entry to bl_Entry'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Entry]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysindexes WHERE [name]=N'PK_bl_Entry' AND id=OBJECT_ID(N'[dbo].[bl_Entry]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Entry]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.indexes WHERE [name]=N'PK_bl_Entry' AND [object_id]=OBJECT_ID(N'[dbo].[bl_Entry]')))
 ALTER TABLE [dbo].[bl_Entry]
 	ADD
 	CONSTRAINT [PK_bl_Entry]
@@ -123,7 +122,7 @@ GO
 -- Add Unique IX_bl_Entry to bl_Entry
 Print 'Add Unique IX_bl_Entry to bl_Entry'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Entry]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysindexes WHERE [name]=N'IX_bl_Entry' AND id=OBJECT_ID(N'[dbo].[bl_Entry]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Entry]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.indexes WHERE [name]=N'IX_bl_Entry' AND [object_id]=OBJECT_ID(N'[dbo].[bl_Entry]')))
 ALTER TABLE [dbo].[bl_Entry]
 	ADD
 	CONSTRAINT [IX_bl_Entry]
@@ -137,7 +136,7 @@ GO
 -- Add Default Constraint DF_bl_Entry_createdOn to bl_Entry
 Print 'Add Default Constraint DF_bl_Entry_createdOn to bl_Entry'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Entry]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[DF_bl_Entry_createdOn]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_Entry]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Entry]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.objects WHERE [object_id]=OBJECT_ID(N'[dbo].[DF_bl_Entry_createdOn]') AND [parent_object_id]=OBJECT_ID(N'[dbo].[bl_Entry]')))
 ALTER TABLE [dbo].[bl_Entry]
 	ADD
 	CONSTRAINT [DF_bl_Entry_createdOn]
@@ -149,7 +148,7 @@ GO
 -- Add Default Constraint DF_bl_Entry_EntryID to bl_Entry
 Print 'Add Default Constraint DF_bl_Entry_EntryID to bl_Entry'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Entry]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[DF_bl_Entry_EntryID]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_Entry]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Entry]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.objects WHERE [object_id]=OBJECT_ID(N'[dbo].[DF_bl_Entry_EntryID]') AND [parent_object_id]=OBJECT_ID(N'[dbo].[bl_Entry]')))
 ALTER TABLE [dbo].[bl_Entry]
 	ADD
 	CONSTRAINT [DF_bl_Entry_EntryID]
@@ -181,7 +180,7 @@ GO
 -- Add Primary Key PK_bl_Host to bl_Host
 Print 'Add Primary Key PK_bl_Host to bl_Host'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Host]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysindexes WHERE [name]=N'PK_bl_Host' AND id=OBJECT_ID(N'[dbo].[bl_Host]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Host]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.indexes WHERE [name]=N'PK_bl_Host' AND [object_id]=OBJECT_ID(N'[dbo].[bl_Host]')))
 ALTER TABLE [dbo].[bl_Host]
 	ADD
 	CONSTRAINT [PK_bl_Host]
@@ -195,7 +194,7 @@ GO
 -- Add Default Constraint DF_bl_Host_HostID to bl_Host
 Print 'Add Default Constraint DF_bl_Host_HostID to bl_Host'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Host]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[DF_bl_Host_HostID]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_Host]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Host]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.objects WHERE [object_id]=OBJECT_ID(N'[dbo].[DF_bl_Host_HostID]') AND [parent_object_id]=OBJECT_ID(N'[dbo].[bl_Host]')))
 ALTER TABLE [dbo].[bl_Host]
 	ADD
 	CONSTRAINT [DF_bl_Host_HostID]
@@ -228,7 +227,7 @@ GO
 -- Add Primary Key PK_bl_Severity to bl_Severity
 Print 'Add Primary Key PK_bl_Severity to bl_Severity'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Severity]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysindexes WHERE [name]=N'PK_bl_Severity' AND id=OBJECT_ID(N'[dbo].[bl_Severity]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Severity]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.indexes WHERE [name]=N'PK_bl_Severity' AND [object_id]=OBJECT_ID(N'[dbo].[bl_Severity]')))
 ALTER TABLE [dbo].[bl_Severity]
 	ADD
 	CONSTRAINT [PK_bl_Severity]
@@ -242,7 +241,7 @@ GO
 -- Add Default Constraint DF_bl_Severity_SeverityID to bl_Severity
 Print 'Add Default Constraint DF_bl_Severity_SeverityID to bl_Severity'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Severity]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[DF_bl_Severity_SeverityID]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_Severity]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Severity]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.objects WHERE [object_id]=OBJECT_ID(N'[dbo].[DF_bl_Severity_SeverityID]') AND [parent_object_id]=OBJECT_ID(N'[dbo].[bl_Severity]')))
 ALTER TABLE [dbo].[bl_Severity]
 	ADD
 	CONSTRAINT [DF_bl_Severity_SeverityID]
@@ -274,7 +273,7 @@ GO
 -- Add Primary Key PK_bl_Source to bl_Source
 Print 'Add Primary Key PK_bl_Source to bl_Source'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Source]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysindexes WHERE [name]=N'PK_bl_Source' AND id=OBJECT_ID(N'[dbo].[bl_Source]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Source]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.indexes WHERE [name]=N'PK_bl_Source' AND [object_id]=OBJECT_ID(N'[dbo].[bl_Source]')))
 ALTER TABLE [dbo].[bl_Source]
 	ADD
 	CONSTRAINT [PK_bl_Source]
@@ -288,7 +287,7 @@ GO
 -- Add Default Constraint DF_bl_Source_SourceID to bl_Source
 Print 'Add Default Constraint DF_bl_Source_SourceID to bl_Source'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Source]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[DF_bl_Source_SourceID]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_Source]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_Source]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.objects WHERE [object_id]=OBJECT_ID(N'[dbo].[DF_bl_Source_SourceID]') AND [parent_object_id]=OBJECT_ID(N'[dbo].[bl_Source]')))
 ALTER TABLE [dbo].[bl_Source]
 	ADD
 	CONSTRAINT [DF_bl_Source_SourceID]
@@ -321,7 +320,7 @@ GO
 -- Add Primary Key PK_bl_User to bl_User
 Print 'Add Primary Key PK_bl_User to bl_User'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_User]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysindexes WHERE [name]=N'PK_bl_User' AND id=OBJECT_ID(N'[dbo].[bl_User]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_User]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.indexes WHERE [name]=N'PK_bl_User' AND [object_id]=OBJECT_ID(N'[dbo].[bl_User]')))
 ALTER TABLE [dbo].[bl_User]
 	ADD
 	CONSTRAINT [PK_bl_User]
@@ -335,7 +334,7 @@ GO
 -- Add Default Constraint DF_bl_User_UserID to bl_User
 Print 'Add Default Constraint DF_bl_User_UserID to bl_User'
 GO
-IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_User]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[DF_bl_User_UserID]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_User]')))
+IF (EXISTS(SELECT * FROM sys.objects WHERE [object_id] = OBJECT_ID(N'[dbo].[bl_User]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sys.objects WHERE [object_id]=OBJECT_ID(N'[dbo].[DF_bl_User_UserID]') AND [parent_object_id]=OBJECT_ID(N'[dbo].[bl_User]')))
 ALTER TABLE [dbo].[bl_User]
 	ADD
 	CONSTRAINT [DF_bl_User_UserID]
@@ -350,7 +349,7 @@ Print 'Create Foreign Key FK_bl_Entry_bl_Application on bl_Entry'
 GO
 IF OBJECT_ID(N'[dbo].[bl_Entry]') IS NOT NULL
 	AND OBJECT_ID(N'[dbo].[bl_Application]') IS NOT NULL
-	AND NOT EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[FK_bl_Entry_bl_Application]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_Entry]'))
+	AND NOT EXISTS (SELECT * FROM sys.objects WHERE [object_id]=OBJECT_ID(N'[dbo].[FK_bl_Entry_bl_Application]') AND [parent_object_id]=OBJECT_ID(N'[dbo].[bl_Entry]'))
 BEGIN
 		ALTER TABLE [dbo].[bl_Entry]
 			WITH NOCHECK
@@ -369,7 +368,7 @@ Print 'Create Foreign Key FK_bl_Entry_bl_Host on bl_Entry'
 GO
 IF OBJECT_ID(N'[dbo].[bl_Entry]') IS NOT NULL
 	AND OBJECT_ID(N'[dbo].[bl_Host]') IS NOT NULL
-	AND NOT EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[FK_bl_Entry_bl_Host]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_Entry]'))
+	AND NOT EXISTS (SELECT * FROM sys.objects WHERE [object_id]=OBJECT_ID(N'[dbo].[FK_bl_Entry_bl_Host]') AND [parent_object_id]=OBJECT_ID(N'[dbo].[bl_Entry]'))
 BEGIN
 		ALTER TABLE [dbo].[bl_Entry]
 			ADD CONSTRAINT [FK_bl_Entry_bl_Host]
@@ -384,7 +383,7 @@ Print 'Create Foreign Key FK_bl_Entry_bl_Severity on bl_Entry'
 GO
 IF OBJECT_ID(N'[dbo].[bl_Entry]') IS NOT NULL
 	AND OBJECT_ID(N'[dbo].[bl_Severity]') IS NOT NULL
-	AND NOT EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[FK_bl_Entry_bl_Severity]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_Entry]'))
+	AND NOT EXISTS (SELECT * FROM sys.objects WHERE [object_id]=OBJECT_ID(N'[dbo].[FK_bl_Entry_bl_Severity]') AND [parent_object_id]=OBJECT_ID(N'[dbo].[bl_Entry]'))
 BEGIN
 		ALTER TABLE [dbo].[bl_Entry]
 			ADD CONSTRAINT [FK_bl_Entry_bl_Severity]
@@ -399,7 +398,7 @@ Print 'Create Foreign Key FK_bl_Entry_bl_Source on bl_Entry'
 GO
 IF OBJECT_ID(N'[dbo].[bl_Entry]') IS NOT NULL
 	AND OBJECT_ID(N'[dbo].[bl_Source]') IS NOT NULL
-	AND NOT EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[FK_bl_Entry_bl_Source]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_Entry]'))
+	AND NOT EXISTS (SELECT * FROM sys.objects WHERE [object_id]=OBJECT_ID(N'[dbo].[FK_bl_Entry_bl_Source]') AND [parent_object_id]=OBJECT_ID(N'[dbo].[bl_Entry]'))
 BEGIN
 		ALTER TABLE [dbo].[bl_Entry]
 			ADD CONSTRAINT [FK_bl_Entry_bl_Source]

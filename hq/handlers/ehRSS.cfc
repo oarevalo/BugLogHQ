@@ -17,7 +17,7 @@
 			for(i=1;i lte min(maxEntries, qryEntries.recordCount);i=i+1) {
 				queryAddRow(data,1);
 				querySetCell(data,"title","Bug ###qryEntries.entryID[i]#: " & qryEntries.message[i]);
-				querySetCell(data,"body",composeMessage(qryEntries.dateTime[i], qryEntries.applicationCode[i], qryEntries.hostName[i], qryEntries.templatePath[i], qryEntries.exceptionMessage[i], qryEntries.exceptionDetails[i] ));
+				querySetCell(data,"body",composeMessage(qryEntries.mydateTime[i], qryEntries.applicationCode[i], qryEntries.hostName[i], qryEntries.templatePath[i], qryEntries.exceptionMessage[i], qryEntries.exceptionDetails[i] ));
 				querySetCell(data,"link","http://#cgi.HTTP_HOST##cgi.script_name#?event=ehGeneral.dspEntry&entryID=" & qryEntries.entryID[i]);
 				querySetCell(data,"subject","Subject");
 				querySetCell(data,"date",now());

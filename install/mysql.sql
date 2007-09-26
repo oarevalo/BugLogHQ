@@ -83,7 +83,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `bl_Entry`;
 CREATE TABLE `bl_Entry` (
   `EntryID` int(11) NOT NULL auto_increment,
-  `DateTime` datetime NOT NULL COMMENT '\n',
+  `myDateTime` datetime NOT NULL COMMENT '\n',
   `Message` varchar(500) NOT NULL,
   `ApplicationID` int(11) NOT NULL COMMENT '\n',
   `SourceID` int(11) NOT NULL,

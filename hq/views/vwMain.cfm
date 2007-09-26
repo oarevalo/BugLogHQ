@@ -13,6 +13,7 @@
 <cfparam name="startRow" default="1">
 <cfparam name="sortBy" default="">
 <cfparam name="sortDir" default="ASC">
+<cfparam name="numDays" default="1">
 
 <cfparam name="groupByApp" default="true">
 <cfparam name="groupByHost" default="true">
@@ -28,6 +29,7 @@
 <cfset hostID = request.requestState.hostID>
 
 <cfset qryOriginal = qryEntries>
+<cfset startDate = dateAdd("d", val(numDays) * -1, now())>
 
 <cfquery name="qryEntries" dbtype="query">
 	SELECT <cfif groupByApp>
@@ -38,6 +40,7 @@
 			</cfif>
 			Message, COUNT(*) AS bugCount, MAX(createdOn) as createdOn, MAX(entryID) AS EntryID
 		FROM qryEntries
+		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
 		GROUP BY 
 			<cfif groupByApp>
 				ApplicationCode, ApplicationID, 
@@ -51,7 +54,7 @@
 
 
 <!--- base URL for reloading --->
-<cfset pageURL = "index.cfm?event=ehGeneral.dspMain&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#searchTerm#&groupByApp=#groupByApp#&groupByHost=#groupByHost#">
+<cfset pageURL = "index.cfm?event=ehGeneral.dspMain&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#searchTerm#&groupByApp=#groupByApp#&groupByHost=#groupByHost#&numDays=#numDays#">
 
 <!--- setup variables for paging records --->
 <cfset numPages = ceiling(qryEntries.recordCount / rowsPerPage)>
@@ -88,8 +91,6 @@
 </cfif>
 
 
-
-
 <cfsavecontent variable="tmpHead">
 	<cfoutput>
 		<cfif refreshSeconds gt 0>
@@ -98,8 +99,15 @@
 		</cfif>
 		
 		<script type="text/javascript">
-			function search(term, appID, hostID, groupByApp, groupByHost) {
-				location.replace('index.cfm?event=ehGeneral.dspMain&applicationID='+appID+'&hostID='+hostID+'&searchTerm='+term+'&groupByApp='+groupByApp+'&groupByHost='+groupByHost);
+			function doSearch() {
+				var frm = document.frmSearch;
+				
+				location.replace('index.cfm?event=ehGeneral.dspMain&applicationID='+frm.applicationID.value
+									+'&hostID='+frm.hostID.value
+									+'&searchTerm='+frm.searchTerm.value
+									+'&groupByApp='+ document.getElementById("groupByApp").checked
+									+'&groupByHost='+ document.getElementById("groupByHost").checked
+									+"&numDays="+frm.numDays.value);
 			}
 		</script>	
 	</cfoutput>
@@ -139,12 +147,23 @@
 		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 			<tr align="center">
 				<td>
+					Show for last: &nbsp;&nbsp;
+					<select name="numDays" style="width:100px;" onchange="doSearch()">
+						<option value="1" <cfif numDays eq 1>selected</cfif>>24 hours</option>
+						<option value="7" <cfif numDays eq 7>selected</cfif>>7 days</option>
+						<option value="30" <cfif numDays eq 30>selected</cfif>>30 days</option>
+						<option value="60" <cfif numDays eq 60>selected</cfif>>60 days</option>
+						<option value="120" <cfif numDays eq 120>selected</cfif>>120 days</option>
+						<option value="360" <cfif numDays eq 360>selected</cfif>>360 days</option>
+					</select>				
+				</td>
+				<td>
 					<span <cfif searchTerm neq "">style="color:red;"</cfif>>Search:</span> &nbsp;&nbsp;
-					<input type="text" name="searchTerm" value="#searchTerm#" style="width:200px;" onchange="search(this.value,#applicationID#,#hostID#,#groupByApp#,#groupByHost#)">
+					<input type="text" name="searchTerm" value="#searchTerm#" style="width:200px;" onchange="doSearch()">
 				</td>
 				<td>
 					<span <cfif applicationID gt 0>style="color:red;"</cfif>>Application:</span> &nbsp;&nbsp;
-					<select name="applicationID" style="width:200px;" onchange="search('#searchTerm#',this.value,#hostID#,#groupByApp#,#groupByHost#)">
+					<select name="applicationID" style="width:200px;" onchange="doSearch()">
 						<option value="0">All</option>
 						<cfset tmp = applicationID>
 						<cfloop query="qryApplications">
@@ -154,7 +173,7 @@
 				</td>
 				<td>
 					<span <cfif hostID gt 0>style="color:red;"</cfif>>Host:</span> &nbsp;&nbsp;
-					<select name="hostID" style="width:200px;" onchange="search('#searchTerm#',#applicationID#,this.value,#groupByApp#,#groupByHost#)">
+					<select name="hostID" style="width:200px;" onchange="doSearch()">
 						<option value="0">All</option>
 						<cfset tmp = hostID>
 						<cfloop query="qryHosts">
@@ -175,7 +194,7 @@
 	<table class="browseTable" style="width:100%">	
 		<tr>
 			<th width="120">
-				<input type="checkbox" name="groupByApp" value="1" <cfif groupByApp>checked</cfif> onclick="search('#searchTerm#',#applicationID#,#hostID#,this.checked,#groupByHost#)" title="Breakdown bugs by application name">
+				<input type="checkbox" name="groupByApp" id="groupByApp" value="1" <cfif groupByApp>checked</cfif> onclick="doSearch()" title="Breakdown bugs by application name">
 				<cfif sortBy eq "applicationCode">
 					<a href="#pageURL#&sortBy=applicationCode&sortDir=#opSortDir#" title="Click to sort by application name">Application</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
@@ -184,7 +203,7 @@
 				</cfif>
 			</th>
 			<th width="120">
-				<input type="checkbox" name="groupByHost" value="1" <cfif groupByHost>checked</cfif> onclick="search('#searchTerm#',#applicationID#,#hostID#,#groupByApp#,this.checked)" title="Breakdown bugs by host name">
+				<input type="checkbox" name="groupByHost" id="groupByHost" value="1" <cfif groupByHost>checked</cfif> onclick="doSearch()" title="Breakdown bugs by host name">
 				<cfif sortBy eq "hostName">
 					<a href="#pageURL#&sortBy=hostName&sortDir=#opSortDir#" title="Click to sort by host name">Host</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />

@@ -5,7 +5,7 @@
 		<cfset variables.PKName = "entryID">
 		<cfset variables.LabelFieldName = "EntryID">
 		
-		<cfset addColumn("dateTime", "cf_sql_timestamp")>
+		<cfset addColumn("mydateTime", "cf_sql_timestamp")>
 		<cfset addColumn("message", "cf_sql_varchar")>
 		<cfset addColumn("applicationID", "cf_sql_numeric")>
 		<cfset addColumn("sourceID", "cf_sql_numeric")>
@@ -22,7 +22,7 @@
 	</cffunction>
 	
 	<cffunction name="save" access="public" returntype="numeric">
-		<cfargument name="dateTime" type="Date" required="true">
+		<cfargument name="mydateTime" type="Date" required="true">
 		<cfargument name="message" type="string" required="true">
 		<cfargument name="applicationID" type="string" required="true">
 		<cfargument name="sourceID" type="numeric" required="true">
@@ -50,8 +50,9 @@
 		
 		<cfreturn rtn>
 	</cffunction>
-	
-	<cffunction name="search" returnType="query" access="public">
+
+	<!--- Thanks to Chuck Weidler for providing the code for the query to work with all supported databases (including access) --->	
+	<cffunction name="search" returntype="query" access="public">
 		<cfargument name="searchTerm" type="string" required="true">
 		<cfargument name="applicationID" type="numeric" required="false" default="0">
 		<cfargument name="hostID" type="numeric" required="false" default="0">
@@ -60,52 +61,98 @@
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
 		<cfargument name="search_cfid" type="string" required="false" default="">
 		<cfargument name="search_cftoken" type="string" required="false" default="">
-
+		
+		<!--- Query modified for Access --->
 		<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
-			SELECT e.entryID, e.message, e.cfid, e.cftoken, e.dateTime, e.exceptionMessage, e.exceptionDetails, 
-					e.templatePath, e.userAgent, a.code as ApplicationCode, h.hostName, s.code AS SeverityCode,
-					src.name AS SourceName, e.applicationID, e.hostID, e.severityID, e.sourceID, e.createdOn,
-					year(e.dateTime) as entry_year, month(e.dateTime) as entry_month, day(e.dateTime) as entry_day,
-					hour(e.dateTime) as entry_hour, minute(e.dateTime) as entry_minute
-				FROM #variables.tableName# e
-					INNER JOIN bl_Application a ON e.applicationID = a.ApplicationID
-					INNER JOIN bl_Host h ON e.hostID = h.hostID
-					INNER JOIN bl_Severity s ON e.severityID = s.severityID
-					INNER JOIN bl_Source src ON e.sourceID = src.SourceID
-				WHERE (1=1)
-					<cfif arguments.searchTerm neq "">
-						AND (
-							message LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%">
-							or
-							exceptionMessage LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%">
-							or
-							exceptionDetails LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%">
+			SELECT e.entryID,
+				   e.message,
+				   e.cfid,
+				   e.cftoken,
+				   e.mydateTime,
+				   e.exceptionMessage,
+				   e.exceptionDetails,
+				   e.templatePath,
+				   e.userAgent,
+				   a.code as ApplicationCode,
+				   h.hostName,
+				   s.code AS SeverityCode,
+				   src.name AS SourceName,
+				   e.applicationID,
+				   e.hostID,
+				   e.severityID,
+				   e.sourceID,
+				   e.createdOn,
+				   0 as entry_year,<!--- This is New Starting Value. --->
+				   0 as entry_month,<!--- This is New Starting Value. --->
+				   0 as entry_day,<!--- This is New Starting Value. --->
+				   0 as entry_hour,<!--- This is New Starting Value. --->
+				   0 as entry_minute<!--- This is New Starting Value. --->
+				   
+			<!--- The From Clause has been redone for use with Access Database. --->
+			FROM bl_Source src INNER JOIN 
+				(
+					bl_Severity s INNER JOIN 
+					(
+						bl_Host h INNER JOIN 
+						(
+							bl_Application a INNER JOIN #variables.tableName# e
+							ON a.ApplicationID = e.ApplicationID
 						)
-					</cfif>
-					<cfif arguments.applicationID gt 0>
-						AND e.applicationID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.applicationID#"> 
-					</cfif>
-					<cfif arguments.hostID gt 0>
-						AND e.hostID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.hostID#"> 
-					</cfif>
-					<cfif arguments.severityID gt 0>
-						AND e.severityID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.severityID#"> 
-					</cfif>
-					<cfif arguments.startDate neq "1/1/1800">
-						AND dateTime >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.startDate#"> 
-					</cfif>
-					<cfif arguments.endDate neq "1/1/3000">
-						AND dateTime <= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.endDate#"> 
-					</cfif>
-					<cfif arguments.search_cfid neq "">
-						AND cfid LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.search_cfid#%"> 
-					</cfif>
-					<cfif arguments.search_cftoken neq "">
-						AND cftoken LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.search_cftoken#%"> 
-					</cfif>
-				ORDER BY createdOn DESC, entryID DESC
-			</cfquery>
+						ON h.HostID = e.HostID
+					)
+					ON s.SeverityID = e.SeverityID
+				)
+				ON src.SourceID = e.SourceID
+			
+			WHERE (1=1)
+			<cfif arguments.searchTerm neq "">
+				AND (
+					message LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%">
+					or
+					exceptionMessage LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%">
+					or
+					exceptionDetails LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%">
+				)
+			</cfif>
+			<cfif arguments.applicationID gt 0>
+				AND e.applicationID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.applicationID#"> 
+			</cfif>
+			<cfif arguments.hostID gt 0>
+				AND e.hostID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.hostID#"> 
+			</cfif>
+			<cfif arguments.severityID gt 0>
+				AND e.severityID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.severityID#"> 
+			</cfif>
+			<cfif arguments.startDate neq "1/1/1800">
+				AND mydateTime >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.startDate#"> 
+			</cfif>
+			<cfif arguments.endDate neq "1/1/3000">
+				AND mydateTime <= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.endDate#"> 
+			</cfif>
+			<cfif arguments.search_cfid neq "">
+				AND cfid LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.search_cfid#%"> 
+			</cfif>
+			<cfif arguments.search_cftoken neq "">
+				AND cftoken LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.search_cftoken#%"> 
+			</cfif>
+		</cfquery>
+		
+		<!--- 
+			This is New.
+			Since not all Databases have the aggregate functions of Hour and Minute,
+			let ColdFusion do the that part.
+		 --->
+		<cfloop query="qry">
+			<cfscript>
+				QuerySetCell(qry, "entry_year", Year(qry.mydateTime), CurrentRow);
+				QuerySetCell(qry, "entry_month", Month(qry.mydateTime), CurrentRow);
+				QuerySetCell(qry, "entry_day", Day(qry.mydateTime), CurrentRow);
+				QuerySetCell(qry, "entry_hour", Hour(qry.mydateTime), CurrentRow);
+				QuerySetCell(qry, "entry_minute", Minute(qry.mydateTime), CurrentRow);
+			</cfscript>
+		</cfloop>
+		
 		<cfreturn qry>
-	</cffunction>	
+	</cffunction>
 	
 </cfcomponent>

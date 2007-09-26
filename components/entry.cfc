@@ -3,7 +3,7 @@
 	<cfscript>
 		variables.oDAO = 0;
 		variables.instance.EntryID = 0;
-		variables.instance.dateTime = now();
+		variables.instance.mydateTime = now();
 		variables.instance.message = "";
 		variables.instance.applicationID = 0;
 		variables.instance.sourceID = 0;
@@ -18,7 +18,7 @@
 		variables.instance.HTMLReport = "";
 		
 		function setEntryID(data) {variables.instance.EntryID = arguments.data;}
-		function setDateTime(data) {variables.instance.dateTime = arguments.data;}
+		function setDateTime(data) {variables.instance.mydateTime = arguments.data;}
 		function setMessage(data) {variables.instance.message = arguments.data;}
 		function setApplicationID(data) {variables.instance.applicationID = arguments.data;}
 		function setSourceID(data) {variables.instance.sourceID = arguments.data;}
@@ -33,7 +33,7 @@
 		function setHTMLReport(data) {variables.instance.HTMLReport = arguments.data;}
 		
 		function getEntryID() {return variables.instance.EntryID;}
-		function getDateTime() {return variables.instance.dateTime;}
+		function getDateTime() {return variables.instance.mydateTime;}
 		function getMessage() {return variables.instance.message;}
 		function getApplicationID() {return variables.instance.applicationID;}
 		function getSourceID() {return variables.instance.sourceID;}

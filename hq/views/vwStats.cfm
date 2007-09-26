@@ -29,7 +29,7 @@
 <cfquery name="qryAppSummary" dbtype="query" maxrows="#maxRows#">
 	SELECT ApplicationCode, COUNT(*) as NumCount
 		FROM qryEntries
-		WHERE dateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
+		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
 		GROUP BY ApplicationCode
 		ORDER BY NumCount DESC
 </cfquery>
@@ -38,7 +38,7 @@
 <cfquery name="qryHostSummary" dbtype="query" maxrows="#maxRows#">
 	SELECT hostName, COUNT(*) as NumCount
 		FROM qryEntries
-		WHERE dateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
+		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
 		GROUP BY hostName
 		ORDER BY NumCount DESC
 </cfquery>
@@ -47,7 +47,7 @@
 <cfquery name="qryMsgSummary" dbtype="query" maxrows="#maxRows#">
 	SELECT message, COUNT(*) as NumCount
 		FROM qryEntries
-		WHERE dateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
+		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
 		GROUP BY message
 		ORDER BY NumCount DESC
 </cfquery>
@@ -57,7 +57,7 @@
 <cfquery name="qryTimeline" dbtype="query">
 	SELECT entry_#datePartName# as DatePartValue, COUNT(*) as NumCount
 		FROM qryEntries
-		WHERE dateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
+		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
 			<cfif applicationID gt 0>
 				AND applicationID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#applicationID#">
 			</cfif>

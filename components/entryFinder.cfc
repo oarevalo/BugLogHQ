@@ -14,7 +14,7 @@
 			if(qry.recordCount gt 0) {
 				o = createObject("component","entry").init();
 				o.setEntryID(qry.entryID);
-				o.setDateTime(qry.dateTime);
+				o.setDateTime(qry.mydateTime);
 				o.setMessage(qry.message);
 				o.setApplicationID(qry.ApplicationID);
 				o.setSourceID(qry.SourceID);
