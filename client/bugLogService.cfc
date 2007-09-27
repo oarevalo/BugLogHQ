@@ -5,6 +5,7 @@
 	<cfset variables.oBugLogListener = 0>
 	<cfset variables.protocol = "">
 	<cfset variables.useListener = true>
+	<cfset variables.defaultSeverityCode = "ERROR">
 	
 	<cfset variables.hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName()>
 	<cfset variables.appName = replace(application.applicationName," ","","all")>
@@ -69,6 +70,7 @@
 		<cfargument name="message" type="string" required="true">
 		<cfargument name="exception" type="any" required="false" default="#structNew()#">
 		<cfargument name="ExtraInfo" type="any" required="false" default="">
+		<cfargument name="severityCode" type="string" required="false" default="#variables.defaultSeverityCode#">
 
 		<cfset var shortMessage = "">
 		<cfset var longMessage = "">
@@ -90,7 +92,7 @@
 						<cfhttpparam type="formfield" name="dateTime" value="#Now()#">
 						<cfhttpparam type="formfield" name="message" value="#arguments.message#">
 						<cfhttpparam type="formfield" name="applicationCode" value="#variables.appName#">
-						<cfhttpparam type="formfield" name="severityCode" value="ERROR">
+						<cfhttpparam type="formfield" name="severityCode" value="#arguments.severityCode#">
 						<cfhttpparam type="formfield" name="hostName" value="#variables.hostName#">
 						<cfhttpparam type="formfield" name="exceptionMessage" value="#arguments.exception.message#">
 						<cfhttpparam type="formfield" name="exceptionDetails" value="#arguments.exception.detail#">
@@ -105,7 +107,7 @@
 					<cfset variables.oBugLogListener.logEntry(Now(), 
 																arguments.message, 
 																variables.appName, 
-																"ERROR",
+																arguments.severityCode,
 																variables.hostName,
 																arguments.exception.message,
 																arguments.exception.detail,
