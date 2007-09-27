@@ -6,8 +6,13 @@
 			hostID = getValue("hostID",0);
 			maxEntries = 15;
 
+			// get data
 			qryEntries = getService("app").searchEntries("", applicationID, hostID);
 
+			// sort data to put newest entries first
+			qryEntries = sortQuery(qryEntries, "mydatetime", "DESC");
+
+			// build rss feed
 			meta = structNew();
 			meta.title = "BugLog";
 			meta.link = "http://#cgi.HTTP_HOST##cgi.script_name#";
@@ -17,7 +22,7 @@
 			for(i=1;i lte min(maxEntries, qryEntries.recordCount);i=i+1) {
 				queryAddRow(data,1);
 				querySetCell(data,"title","Bug ###qryEntries.entryID[i]#: " & qryEntries.message[i]);
-				querySetCell(data,"body",composeMessage(qryEntries.mydateTime[i], qryEntries.applicationCode[i], qryEntries.hostName[i], qryEntries.templatePath[i], qryEntries.exceptionMessage[i], qryEntries.exceptionDetails[i] ));
+				querySetCell(data,"body",composeMessage(qryEntries.mydateTime[i], qryEntries.applicationCode[i], qryEntries.hostName[i], qryEntries.templatePath[i], qryEntries.severityCode[i], qryEntries.exceptionMessage[i], qryEntries.exceptionDetails[i] ));
 				querySetCell(data,"link","http://#cgi.HTTP_HOST##cgi.script_name#?event=ehGeneral.dspEntry&entryID=" & qryEntries.entryID[i]);
 				querySetCell(data,"subject","Subject");
 				querySetCell(data,"date",now());
@@ -36,6 +41,7 @@
 		<cfargument name="applicationCode" type="string" required="true">
 		<cfargument name="hostName" type="string" required="true">
 		<cfargument name="templatePath" type="string" required="true">
+		<cfargument name="severityCode" type="string" required="true">
 		<cfargument name="exceptionMessage" type="string" required="true">
 		<cfargument name="ExceptionDetails" type="string" required="true">
 
@@ -55,6 +61,10 @@
 				<tr>
 					<td><b>Host:</b></td>
 					<td>#arguments.hostname#</td>
+				</tr>
+				<tr>
+					<td><b>Severity:</b></td>
+					<td>#arguments.severityCode#</td>
 				</tr>
 				<tr>
 					<td><b>Template Path:</b></td>
