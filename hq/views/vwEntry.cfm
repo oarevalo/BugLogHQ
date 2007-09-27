@@ -4,6 +4,7 @@
 <cfset oApp = oEntry.getApplication()>
 <cfset oHost = oEntry.getHost()>
 <cfset oSource = oEntry.getSource()>
+<cfset oSeverity = oEntry.getSeverity()>
 
 <script type="text/javascript">
 	function toggle(sec) {
@@ -11,6 +12,8 @@
 		d.style.display = (d.style.display=='block') ? 'none' : 'block';
 	}
 </script>
+
+<cfset tmpSeverity = oSeverity.getCode()>
 
 <cfoutput>
 <h2>Bug ###oEntry.getEntryID()# : <span style="color:##cc0000;">#oEntry.getMessage()#</span></h2>
@@ -25,6 +28,15 @@
 				<img width="16" height="16" src="images/icons/email.png" align="absmiddle" />
 				<a href="##" onclick="toggle('dSendForm')">Send to email</a>
 			</td>
+			<cfif tmpSeverity neq "">
+				<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
+					<img src="images/icons/#lcase(tmpSeverity)#.png" 
+							align="bottom"
+							alt="#lcase(tmpSeverity)#" 
+							title="#lcase(tmpSeverity)#">
+					#tmpSeverity#		
+				</td>
+			</cfif>
 			<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
 				<a href="index.cfm?event=ehGeneral.dspMain&applicationID=#oApp.getApplicationID()#">#oApp.getCode()#</a>
 			</td>
@@ -57,6 +69,10 @@
 	<tr>
 		<td><b>Date/Time:</b></td>
 		<td>#lsDateFormat(oEntry.getDateTime())# - #lsTimeFormat(oEntry.getDateTime())#</td>
+	</tr>
+	<tr>
+		<td><b>Severity:</b></td>
+		<td>#tmpSeverity#</td>
 	</tr>
 	<tr>
 		<td><b>User Agent:</b></td>

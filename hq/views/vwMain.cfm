@@ -38,7 +38,7 @@
 			<cfif groupByHost>
 				HostName, HostID, 
 			</cfif>
-			Message, COUNT(*) AS bugCount, MAX(createdOn) as createdOn, MAX(entryID) AS EntryID
+			Message, COUNT(*) AS bugCount, MAX(createdOn) as createdOn, MAX(entryID) AS EntryID, MAX(severityCode) AS SeverityCode
 		FROM qryEntries
 		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
 		GROUP BY 
@@ -193,6 +193,7 @@
 	</div>
 	<table class="browseTable" style="width:100%">	
 		<tr>
+			<th width="15" nowrap>&nbsp;</th>
 			<th width="120">
 				<input type="checkbox" name="groupByApp" id="groupByApp" value="1" <cfif groupByApp>checked</cfif> onclick="doSearch()" title="Breakdown bugs by application name">
 				<cfif sortBy eq "applicationCode">
@@ -252,10 +253,19 @@
 		</cfif>
 		
 		<tr <cfif qryEntries.currentRow mod 2>class="altRow"</cfif> <cfif isNew>style="font-weight:bold;"</cfif>>
+			<td width="15" align="center" style="padding:0px;">
+				<cfif qryEntries.SeverityCode neq "">
+					<img src="images/icons/#lcase(qryEntries.SeverityCode)#.png" 
+							align="absmiddle"
+							alt="#lcase(qryEntries.SeverityCode)#" 
+							title="#lcase(qryEntries.SeverityCode)#">
+				</cfif>
+			</td>
 			<td width="120">
 				<cfif groupByApp>
-					<a href="index.cfm?event=ehGeneral.dspMain&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a></td>
+					<a href="index.cfm?event=ehGeneral.dspMain&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a>
 				</cfif>
+			</td>	
 			<td width="120">
 				<cfif groupByHost>
 					<a href="index.cfm?event=ehGeneral.dspMain&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a>

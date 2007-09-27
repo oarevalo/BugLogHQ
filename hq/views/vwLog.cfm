@@ -128,6 +128,7 @@
 	</div>
 	<table class="browseTable" style="width:100%">	
 		<tr>
+			<th width="15" nowrap>&nbsp;</th>
 			<th width="20" nowrap>
 				<cfif sortBy eq "entryID">
 					<a href="#pageURL#&sortBy=entryID&sortDir=#opSortDir#" title="Click to sort by bug ##">##</a>
@@ -173,6 +174,14 @@
 	<cfloop query="qryEntries" startrow="#startRow#" endrow="#startRow+rowsPerPage-1#">
 		<cfset isNew = qryEntries.entryID gt lastbugread>
 		<tr <cfif qryEntries.currentRow mod 2>class="altRow"</cfif> <cfif isNew>style="font-weight:bold;"</cfif>>
+			<td width="15" align="center" style="padding:0px;">
+				<cfif qryEntries.SeverityCode neq "">
+					<img src="images/icons/#lcase(qryEntries.SeverityCode)#.png" 
+							align="absmiddle"
+							alt="#lcase(qryEntries.SeverityCode)#" 
+							title="#lcase(qryEntries.SeverityCode)#">
+				</cfif>
+			</td>
 			<td width="15">
 				<a href="?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#qryEntries.entryID#</a>
 			</td>
