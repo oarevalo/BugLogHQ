@@ -6,6 +6,7 @@
 
 <cfparam name="protocol" default="soap">
 <cfparam name="pathToService" default="bugLog.client.bugLogService">
+<cfparam name="severity" default="FATAL">
 <cfparam name="reset" default="false">
 
 <cfif not IsDefined("application.oBugLogService")>
@@ -21,7 +22,7 @@
 	<cfthrow message="Test message via #protocol#">	
 	
 	<cfcatch type="any">
-		<cfset application.oBugLogService.notifyService(cfcatch.message, cfcatch)>
+		<cfset application.oBugLogService.notifyService(cfcatch.message, cfcatch, "", severity)>
 	</cfcatch>
 </cftry>
 
