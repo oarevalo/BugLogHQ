@@ -1,52 +1,56 @@
 <cfcomponent>
 	
 	<cfscript>
-		variables.dateTime = now();
-		variables.message = "";
-		variables.applicationCode = "";
-		variables.sourceID = 0;
-		variables.severityCode = "";
-		variables.hostName = "";
-		variables.exceptionMessage = "";
-		variables.exceptionDetails = "";
-		variables.CFID = "";
-		variables.CFTOKEN = "";
-		variables.userAgent = "";
-		variables.templatePath = "";
-		variables.HTMLReport = "";
+		variables.instance = structNew();
+		variables.instance.dateTime = now();
+		variables.instance.message = "";
+		variables.instance.applicationCode = "";
+		variables.instance.sourceID = 0;
+		variables.instance.severityCode = "";
+		variables.instance.hostName = "";
+		variables.instance.exceptionMessage = "";
+		variables.instance.exceptionDetails = "";
+		variables.instance.CFID = "";
+		variables.instance.CFTOKEN = "";
+		variables.instance.userAgent = "";
+		variables.instance.templatePath = "";
+		variables.instance.HTMLReport = "";
 		
-		function setDateTime(data) {variables.dateTime = arguments.data;}
-		function setMessage(data) {variables.message = arguments.data;}
-		function setApplicationCode(data) {variables.applicationCode = arguments.data;}
-		function setSourceID(data) {variables.sourceID = arguments.data;}
-		function setSeverityCode(data) {variables.severityCode = arguments.data;}
-		function setHostName(data) {variables.hostName = arguments.data;}
-		function setExceptionMessage(data) {variables.exceptionMessage = arguments.data;}
-		function setExceptionDetails(data) {variables.exceptionDetails = arguments.data;}
-		function setCFID(data) {variables.CFID = arguments.data;}
-		function setCFTOKEN(data) {variables.CFTOKEN = arguments.data;}
-		function setUserAgent(data) {variables.userAgent = arguments.data;}
-		function setTemplatePath(data) {variables.templatePath = arguments.data;}
-		function setHTMLReport(data) {variables.HTMLReport = arguments.data;}
+		function setDateTime(data) {variables.instance.dateTime = arguments.data;}
+		function setMessage(data) {variables.instance.message = arguments.data;}
+		function setApplicationCode(data) {variables.instance.applicationCode = arguments.data;}
+		function setSourceID(data) {variables.instance.sourceID = arguments.data;}
+		function setSeverityCode(data) {variables.instance.severityCode = arguments.data;}
+		function setHostName(data) {variables.instance.hostName = arguments.data;}
+		function setExceptionMessage(data) {variables.instance.exceptionMessage = arguments.data;}
+		function setExceptionDetails(data) {variables.instance.exceptionDetails = arguments.data;}
+		function setCFID(data) {variables.instance.CFID = arguments.data;}
+		function setCFTOKEN(data) {variables.instance.CFTOKEN = arguments.data;}
+		function setUserAgent(data) {variables.instance.userAgent = arguments.data;}
+		function setTemplatePath(data) {variables.instance.templatePath = arguments.data;}
+		function setHTMLReport(data) {variables.instance.HTMLReport = arguments.data;}
 		
-		function getDateTime() {return variables.dateTime;}
-		function getMessage() {return variables.message;}
-		function getApplicationCode() {return variables.applicationCode;}
-		function getSourceID() {return variables.sourceID;}
-		function getSeverityCode() {return variables.severityCode;}
-		function getHostName() {return variables.hostName;}
-		function getExceptionMessage() {return variables.exceptionMessage;}
-		function getExceptionDetails() {return variables.exceptionDetails;}
-		function getCFID() {return variables.CFID;}
-		function getCFTOKEN() {return variables.CFTOKEN;}
-		function getUserAgent() {return variables.userAgent;}
-		function getTemplate_Path() {return variables.templatePath;}
-		function getHTMLReport() {return variables.HTMLReport;}
+		function getDateTime() {return variables.instance.dateTime;}
+		function getMessage() {return variables.instance.message;}
+		function getApplicationCode() {return variables.instance.applicationCode;}
+		function getSourceID() {return variables.instance.sourceID;}
+		function getSeverityCode() {return variables.instance.severityCode;}
+		function getHostName() {return variables.instance.hostName;}
+		function getExceptionMessage() {return variables.instance.exceptionMessage;}
+		function getExceptionDetails() {return variables.instance.exceptionDetails;}
+		function getCFID() {return variables.instance.CFID;}
+		function getCFTOKEN() {return variables.instance.CFTOKEN;}
+		function getUserAgent() {return variables.instance.userAgent;}
+		function getTemplate_Path() {return variables.instance.templatePath;}
+		function getHTMLReport() {return variables.instance.HTMLReport;}
 	</cfscript>
 	
 	<cffunction name="init" access="public" returnType="rawEntryBean">
 		<cfreturn this>
 	</cffunction>
 
+	<cffunction name="getMemento" access="public" returntype="struct">
+		<cfreturn variables.instance>
+	</cffunction>
 
 </cfcomponent>

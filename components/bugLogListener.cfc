@@ -5,10 +5,18 @@
 	<cffunction name="init" access="public" returntype="bugLogListener">
 	
 		<cfscript>
+			var testRule = 0;
+			
 			// load the finder objects
 			variables.oAppFinder = createObject("component","appFinder").init();
 			variables.oHostFinder = createObject("component","hostFinder").init();
 			variables.oSeverityFinder = createObject("component","severityFinder").init();
+			
+			// load the rule processor
+			variables.oRuleProcessor = createObject("component","ruleProcessor").init();
+			
+			// load rules
+			loadRules();
 			
 			// record the date at which the service started 
 			variables.startedOn = Now();
@@ -80,11 +88,38 @@
 		
 			oEntry.save();
 		
+		
+			// process rules
+			variables.oRuleProcessor.processRules(bean);
+		
 		</cfscript>
 	</cffunction>
 
 	<cffunction name="getStartedOn" access="public" returntype="date">
 		<cfreturn variables.startedOn>
+	</cffunction>
+
+	<cffunction name="loadRules" access="private" returntype="void" hint="this method loads the rules into the rule processor">
+		<cfscript>
+			var oRule = 0;
+			var oExtensionsService = 0;
+			var aRules = arrayNew(1);
+			var i = 0;
+			
+			// get the rule definitions from the extensions service
+			oExtensionsService = createObject("component","extensionsService").init();
+			aRules = oExtensionsService.getRules();
+			
+			// create rule objects and load them into the rule processor
+			for(i=1; i lte arrayLen(aRules);i=i+1) {
+
+				oRule = createObject("component", aRules[i].component ).init( argumentCollection = aRules[i].config );
+
+				// add rule to processor
+				variables.oRuleProcessor.addRule(oRule);
+			}
+			
+		</cfscript>
 	</cffunction>
 
 </cfcomponent>
