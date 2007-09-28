@@ -30,7 +30,7 @@
 			</td>
 			<cfif tmpSeverity neq "">
 				<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
-					<img src="images/icons/#lcase(tmpSeverity)#.png" 
+					<img src="images/severity/#lcase(tmpSeverity)#.png" 
 							align="bottom"
 							alt="#lcase(tmpSeverity)#" 
 							title="#lcase(tmpSeverity)#">

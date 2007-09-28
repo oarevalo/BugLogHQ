@@ -176,7 +176,7 @@
 		<tr <cfif qryEntries.currentRow mod 2>class="altRow"</cfif> <cfif isNew>style="font-weight:bold;"</cfif>>
 			<td width="15" align="center" style="padding:0px;">
 				<cfif qryEntries.SeverityCode neq "">
-					<img src="images/icons/#lcase(qryEntries.SeverityCode)#.png" 
+					<img src="images/severity/#lcase(qryEntries.SeverityCode)#.png" 
 							align="absmiddle"
 							alt="#lcase(qryEntries.SeverityCode)#" 
 							title="#lcase(qryEntries.SeverityCode)#">
