@@ -48,7 +48,7 @@
 			on the last #variables.config.timespan# minutes.
 			<br><br><br>
 			** This email has been sent from the BugLog server at 
-			<a href="http://#cgi.HTTP_HOST##cgi.script_name#">http://#cgi.HTTP_HOST##cgi.script_name#</a>
+			<a href="http://#cgi.HTTP_HOST#/bugLog/hq">http://#cgi.HTTP_HOST#/bugLog/hq</a>
 		</cfmail>
 		<cfset variables.lastEmailTimestamp = now()>
 	</cffunction>
