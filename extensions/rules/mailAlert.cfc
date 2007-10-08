@@ -1,6 +1,12 @@
 <cfcomponent extends="bugLog.components.baseRule" 
 			hint="This rule sends an email everytime a bug matching a given set of conditions is received">
 
+	<cfproperty name="senderEmail" type="string" hint="An email address to use as sender of the email notifications">
+	<cfproperty name="recipientEmail" type="string" hint="The email address to which to send the notifications">
+	<cfproperty name="severityCode" type="string" hint="The severity code (fatal,critical,error,etc) that will trigger the rule. Leave empty to look for all severity codes">
+	<cfproperty name="application" type="string" hint="The application name that will trigger the rule. Leave empty to look for all applications">
+	<cfproperty name="keywords" type="string" hint="A list of keywords that will trigger the rule. The keywords are searched within the bug message text">
+
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="senderEmail" type="string" required="true">
 		<cfargument name="recipientEmail" type="string" required="true">

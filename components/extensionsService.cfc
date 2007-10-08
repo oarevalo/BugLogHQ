@@ -6,12 +6,11 @@
 	<!--- this is the path to the extensions components --->
 	<cfset variables.extensionsPath = "bugLog.extensions.">
 	
-	
 	<cffunction name="init" access="public" returnType="extensionsService">
 		
 		<cfscript>
 			// load the config doc			
-			xmlDoc = expandPath(variables.configDocHREF);
+			xmlDoc = xmlParse(expandPath(variables.configDocHREF));
 	
 			// read and parse the different types of extensions
 			variables.aRules = parseRules(xmlDoc);
@@ -60,4 +59,56 @@
 		</cfscript>		
 	</cffunction>
 
+	<cffunction name="removeRule" access="public" returntype="void" hint="removes a rule from the active rules">
+		<cfargument name="index" type="string" required="true">
+		
+		<cfscript>
+			// load the config doc			
+			var xmlDoc = xmlParse(expandPath(variables.configDocHREF));
+		
+			arrayDeleteAt(xmlDoc.xmlRoot.rules.xmlChildren,arguments.index);
+		</cfscript>
+		<cffile action="write" file="#expandPath(variables.configDocHREF)#" output="#toString(xmlDoc)#">
+	</cffunction>
+	
+	<cffunction name="updateRule" access="public" returntype="void" hint="updates the settings of a rule">
+		<cfargument name="index" type="string" required="true">
+		<cfargument name="properties" type="struct" required="true">
+		<cfscript>
+			// load the config doc			
+			var xmlDoc = xmlParse(expandPath(variables.configDocHREF));
+			var xmlNode = xmlDoc.xmlRoot.rules.xmlChildren[arguments.index];
+	
+			arrayClear(xmlNode.xmlChildren);
+			
+			for(prop in arguments.properties) {
+				xmlNewNode = xmlElemNew(xmlDoc,prop);
+				xmlNewNode.xmlText = arguments.properties[prop];
+				arrayAppend(xmlNode.xmlChildren, xmlNewNode);
+			}			
+		</cfscript>
+		<cffile action="write" file="#expandPath(variables.configDocHREF)#" output="#toString(xmlDoc)#">
+	</cffunction>
+
+	<cffunction name="createRule" access="public" returntype="void" hint="creates a new rule">
+		<cfargument name="ruleName" type="string" required="true">
+		<cfargument name="properties" type="struct" required="true">
+		<cfscript>
+			// load the config doc			
+			var xmlDoc = xmlParse(expandPath(variables.configDocHREF));
+
+			var xmlNode = xmlElemNew(xmlDoc,"rule");
+			xmlNode.xmlAttributes["name"] = arguments.ruleName;
+			
+			for(prop in arguments.properties) {
+				xmlNewNode = xmlElemNew(xmlDoc,prop);
+				xmlNewNode.xmlText = arguments.properties[prop];
+				arrayAppend(xmlNode.xmlChildren, xmlNewNode);
+			}			
+			
+			arrayAppend(xmlDoc.xmlRoot.rules.xmlChildren, xmlNode);
+		</cfscript>
+		<cffile action="write" file="#expandPath(variables.configDocHREF)#" output="#toString(xmlDoc)#">
+	</cffunction>
+	
 </cfcomponent>

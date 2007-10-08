@@ -3,6 +3,7 @@
 	<cfset variables.path = "">
 	<cfset variables.cfcPath = "">
 	<cfset variables.OSPathSeparator = createObject("java","java.lang.System").getProperty("file.separator")>
+	<cfset variables.extensionsPath = "bugLog.extensions.">
 
 	<cffunction name="init" access="public" returntype="appService">
 		<cfargument name="path" type="string" required="true">
@@ -219,6 +220,74 @@
 			return true;
 		</cfscript>		
 	</cffunction>
+
+
+	<!----- Extensions ----->	
+	<cffunction name="getRules" access="public" returnType="array" hint="Returns all rules that are available">
+		<cfset var tmpRulesPath = "/bugLog/extensions/rules">
+		<cfset var aRtn = arrayNew(1)>
+		<cfset var st = structNew()>
+		
+		<cfdirectory action="list" directory="#expandPath(tmpRulesPath)#" name="qryDir" listinfo="name">
+
+		<cfloop query="qryDir">
+			<cfset st = getCFCInfo(variables.extensionsPath & "rules." & listFirst(qryDir.name,".") )>
+			<cfset arrayAppend(aRtn, st)>
+		</cfloop>
+
+		<cfreturn aRtn>
+	</cffunction>
+	
+	<cffunction name="getActiveRules" access="public" returnType="array" hint="Returns all rules that are active">
+		<cfscript>
+			// create the extensions service
+			var oExtensionsService = createModelObject("components.extensionsService").init();
+			return oExtensionsService.getRules();
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="getRuleInfo" access="public" returnType="struct" hint="Returns information about a given rule">
+		<cfargument name="ruleName" type="string" required="true">
+		<cfreturn getCFCInfo(variables.extensionsPath & "rules." & arguments.ruleName )>
+	</cffunction>
+
+	<cffunction name="saveRule" access="public" returntype="void" hint="adds or updates a rule">
+		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfargument name="ruleName" type="string" required="true">
+		<!--- rule settings are passed as individual arguments --->
+		
+		<cfscript>
+			var stRule = 0; var oExtensionsService = 0;
+			var stProperties = 0; var i=0; var prop = "";
+			
+			// get rule info
+			stRule = getCFCInfo(variables.extensionsPath & "rules." & arguments.ruleName);
+			oExtensionsService = createModelObject("components.extensionsService").init();
+			
+			stProperties = structNew();
+			for(i=1;i lte arrayLen(stRule.properties);i=i+1) {
+				prop = stRule.properties[i].name;
+				if(structKeyExists(arguments,prop))
+					stProperties[prop] = arguments[prop];
+			}
+			
+			if(arguments.index gt 0) 
+				oExtensionsService.updateRule(arguments.index, stProperties);
+			 else 
+				oExtensionsService.createRule(arguments.ruleName, stProperties);
+		</cfscript>
+		
+	</cffunction>
+
+	<cffunction name="deleteRule" access="public" returntype="void" hint="delete a rule">
+		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfscript>
+			var oExtensionsService = createModelObject("components.extensionsService").init();
+			oExtensionsService.removeRule(arguments.index);
+		</cfscript>		
+	</cffunction>
+
+
 	
 	<!----- Private Methods ---->
 	<cffunction name="createModelObject" access="private" returntype="any">
@@ -226,5 +295,25 @@
 		<cfreturn createObject("component", variables.cfcPath & "." & arguments.cfc)>
 	</cffunction>
 	
+	<cffunction name="getCFCInfo" access="private" returntype="struct" hint="returns information about a given cfc">
+		<cfargument name="cfcPath" type="string" required="true">
+		<cfscript>
+			var stMD = structNew();
+			var st = structNew();
+			var o = 0;
+			
+			st.description = "";
+			st.properties = arrayNew(1);
+	
+			o = createObject("component",arguments.cfcPath);
+			stMD = getMetaData(o);
+			
+			st.name = stMD.name;
+			if(structKeyExists(stMD,"hint")) st.description = stMD.hint;
+			if(structKeyExists(stMD,"properties")) st.properties = duplicate(stMD.properties);
+
+			return st;
+		</cfscript>
+	</cffunction>
 
 </cfcomponent>

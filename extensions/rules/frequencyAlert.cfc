@@ -1,5 +1,10 @@
 <cfcomponent extends="bugLog.components.baseRule" 
 			hint="This rule checks the amount of messages received on a given timespan and if the number of bugs received is greater than a given threshold, send an email alert">
+	
+	<cfproperty name="senderEmail" type="string" hint="An email address to use as sender of the email notifications">
+	<cfproperty name="recipientEmail" type="string" hint="The email address to which to send the notifications">
+	<cfproperty name="count" type="numeric" hint="The number of bugreports that will trigger the rule">
+	<cfproperty name="timespan" type="numeric" hint="The number in minutes for which to count the amount of bug reports received">
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="senderEmail" type="string" required="true">
@@ -19,7 +24,7 @@
 		
 		<cfscript>
 			// only evaluate this rule if the amount of timespan minutes has passed after the last email was sent
-			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.count ) {
+			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan ) {
 			
 				oEntryFinder = createObject("component","bugLog.components.entryFinder").init();
 	

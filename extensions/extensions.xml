@@ -2,20 +2,14 @@
 <bugLogExtensions>
 	
 	<rules>
-		<!--
-		<rule name="mailRelay">
-			<senderEmail>info@sandals.com</senderEmail>
-			<recipientEmail>oarevalo@sandals.com</recipientEmail>
-		</rule>
-		-->
 		
 		<rule name="mailAlert">
 			<!-- sender/recipient of email -->
-			<senderEmail>info@sandals.com</senderEmail>
-			<recipientEmail>oarevalo@sandals.com</recipientEmail>
+			<senderEmail>buglog@xyz.com</senderEmail>
+			<recipientEmail>someone@xyz.com</recipientEmail>
 
 			<!-- severity code to trigger the alert, leave empty for any severity code -->
-			<severityCode>fatal</severityCode>
+			<severityCode>FATAL</severityCode>
 			
 			<!-- application to trigger the alert, leave empty for any application -->
 			<application></application>
@@ -26,8 +20,8 @@
 
 		<rule name="frequencyAlert">
 			<!-- sender/recipient of email -->
-			<senderEmail>info@sandals.com</senderEmail>
-			<recipientEmail>oarevalo@sandals.com</recipientEmail>
+			<senderEmail>buglog@xyz.com</senderEmail>
+			<recipientEmail>someone@xyz.com</recipientEmail>
 
 			<!-- number of bugs that will trigger the rule -->
 			<count>5</count>

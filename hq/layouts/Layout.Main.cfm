@@ -24,6 +24,7 @@
 						</tr>
 					</table>
 				</div>
+				<cfinclude template="../includes/footer.cfm">
 			</div>
 		</body>
 	</html>
