@@ -1,5 +1,5 @@
 /**************************************************************/	
-/* BugLogHQ  (v1.1)										  */
+/* BugLogHQ  (v1.2 beta)										  */
 /* http://buglogHQ.riaforge.org
 /**************************************************************/	
 
@@ -29,6 +29,17 @@ graph, forward, and explore the bug reports submitted by the applications.
 All bug reports received by BugLogHQ are stored on a normalized database, thus 
 providing the option to the developers to further extend the application
 to leverage this information.
+
+
+New in 1.2
+-----------------------------------------------------------------------
+* Support for a configurable and extensible rules system. Rules are processes that are applied
+to each bug report as it is received. Rules can be defined for tasks such as sending notifications
+when a bug of given conditions is received; when the amount of bugs received in 
+a given timeframe is greater than a defined threshold, etc. The rules system is
+extensible in the sense that each rule is implemented as a CFC with a common interface.
+For more info on rules see:
+http://www.oscararevalo.com/index.cfm/2007/10/2/BugLogHQ-New-Rules-feature
 
 
 
