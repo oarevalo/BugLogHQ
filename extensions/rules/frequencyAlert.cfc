@@ -46,6 +46,9 @@
 				subject="BugLog: bug frequency alert!!" type="text/html">
 			BugLog has received more than #variables.config.count# bug reports 
 			on the last #variables.config.timespan# minutes.
+			<br><br><br>
+			** This email has been sent from the BugLog server at 
+			<a href="http://#cgi.HTTP_HOST##cgi.script_name#">http://#cgi.HTTP_HOST##cgi.script_name#</a>
 		</cfmail>
 		<cfset variables.lastEmailTimestamp = now()>
 	</cffunction>

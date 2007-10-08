@@ -15,11 +15,10 @@
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		
-		<cfmail from="#variables.config.senderEmail#" to="#variables.config.recipientEmail#"
-				subject="BugLog: bug received" type="text/html">
-			The following bug has just been received:<br><br>
-			<cfdump var="#arguments.rawEntry.getMemento()#">
-		</cfmail>
+		<cfset sendToEmail(rawEntryBean = arguments.rawEntry, 
+							sender = variables.config.senderEmail,
+							recipient = variables.config.recipientEmail,
+							subject = "BugLog: #arguments.rawEntry.getMessage()#")>
 		
 		<cfreturn true>
 	</cffunction>

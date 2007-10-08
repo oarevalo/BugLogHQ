@@ -52,11 +52,12 @@
 
 	<cffunction name="sendEmail" access="private" returntype="void">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
-		<cfmail from="#variables.config.senderEmail#" to="#variables.config.recipientEmail#"
-				subject="BugLog: bug received" type="text/html">
-			<cfdump var="#arguments.rawEntry.getMemento()#" label="Bug Info">
-			<cfdump var="#variables.config#" label="Rule Criteria">
-		</cfmail>
+		
+		<cfset sendToEmail(rawEntryBean = arguments.rawEntry, 
+							sender = variables.config.senderEmail,
+							recipient = variables.config.recipientEmail,
+							subject = "BugLog: #arguments.rawEntry.getMessage()#",
+							comment = "This message has been sent because the following bug report matched the given criteria. To review or modify the criteria please log into the bugLog server and go into the Rules section.")>
 	</cffunction>
 
 
