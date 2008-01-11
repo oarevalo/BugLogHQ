@@ -1,5 +1,5 @@
 /**************************************************************/	
-/* BugLogHQ  (v1.2 beta)										  */
+/* BugLogHQ  (v1.3)										  */
 /* http://buglogHQ.riaforge.org
 /**************************************************************/	
 
@@ -20,7 +20,22 @@
 
 */ 
 
-About BugLogHQ
+-----------------------------------------------------------------------
+Contents:
+-----------------------------------------------------------------------
+1. About BugLogHQ
+2. Release Notes
+3. Integrating BugLogHQ into your Applications
+4. BugLogHQ Interface
+5. Installation and Usage Notes:
+6. Supported Databases
+7. Acknowledgements / Thanks / Credits
+8. Bugs, suggestions
+
+
+
+-----------------------------------------------------------------------
+1. About BugLogHQ
 -----------------------------------------------------------------------
 BugLogHQ is a tool to centralize the handling of automated bug reports from 
 multiple applications. BugLogHQ provides a unified view of error messages
@@ -31,7 +46,36 @@ providing the option to the developers to further extend the application
 to leverage this information.
 
 
-New in 1.2
+
+-----------------------------------------------------------------------
+2. Release Notes
+-----------------------------------------------------------------------
+ > New in 1.3
+-----------------------------------------------------------------------
+* This is a release of mostly internal changes. The entire data access layer
+has been refactored to use an improved mechanism that makes it easier to work
+with different backend data storages.
+See: 
+http://www.oscararevalo.com/index.cfm/2007/11/28/Using-Polymorphism-and-Inheritance-to-Build-a-Switchable-Data-Access-Layer
+* The BugLogHQ application (where you go to see the bug reports) has also been updated 
+to improve performance and use the new DAO layer.
+* Configuration of data storage is now done via a config xml on the /buglog/config directory.
+The file is dao-config.xml.cfm. Here is where you can set the DSN, user, password and
+dbtype. From here, you can also change the storage mechanism from a database to simple XML files
+(maybe for a quick test drive)
+* Fixed bug that would throw errors if the email addresses for top-level error reporting were
+not defined.
+* Added a directory /bugLog/tests that contains files to test both the client and server side of buglog,
+and also can be used as a refence as to how to implement the client side of bugLog.
+* BugLogListener now uses memory caching to improve performance and process bug reports faster
+* Fixed sql scripts for MSSQL, all tables should now be configured with primary keys defined as numeric identity values
+* bl_source table no longer needs to be populated with pre-defined values. The listener will insert these as needed.
+* Added bugLogProxy.cfm for integration with BugLogMini ( http://buglogmini.riaforge.org/ )
+
+
+
+-----------------------------------------------------------------------
+ > New in 1.2
 -----------------------------------------------------------------------
 * Support for a configurable and extensible rules system. Rules are processes that are applied
 to each bug report as it is received. Rules can be defined for tasks such as sending notifications
@@ -43,7 +87,8 @@ http://www.oscararevalo.com/index.cfm/2007/10/2/BugLogHQ-New-Rules-feature
 
 
 
-Integrating BugLogHQ into your Applications
+-----------------------------------------------------------------------
+3. Integrating BugLogHQ into your Applications
 -----------------------------------------------------------------------
 Applications can send bug reports to BugLogHQ via three different ways:
 * webservice call
@@ -74,9 +119,12 @@ The bugLogListener parameter can be any of:
 If an error occurs while submitting the report to the listener, then bugLogService will automatically
 send the same information as an email to the addresses provided in the Init() method.
 
+TIP: Check the file /bugLog/test/client.cfm for an example of how to use the bugLog client CFC
 
 
-BugLogHQ Interface
+
+-----------------------------------------------------------------------
+4. BugLogHQ Interface
 -----------------------------------------------------------------------
 To access the BugLogHQ interface, go to /bugLog/ on your bugLog server; the interface is
 password protected. The default username and password is: admin / admin.
@@ -86,7 +134,8 @@ data in different ways.
 
 
 
-Installation and Usage Notes:
+-----------------------------------------------------------------------
+5. Installation and Usage Notes:
 --------------------------------------------------------------------------------------
 * To install BugLog just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be
 installed on a directory or mapping named /bugLog.
@@ -95,8 +144,14 @@ installed on a directory or mapping named /bugLog.
 will create the necessary tables.
 
 * By default bugLogHQ uses a datasource named "bugLog" with no password, to change this go to:
-		/bugLog/components/db/DAOFactory.cfc (lines 3-5)
-
+		/bugLog/config/dao-config.xml.cfm
+	Change the appropriate <property /> tags.
+	
+	NOTE: You can test drive bugLog without setting up a database by setting the <dataProviderType /> tag value
+		to "xml" and uncommenting the <dataRoot /> tag (this tag points to a directory where the data files will
+		be stored). BugLog can work normally with XML files, but this is not scalable and who know what may 
+		happen if the XML files get too big!!
+	
 * To access the bugLogHQ interface, go to /bugLog. The default username/password is:
 		username: admin
 		password: admin
@@ -105,25 +160,36 @@ will create the necessary tables.
 * You may also want to setup proper email addresses for sending bug reports when things do not work as they should: 
 		/bugLog/hq/Application.cfc (lines 13-14)
 		/bugLog/hq/config/config.xml (lines 5-6)
+	(this step is optional)
+
+* After installation use your browser to go to /bugLog/test and follow the links to test both the client 
+	and server side of buglog.
 
 
-Supported Databases:
+
+-----------------------------------------------------------------------
+6. Supported Databases:
 --------------------------------------------------------------------------------------
 Currently BugLogHQ supports the following databases:
 * MySQL
 * Microsoft SQL Server 2000
 * Microsoft SQL Server 2005
 * Microsoft Access
+* XML files
 
 
-Acknowledgements / Thanks / Credits
+-----------------------------------------------------------------------
+7. Acknowledgements / Thanks / Credits
 ---------------------------------------------------------------------------
 * BugLogHQ uses rss.cfc by Raymond Camden (http://cfrss.riaforge.org/)
 * Lots of icons from the "Silk" icon set by Mark James (http://www.famfamfam.com/)
 * Thanks to Tom DeManincor for creating the SQL script for MSSQL
 * Thanks to Chuck Weidler for updating and providing the SQL scripts for Access, MS SQL Server 2000, MSSQL Server 2005
 
-Bugs, suggestions, criticisms, well-wishes, good vibrations, etc
+
+
+-----------------------------------------------------------------------
+8. Bugs, suggestions, criticisms, well-wishes, good vibrations, etc
 ---------------------------------------------------------------------------
 Please send to oarevalo@gmail.com or share them on the forum at http://bugloghq.riaforge.org/
 

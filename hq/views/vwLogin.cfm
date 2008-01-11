@@ -1,4 +1,7 @@
+<cfparam name="request.requestState.versionTag" default="">
 <cfparam name="username" default="">
+
+<cfset versionTag = request.requestState.versionTag>
 
 <link href="includes/style.css" rel="stylesheet" type="text/css">
 <style type="text/css">
@@ -18,6 +21,7 @@
 			<tr>
 				<td rowspan="5" style="border-right:1px solid ##ccc;width:150px;" valign="middle" align="center">
 					<span style="color:red;text-decoration:none;font-size:20px;">BugLog<span style="color:black;">HQ</span></span>
+					<div style="margin-top:5px;text-align:center;font-size:9px;">#versionTag#</div>
 				</td>
 				<td colspan="2">&nbsp;</td>
 			</tr>

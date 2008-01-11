@@ -1,9 +1,4 @@
-<cfcomponent>
-	
-	<cffunction name="init" returntype="appFinder" access="public">
-		<cfset variables.oDAO = createObject("component","bugLog.components.db.DAOFactory").getDAO("application")>
-		<cfreturn this>
-	</cffunction>
+<cfcomponent extends="finder">
 	
 	<cffunction name="findByID" returnType="app" access="public">
 		<cfargument name="id" type="numeric" required="true">
@@ -12,7 +7,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","app").init();
+				o = createObject("component","app").init( variables.oDAO );
 				o.setApplicationID(qry.applicationID);
 				o.setName(qry.name);
 				o.setCode(qry.code);
@@ -30,7 +25,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","app").init();
+				o = createObject("component","app").init( variables.oDAO );
 				o.setApplicationID(qry.applicationID);
 				o.setName(qry.name);
 				o.setCode(qry.code);
@@ -41,10 +36,4 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="throw" access="private" returntype="void">
-		<cfargument name="message" type="string" required="true">
-		<cfargument name="type" type="string" required="true">
-		<cfthrow message="#arguments.message#" type="#arguments.type#">
-	</cffunction>
-	
 </cfcomponent>

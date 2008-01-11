@@ -15,6 +15,7 @@
 		variables.instance.userAgent = "";
 		variables.instance.templatePath = "";
 		variables.instance.HTMLReport = "";
+		variables.instance.sourceName = "";
 		
 		function setDateTime(data) {variables.instance.dateTime = arguments.data;}
 		function setMessage(data) {variables.instance.message = arguments.data;}
@@ -29,6 +30,7 @@
 		function setUserAgent(data) {variables.instance.userAgent = arguments.data;}
 		function setTemplatePath(data) {variables.instance.templatePath = arguments.data;}
 		function setHTMLReport(data) {variables.instance.HTMLReport = arguments.data;}
+		function setSourceName(data) {variables.instance.sourceName = arguments.data;}
 		
 		function getDateTime() {return variables.instance.dateTime;}
 		function getMessage() {return variables.instance.message;}
@@ -43,6 +45,7 @@
 		function getUserAgent() {return variables.instance.userAgent;}
 		function getTemplate_Path() {return variables.instance.templatePath;}
 		function getHTMLReport() {return variables.instance.HTMLReport;}
+		function getSourceName() {return variables.instance.sourceName;}
 	</cfscript>
 	
 	<cffunction name="init" access="public" returnType="rawEntryBean">

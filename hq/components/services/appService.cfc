@@ -7,6 +7,7 @@
 
 	<cffunction name="init" access="public" returntype="appService">
 		<cfargument name="path" type="string" required="true">
+		<cfset var oDAOFactory = 0>
 		
 		<cfset variables.path = arguments.path>
 
@@ -18,6 +19,15 @@
 		<cfif right(variables.cfcPath,1) eq ".">
 			<cfset variables.cfcPath = left(variables.cfcPath, len(variables.cfcPath)-1)>
 		</cfif>
+
+		<!--- Load the DAO objects --->
+		<cfset oDAOFactory = createModelObject("components.lib.dao.DAOFactory").init( expandPath("#variables.path#/config/dao-config.xml.cfm") )>
+		<cfset variables.oApplicationDAO = oDAOFactory.getDAO("application")>
+		<cfset variables.oEntryDAO = oDAOFactory.getDAO("entry")>
+		<cfset variables.oHostDAO = oDAOFactory.getDAO("host")>
+		<cfset variables.oSeverityDAO = oDAOFactory.getDAO("severity")>
+		<cfset variables.oSourceDAO = oDAOFactory.getDAO("source")>
+		<cfset variables.oUserDAO = oDAOFactory.getDAO("user")>
 
 		<cfreturn this>		
 	</cffunction>
@@ -71,14 +81,14 @@
 
 			// if applicationID is not numeric, assume it is the applicationCode
 			if(Not isNumeric(arguments.applicationID)) {
-				oFinder = createModelObject("components.appFinder").init();
+				oFinder = createModelObject("components.appFinder").init( variables.oApplicationDAO );
 				o = oFinder.findByCode(arguments.applicationID);
 				arguments.applicationID = o.getApplicationID();
 			}
 
 			// if hostID is not numeric, assume it is the hostname
 			if(Not isNumeric(arguments.hostID)) {
-				oFinder = createModelObject("components.hostFinder").init();
+				oFinder = createModelObject("components.hostFinder").init( variables.oHostDAO );
 				o = oFinder.findByName(arguments.hostID);
 				arguments.hostID = o.getHostID();
 			}
@@ -87,7 +97,7 @@
 			arguments.hostID = val(arguments.hostID);
 			
 			// get entries
-			oEntryFinder = createModelObject("components.entryFinder").init();
+			oEntryFinder = createModelObject("components.entryFinder").init( variables.oEntryDAO );
 			qry = oEntryFinder.search(argumentCollection = arguments);
 			
 			return qry;
@@ -101,7 +111,7 @@
 			var qry = 0;
 
 			// create the dao factory
-			oEntryFinder = createModelObject("components.entryFinder").init();
+			oEntryFinder = createModelObject("components.entryFinder").init( variables.oEntryDAO );
 			
 			// get entries
 			qry = oEntryFinder.findByID(arguments.entryID);
@@ -111,33 +121,11 @@
 	</cffunction>
 	
 	<cffunction name="getApplications" access="public" returntype="query">
-		<cfscript>
-			var oDAO = 0;
-			var qry = 0;
-
-			// create the dao factory
-			oDAO = createModelObject("components.db.DAOFactory").getDAO("application");
-			
-			// get entries
-			qry = oDAO.getAll();
-			
-			return qry;
-		</cfscript>
+		<cfreturn variables.oApplicationDAO.getAll()>
 	</cffunction>	
 
 	<cffunction name="getHosts" access="public" returntype="query">
-		<cfscript>
-			var oDAO = 0;
-			var qry = 0;
-
-			// create the dao factory
-			oDAO = createModelObject("components.db.DAOFactory").getDAO("host");
-			
-			// get entries
-			qry = oDAO.getAll();
-			
-			return qry;
-		</cfscript>
+		<cfreturn variables.oHostDAO.getAll()>
 	</cffunction>	
 	
 	<cffunction name="sendEntry" access="public" returntype="void">
@@ -204,7 +192,7 @@
 			var o = 0;
 
 			// create the finder
-			oFinder = createModelObject("components.userFinder").init();
+			oFinder = createModelObject("components.userFinder").init( oUserDAO );
 			
 			// see if the user exists
 			try {
@@ -229,6 +217,13 @@
 		<cfset var st = structNew()>
 		
 		<cfdirectory action="list" directory="#expandPath(tmpRulesPath)#" name="qryDir" listinfo="name">
+		<cfquery name="qryDir" dbtype="query">
+			SELECT *
+				FROM qryDir
+				WHERE name not like '%.svn'
+					and name not like '%.cvs'
+				ORDER BY name
+		</cfquery>	
 
 		<cfloop query="qryDir">
 			<cfset st = getCFCInfo(variables.extensionsPath & "rules." & listFirst(qryDir.name,".") )>

@@ -63,18 +63,6 @@ CREATE TABLE  `bl_Source` (
   PRIMARY KEY  (`sourceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `bl_Source`
---
-
-/*!40000 ALTER TABLE `bl_Source` DISABLE KEYS */;
-LOCK TABLES `bl_Source` WRITE;
-INSERT INTO `bl_Source` VALUES  (1,'WebService'),
- (2,'Post');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `bl_Source` ENABLE KEYS */;
-
-
 
 --
 -- Definition of table `bl_Entry`

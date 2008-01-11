@@ -1,5 +1,5 @@
 <cfcomponent>
-	<cfset variables.sourceID = 1>
+	<cfset variables.sourceName = "WebService">
 
 	<cffunction name="logEntry" access="remote" returntype="boolean">
 		<cfargument name="dateTime" type="Date" required="true">
@@ -43,7 +43,7 @@
 			oRawEntry.setDateTime(arguments.dateTime);
 			oRawEntry.setMessage(arguments.message);
 			oRawEntry.setApplicationCode(arguments.applicationCode);
-			oRawEntry.setSourceID(variables.sourceID);
+			oRawEntry.setSourceName(variables.sourceName);
 			oRawEntry.setSeverityCode(arguments.severityCode);
 			oRawEntry.setHostName(arguments.hostName);
 			oRawEntry.setExceptionMessage(arguments.exceptionMessage);

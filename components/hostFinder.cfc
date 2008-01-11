@@ -1,10 +1,5 @@
-<cfcomponent>
-	
-	<cffunction name="init" returntype="hostFinder" access="public">
-		<cfset variables.oDAO = createObject("component","bugLog.components.db.DAOFactory").getDAO("host")>
-		<cfreturn this>
-	</cffunction>
-	
+<cfcomponent extends="finder">
+
 	<cffunction name="findByID" returnType="host" access="public">
 		<cfargument name="id" type="numeric" required="true">
 		<cfscript>
@@ -12,7 +7,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","host").init();
+				o = createObject("component","host").init( variables.oDAO );
 				o.setHostID(qry.hostID);
 				o.setHostName(qry.hostName);
 				return o;
@@ -29,7 +24,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","host").init();
+				o = createObject("component","host").init( variables.oDAO );
 				o.setHostID(qry.hostID);
 				o.setHostName(qry.hostName);
 				return o;
@@ -39,10 +34,4 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="throw" access="private" returntype="void">
-		<cfargument name="message" type="string" required="true">
-		<cfargument name="type" type="string" required="true">
-		<cfthrow message="#arguments.message#" type="#arguments.type#">
-	</cffunction>
-	
 </cfcomponent>

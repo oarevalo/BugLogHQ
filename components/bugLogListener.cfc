@@ -1,16 +1,32 @@
 <cfcomponent displayname="bugLogListener">
+	
+	<!---
+		bugLogListener.cfc
+		
+		This is the main point of entry into the bugLog API. This component is the one that
+		actually processes the bug reports, it adds them to the database and is responsible
+		for processing any defined rules.
+	
+		Created: 2007 - Oscar Arevalo - http://www.oscararevalo.com
+	--->
 
 	<cfset variables.startedOn = 0>
+	<cfset variables.oDAOFactory = 0>
+	<cfset variables.oRuleProcessor = 0>
 
-	<cffunction name="init" access="public" returntype="bugLogListener">
+	<cffunction name="init" access="public" returntype="bugLogListener" hint="This is the constructor">
 	
 		<cfscript>
-			var testRule = 0;
-			
+			var cacheTTL = 300;		// timeout in minutes for cache entries
+
+			// load DAO Factory
+			variables.oDAOFactory = createObject("component","lib.dao.DAOFactory").init( expandPath("/bugLog/config/dao-config.xml.cfm") );
+					
 			// load the finder objects
-			variables.oAppFinder = createObject("component","appFinder").init();
-			variables.oHostFinder = createObject("component","hostFinder").init();
-			variables.oSeverityFinder = createObject("component","severityFinder").init();
+			variables.oAppFinder = createObject("component","appFinder").init( variables.oDAOFactory.getDAO("application") );
+			variables.oHostFinder = createObject("component","hostFinder").init( variables.oDAOFactory.getDAO("host") );
+			variables.oSeverityFinder = createObject("component","severityFinder").init( variables.oDAOFactory.getDAO("severity") );
+			variables.oSourceFinder = createObject("component","sourceFinder").init( variables.oDAOFactory.getDAO("source") );
 			
 			// load the rule processor
 			variables.oRuleProcessor = createObject("component","ruleProcessor").init();
@@ -18,6 +34,12 @@
 			// load rules
 			loadRules();
 			
+			// create cache instances
+			variables.oAppCache = createObject("component","lib.cache.cacheService").init(50, cacheTTL, false);
+			variables.oHostCache = createObject("component","lib.cache.cacheService").init(50, cacheTTL, false);
+			variables.oSeverityCache = createObject("component","lib.cache.cacheService").init(5, cacheTTL, false);
+			variables.oSourceCache = createObject("component","lib.cache.cacheService").init(5, cacheTTL, false);		
+						
 			// record the date at which the service started 
 			variables.startedOn = Now();
 		</cfscript>
@@ -25,57 +47,30 @@
 		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="logEntry" access="public" returntype="void">
+	<cffunction name="logEntry" access="public" returntype="void" hint="This method adds a bug report entry into BugLog. Bug reports must be passed as RawEntryBeans">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
 		
 		<cfscript>
 			var bean = arguments.entryBean;
-			var oEntry = createObject("component","entry").init();
+			var oEntry = 0;
 			var oApp = 0;
 			var oHost = 0;
 			var oSeverity = 0;
+			var oSource = 0;
+			var oDF = variables.oDAOFactory;
 				
-			// get the applicationID
-			try {
-				oApp = variables.oAppFinder.findByCode(bean.getApplicationCode());
+			// extract related objects from bean
+			oApp = getApplicationFromBean( bean );
+			oHost = getHostFromBean( bean );
+			oSeverity = getSeverityFromBean( bean );
+			oSource = getSourceFromBean( bean );
 
-			} catch(appFinderException.ApplicationCodeNotFound e) {
-				// code does not exist, so we need to create it
-				oApp = createObject("component","app").init();
-				oApp.setCode(bean.getApplicationCode());
-				oApp.setName(bean.getApplicationCode());
-				oApp.save();
-			}
-			
-			
-			// get the hostID
-			try {
-				oHost = variables.oHostFinder.findByName(bean.getHostName());
-
-			} catch(hostFinderException.HostNameNotFound e) {
-				// code does not exist, so we need to create it
-				oHost = createObject("component","host").init();
-				oHost.setHostName(bean.getHostName());
-				oHost.save();
-			}
-
-
-			// get the severityID
-			try {
-				oSeverity = variables.oSeverityFinder.findByCode(bean.getSeverityCode());
-
-			} catch(severityFinderException.codeNotFound e) {
-				// code does not exist, so we need to create it
-				oSeverity = createObject("component","severity").init();
-				oSeverity.setCode(bean.getSeverityCode());
-				oSeverity.setName(bean.getSeverityCode());
-				oSeverity.save();
-			}
-
+			// create entry
+			oEntry = createObject("component","entry").init( oDF.getDAO("entry") );
 			oEntry.setDateTime(bean.getdateTime());
 			oEntry.setMessage(bean.getmessage());
 			oEntry.setApplicationID(oApp.getApplicationID());
-			oEntry.setSourceID(bean.getSourceID());
+			oEntry.setSourceID(oSource.getSourceID());
 			oEntry.setSeverityID(oSeverity.getSeverityID());
 			oEntry.setHostID(oHost.getHostID());
 			oEntry.setExceptionMessage(bean.getexceptionMessage());
@@ -85,19 +80,155 @@
 			oEntry.setUserAgent(bean.getuserAgent());
 			oEntry.setTemplatePath(bean.gettemplate_Path());
 			oEntry.setHTMLReport(bean.getHTMLReport());
+			oEntry.setCreatedOn(now());
 		
+			// save entry
 			oEntry.save();
 		
-		
 			// process rules
-			variables.oRuleProcessor.processRules(bean);
+			variables.oRuleProcessor.processRules(bean, oDF.getDataProvider() );
 		
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="getStartedOn" access="public" returntype="date">
+	<cffunction name="getStartedOn" access="public" returntype="date" hint="Returns the date and time where this instance of BugLogListener was created">
 		<cfreturn variables.startedOn>
 	</cffunction>
+
+	<!---- Private Methods ---->
+	
+	<cffunction name="getApplicationFromBean" access="private" returntype="app" hint="Uses the information on the rawEntryBean to retrieve the corresponding Application object">
+		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfscript>
+			var key = "";
+			var bean = arguments.entryBean;
+			var oApp = 0;
+			var oDF = variables.oDAOFactory;
+			
+			key = bean.getApplicationCode();
+			try {
+				// first we try to get it from the cache
+				oApp = variables.oAppCache.retrieve( key ); 
+			
+			} catch(cacheService.itemNotFound e) {
+				// entry not in cache, so we get it from DB
+				try {
+					oApp = variables.oAppFinder.findByCode( key );
+	
+				} catch(appFinderException.ApplicationCodeNotFound e) {
+					// code does not exist, so we need to create it
+					oApp = createObject("component","app").init( oDF.getDAO("application") );
+					oApp.setCode( key );
+					oApp.setName( key );
+					oApp.save();
+				}
+				
+				// store entry in cache
+				variables.oAppCache.store( key, oApp );
+			}
+		</cfscript>
+		<cfreturn oApp>
+	</cffunction>
+		
+	<cffunction name="getHostFromBean" access="private" returntype="host" hint="Uses the information on the rawEntryBean to retrieve the corresponding Host object">
+		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfscript>
+			var key = "";
+			var bean = arguments.entryBean;
+			var oHost = 0;
+			var oDF = variables.oDAOFactory;
+			
+			key = bean.getHostName();
+			
+			try {
+				// first we try to get it from the cache
+				oHost = variables.oHostCache.retrieve( key ); 
+			
+			} catch(cacheService.itemNotFound e) {
+				// entry not in cache, so we get it from DB
+				try {
+					oHost = variables.oHostFinder.findByName( key );
+	
+				} catch(hostFinderException.HostNameNotFound e) {
+					// code does not exist, so we need to create it
+					oHost = createObject("component","host").init( oDF.getDAO("host") );
+					oHost.setHostName(key);
+					oHost.save();
+				}
+
+				// store entry in cache
+				variables.oHostCache.store( key, oHost );
+			}			
+		</cfscript>
+		<cfreturn oHost>
+	</cffunction>
+	
+	<cffunction name="getSeverityFromBean" access="private" returntype="severity" hint="Uses the information on the rawEntryBean to retrieve the corresponding Severity object">
+		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfscript>
+			var key = "";
+			var bean = arguments.entryBean;
+			var oSeverity = 0;
+			var oDF = variables.oDAOFactory;
+			
+			key = bean.getSeverityCode();
+			
+			try {
+				// first we try to get it from the cache
+				oSeverity = variables.oSeverityCache.retrieve( key ); 
+			
+			} catch(cacheService.itemNotFound e) {
+				// entry not in cache, so we get it from DB
+				try {
+					oSeverity = variables.oSeverityFinder.findByCode( key );
+	
+				} catch(severityFinderException.codeNotFound e) {
+					// code does not exist, so we need to create it
+					oSeverity = createObject("component","severity").init( oDF.getDAO("severity") );
+					oSeverity.setCode( key );
+					oSeverity.setName( key );
+					oSeverity.save();
+				}
+				
+				// store entry in cache
+				variables.oSeverityCache.store( key, oSeverity );
+			}
+		</cfscript>
+		<cfreturn oSeverity>
+	</cffunction>
+	
+	<cffunction name="getSourceFromBean" access="private" returntype="source" hint="Uses the information on the rawEntryBean to retrieve the corresponding Source object">
+		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfscript>
+			var key = "";
+			var bean = arguments.entryBean;
+			var oSource = 0;
+			var oDF = variables.oDAOFactory;
+			
+			key = bean.getSourceName();
+			
+			try {
+				// first we try to get it from the cache
+				oSource = variables.oSourceCache.retrieve( key ); 
+			
+			} catch(cacheService.itemNotFound e) {
+				// entry not in cache, so we get it from DB
+				try {
+					oSource = variables.oSourceFinder.findByName( key );
+	
+				} catch(sourceFinderException.codeNotFound e) {
+					// code does not exist, so we need to create it
+					oSource = createObject("component","source").init( oDF.getDAO("source") );
+					oSource.setName( key );
+					oSource.save();
+				}
+				
+				// store entry in cache
+				variables.oSourceCache.store( key, oSource );
+			}
+		</cfscript>
+		<cfreturn oSource>
+	</cffunction>		
 
 	<cffunction name="loadRules" access="private" returntype="void" hint="this method loads the rules into the rule processor">
 		<cfscript>
@@ -121,5 +252,6 @@
 			
 		</cfscript>
 	</cffunction>
+
 
 </cfcomponent>

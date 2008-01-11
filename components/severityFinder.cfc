@@ -1,9 +1,4 @@
-<cfcomponent>
-	
-	<cffunction name="init" returntype="severityFinder" access="public">
-		<cfset variables.oDAO = createObject("component","bugLog.components.db.DAOFactory").getDAO("severity")>
-		<cfreturn this>
-	</cffunction>
+<cfcomponent extends="finder">
 	
 	<cffunction name="findByID" returnType="severity" access="public">
 		<cfargument name="id" type="numeric" required="true">
@@ -12,7 +7,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","severity").init();
+				o = createObject("component","severity").init( variables.oDAO );
 				o.setSeverityID(qry.severityID);
 				o.setName(qry.name);
 				o.setCode(qry.code);
@@ -30,7 +25,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","severity").init();
+				o = createObject("component","severity").init( variables.oDAO );
 				o.setSeverityID(qry.severityID);
 				o.setName(qry.name);
 				o.setCode(qry.code);
@@ -39,12 +34,6 @@
 				throw("Severity code not found","severityFinderException.codeNotFound");
 			}
 		</cfscript>
-	</cffunction>
-
-	<cffunction name="throw" access="private" returntype="void">
-		<cfargument name="message" type="string" required="true">
-		<cfargument name="type" type="string" required="true">
-		<cfthrow message="#arguments.message#" type="#arguments.type#">
 	</cffunction>
 	
 </cfcomponent>

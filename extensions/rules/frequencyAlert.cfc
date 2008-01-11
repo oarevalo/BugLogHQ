@@ -21,12 +21,18 @@
 	
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
+		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
 		
 		<cfscript>
+			var qry = 0;
+			var oEntryFinder = 0;
+			var oEntryDAO = 0;
+			
 			// only evaluate this rule if the amount of timespan minutes has passed after the last email was sent
 			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan ) {
 			
-				oEntryFinder = createObject("component","bugLog.components.entryFinder").init();
+				oEntryDAO = createObject("component","bugLog.components.db.entryDAO").init(arguments.dataProvider);
+				oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
 	
 				qry = oEntryFinder.search(searchTerm = "", 
 											startDate = dateAdd("n", variables.config.timespan * (-1), now() ),

@@ -8,16 +8,16 @@
 <cfparam name="request.requestState.searchTerm" default="">
 <cfparam name="request.requestState.applicationID" default="0">
 <cfparam name="request.requestState.hostID" default="0">
+<cfparam name="request.requestState.numDays" default="1">
+<cfparam name="request.requestState.groupByApp" default="true">
+<cfparam name="request.requestState.groupByHost" default="true">
+<cfparam name="request.requestState.qryApplications" default="#queryNew('')#">
+<cfparam name="request.requestState.qryHosts" default="#queryNew('')#">
 
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
 <cfparam name="sortBy" default="">
 <cfparam name="sortDir" default="ASC">
-<cfparam name="numDays" default="1">
-
-<cfparam name="groupByApp" default="true">
-<cfparam name="groupByHost" default="true">
-
 
 <cfset stInfo = request.requestState.stInfo>
 <cfset qryEntries = request.requestState.qryEntries>
@@ -27,31 +27,11 @@
 <cfset searchTerm = request.requestState.searchTerm>
 <cfset applicationID = request.requestState.applicationID>
 <cfset hostID = request.requestState.hostID>
-
-<cfset qryOriginal = qryEntries>
-<cfset startDate = dateAdd("d", val(numDays) * -1, now())>
-
-<cfquery name="qryEntries" dbtype="query">
-	SELECT <cfif groupByApp>
-				ApplicationCode, ApplicationID, 
-			</cfif>
-			<cfif groupByHost>
-				HostName, HostID, 
-			</cfif>
-			Message, COUNT(*) AS bugCount, MAX(createdOn) as createdOn, MAX(entryID) AS EntryID, MAX(severityCode) AS SeverityCode
-		FROM qryEntries
-		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
-		GROUP BY 
-			<cfif groupByApp>
-				ApplicationCode, ApplicationID, 
-			</cfif>
-			<cfif groupByHost>
-				HostName, HostID, 
-			</cfif>
-			Message
-		ORDER BY createdOn DESC
-</cfquery>
-
+<cfset numDays = request.requestState.numDays>
+<cfset groupByApp = request.requestState.groupByApp>
+<cfset groupByHost = request.requestState.groupByHost>
+<cfset qryApplications = request.requestState.qryApplications>
+<cfset qryHosts = request.requestState.qryHosts>
 
 <!--- base URL for reloading --->
 <cfset pageURL = "index.cfm?event=ehGeneral.dspMain&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#searchTerm#&groupByApp=#groupByApp#&groupByHost=#groupByHost#&numDays=#numDays#">
@@ -63,16 +43,7 @@
 <cfif endRow gt qryEntries.recordCount>
 	<cfset endRow = qryEntries.recordCount>
 </cfif>
-
-
-<!--- get the data for the filter dropdowns --->
-<cfquery name="qryApplications" dbtype="query">
-	SELECT DISTINCT applicationID, applicationCode FROM qryOriginal ORDER BY applicationCode
-</cfquery>
-<cfquery name="qryHosts" dbtype="query">
-	SELECT DISTINCT hostID, hostName FROM qryOriginal ORDER BY hostName
-</cfquery>
-
+<cfset delta = 5>
 
 <!--- Handle sorting of data --->
 <cfif sortBy neq "">
@@ -241,7 +212,8 @@
 	<cfloop query="qryEntries" startrow="#startRow#" endrow="#startRow+rowsPerPage-1#">
 		<cfset isNew = qryEntries.entryID gt lastbugread>
 		<cfif bugCount gt 1>
-			<cfset zoomURL = "index.cfm?event=ehGeneral.dspLog&searchTerm=#urlencodedformat(qryEntries.message)#">
+		<!--- 	<cfset zoomURL = "index.cfm?event=ehGeneral.dspLog&searchTerm=#urlencodedformat(qryEntries.message)#"> --->
+			<cfset zoomURL = "index.cfm?event=ehGeneral.dspLog&msgFromEntryID=#qryEntries.entryID#">
 			<cfif groupByApp>
 				<Cfset zoomURL = zoomURL & "&ApplicationID=#qryEntries.applicationID#">
 			</cfif>		
@@ -309,14 +281,18 @@
 			&nbsp;&nbsp;&middot;&nbsp;&nbsp;
 		</cfif>
 
+		<cfif currPage - delta gt 0>... &nbsp;&nbsp;</cfif>
 		<cfloop from="1" to="#numPages#" index="i">
-			<cfif i eq currPage>
-				<b>#i#</b>
-			<cfelse>						
-				<a href="#pageURL#&startRow=#(i-1)*rowsPerPage+1#">#i#</a>
+			<cfif i gte currPage-delta and i lte currPage+delta>
+				<cfif i eq currPage>
+					<b>#i#</b>
+				<cfelse>						
+					<a href="#pageURL#&startRow=#(i-1)*rowsPerPage+1#">#i#</a>
+				</cfif>
+				&nbsp;&nbsp;
 			</cfif>
-			&nbsp;&nbsp;
 		</cfloop>
+		<cfif currPage + delta lt numPages>... &nbsp;&nbsp;</cfif>
 	</div>
 	
 	<cfif refreshSeconds gt 0>

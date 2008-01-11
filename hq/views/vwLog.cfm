@@ -1,4 +1,4 @@
-<!--- vwHome.cfm --->
+<!--- vwLog.cfm --->
 
 <!--- values sent from the event handler --->
 <cfparam name="request.requestState.stInfo" default="structNew()">
@@ -8,6 +8,8 @@
 <cfparam name="request.requestState.searchTerm" default="">
 <cfparam name="request.requestState.applicationID" default="0">
 <cfparam name="request.requestState.hostID" default="0">
+<cfparam name="request.requestState.qryApplications" default="#queryNew('')#">
+<cfparam name="request.requestState.qryHosts" default="#queryNew('')#">
 
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
@@ -23,6 +25,9 @@
 <cfset searchTerm = request.requestState.searchTerm>
 <cfset applicationID = request.requestState.applicationID>
 <cfset hostID = request.requestState.hostID>
+<cfset qryApplications = request.requestState.qryApplications>
+<cfset qryHosts = request.requestState.qryHosts>
+
 
 <!--- base URL for reloading --->
 <cfset pageURL = "index.cfm?event=ehGeneral.dspLog&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#searchTerm#">
@@ -35,15 +40,6 @@
 	<cfset endRow = qryEntries.recordCount>
 </cfif>
 <cfset delta = 5>
-
-
-<!--- get the data for the filter dropdowns --->
-<cfquery name="qryApplications" dbtype="query">
-	SELECT DISTINCT applicationID, applicationCode FROM qryEntries ORDER BY applicationCode
-</cfquery>
-<cfquery name="qryHosts" dbtype="query">
-	SELECT DISTINCT hostID, hostName FROM qryEntries ORDER BY hostName
-</cfquery>
 
 
 <!--- Handle sorting of data --->

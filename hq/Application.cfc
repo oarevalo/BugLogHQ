@@ -1,7 +1,7 @@
 <cfcomponent displayname="Controller">
 	
 	<cfset this.name = "bugLogHQ"> 
-	<cfset this.clientManagement = true> 
+	<cfset this.clientManagement = false> 
 	<cfset this.sessionManagement = true> 
 	<cfset this.setClientCookies = true>
 	<cfset this.setDomainCookies = false>	
@@ -13,8 +13,8 @@
 	<cfset this.topLevelErrorRecipient = "">
 	<cfset this.topLevelErrorSender = "">
 	<cfset this.restartKey = "cookieMonster">
-	<cfset this.configDoc = "config/config.xml">
-	<cfset this.modelsPath = "components/model">
+	<cfset this.configDoc = "config/config.xml.cfm">
+	<cfset this.modelsPath = "">
 
 	<cffunction name="onRequestStart">
 		<cfparam name="Event" default="#this.defaultEvent#"> <!--- use to determine the action to perform --->
@@ -113,10 +113,12 @@
 		</cfif>
 		
 		<!--- notify administrator of the error --->
-		<cfmail to="#this.topLevelErrorRecipient#" 
-				from="#this.topLevelErrorSender#" 
-				subject="BUG REPORT: [#this.Name#] [#hostName#] #error.message#" 
-				type="html"><cfdump var="#arguments.exception#"></cfmail>	
+		<cfif this.topLevelErrorRecipient neq "" and this.topLevelErrorSender neq "">
+			<cfmail to="#this.topLevelErrorRecipient#" 
+					from="#this.topLevelErrorSender#" 
+					subject="BUG REPORT: [#this.Name#] [#hostName#] #error.message#" 
+					type="html"><cfdump var="#arguments.exception#"></cfmail>	
+		</cfif>
 						
 		<!--- display a user-friendly error screen --->
 		<cfinclude template="includes/error.cfm">

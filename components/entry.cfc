@@ -2,7 +2,7 @@
 	
 	<cfscript>
 		variables.oDAO = 0;
-		variables.instance.EntryID = 0;
+		variables.instance.ID = 0;
 		variables.instance.mydateTime = now();
 		variables.instance.message = "";
 		variables.instance.applicationID = 0;
@@ -16,8 +16,9 @@
 		variables.instance.userAgent = "";
 		variables.instance.templatePath = "";
 		variables.instance.HTMLReport = "";
+		variables.instance.createdOn = now();
 		
-		function setEntryID(data) {variables.instance.EntryID = arguments.data;}
+		function setEntryID(data) {variables.instance.ID = arguments.data;}
 		function setDateTime(data) {variables.instance.mydateTime = arguments.data;}
 		function setMessage(data) {variables.instance.message = arguments.data;}
 		function setApplicationID(data) {variables.instance.applicationID = arguments.data;}
@@ -31,8 +32,9 @@
 		function setUserAgent(data) {variables.instance.userAgent = arguments.data;}
 		function setTemplatePath(data) {variables.instance.templatePath = arguments.data;}
 		function setHTMLReport(data) {variables.instance.HTMLReport = arguments.data;}
+		function setCreatedOn(data) {variables.instance.createdOn = arguments.data;}
 		
-		function getEntryID() {return variables.instance.EntryID;}
+		function getEntryID() {return variables.instance.ID;}
 		function getDateTime() {return variables.instance.mydateTime;}
 		function getMessage() {return variables.instance.message;}
 		function getApplicationID() {return variables.instance.applicationID;}
@@ -46,33 +48,43 @@
 		function getUserAgent() {return variables.instance.userAgent;}
 		function getTemplate_Path() {return variables.instance.templatePath;}
 		function getHTMLReport() {return variables.instance.HTMLReport;}
+		function getCreatedOn() {return variables.instance.createdOn;}
 	</cfscript>
 	
 	<cffunction name="init" access="public" returnType="entry">
-		<cfset variables.oDAO = createObject("component","bugLog.components.db.DAOFactory").getDAO("entry")>
+		<cfargument name="dao" type="bugLog.components.db.entryDAO" required="true">
+		<cfset variables.oDAO = arguments.dao>
 		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="save" access="public">
 		<cfset var rtn = 0>
 		<cfset rtn = variables.oDAO.save(argumentCollection = variables.instance)>
-		<cfset variables.EntryID = rtn>
+		<cfset variables.instance.ID = rtn>
 	</cffunction>
 
 	<cffunction name="getApplication" access="public" returntype="app" hint="Returns the application object">
-		<cfreturn createObject("component","appFinder").init().findByID(variables.instance.applicationID)>
+		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
+		<cfset var oApplicationDAO = createObject("component","db.applicationDAO").init( oDataProvider )>
+		<cfreturn createObject("component","appFinder").init( oApplicationDAO ).findByID(variables.instance.applicationID)>
 	</cffunction>
 
 	<cffunction name="getHost" access="public" returntype="host" hint="Returns the host object">
-		<cfreturn createObject("component","hostFinder").init().findByID(variables.instance.hostID)>
+		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
+		<cfset var oHostDAO = createObject("component","db.hostDAO").init( oDataProvider )>
+		<cfreturn createObject("component","hostFinder").init( oHostDAO ).findByID(variables.instance.hostID)>
 	</cffunction>
 
 	<cffunction name="getSource" access="public" returntype="source" hint="Returns the source object">
-		<cfreturn createObject("component","sourceFinder").init().findByID(variables.instance.sourceID)>
+		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
+		<cfset var oSourceDAO = createObject("component","db.sourceDAO").init( oDataProvider )>
+		<cfreturn createObject("component","sourceFinder").init( oSourceDAO ).findByID(variables.instance.sourceID)>
 	</cffunction>
 
 	<cffunction name="getSeverity" access="public" returntype="severity" hint="Returns the severity object">
-		<cfreturn createObject("component","severityFinder").init().findByID(variables.instance.severityID)>
+		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
+		<cfset var oSeverityDAO = createObject("component","db.severityDAO").init( oDataProvider )>
+		<cfreturn createObject("component","severityFinder").init( oSeverityDAO ).findByID(variables.instance.severityID)>
 	</cffunction>
 	
 </cfcomponent>

@@ -14,6 +14,7 @@
 </script>
 
 <cfset tmpSeverity = oSeverity.getCode()>
+<cfset htmlReport = oEntry.getHTMLReport()>
 
 <cfoutput>
 <h2>Bug ###oEntry.getEntryID()# : <span style="color:##cc0000;">#oEntry.getMessage()#</span></h2>
@@ -103,7 +104,11 @@
 
 
 <h2>HTML Report</h2>
-#oEntry.getHTMLReport()#
+<cfif htmlReport neq "">
+	#htmlReport#
+<cfelse>
+	<em>Empty</em>
+</cfif>
 </cfoutput>
 <br>
 <br>

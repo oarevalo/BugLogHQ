@@ -14,12 +14,13 @@
 	
 	<cffunction name="processRules" access="public" returnType="void" hint="Process all rules with a given raw entry bean">
 		<cfargument name="rawEntry" type="rawEntryBean" required="true">
+		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
 		
 		<cfscript>
 			for(i=1;i lte arrayLen(variables.aRules);i=i+1) {
 				try {
 					// process rule with current entry bean					
-					rtn = variables.aRules[i].processRule(arguments.rawEntry);
+					rtn = variables.aRules[i].processRule(arguments.rawEntry, arguments.dataProvider);
 
 					// if rule returns false, then that means that no more rules will be processed, so we exit
 					if(not rtn) break;

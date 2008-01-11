@@ -23,6 +23,7 @@
 	
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
+		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
 		
 		<cfscript>
 			var stEntry = arguments.rawEntry.getMemento();

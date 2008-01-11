@@ -17,6 +17,7 @@
 						The method returns a boolean value that can be used by the caller to determine if additional rules
 						need to be evaluated.">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
+		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
 		<!--- this method must be implemented by rules that extend the base rule --->
 		<cfreturn true>
 	</cffunction>

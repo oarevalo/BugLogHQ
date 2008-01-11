@@ -25,29 +25,28 @@
 		</cfcase>
 	
 	
-		<cfcase value="getListing">
+		<cfcase value="getSummary">
+			<cfparam name="numDays" default="1">
 			<cfparam name="token" default="">
 			
 			<!--- to do: validate token --->
 			
 			<!--- get listing --->
-			<cfset qryEntries = oAppService.searchEntries(searchTerm = "",startDate = dateAdd("d",now(),-1))>
+			<cfset qryEntries = oAppService.searchEntries(searchTerm = "",startDate = dateAdd("d",now(),-1 * numDays))>
 			<cfquery name="qryEntries" dbtype="query">
-				SELECT ApplicationCode, ApplicationID, HostName, HostID, 
+				SELECT ApplicationCode, ApplicationID,  
 						Message, COUNT(*) AS bugCount, MAX(createdOn) as createdOn, MAX(entryID) AS EntryID, MAX(severityCode) AS SeverityCode
 					FROM qryEntries
-					GROUP BY ApplicationCode, ApplicationID, HostName, HostID, Message
+					GROUP BY ApplicationCode, ApplicationID, Message
 					ORDER BY createdOn DESC
 			</cfquery>
 			
 			<cfsavecontent variable="results">
 				<cfoutput query="qryEntries">
 					<entry>
-						<ApplicationCode>#qryEntries.ApplicationCode#</ApplicationCode>
+						<ApplicationCode>#xmlFormat(qryEntries.ApplicationCode)#</ApplicationCode>
 						<ApplicationID>#ApplicationID#</ApplicationID>
-						<HostName>#qryEntries.hostname#</HostName>
-						<HostID>#qryEntries.hostid#</HostID>
-						<Message>#qryEntries.message#</Message>
+						<Message>#xmlFormat(qryEntries.message)#</Message>
 						<bugCount>#qryEntries.bugCount#</bugCount>
 						<createdOn>#dateFormat(qryEntries.createdOn,"mm/dd/yyyy")# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
 						<EntryID>#qryEntries.entryID#</EntryID>
@@ -56,6 +55,73 @@
 				</cfoutput>
 			</cfsavecontent>
 		</cfcase>
+	
+		<cfcase value="getListing">
+			<cfparam name="numDays" default="-1">
+			<cfparam name="token" default="">
+			<cfparam name="applicationID" default="0">
+			<cfparam name="hostID" default="0">
+			<cfparam name="message" default="">
+			
+			<!--- to do: validate token --->
+			
+			<!--- get listing --->
+			<cfset qryEntries = oAppService.searchEntries(searchTerm = message,
+															startDate = dateAdd("d",now(),-1),
+															applicationID=applicationID,
+															hostID=hostID)>
+			<cfquery name="qryEntries" dbtype="query">
+				SELECT *
+					FROM qryEntries
+					ORDER BY createdOn DESC
+			</cfquery>
+			
+			<cfsavecontent variable="results">
+				<cfoutput query="qryEntries">
+					<entry>
+						<ApplicationCode>#xmlFormat(qryEntries.ApplicationCode)#</ApplicationCode>
+						<ApplicationID>#ApplicationID#</ApplicationID>
+						<HostName>#xmlFormat(qryEntries.hostname)#</HostName>
+						<HostID>#qryEntries.hostid#</HostID>
+						<Message>#xmlFormat(qryEntries.message)#</Message>
+						<createdOn>#dateFormat(qryEntries.createdOn,"mm/dd/yyyy")# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
+						<EntryID>#qryEntries.entryID#</EntryID>
+						<SeverityCode>#qryEntries.severityCode#</SeverityCode>
+					</entry>
+				</cfoutput>
+			</cfsavecontent>
+		</cfcase>	
+	
+		<cfcase value="getEntry">
+			<cfparam name="entryID" default="0" type="numeric">
+			<cfparam name="token" default="">
+			
+			<!--- to do: validate token --->
+			
+			<!--- get listing --->
+			<cfset oEntry = oAppService.getEntry(entryID)>
+
+			<cfsavecontent variable="results">
+				<cfoutput>
+					<entry>
+						<ApplicationCode>#xmlFormat(oEntry.getApplication().getCode())#</ApplicationCode>
+						<ApplicationID>#oEntry.getApplicationID()#</ApplicationID>
+						<HostName>#xmlFormat(oEntry.getHost().getHostname())#</HostName>
+						<HostID>#oEntry.getHostID()#</HostID>
+						<Message>#xmlFormat(oEntry.getMessage())#</Message>
+						<createdOn>#lsDateFormat(oEntry.getDateTime())# - #lsTimeFormat(oEntry.getDateTime())#</createdOn>
+						<EntryID>#oEntry.getEntryID()#</EntryID>
+						<SeverityCode>#oEntry.getSeverity().getCode()#</SeverityCode>
+						<ExceptionMessage>#xmlFormat(oEntry.getExceptionMessage())#</ExceptionMessage>
+						<ExceptionDetails>#xmlFormat(oEntry.getExceptionDetails())#</ExceptionDetails>
+						<BugCFID>#xmlFormat(oEntry.getCFID())#</BugCFID>
+						<BugCFTOKEN>#xmlFormat(oEntry.getCFTOKEN())#</BugCFTOKEN>
+						<UserAgent>#xmlFormat(oEntry.getUserAgent())#</UserAgent>
+						<TemplatePath>#xmlFormat(oEntry.getTemplate_Path())#</TemplatePath>
+					</entry>
+				</cfoutput>
+			</cfsavecontent>
+		</cfcase>	
 	
 		<cfdefaultcase>
 			<cfset error = true>

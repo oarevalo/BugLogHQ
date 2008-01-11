@@ -1,69 +1,29 @@
-<cfparam name="request.requestState.qryEntries" default="#queryNew('')#">
-<cfparam name="maxRows" default="3">
-<cfparam name="numDays" default="30">
-<cfparam name="datePart" default="d">
-<cfparam name="applicationID" default="0">
+<cfparam name="request.requestState.maxRows" default="3">
+<cfparam name="request.requestState.numDays" default="30">
+<cfparam name="request.requestState.datePart" default="d">
+<cfparam name="request.requestState.applicationID" default="0">
+<cfparam name="request.requestState.datePartName" default="">
+<cfparam name="request.requestState.startDate" default="">
 
-<cfset qryEntries = request.requestState.qryEntries>
-<cfset startDate = dateAdd("d", val(numDays) * -1, now())>
-<cfset datePartName = replaceList(datePart,  "y,m,d,h,n", "year,month,day,hour,minute")>
+<cfparam name="request.requestState.qryApplications" default="#queryNew('')#">
+<cfparam name="request.requestState.qryAppSummary" default="#queryNew('')#">
+<cfparam name="request.requestState.qryHostSummary" default="#queryNew('')#">
+<cfparam name="request.requestState.qryMsgSummary" default="#queryNew('')#">
+<cfparam name="request.requestState.qryTimeline" default="#queryNew('')#">
+
+<cfset maxRows = request.requestState.maxRows>
+<cfset numDays = request.requestState.numDays>
+<cfset datePart = request.requestState.datePart>
+<cfset applicationID = request.requestState.applicationID>
+<cfset datePartName = request.requestState.datePartName>
+<cfset startDate = request.requestState.startDate>
+<cfset qryApplications = request.requestState.qryApplications>
+<cfset qryAppSummary = request.requestState.qryAppSummary>
+<cfset qryHostSummary = request.requestState.qryHostSummary>
+<cfset qryMsgSummary = request.requestState.qryMsgSummary>
+<cfset qryTimeline = request.requestState.qryTimeline>
+
 <cfset tmpAppName = "All">
-
-<cfscript>
-	switch(datePart) {
-		case "y": datePartName = "year"; break;
-		case "m": datePartName = "month"; break;
-		case "d": datePartName = "day"; break;
-		case "h": datePartName = "hour"; break;
-		case "n": datePartName = "minute"; break;
-		default : datePartName = "day";
-	}
-</cfscript>
-
-<!--- get applications list --->
-<cfquery name="qryApplications" dbtype="query">
-	SELECT DISTINCT applicationID, applicationCode FROM qryEntries ORDER BY applicationCode
-</cfquery>
-
-<!--- count by application --->
-<cfquery name="qryAppSummary" dbtype="query" maxrows="#maxRows#">
-	SELECT ApplicationCode, COUNT(*) as NumCount
-		FROM qryEntries
-		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
-		GROUP BY ApplicationCode
-		ORDER BY NumCount DESC
-</cfquery>
-
-<!--- count by host --->
-<cfquery name="qryHostSummary" dbtype="query" maxrows="#maxRows#">
-	SELECT hostName, COUNT(*) as NumCount
-		FROM qryEntries
-		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
-		GROUP BY hostName
-		ORDER BY NumCount DESC
-</cfquery>
-
-<!--- count by message --->
-<cfquery name="qryMsgSummary" dbtype="query" maxrows="#maxRows#">
-	SELECT message, COUNT(*) as NumCount
-		FROM qryEntries
-		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
-		GROUP BY message
-		ORDER BY NumCount DESC
-</cfquery>
-
-
-<!--- count by timeline --->
-<cfquery name="qryTimeline" dbtype="query">
-	SELECT entry_#datePartName# as DatePartValue, COUNT(*) as NumCount
-		FROM qryEntries
-		WHERE mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#startDate#">
-			<cfif applicationID gt 0>
-				AND applicationID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#applicationID#">
-			</cfif>
-		GROUP BY entry_#datePartName#
-		ORDER BY entry_year, entry_month, entry_day, entry_hour, entry_minute
-</cfquery>
 
 
 <h2 style="margin-bottom:3px;">BugLog Stats</h2>
@@ -112,10 +72,10 @@
 						<cfset tmp = applicationID>
 						<cfloop query="qryApplications">
 							<cfif qryApplications.applicationID eq tmp>
-								<cfset tmpAppName = qryApplications.applicationCode>
-								<option value="#qryApplications.applicationID#" selected>#qryApplications.applicationCode#</option>
+								<cfset tmpAppName = qryApplications.code>
+								<option value="#qryApplications.applicationID#" selected>#qryApplications.code#</option>
 							<cfelse>
-								<option value="#qryApplications.applicationID#">#qryApplications.applicationCode#</option>
+								<option value="#qryApplications.applicationID#">#qryApplications.code#</option>
 							</cfif>
 						</cfloop>
 					</select>

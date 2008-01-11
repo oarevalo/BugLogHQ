@@ -22,7 +22,7 @@ Print 'Create Table bl_Application'
 GO
 CREATE TABLE [dbo].[bl_Application] (
 		[ApplicationID]     int IDENTITY (1,1) NOT NULL,
-		[Code]              varchar(50) NOT NULL,
+		[Code]              varchar(100) NOT NULL,
 		[Name]              varchar(250) NOT NULL
 )
 ON [PRIMARY]
@@ -78,9 +78,9 @@ CREATE TABLE [dbo].[bl_Entry] (
 		[SeverityID]           int NOT NULL,
 		[HostID]               int NOT NULL,
 		[ExceptionMessage]     varchar(500) NULL,
-		[ExceptionDetails]     text NULL,
-		[CFID]                 varchar(250) NULL,
-		[CFTOKEN]              varchar(250) NULL,
+		[ExceptionDetails]     varchar(5000) NULL,
+		[CFID]                 varchar(255) NULL,
+		[CFTOKEN]              varchar(255) NULL,
 		[UserAgent]            varchar(500) NULL,
 		[TemplatePath]         varchar(500) NULL,
 		[HTMLReport]           text NULL,
@@ -133,8 +133,8 @@ GO
 IF @@ERROR<>0 OR @@TRANCOUNT=0 BEGIN IF @@TRANCOUNT>0 ROLLBACK SET NOEXEC ON END
 GO
 
--- Add Default Constraint DF_bl_Entry_createdOn to bl_Entry
-Print 'Add Default Constraint DF_bl_Entry_createdOn to bl_Entry'
+-- Add Default Constraint DF_bl_Entry_myDateTime to bl_Entry
+Print 'Add Default Constraint DF_bl_Entry_myDateTime to bl_Entry'
 GO
 IF (EXISTS(SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'[dbo].[bl_Entry]') AND [type]='U')) AND NOT (EXISTS (SELECT * FROM sysobjects WHERE id=OBJECT_ID(N'[dbo].[DF_bl_Entry_createdOn]') AND parent_obj=OBJECT_ID(N'[dbo].[bl_Entry]')))
 ALTER TABLE [dbo].[bl_Entry]
@@ -327,7 +327,7 @@ IF OBJECT_ID(N'[dbo].[bl_Entry]') IS NOT NULL
 BEGIN
 		ALTER TABLE [dbo].[bl_Entry]
 			ADD CONSTRAINT [FK_bl_Entry_bl_Severity]
-			FOREIGN KEY ([EntryID]) REFERENCES [dbo].[bl_Severity] ([SeverityID])
+			FOREIGN KEY ([SeverityID]) REFERENCES [dbo].[bl_Severity] ([SeverityID])
 END
 GO
 
@@ -342,7 +342,7 @@ IF OBJECT_ID(N'[dbo].[bl_Entry]') IS NOT NULL
 BEGIN
 		ALTER TABLE [dbo].[bl_Entry]
 			ADD CONSTRAINT [FK_bl_Entry_bl_Source]
-			FOREIGN KEY ([EntryID]) REFERENCES [dbo].[bl_Source] ([SourceID])
+			FOREIGN KEY ([SourceID]) REFERENCES [dbo].[bl_Source] ([SourceID])
 END
 GO
 
@@ -368,34 +368,6 @@ GO
 -- Deleting from table: bl_User
 PRINT 'Deleting from table: bl_User'
 DELETE FROM [dbo].[bl_User]
--- Deleting from table: bl_Source
-PRINT 'Deleting from table: bl_Source'
-DELETE FROM [dbo].[bl_Source]
--- Deleting from table: bl_Severity
-PRINT 'Deleting from table: bl_Severity'
-DELETE FROM [dbo].[bl_Severity]
--- Deleting from table: bl_Host
-PRINT 'Deleting from table: bl_Host'
-DELETE FROM [dbo].[bl_Host]
--- Deleting from table: bl_Entry
-PRINT 'Deleting from table: bl_Entry'
-DELETE FROM [dbo].[bl_Entry]
--- Deleting from table: bl_Application
-PRINT 'Deleting from table: bl_Application'
-DELETE FROM [dbo].[bl_Application]
-
--- No rows are in bl_Application
-PRINT 'No rows are in bl_Application'
--- No rows are in bl_Entry
-PRINT 'No rows are in bl_Entry'
--- No rows are in bl_Host
-PRINT 'No rows are in bl_Host'
--- No rows are in bl_Severity
-PRINT 'No rows are in bl_Severity'
--- Insert scripts for table: bl_Source
-PRINT 'Inserting rows into table: bl_Source'
-INSERT INTO [dbo].[bl_Source] ([Name]) VALUES ('Post')
-INSERT INTO [dbo].[bl_Source] ([Name]) VALUES ('WebService')
 
 -- Insert scripts for table: bl_User
 PRINT 'Inserting rows into table: bl_User'

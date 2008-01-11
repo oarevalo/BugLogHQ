@@ -1,4 +1,4 @@
-<cfset variables.sourceID = 2>
+<cfset variables.sourceName = "Post">
 
 <cfparam name="message" type="string">
 <cfparam name="applicationCode" type="string">
@@ -37,7 +37,7 @@
 	oRawEntry.setDateTime(dateTime);
 	oRawEntry.setMessage(message);
 	oRawEntry.setApplicationCode(applicationCode);
-	oRawEntry.setSourceID(variables.sourceID);
+	oRawEntry.setSourceName(variables.sourceName);
 	oRawEntry.setSeverityCode(severityCode);
 	oRawEntry.setHostName(hostName);
 	oRawEntry.setExceptionMessage(exceptionMessage);

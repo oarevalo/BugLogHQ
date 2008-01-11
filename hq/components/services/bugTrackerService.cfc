@@ -31,7 +31,9 @@
 		<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo)>
 
 		<!--- send bug report via email --->
-		<cfset sendEmail(arguments.message, longMessage)>	
+		<cfif variables.bugEmailRecipients neq "" and variables.bugEmailSender neq "">
+			<cfset sendEmail(arguments.message, longMessage)>	
+		</cfif>
 
 		<!--- add entry to coldfusion log --->	
 		<cflog type="error" 
