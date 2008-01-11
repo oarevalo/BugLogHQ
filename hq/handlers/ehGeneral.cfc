@@ -29,7 +29,7 @@
 				setValue("hostName", hostName);
 				setValue("applicationTitle", appTitle);
 				setValue("stInfo", stInfo);
-				setValue("versionTag", "v 1.3 ( beta )");
+				setValue("versionTag", "v 1.3");
 
 			} catch(any e) {
 				setMessage("error",e.message);
