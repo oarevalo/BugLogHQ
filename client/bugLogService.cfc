@@ -74,7 +74,9 @@
 
 		<cfset var shortMessage = "">
 		<cfset var longMessage = "">
-
+		<cfset var tmpCFID = "">
+		<cfset var tmpCFTOKEN = "">
+		
 		<!--- make sure we have required members --->
 		<cfparam name="arguments.exception.message" default="">
 		<cfparam name="arguments.exception.detail" default="">
@@ -82,6 +84,14 @@
 		<!--- compose short and full messages --->
 		<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
 		<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo)>
+		
+		<!--- check if there are valid CFID/CFTOKEN values available --->
+		<cfif isDefined("cfid")>
+			<cfset tmpCFID = cfid>
+		</cfif>
+		<cfif isDefined("cftoken")>
+			<cfset tmpCFTOKEN = cftoken>
+		</cfif>		
 		
 		<!--- submit error --->
 		<cftry>
@@ -96,8 +106,8 @@
 						<cfhttpparam type="formfield" name="hostName" value="#variables.hostName#">
 						<cfhttpparam type="formfield" name="exceptionMessage" value="#arguments.exception.message#">
 						<cfhttpparam type="formfield" name="exceptionDetails" value="#arguments.exception.detail#">
-						<cfhttpparam type="formfield" name="CFID" value="#CFID#">
-						<cfhttpparam type="formfield" name="CFTOKEN" value="#CFTOKEN#">
+						<cfhttpparam type="formfield" name="CFID" value="#tmpCFID#">
+						<cfhttpparam type="formfield" name="CFTOKEN" value="#tmpCFTOKEN#">
 						<cfhttpparam type="formfield" name="userAgent" value="#cgi.HTTP_USER_AGENT#">
 						<cfhttpparam type="formfield" name="templatePath" value="#GetBaseTemplatePath()#">
 						<cfhttpparam type="formfield" name="HTMLReport" value="#longMessage#">
@@ -111,8 +121,8 @@
 																variables.hostName,
 																arguments.exception.message,
 																arguments.exception.detail,
-																cfid,
-																cftoken,
+																tmpCFID,
+																tmpCFTOKEN,
 																cgi.HTTP_USER_AGENT,
 																GetBaseTemplatePath(),
 																longMessage	)>
