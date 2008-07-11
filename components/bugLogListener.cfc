@@ -20,25 +20,25 @@
 			var cacheTTL = 300;		// timeout in minutes for cache entries
 
 			// load DAO Factory
-			variables.oDAOFactory = createObject("component","lib.dao.DAOFactory").init( expandPath("/bugLog/config/dao-config.xml.cfm") );
+			variables.oDAOFactory = createObject("component","bugLog.components.lib.dao.DAOFactory").init( expandPath("/bugLog/config/dao-config.xml.cfm") );
 					
 			// load the finder objects
-			variables.oAppFinder = createObject("component","appFinder").init( variables.oDAOFactory.getDAO("application") );
-			variables.oHostFinder = createObject("component","hostFinder").init( variables.oDAOFactory.getDAO("host") );
-			variables.oSeverityFinder = createObject("component","severityFinder").init( variables.oDAOFactory.getDAO("severity") );
-			variables.oSourceFinder = createObject("component","sourceFinder").init( variables.oDAOFactory.getDAO("source") );
+			variables.oAppFinder = createObject("component","bugLog.components.appFinder").init( variables.oDAOFactory.getDAO("application") );
+			variables.oHostFinder = createObject("component","bugLog.components.hostFinder").init( variables.oDAOFactory.getDAO("host") );
+			variables.oSeverityFinder = createObject("component","bugLog.components.severityFinder").init( variables.oDAOFactory.getDAO("severity") );
+			variables.oSourceFinder = createObject("component","bugLog.components.sourceFinder").init( variables.oDAOFactory.getDAO("source") );
 			
 			// load the rule processor
-			variables.oRuleProcessor = createObject("component","ruleProcessor").init();
+			variables.oRuleProcessor = createObject("component","bugLog.components.ruleProcessor").init();
 			
 			// load rules
 			loadRules();
 			
 			// create cache instances
-			variables.oAppCache = createObject("component","lib.cache.cacheService").init(50, cacheTTL, false);
-			variables.oHostCache = createObject("component","lib.cache.cacheService").init(50, cacheTTL, false);
-			variables.oSeverityCache = createObject("component","lib.cache.cacheService").init(5, cacheTTL, false);
-			variables.oSourceCache = createObject("component","lib.cache.cacheService").init(5, cacheTTL, false);		
+			variables.oAppCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
+			variables.oHostCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
+			variables.oSeverityCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);
+			variables.oSourceCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);		
 						
 			// record the date at which the service started 
 			variables.startedOn = Now();
@@ -66,7 +66,7 @@
 			oSource = getSourceFromBean( bean );
 
 			// create entry
-			oEntry = createObject("component","entry").init( oDF.getDAO("entry") );
+			oEntry = createObject("component","bugLog.components.entry").init( oDF.getDAO("entry") );
 			oEntry.setDateTime(bean.getdateTime());
 			oEntry.setMessage(bean.getmessage());
 			oEntry.setApplicationID(oApp.getApplicationID());
@@ -117,7 +117,7 @@
 	
 				} catch(appFinderException.ApplicationCodeNotFound e) {
 					// code does not exist, so we need to create it
-					oApp = createObject("component","app").init( oDF.getDAO("application") );
+					oApp = createObject("component","bugLog.components.app").init( oDF.getDAO("application") );
 					oApp.setCode( key );
 					oApp.setName( key );
 					oApp.save();
@@ -151,7 +151,7 @@
 	
 				} catch(hostFinderException.HostNameNotFound e) {
 					// code does not exist, so we need to create it
-					oHost = createObject("component","host").init( oDF.getDAO("host") );
+					oHost = createObject("component","bugLog.components.host").init( oDF.getDAO("host") );
 					oHost.setHostName(key);
 					oHost.save();
 				}
@@ -184,7 +184,7 @@
 	
 				} catch(severityFinderException.codeNotFound e) {
 					// code does not exist, so we need to create it
-					oSeverity = createObject("component","severity").init( oDF.getDAO("severity") );
+					oSeverity = createObject("component","bugLog.components.severity").init( oDF.getDAO("severity") );
 					oSeverity.setCode( key );
 					oSeverity.setName( key );
 					oSeverity.save();
@@ -218,7 +218,7 @@
 	
 				} catch(sourceFinderException.codeNotFound e) {
 					// code does not exist, so we need to create it
-					oSource = createObject("component","source").init( oDF.getDAO("source") );
+					oSource = createObject("component","bugLog.components.source").init( oDF.getDAO("source") );
 					oSource.setName( key );
 					oSource.save();
 				}
@@ -238,7 +238,7 @@
 			var i = 0;
 			
 			// get the rule definitions from the extensions service
-			oExtensionsService = createObject("component","extensionsService").init();
+			oExtensionsService = createObject("component","bugLog.components.extensionsService").init();
 			aRules = oExtensionsService.getRules();
 			
 			// create rule objects and load them into the rule processor

@@ -8,6 +8,7 @@
 			var appTitle = getSetting("applicationTitle", application.applicationName);
 			var event = getEvent();
 			var hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName();
+			var versionTag = getSetting("versionTag");
 			
 			try {
 				// make sure that we always access everything via events
@@ -29,7 +30,7 @@
 				setValue("hostName", hostName);
 				setValue("applicationTitle", appTitle);
 				setValue("stInfo", stInfo);
-				setValue("versionTag", "v 1.3.58");
+				setValue("versionTag", versionTag);
 
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -253,6 +254,7 @@
 				
 				if(val(entryID) eq 0) throw("Please select an entry to send");		
 				if(recipient eq "") throw("Please enter the email address of the recipient");
+				if(sender eq "") throw("The sender email address has not been configured.");
 				
 				oEntry = getService("app").sendEntry(entryID, sender, recipient, comment);
 				

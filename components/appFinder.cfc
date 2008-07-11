@@ -7,7 +7,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","app").init( variables.oDAO );
+				o = createObject("component","bugLog.components.app").init( variables.oDAO );
 				o.setApplicationID(qry.applicationID);
 				o.setName(qry.name);
 				o.setCode(qry.code);
@@ -25,7 +25,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","app").init( variables.oDAO );
+				o = createObject("component","bugLog.components.app").init( variables.oDAO );
 				o.setApplicationID(qry.applicationID);
 				o.setName(qry.name);
 				o.setCode(qry.code);

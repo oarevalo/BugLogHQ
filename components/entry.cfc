@@ -65,26 +65,26 @@
 
 	<cffunction name="getApplication" access="public" returntype="app" hint="Returns the application object">
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
-		<cfset var oApplicationDAO = createObject("component","db.applicationDAO").init( oDataProvider )>
-		<cfreturn createObject("component","appFinder").init( oApplicationDAO ).findByID(variables.instance.applicationID)>
+		<cfset var oApplicationDAO = createObject("component","bugLog.components.db.applicationDAO").init( oDataProvider )>
+		<cfreturn createObject("component","bugLog.components.appFinder").init( oApplicationDAO ).findByID(variables.instance.applicationID)>
 	</cffunction>
 
 	<cffunction name="getHost" access="public" returntype="host" hint="Returns the host object">
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
-		<cfset var oHostDAO = createObject("component","db.hostDAO").init( oDataProvider )>
-		<cfreturn createObject("component","hostFinder").init( oHostDAO ).findByID(variables.instance.hostID)>
+		<cfset var oHostDAO = createObject("component","bugLog.components.db.hostDAO").init( oDataProvider )>
+		<cfreturn createObject("component","bugLog.components.hostFinder").init( oHostDAO ).findByID(variables.instance.hostID)>
 	</cffunction>
 
 	<cffunction name="getSource" access="public" returntype="source" hint="Returns the source object">
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
-		<cfset var oSourceDAO = createObject("component","db.sourceDAO").init( oDataProvider )>
-		<cfreturn createObject("component","sourceFinder").init( oSourceDAO ).findByID(variables.instance.sourceID)>
+		<cfset var oSourceDAO = createObject("component","bugLog.components.db.sourceDAO").init( oDataProvider )>
+		<cfreturn createObject("component","bugLog.components.sourceFinder").init( oSourceDAO ).findByID(variables.instance.sourceID)>
 	</cffunction>
 
 	<cffunction name="getSeverity" access="public" returntype="severity" hint="Returns the severity object">
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
-		<cfset var oSeverityDAO = createObject("component","db.severityDAO").init( oDataProvider )>
-		<cfreturn createObject("component","severityFinder").init( oSeverityDAO ).findByID(variables.instance.severityID)>
+		<cfset var oSeverityDAO = createObject("component","bugLog.components.db.severityDAO").init( oDataProvider )>
+		<cfreturn createObject("component","bugLog.components.severityFinder").init( oSeverityDAO ).findByID(variables.instance.severityID)>
 	</cffunction>
 	
 </cfcomponent>

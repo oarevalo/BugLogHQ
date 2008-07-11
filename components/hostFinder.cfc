@@ -7,7 +7,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","host").init( variables.oDAO );
+				o = createObject("component","bugLog.components.host").init( variables.oDAO );
 				o.setHostID(qry.hostID);
 				o.setHostName(qry.hostName);
 				return o;
@@ -24,7 +24,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","host").init( variables.oDAO );
+				o = createObject("component","bugLog.components.host").init( variables.oDAO );
 				o.setHostID(qry.hostID);
 				o.setHostName(qry.hostName);
 				return o;

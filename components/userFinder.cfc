@@ -7,7 +7,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","user").init( variables.oDAO );
+				o = createObject("component","bugLog.components.user").init( variables.oDAO );
 				o.setUserID(qry.userID);
 				o.setUsername(qry.username);
 				o.setPassword(qry.password);
@@ -25,7 +25,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","user").init( variables.oDAO );
+				o = createObject("component","bugLog.components.user").init( variables.oDAO );
 				o.setUserID(qry.userID);
 				o.setUsername(qry.username);
 				o.setPassword(qry.password);

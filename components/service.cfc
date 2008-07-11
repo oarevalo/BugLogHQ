@@ -11,7 +11,7 @@
 			var oListener = 0;
 			
 			// create the bug log listener
-			oListener = createObject("component", "bugLogListener");
+			oListener = createObject("component", "bugLog.components.bugLogListener");
 			oListener.init();
 			
 			// store the service on the application scope

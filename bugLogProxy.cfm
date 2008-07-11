@@ -6,7 +6,7 @@
 <cfset errorMessage = "">
 
 <cftry>
-	<cfset oAppService = createObject("component","hq.components.services.appService").init(bugLogPath)>
+	<cfset oAppService = createObject("component","bugLog.hq.components.services.appService").init(bugLogPath)>
 	
 	<cfswitch expression="#action#">
 		

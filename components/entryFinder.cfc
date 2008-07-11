@@ -7,7 +7,7 @@
 			var o = 0;
 			
 			if(qry.recordCount gt 0) {
-				o = createObject("component","entry").init( variables.oDAO );
+				o = createObject("component","bugLog.components.entry").init( variables.oDAO );
 				o.setEntryID(qry.entryID);
 				o.setDateTime(qry.mydateTime);
 				o.setMessage(qry.message);
@@ -280,10 +280,10 @@
 
 		<cfset qryEntries = variables.oDAO.search(argumentCollection = stSearchParams)>
 
-		<cfset oHostDAO = createObject("component","db.hostDAO").init( oDataProvider )>
-		<cfset oSeverityDAO = createObject("component","db.severityDAO").init( oDataProvider )>
-		<cfset oApplicationDAO = createObject("component","db.applicationDAO").init( oDataProvider )>
-		<cfset oSourceDAO = createObject("component","db.sourceDAO").init( oDataProvider )>
+		<cfset oHostDAO = createObject("component","bugLog.components.db.hostDAO").init( oDataProvider )>
+		<cfset oSeverityDAO = createObject("component","bugLog.components.db.severityDAO").init( oDataProvider )>
+		<cfset oApplicationDAO = createObject("component","bugLog.components.db.applicationDAO").init( oDataProvider )>
+		<cfset oSourceDAO = createObject("component","bugLog.components.db.sourceDAO").init( oDataProvider )>
 
 		<cfset qryHosts = oHostDAO.getAll()>		
 		<cfset qrySeverity = oSeverityDAO.getAll()>		
