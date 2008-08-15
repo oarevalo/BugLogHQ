@@ -110,16 +110,30 @@
 		<cfset setValue("qryEntries", qryEntries)>	
 			
 		<!--- get the data for the filter dropdowns --->
-		<cfquery name="qryApplications" dbtype="query">
-			SELECT DISTINCT applicationID, applicationCode FROM qryEntries ORDER BY applicationCode
-		</cfquery>
+        <cfif groupByApp>
+            <cfquery name="qryApplications" dbtype="query">
+                SELECT DISTINCT applicationID, applicationCode FROM qryEntries ORDER BY applicationCode
+            </cfquery>
+        <cfelse>
+        	<cfset qryApplications = getService("app").getApplications()>
+            <cfquery name="qryApplications" dbtype="query">
+                SELECT applicationID, code as applicationCode, name FROM qryApplications ORDER BY code
+            </cfquery>
+        </cfif>
+
+		<cfif groupByHost>
+            <cfquery name="qryHosts" dbtype="query">
+                SELECT DISTINCT hostID, hostName FROM qryEntries ORDER BY hostName
+            </cfquery>
+        <cfelse>
+        	<cfset qryHosts = getService("app").getHosts()>
+            <cfquery name="qryHosts" dbtype="query">
+                SELECT hostID, hostName FROM qryHosts ORDER BY hostName
+            </cfquery>
+        </cfif>
+
 		<cfset setValue("qryApplications", qryApplications)>	
-
-		<cfquery name="qryHosts" dbtype="query">
-			SELECT DISTINCT hostID, hostName FROM qryEntries ORDER BY hostName
-		</cfquery>
 		<cfset setValue("qryHosts", qryHosts)>	
-
 		<cfset setView("vwMain")>
 	</cffunction>
 	

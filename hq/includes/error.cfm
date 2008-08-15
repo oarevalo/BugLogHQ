@@ -16,6 +16,19 @@
 			margin-bottom:10px;
 			line-height:20px;
 		}
+		.tblDump {
+			width:600px;
+			border-collapse:collapse;
+			border:1px solid silver;
+		}
+		.tblDump td, .tblDump th {
+			padding:4px;
+			line-height:18px;
+		}
+		.tblDump th {
+			background-color:##ccc;
+			text-align:left;
+		}		
 	</style>
 </head>
 		   
@@ -44,6 +57,42 @@
 			</td>
 		</tr>
 	</table>
+
+	<cfif structKeyExists(application,"_appSettings") 
+			and structKeyExists(application["_appSettings"],"debugMode")
+			and application["_appSettings"].debugMode>
+		<br><br>
+		<table align="center" class="tblDump" border="1">
+			<tr>
+				<td colspan="2" style="line-height:24px;">
+					<b><u>Diagnostic Information:</u></b>
+				</td>
+			</tr>
+			<tr>
+				<th>Message:</th>
+				<td>#error.message#</td>
+			</tr>
+			<tr>
+				<th>Type:</th>
+				<td>#error.type#</td>
+			</tr>
+			<tr>
+				<th>Details:</th>
+				<td>#error.detail#</td>
+			</tr>
+			<cfif isDefined("error.tagContext")>
+				<tr valign="top">
+					<th>Tag Context:</th>
+					<td>
+						<cfloop from="1" to="#arrayLen(error.tagContext)#" index="i">
+							&bull; #error.tagContext[i].template# (line #error.tagContext[i].line#)<br>
+						</cfloop>
+					</td>
+				</tr>
+			</cfif>
+		</table>
+	</cfif>
+
 </body>
 </html>
 </cfoutput>
