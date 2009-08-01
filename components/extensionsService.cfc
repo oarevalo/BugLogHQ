@@ -43,6 +43,7 @@
 				st = structNew();
 				st.component = variables.extensionsPath & "rules." & xmlNode.xmlAttributes.name;
 				st.config = structNew();
+				st.description = xmlNode.xmlText;
 				
 				// each child of a rule tag becomes an argument for the rule constructor
 				// this is how each rule instance is configured
@@ -74,12 +75,15 @@
 	<cffunction name="updateRule" access="public" returntype="void" hint="updates the settings of a rule">
 		<cfargument name="index" type="string" required="true">
 		<cfargument name="properties" type="struct" required="true">
+		<cfargument name="description" type="string" required="false" default="">
 		<cfscript>
 			// load the config doc			
 			var xmlDoc = xmlParse(expandPath(variables.configDocHREF));
 			var xmlNode = xmlDoc.xmlRoot.rules.xmlChildren[arguments.index];
 	
 			arrayClear(xmlNode.xmlChildren);
+			
+			xmlNode.xmlText = xmlFormat(arguments.description);
 			
 			for(prop in arguments.properties) {
 				xmlNewNode = xmlElemNew(xmlDoc,prop);
@@ -93,11 +97,13 @@
 	<cffunction name="createRule" access="public" returntype="void" hint="creates a new rule">
 		<cfargument name="ruleName" type="string" required="true">
 		<cfargument name="properties" type="struct" required="true">
+		<cfargument name="description" type="string" required="false" default="">
 		<cfscript>
 			// load the config doc			
 			var xmlDoc = xmlParse(expandPath(variables.configDocHREF));
 
 			var xmlNode = xmlElemNew(xmlDoc,"rule");
+			xmlNode.xmlText = xmlFormat(arguments.description);
 			xmlNode.xmlAttributes["name"] = arguments.ruleName;
 			
 			for(prop in arguments.properties) {

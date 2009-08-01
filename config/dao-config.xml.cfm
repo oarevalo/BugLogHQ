@@ -4,21 +4,21 @@
 		db: standard datasource
 		xml: xml storage (file-based)
 	 -->
-	<dataProviderType>db</dataProviderType>
+	<dataProviderType>xml</dataProviderType>
 
 	<!-- this is the path to where the DAOs for the application are stored -->
 	<clientDAOPath>bugLog.components.db.</clientDAOPath>
 
 	<properties>
-		<!-- xml storage 
+		<!-- xml storage -->
 		<property name="dataRoot" value="/bugLog/data/" />
-		-->
+		
 
-		<!-- database storage -->
+		<!-- database storage 
 		<property name="dsn" value="bugLog" />
 		<property name="dbtype" value="mysql" />
 		<property name="username" value="" />
-		<property name="password" value="" />
+		<property name="password" value="" />-->
 		
 	</properties>
 </config>

@@ -14,6 +14,7 @@
 		<cfargument name="bugLogListener" type="string" required="true">
 		<cfargument name="bugEmailRecipients" type="string" required="false" default="">
 		<cfargument name="bugEmailSender" type="string" required="false" default="">
+		<cfargument name="hostname" type="string" required="false" default="">
 		
 		<cfscript>
 			// determine the protocol based on the bugLogListener location 
@@ -31,6 +32,7 @@
 			variables.bugLogListener = arguments.bugLogListener;
 			variables.bugEmailSender = arguments.bugEmailSender;
 			variables.bugEmailRecipients = arguments.bugEmailRecipients;
+			if(arguments.hostname neq "") variables.hostName = arguments.hostname;
 			
 			if(arguments.bugEmailSender eq "" and arguments.bugEmailRecipients neq "")
 				arguments.bugEmailSender = listFirst(arguments.bugEmailRecipients);
@@ -206,6 +208,7 @@
 		
 
 		<cfsavecontent variable="tmpHTML">
+			<cfoutput>
 			<h3>Exception Summary</h3>
 			<table style="font-size:11px;font-family:arial;">
 				<tr>
@@ -224,6 +227,12 @@
 					<td><b>Message:</b></td>
 					<td>#arguments.exception.message#</td>
 				</tr>
+				<cfif structKeyExists(arguments.exception,"type")>
+					<tr>
+						<td><b>Type:</b></td>
+						<td>#arguments.exception.type#</td>
+					</tr>
+				</cfif>
 				<tr>
 					<td><b>Detail:</b></td>
 					<td>#arguments.exception.detail#</td>
@@ -238,6 +247,10 @@
 						</td>
 					</tr>
 				</cfif>
+				<tr>
+					<td><b>Script Name (CGI):</b></td>
+					<td>#cgi.SCRIPT_NAME#</td>
+				</tr>
 				<tr>
 					<td><b>User Agent:</b></td>
 					<td>#cgi.HTTP_USER_AGENT#</td>
@@ -289,10 +302,22 @@
 			</table>
 
 			<h3>Exception Info</h3>
-			<cfdump var="#arguments.exception#">
-		
+			<cfset stEx = structNew()>
+			<cfloop collection="#arguments.exception#" item="key">
+				<cfif not listFindNoCase("message,detail,tagcontext,type",key)>
+					<cfset stEx[key] = arguments.exception[key]>
+				</cfif>
+			</cfloop>
+			<cfdump var="#stEx#">
+			<br />
+			
 			<h3>Additional Info</h3>
-			<cfdump var="#arguments.ExtraInfo#">
+			<cfif isSimpleValue(arguments.ExtraInfo)>
+				#arguments.ExtraInfo#
+			<cfelse>
+				<cfdump var="#arguments.ExtraInfo#">
+			</cfif>
+			</cfoutput>
 		</cfsavecontent>
 		<cfreturn tmpHTML>
 	</cffunction>

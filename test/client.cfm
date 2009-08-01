@@ -10,8 +10,8 @@
 --->
 
 <cfset bugLogListener = structNew()>
-<cfset bugLogListener.soap = "http://#cgi.server_name#/bugLog/listeners/bugLogListenerWS.cfc?wsdl">
-<cfset bugLogListener.rest = "http://#cgi.server_name#/bugLog/listeners/bugLogListenerREST.cfm">
+<cfset bugLogListener.soap = "http://#cgi.HTTP_HOST#/bugLog/listeners/bugLogListenerWS.cfc?wsdl">
+<cfset bugLogListener.rest = "http://#cgi.HTTP_HOST#/bugLog/listeners/bugLogListenerREST.cfm">
 <cfset bugLogListener.cfc = "bugLog.listeners.bugLogListenerWS">
 
 <cfparam name="protocol" default="cfc">
@@ -25,7 +25,7 @@
 			body {
 				font-size:12px;
 				font-family: "trebuchet MS", Arial, Helvetica, "Sans Serif";
-				line-height:18px;
+				line-height:24px;
 				margin:20px;
 			}
 		</style>
@@ -35,14 +35,20 @@
 
 		<!--- Load bugLog client into application scope (if needed) --->
 		Checking if buglog client is in memory...<br>
-		<cfif not IsDefined("application.oBugLogService")>
-			<cflock scope="application" timeout="5" type="exclusive">
-				<cfif not IsDefined("application.oBugLogService")>
+		<cfif not IsDefined("application.oBugLogService") or reset>
+			<cflock name="buglogservice" timeout="5" type="exclusive">
+				<cfif not IsDefined("application.oBugLogService") or reset>
 					BugLog client not loaded. Creating instance and loading into Application scope now... <br>
+					<cfoutput>
+						... Listener type is: <b>#protocol#</b><br />
+						... Listener is: <a href="#bugLogListener[protocol]#">#bugLogListener[protocol]#</a><br />
+					</cfoutput>
 					<cfset application.oBugLogService = createObject("component",pathToService).init(bugLogListener[protocol])>
 				</cfif>
 			</cflock>
 		</cfif>
+
+		<br />
 
 		<cftry>
 			<!--- throw an error --->
@@ -51,7 +57,7 @@
 			
 			<cfcatch type="any">
 				<!--- notify bugLog of error --->
-				Notify service of error using via  [<cfoutput>#protocol#</cfoutput>] .... <br>
+				<cfoutput>Notify service via  <strong>[#protocol#]</strong> using severity <strong>[#severity#]</strong>....</cfoutput> <br>
 				<cfset application.oBugLogService.notifyService(cfcatch.message, cfcatch, "", severity)>
 			</cfcatch>
 		</cftry>
@@ -65,7 +71,18 @@
 		<br>
 		Done.
 	
-		<br><br>
+		<br /><br />
+		
+		<strong>Send test bug report via:</strong> 
+		<cfoutput>
+			<cfloop collection="#bugLogListener#" item="key">
+				<a href="client.cfm?protocol=#key#">#key#</a>
+				&nbsp;|&nbsp;
+			</cfloop>
+		</cfoutput>
+
+		<br /><br />
+
 		<a href="index.cfm">Return</a>
 	</body>
 </html>

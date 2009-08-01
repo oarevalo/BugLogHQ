@@ -3,8 +3,8 @@
 <cfparam name="request.requestState.aActiveRule" default="#structNew()#">
 
 <cfset rs = request.requestState>
-
 <cfset ruleName = listLast(rs.stRule.name,".")>
+<cfparam name="rs.aActiveRule.description" default="">
 
 <cfoutput>
 	<h2 style="margin-bottom:3px;">BugLog Add/Edit Rule</h2>
@@ -19,6 +19,12 @@
 		<input type="hidden" name="index" value="#rs.index#">
 	
 		<table>
+			<tr valign="top">
+				<td><b>Description:</b></td>
+				<td><textarea name="description" rows="3" class="formField">#trim(rs.aActiveRule.description)#</textarea></td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+
 			<cfset aProps = rs.stRule.properties>
 			<cfloop from="1" to="#arrayLen(aProps)#" index="i">
 				<cfif isDefined("rs.aActiveRule.config.#aProps[i].name#")>

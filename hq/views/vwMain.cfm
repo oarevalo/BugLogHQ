@@ -13,6 +13,8 @@
 <cfparam name="request.requestState.groupByHost" default="true">
 <cfparam name="request.requestState.qryApplications" default="#queryNew('')#">
 <cfparam name="request.requestState.qryHosts" default="#queryNew('')#">
+<cfparam name="request.requestState.qrySeverities" default="#queryNew('')#">
+<cfparam name="request.requestState.severityID" default="_ALL_">
 
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
@@ -32,9 +34,11 @@
 <cfset groupByHost = request.requestState.groupByHost>
 <cfset qryApplications = request.requestState.qryApplications>
 <cfset qryHosts = request.requestState.qryHosts>
+<cfset qrySeverities = request.requestState.qrySeverities>
+<cfset severityID = request.requestState.severityID>
 
 <!--- base URL for reloading --->
-<cfset pageURL = "index.cfm?event=ehGeneral.dspMain&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#searchTerm#&groupByApp=#groupByApp#&groupByHost=#groupByHost#&numDays=#numDays#">
+<cfset pageURL = "index.cfm?event=ehGeneral.dspMain&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#searchTerm#&groupByApp=#groupByApp#&groupByHost=#groupByHost#&numDays=#numDays#&severityID=#severityID#">
 
 <!--- setup variables for paging records --->
 <cfset numPages = ceiling(qryEntries.recordCount / rowsPerPage)>
@@ -73,12 +77,10 @@
 			function doSearch() {
 				var frm = document.frmSearch;
 				
-				location.replace('index.cfm?event=ehGeneral.dspMain&applicationID='+frm.applicationID.value
-									+'&hostID='+frm.hostID.value
-									+'&searchTerm='+frm.searchTerm.value
-									+'&groupByApp='+ document.getElementById("groupByApp").checked
-									+'&groupByHost='+ document.getElementById("groupByHost").checked
-									+"&numDays="+frm.numDays.value);
+				frm.groupByApp.value = document.getElementById("groupByApp").checked;
+				frm.groupByHost.value = document.getElementById("groupByHost").checked;
+				
+				frm.submit();
 			}
 		</script>	
 	</cfoutput>
@@ -100,6 +102,7 @@
 				<cfif stInfo.isRunning>
 					<span style="color:green;font-weight:bold;">Running</span>
 					<span style="font-size:12px;">(<a href="index.cfm?event=ehGeneral.doStop">Stop</a>)</span>
+					<a href="index.cfm?event=ehServiceMonitor.dspMain"><img src="images/icons/server_connect.png" border="0" align="absmiddle"></a>
 					<div style="font-size:9px;">
 						<strong>Last Start:</strong> 
 						#lsdateformat(stInfo.startedOn)# #lstimeformat(stInfo.startedOn)#
@@ -114,7 +117,10 @@
 				
 				
 	<!--- Search Criteria / Filters --->			
-	<form name="frmSearch" action="index.cfm" method="post" style="margin:0px;padding-top:10px;">
+	<form name="frmSearch" action="index.cfm" method="get" style="margin:0px;padding-top:10px;">
+		<input type="hidden" name="groupByApp" value="#groupByApp#">
+		<input type="hidden" name="groupByHost" value="#groupByHost#">
+		
 		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 			<tr align="center">
 				<td>
@@ -137,9 +143,16 @@
 					<select name="applicationID" style="width:200px;" onchange="doSearch()">
 						<option value="0">All</option>
 						<cfset tmp = applicationID>
+						<cfset found = false>
 						<cfloop query="qryApplications">
 							<option value="#qryApplications.applicationID#" <cfif qryApplications.applicationID eq tmp>selected</cfif>>#qryApplications.applicationCode#</option>
+							<cfif qryApplications.applicationID eq tmp>
+								<cfset found = true>
+							</cfif>
 						</cfloop>
+						<cfif applicationID gt 0 and not found>
+							<option value="0" selected>No Match Found</option>
+						</cfif>
 					</select>
 				</td>
 				<td>
@@ -147,10 +160,45 @@
 					<select name="hostID" style="width:200px;" onchange="doSearch()">
 						<option value="0">All</option>
 						<cfset tmp = hostID>
+						<cfset found = false>
 						<cfloop query="qryHosts">
 							<option value="#qryHosts.hostID#" <cfif qryHosts.hostID eq tmp>selected</cfif>>#qryHosts.hostName#</option>
+							<cfif qryHosts.hostID eq tmp>
+								<cfset found = true>
+							</cfif>
 						</cfloop>
+						<cfif hostID gt 0 and not found>
+							<option value="0" selected>No Match Found</option>
+						</cfif>
 					</select>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="4" align="center">
+					<span <cfif severityID neq "_ALL_">style="color:red;"</cfif>>Severity:</span> &nbsp;&nbsp;
+					<cfset tmp = severityID>
+					<cfloop query="qrySeverities">
+						<cfset tmpImgName = "images/severity/#lcase(qrySeverities.name)#.png">
+						<cfset tmpDefImgName = "images/severity/default.png">
+
+						<input type="checkbox" 
+								onclick="doSearch()"
+								name="severityID" 
+								value="#qrySeverities.severityID#"
+								<cfif tmp eq "_ALL_" or listFind(tmp,qrySeverities.severityID)>checked</cfif>
+								>
+						<cfif fileExists(expandPath(tmpImgName))>
+							<img src="#tmpImgName#" 
+									alt="#lcase(qrySeverities.name)#" 
+									title="#lcase(qrySeverities.name)#">
+						<cfelse>
+							<img src="#tmpDefImgName#" 
+									alt="#lcase(qrySeverities.name)#" 
+									title="#lcase(qrySeverities.name)#">
+						</cfif>
+						 #lcase(qrySeverities.name)#
+						&nbsp;&nbsp;&nbsp;
+					</cfloop>
 				</td>
 			</tr>
 		</table>
@@ -166,7 +214,7 @@
 		<tr>
 			<th width="15" nowrap>&nbsp;</th>
 			<th width="120">
-				<input type="checkbox" name="groupByApp" id="groupByApp" value="1" <cfif groupByApp>checked</cfif> onclick="doSearch()" title="Breakdown bugs by application name">
+				<input type="checkbox" name="groupByAppFld" id="groupByApp" value="1" <cfif groupByApp>checked</cfif> onclick="doSearch()" title="Breakdown bugs by application name">
 				<cfif sortBy eq "applicationCode">
 					<a href="#pageURL#&sortBy=applicationCode&sortDir=#opSortDir#" title="Click to sort by application name">Application</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
@@ -175,7 +223,7 @@
 				</cfif>
 			</th>
 			<th width="120">
-				<input type="checkbox" name="groupByHost" id="groupByHost" value="1" <cfif groupByHost>checked</cfif> onclick="doSearch()" title="Breakdown bugs by host name">
+				<input type="checkbox" name="groupByHostFld" id="groupByHost" value="1" <cfif groupByHost>checked</cfif> onclick="doSearch()" title="Breakdown bugs by host name">
 				<cfif sortBy eq "hostName">
 					<a href="#pageURL#&sortBy=hostName&sortDir=#opSortDir#" title="Click to sort by host name">Host</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
@@ -226,21 +274,28 @@
 		
 		<tr <cfif qryEntries.currentRow mod 2>class="altRow"</cfif> <cfif isNew>style="font-weight:bold;"</cfif>>
 			<td width="15" align="center" style="padding:0px;">
+				<cfset tmpImgName = "images/severity/default.png">
 				<cfif qryEntries.SeverityCode neq "">
-					<img src="images/severity/#lcase(qryEntries.SeverityCode)#.png" 
-							align="absmiddle"
-							alt="#lcase(qryEntries.SeverityCode)#" 
-							title="#lcase(qryEntries.SeverityCode)#">
+					<cfif fileExists(expandPath("images/severity/#lcase(qryEntries.SeverityCode)#.png"))>
+						<cfset tmpImgName = "images/severity/#lcase(qryEntries.SeverityCode)#.png">
+					</cfif>
 				</cfif>
+				<a href="index.cfm?event=ehGeneral.dspLog&severityID=#qryEntries.SeverityCode#" 
+					title="Click to view all #qryEntries.SeverityCode# bugs"><img 
+						src="#tmpImgName#" 
+						align="absmiddle"
+						alt="#lcase(qryEntries.SeverityCode)#" 
+						title="#lcase(qryEntries.SeverityCode)#"
+						border="0"></a>
 			</td>
 			<td width="120">
 				<cfif groupByApp>
-					<a href="index.cfm?event=ehGeneral.dspMain&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a>
+					<a href="index.cfm?event=ehGeneral.dspLog&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a>
 				</cfif>
 			</td>	
 			<td width="120">
 				<cfif groupByHost>
-					<a href="index.cfm?event=ehGeneral.dspMain&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a>
+					<a href="index.cfm?event=ehGeneral.dspLog&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a>
 				</cfif>	
 			</td>
 			<td onclick="document.location='#zoomURL#'" 
@@ -265,6 +320,10 @@
 	<!--- Table Footer (paging controls) --->
 	<div style="font-size:10px;line-height:20px;margin-top:10px;font-weight:bold;">
 		<cfset pageURL = pageURL & "&sortBy=#sortBy#&sortDir=#sortDir#">
+		
+		<div style="float:right;width:150px;text-align:right;">
+			<a href="index.cfm?resetCriteria=1">Reset Filters</a>
+		</div>
 		
 		Page #currPage# of #numPages#
 		&nbsp;&nbsp;&middot;&nbsp;&nbsp;

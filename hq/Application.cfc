@@ -181,15 +181,7 @@
 						}
 	
 						// instantiate service
-						if( (xmlNode.xmlAttributes.class DOES NOT CONTAIN ".") OR ((xmlNode.xmlAttributes.class CONTAINS ".") AND (xmlNode.xmlAttributes.class DOES NOT CONTAIN "/") AND (xmlNode.xmlAttributes.class DOES NOT CONTAIN "\")) ) {
-							// class is a regular cfc path
-							oService = createObject("component", xmlNode.xmlAttributes.class);
-						} else {
-							// class is a relative path
-							oProxy = createObject("java", "coldfusion.runtime.TemplateProxyFactory");
-							oFile = createObject("java", "java.io.File").init( expandPath(xmlNode.xmlAttributes.class) );
-							oService = oProxy.resolveFile(getPageContext(), oFile);
-						}
+						oService = createObject("component", xmlNode.xmlAttributes.class);
 
 						// initialize service
 						oService = oService.init(argumentCollection = stArguments);

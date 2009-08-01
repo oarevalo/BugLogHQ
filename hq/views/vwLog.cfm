@@ -171,12 +171,16 @@
 		<cfset isNew = qryEntries.entryID gt lastbugread>
 		<tr <cfif qryEntries.currentRow mod 2>class="altRow"</cfif> <cfif isNew>style="font-weight:bold;"</cfif>>
 			<td width="15" align="center" style="padding:0px;">
+				<cfset tmpImgName = "images/severity/default.png">
 				<cfif qryEntries.SeverityCode neq "">
-					<img src="images/severity/#lcase(qryEntries.SeverityCode)#.png" 
-							align="absmiddle"
-							alt="#lcase(qryEntries.SeverityCode)#" 
-							title="#lcase(qryEntries.SeverityCode)#">
+					<cfif fileExists(expandPath("images/severity/#lcase(qryEntries.SeverityCode)#.png"))>
+						<cfset tmpImgName = "images/severity/#lcase(qryEntries.SeverityCode)#.png">
+					</cfif>
 				</cfif>
+				<img src="#tmpImgName#" 
+						align="absmiddle"
+						alt="#lcase(qryEntries.SeverityCode)#" 
+						title="#lcase(qryEntries.SeverityCode)#">
 			</td>
 			<td width="15">
 				<a href="?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#qryEntries.entryID#</a>

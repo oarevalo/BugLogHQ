@@ -60,6 +60,11 @@
 		<b>#ruleName#</b>
 		( <a href="##" onclick="confirmDeleteRule(#i#)" style="font-size:10px;">Remove</a> )
 		( <a href="index.cfm?event=ehExtensions.dspRule&index=#i#&ruleName=#ruleName#" style="font-size:10px;">Modify</a> )
+		
+		<div style="margin-top:5px;">
+			#item.description#
+		</div>
+		
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<cfloop list="#lstProps#" index="fld">

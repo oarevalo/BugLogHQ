@@ -10,9 +10,9 @@
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="senderEmail" type="string" required="true">
 		<cfargument name="recipientEmail" type="string" required="true">
-		<cfargument name="severityCode" type="string" required="true">
-		<cfargument name="application" type="string" required="true">
-		<cfargument name="keywords" type="string" required="true">
+		<cfargument name="severityCode" type="string" required="false" default="">
+		<cfargument name="application" type="string" required="false" default="">
+		<cfargument name="keywords" type="string" required="false" default="">
 		<cfset variables.config.senderEmail = arguments.senderEmail>
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.severityCode = trim(arguments.severityCode)>

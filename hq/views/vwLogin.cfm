@@ -2,6 +2,8 @@
 <cfparam name="username" default="">
 
 <cfset versionTag = request.requestState.versionTag>
+<cfset lstNoPassKeys = "event,view,layout,resetApp,versionTag,_modelsPath,applicationTitle,hostName">
+<cfset qs = replaceNoCase(cgi.QUERY_STRING,"event=ehGeneral.dspLogin","")>
 
 <link href="includes/style.css" rel="stylesheet" type="text/css">
 <style type="text/css">
@@ -14,7 +16,7 @@
 <br>
 
 <cfoutput>
-	<form name="frmLogin" action="index.cfm" method="post">
+	<form name="frmLogin" action="index.cfm?#qs#" method="post">
 		<input type="hidden" name="event" value="ehGeneral.doLogin">
 		
 		<table align="center" border="0" cellpadding="2" cellspacing="0" class="tblLogin">

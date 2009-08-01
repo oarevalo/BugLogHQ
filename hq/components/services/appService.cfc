@@ -68,7 +68,7 @@
 		<cfargument name="searchTerm" type="string" required="true">
 		<cfargument name="applicationID" type="string" required="false" default="0">
 		<cfargument name="hostID" type="string" required="false" default="0">
-		<cfargument name="severityID" type="numeric" required="false" default="0">
+		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
 		<cfargument name="search_cfid" type="string" required="false" default="">
@@ -91,6 +91,13 @@
 				oFinder = createModelObject("components.hostFinder").init( variables.oHostDAO );
 				o = oFinder.findByName(arguments.hostID);
 				arguments.hostID = o.getHostID();
+			}
+
+			// if severityID is not numeric and is not a list and is not _ALL_, assume it is the severityCode
+			if(Not isNumeric(arguments.severityID) and listlen(arguments.severityID) eq 1 and arguments.severityID neq "_ALL_") {
+				oFinder = createModelObject("components.severityFinder").init( variables.oSeverityDAO );
+				o = oFinder.findByCode(arguments.severityID);
+				arguments.severityID = o.getSeverityID();
 			}
 			
 			arguments.applicationID = val(arguments.applicationID);
@@ -126,6 +133,10 @@
 
 	<cffunction name="getHosts" access="public" returntype="query">
 		<cfreturn variables.oHostDAO.getAll()>
+	</cffunction>	
+
+	<cffunction name="getSeverities" access="public" returntype="query">
+		<cfreturn variables.oSeverityDAO.getAll()>
 	</cffunction>	
 	
 	<cffunction name="sendEntry" access="public" returntype="void">
@@ -254,6 +265,7 @@
 		<cfscript>
 			var stRule = 0; var oExtensionsService = 0;
 			var stProperties = 0; var i=0; var prop = "";
+			var desc = "";
 			
 			// get rule info
 			stRule = getCFCInfo(variables.extensionsPath & "rules." & arguments.ruleName);
@@ -266,10 +278,13 @@
 					stProperties[prop] = arguments[prop];
 			}
 			
+			if(structKeyExists(arguments,"description"))
+				desc = arguments.description;
+			
 			if(arguments.index gt 0) 
-				oExtensionsService.updateRule(arguments.index, stProperties);
+				oExtensionsService.updateRule(arguments.index, stProperties, desc);
 			 else 
-				oExtensionsService.createRule(arguments.ruleName, stProperties);
+				oExtensionsService.createRule(arguments.ruleName, stProperties, desc);
 		</cfscript>
 		
 	</cffunction>

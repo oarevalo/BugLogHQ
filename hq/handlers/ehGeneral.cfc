@@ -9,6 +9,7 @@
 			var event = getEvent();
 			var hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName();
 			var versionTag = getSetting("versionTag");
+			var	qs = "";
 			
 			try {
 				// make sure that we always access everything via events
@@ -20,7 +21,13 @@
 				if(not listFindNoCase("ehGeneral.doLogin,ehGeneral.dspLogin,ehRSS.dspRSS",event) and 
 					(Not structKeyExists(session,"userID") or session.userID eq 0)) {
 					setMessage("Warning","Please enter your username and password");
-					setNextEvent("ehGeneral.dspLogin");
+					for(key in url) {
+						if(key eq "event")
+							qs = qs & "nextevent=" & url.event & "&";
+						else
+							qs = qs & key & "=" & url[key] & "&";
+					}
+					setNextEvent("ehGeneral.dspLogin",qs);
 				}
 
 				// get status of buglog server
@@ -51,18 +58,41 @@
 
 	<cffunction name="dspMain" access="public" returntype="void">
 		<cfscript>
+			resetCriteria = getValue("resetCriteria", false);
+			if(resetCriteria) {
+				structDelete(cookie,"criteria");
+				writeCookie("criteria","","now");
+			}
+			
+			if(structKeyExists(cookie,"criteria") and isJSON(cookie.criteria)) {
+				criteria = deserializeJSON(cookie.criteria);
+			} else {
+				// set default values
+				criteria = structNew();
+				criteria.numDays = 1;
+				criteria.searchTerm = "";
+				criteria.applicationID = 0;
+				criteria.hostID = 0;
+				criteria.severityID = "_ALL_";
+				criteria.search_cfid = "";
+				criteria.search_cftoken = "";
+				criteria.enddate = "1/1/3000";
+				criteria.groupByApp = true;
+				criteria.groupByHost = true;
+			}
+			
 			// page params
-			numDays = getValue("numDays",1);
-			searchTerm = getValue("searchTerm","");
-			applicationID = getValue("applicationID",0);
-			hostID = getValue("hostID",0);
-			severityID = getValue("severityID",0);
-			search_cfid = getValue("search_cfid","");
-			search_cftoken = getValue("search_cftoken","");
-			endDate = getValue("endDate","1/1/3000");
+			numDays = getValue("numDays", criteria.numDays);
+			searchTerm = getValue("searchTerm", criteria.searchTerm);
+			applicationID = getValue("applicationID", criteria.applicationID);
+			hostID = getValue("hostID", criteria.hostID);
+			severityID = getValue("severityID", criteria.severityID);
+			search_cfid = getValue("search_cfid", criteria.search_cfid);
+			search_cftoken = getValue("search_cftoken", criteria.search_cftoken);
+			endDate = getValue("endDate", criteria.enddate);
 
-			groupByApp = getValue("groupByApp", true);
-			groupByHost = getValue("groupByHost", true);
+			groupByApp = getValue("groupByApp", criteria.groupByApp);
+			groupByHost = getValue("groupByHost", criteria.groupByHost);
 
 			// calculate how far back to query the data
 			startDate = dateAdd("d", val(numDays) * -1, now());
@@ -77,7 +107,7 @@
 			// save the last entryID on a cookie, this allows to detect unread entries
 			lastEntryID = arrayMax( listToArray( valueList(qryEntries.entryID) ) );
 			if(not structKeyExists(cookie,"lastbugread")) {
-				cookie.lastbugread = lastEntryID;
+				writeCookie("lastbugread",lastEntryID,30);
 			}
 			setValue("lastbugread", cookie.lastbugread);
 
@@ -85,6 +115,19 @@
 			if(lastEntryID gt cookie.lastbugread) {
 				setValue("applicationTitle", getValue("applicationTitle") & " (#lastEntryID-cookie.lastbugread#)");
 			}
+			
+			criteria = structNew();
+			criteria.numDays = numDays;
+			criteria.searchTerm = searchTerm;
+			criteria.applicationID = applicationID;
+			criteria.hostID = hostID;
+			criteria.severityID = severityID;
+			criteria.search_cfid = search_cfid;
+			criteria.search_cftoken = search_cftoken;
+			criteria.enddate = enddate;
+			criteria.groupByApp = groupByApp;
+			criteria.groupByHost = groupByHost;
+			writeCookie("criteria",serializeJSON(criteria),30);
 		</cfscript>
 			
 		<!--- perform grouping for summary display --->	
@@ -131,9 +174,26 @@
                 SELECT hostID, hostName FROM qryHosts ORDER BY hostName
             </cfquery>
         </cfif>
+		
+		<cfset qrySeverities = getService("app").getSeverities()>
+		<cfquery name="qrySeverities" dbtype="query">
+			SELECT severityID, name FROM qrySeverities ORDER BY name
+		</cfquery>
 
+
+		<cfset setValue("numDays", numDays)>	
+		<cfset setValue("searchTerm", searchTerm)>	
+		<cfset setValue("applicationID", applicationID)>	
+		<cfset setValue("hostID", hostID)>	
+		<cfset setValue("severityID", severityID)>	
+		<cfset setValue("search_cfid", search_cfid)>	
+		<cfset setValue("search_cftoken", search_cftoken)>	
+		<cfset setValue("endDate", endDate)>	
+		<cfset setValue("groupByApp", groupByApp)>	
+		<cfset setValue("groupByHost", groupByHost)>	
 		<cfset setValue("qryApplications", qryApplications)>	
 		<cfset setValue("qryHosts", qryHosts)>	
+		<cfset setValue("qrySeverities", qrySeverities)>	
 		<cfset setView("vwMain")>
 	</cffunction>
 	
@@ -195,7 +255,10 @@
 			try {
 				entryID = getValue("entryID");
 
-				if(val(entryID) eq 0) throw("Please select an entry to view");		
+				if(val(entryID) eq 0) {
+					setMessage("warning","Please select an entry to view");
+					setNextEvent("ehGeneral.dspMain");
+				}		
 				
 				oEntry = getService("app").getEntry(entryID);
 				
@@ -242,7 +305,7 @@
 				// start service
 				getService("app").startService();
 				setMessage("info","BugLogListener has been started!");
-			
+
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
@@ -291,19 +354,22 @@
 			var username = "";
 			var password = "";
 			var userID = 0;
-			
+			var nextEvent = getValue("nextEvent");
+			var qs = replaceNoCase(cgi.QUERY_STRING,"event=ehGeneral.doLogin","");
+
 			try {
 				username = getValue("username","");
 				password = getValue("password","");
 				
 				if(username eq "") throw("Please enter your username");		
 				if(password eq "") throw("Please enter your password");
+				if(nextEvent eq "") nextEvent = "ehGeneral.dspMain";
 				
 				userID = getService("app").checkLogin(username, password);
 				if(userID eq 0) throw("Invalid username/password combination");
-				
 				session.userID = userID;
-				setNextEvent("ehGeneral.dspMain");
+
+				setNextEvent(nextEvent,qs);
 				
 			} catch(custom e) {
 				setMessage("warning",e.message);
@@ -324,5 +390,12 @@
 		<cfset setNextEvent("ehGeneral.dspLogin")>
 	</cffunction>
 		
+	<cffunction name="writeCookie" access="private">
+		<cfargument name="name" type="string">
+		<cfargument name="value" type="string">
+		<cfargument name="expires" type="string">
+		<cfcookie name="#arguments.name#" value="#arguments.value#" expires="#arguments.expires#">
+	</cffunction>
+	
 
 </cfcomponent>

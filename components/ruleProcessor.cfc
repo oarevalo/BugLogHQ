@@ -27,7 +27,7 @@
 
 				} catch(any e) {
 					// if an error occurs while a rule executes, then write to normal log file
-					writeToCFLog(e.message);	
+					writeToCFLog(e.message & e.detail);	
 				}
 			}
 		</cfscript>

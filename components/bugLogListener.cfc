@@ -18,7 +18,7 @@
 	
 		<cfscript>
 			var cacheTTL = 300;		// timeout in minutes for cache entries
-
+			
 			// load DAO Factory
 			variables.oDAOFactory = createObject("component","bugLog.components.lib.dao.DAOFactory").init( expandPath("/bugLog/config/dao-config.xml.cfm") );
 					
@@ -93,6 +93,10 @@
 
 	<cffunction name="getStartedOn" access="public" returntype="date" hint="Returns the date and time where this instance of BugLogListener was created">
 		<cfreturn variables.startedOn>
+	</cffunction>
+
+	<cffunction name="shutDown" access="public" returntype="void" hint="Performs any clean up action required">
+		<!--- empty --->
 	</cffunction>
 
 	<!---- Private Methods ---->

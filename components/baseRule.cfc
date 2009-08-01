@@ -79,5 +79,10 @@
 		</cfmail>
 		
 	</cffunction>
+
+	<cffunction name="writeToCFLog" access="private" returntype="void" hint="writes a message to the internal cf logs">
+		<cfargument name="message" type="string" required="true">
+		<cflog application="true" file="bugLog_ruleProcessor" text="#arguments.message#">
+	</cffunction>
 	
 </cfcomponent>

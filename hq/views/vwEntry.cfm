@@ -28,16 +28,23 @@
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<img width="16" height="16" src="images/icons/email.png" align="absmiddle" />
 				<a href="##" onclick="toggle('dSendForm')">Send to email</a>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<img width="16" height="16" src="images/icons/jira.png" align="absmiddle" />
+				<a href="index.cfm?event=ehJira.dspSendToJira&entryID=#entryID#">Send to JIRA</a>
 			</td>
-			<cfif tmpSeverity neq "">
-				<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
-					<img src="images/severity/#lcase(tmpSeverity)#.png" 
-							align="bottom"
-							alt="#lcase(tmpSeverity)#" 
-							title="#lcase(tmpSeverity)#">
-					#tmpSeverity#		
-				</td>
-			</cfif>
+			<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
+				<cfset tmpImgName = "images/severity/default.png">
+				<cfif tmpSeverity neq "">
+					<cfif fileExists(expandPath("images/severity/#lcase(tmpSeverity)#.png"))>
+						<cfset tmpImgName = "images/severity/#lcase(tmpSeverity)#.png">
+					</cfif>
+				</cfif>
+				<img src="#tmpImgName#" 
+						align="bottom"
+						alt="#lcase(tmpSeverity)#" 
+						title="#lcase(tmpSeverity)#">
+				#tmpSeverity#		
+			</td>
 			<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
 				<a href="index.cfm?event=ehGeneral.dspMain&applicationID=#oApp.getApplicationID()#">#oApp.getCode()#</a>
 			</td>

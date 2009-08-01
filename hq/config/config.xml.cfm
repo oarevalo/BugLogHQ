@@ -3,7 +3,7 @@
 	<settings>
 		<!-- Application Title -->
 		<setting name="applicationTitle" value="BugLogHQ"/>
-		<setting name="versionTag" value="1.3.60" />
+		<setting name="versionTag" value="1.4.60" />
 		
 		<!-- These two settings are used for reporting internal
 			errors of the HQ application -->
@@ -22,20 +22,33 @@
 		<!-- This flag controls wether detailed error information is displayed
 			in case the application encounters an unhandled exception -->
 		<setting name="debugMode" value="true" />
+
+		<!-- JIRA integration settings -->
+		<setting name="jiraEnabled" value="true" />
+		<setting name="jiraWsdl" value="" />
+		<setting name="jiraUsername" value="" />
+		<setting name="jiraPassword" value="" />
 	</settings>
 
 		
 	<!-- This section describes all services that will be loaded into the application -->
 	<services>
 		<!-- Application service (service layer) -->
-		<service name="app" class="components/services/appService.cfc">
+		<service name="app" class="bugLog.hq.components.services.appService">
 			<init-param name="path" settingName="bugLogPath" />
 		</service>
 	
 		<!-- error reporting service -->
-		<service name="bugTracker" class="components/services/bugTrackerService.cfc">
+		<service name="bugTracker" class="bugLog.hq.components.services.bugTrackerService">
 			<init-param name="bugEmailSender" settingName="bugEmailSender" />
 			<init-param name="bugEmailRecipients" settingName="bugEmailRecipients" />
+		</service>
+
+		<!-- JIRA service -->
+		<service name="jira" class="bugLog.components.jiraService">
+			<init-param name="wsdl" settingName="jiraWsdl" />
+			<init-param name="username" settingName="jiraUsername" />
+			<init-param name="password" settingName="jiraPassword" />
 		</service>
 		
 	</services>

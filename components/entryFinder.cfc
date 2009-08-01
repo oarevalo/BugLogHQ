@@ -33,7 +33,7 @@
 		<cfargument name="searchTerm" type="string" required="true">
 		<cfargument name="applicationID" type="numeric" required="false" default="0">
 		<cfargument name="hostID" type="numeric" required="false" default="0">
-		<cfargument name="severityID" type="numeric" required="false" default="0">
+		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
 		<cfargument name="search_cfid" type="string" required="false" default="">
@@ -66,16 +66,21 @@
 		<cfargument name="searchTerm" type="string" required="true">
 		<cfargument name="applicationID" type="numeric" required="false" default="0">
 		<cfargument name="hostID" type="numeric" required="false" default="0">
-		<cfargument name="severityID" type="numeric" required="false" default="0">
+		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
 		<cfargument name="search_cfid" type="string" required="false" default="">
 		<cfargument name="search_cftoken" type="string" required="false" default="">
+		<cfargument name="searchHTMLReport" type="boolean" required="false" default="false">
 
 		<cfset var tmpSQL = "">
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var dbType = oDataProvider.getConfig().getDBType()>
 		<cfset var qry = 0>
+
+		<cfif arguments.searchTerm neq "" and dbType eq "mysql">
+			<cfset arguments.searchTerm = replace(arguments.searchTerm,"'","\'","ALL")>
+		</cfif>
 
 		<cfsavecontent variable="tmpSQL">
 			<cfoutput>
@@ -111,6 +116,13 @@
 							exceptionMessage LIKE '%#arguments.searchTerm#%'
 							or
 							exceptionDetails LIKE '%#arguments.searchTerm#%'
+							or
+							templatePath LIKE '%#arguments.searchTerm#%'
+							or
+							userAgent LIKE '%#arguments.searchTerm#%'
+							<cfif arguments.searchHTMLReport>
+								or HTMLReport LIKE '%#arguments.searchTerm#%'
+							</cfif>
 						)
 					</cfif>
 					<cfif arguments.applicationID gt 0>
@@ -119,8 +131,8 @@
 					<cfif arguments.hostID gt 0>
 						AND e.hostID = #arguments.hostID# 
 					</cfif>
-					<cfif arguments.severityID gt 0>
-						AND e.severityID = #arguments.severityID# 
+					<cfif arguments.severityID neq "" and arguments.severityID neq 0 and arguments.severityID neq "_ALL_">
+						AND e.severityID IN (#arguments.severityID#) 
 					</cfif>
 					<cfif arguments.startDate neq "1/1/1800">
 						AND mydateTime >= #arguments.startDate# 
@@ -145,11 +157,12 @@
 		<cfargument name="searchTerm" type="string" required="true">
 		<cfargument name="applicationID" type="numeric" required="false" default="0">
 		<cfargument name="hostID" type="numeric" required="false" default="0">
-		<cfargument name="severityID" type="numeric" required="false" default="0">
+		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
 		<cfargument name="search_cfid" type="string" required="false" default="">
 		<cfargument name="search_cftoken" type="string" required="false" default="">
+		<cfargument name="searchHTMLReport" type="boolean" required="false" default="false">
 
 		<cfset var tmpSQL = "">
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
@@ -255,11 +268,12 @@
 		<cfargument name="searchTerm" type="string" required="true">
 		<cfargument name="applicationID" type="numeric" required="false" default="0">
 		<cfargument name="hostID" type="numeric" required="false" default="0">
-		<cfargument name="severityID" type="numeric" required="false" default="0">
+		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
 		<cfargument name="search_cfid" type="string" required="false" default="">
 		<cfargument name="search_cftoken" type="string" required="false" default="">
+		<cfargument name="searchHTMLReport" type="boolean" required="false" default="false">
 		
 		<cfset var qryEntries = 0>
 		<cfset var qryHosts = 0>
@@ -272,7 +286,7 @@
 		<cfscript>
 			if(arguments.applicationID gt 0) stSearchParams.applicationID = arguments.applicationID;
 			if(arguments.hostID gt 0) stSearchParams.hostID = arguments.hostID;
-			if(arguments.severityID gt 0) stSearchParams.severityID = arguments.severityID;
+			if(arguments.severityID neq "" and arguments.severityID neq 0 and arguments.severityID neq "_ALL_") stSearchParams.severityID = arguments.severityID;
 			if(arguments.searchTerm neq "") stSearchParams.message = "%arguments.searchTerm%";
 			if(arguments.search_cfid neq "") arguments.cfid = "arguments.search_cfid%";
 			if(arguments.search_cftoken neq "") arguments.cftoken = "arguments.search_cftoken%";
