@@ -10,6 +10,9 @@
 	<cfset variables.hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName()>
 	<cfset variables.appName = replace(application.applicationName," ","","all")>
 	
+	<cfset variables.escapePattern = createObject('java','java.util.regex.Pattern').compile("[^\u0009\u000a\u000d\u0020-\ud7ff\ud800\udc00\ue000-\ufffd\u100000-\u10ffff]") /> 
+
+	
 	<cffunction name="init" returntype="bugLogService" access="public" hint="Constructor" output="false">
 		<cfargument name="bugLogListener" type="string" required="true">
 		<cfargument name="bugEmailRecipients" type="string" required="false" default="">
@@ -117,17 +120,17 @@
 				<cfelse>
 					<!--- send bug via a webservice (SOAP) --->
 					<cfset variables.oBugLogListener.logEntry(Now(), 
-																arguments.message, 
+																sanitizeForXML(arguments.message), 
 																variables.appName, 
 																arguments.severityCode,
 																variables.hostName,
-																arguments.exception.message,
-																arguments.exception.detail,
+																sanitizeForXML(arguments.exception.message),
+																sanitizeForXML(arguments.exception.detail),
 																tmpCFID,
 																tmpCFTOKEN,
 																cgi.HTTP_USER_AGENT,
 																GetBaseTemplatePath(),
-																longMessage	)>
+																sanitizeForXML(longMessage)	)>
 				</cfif>
 			<cfelse>
 				<cfif variables.bugEmailRecipients neq "">
@@ -325,6 +328,17 @@
 	<cffunction name="throw" access="private" returntype="void" hint="facade for cfthrow">
 		<cfargument name="message" type="String" required="true">
 		<cfthrow message="#arguments.message#">
+	</cffunction>
+	
+	<cffunction name="sanitizeForXML" access="private" returnType="string" hint="sanitizes a string to make it safe for xml">
+		<cfargument name="inString" type="string" required="true" />
+		<cfset var matcher = variables.escapePattern.matcher(inString) />
+		<cfset var buffer = createObject('java','java.lang.StringBuffer').init('') />
+		<cfloop condition="matcher.find()">
+			<cfset matcher.appendReplacement(buffer,"") />
+		</cfloop>		
+		<cfset matcher.appendTail(buffer) />
+		<cfreturn buffer.toString() />
 	</cffunction>
 	
 </cfcomponent>
