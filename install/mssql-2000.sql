@@ -262,7 +262,8 @@ GO
 CREATE TABLE [dbo].[bl_User] (
 		[UserID]       int IDENTITY (1,1) NOT NULL,
 		[Username]     varchar(250) NOT NULL,
-		[Password]     varchar(50) NOT NULL
+		[Password]     varchar(50) NOT NULL,
+		[IsAdmin]	   int NOT NULL
 )
 ON [PRIMARY]
 GO
@@ -371,7 +372,7 @@ DELETE FROM [dbo].[bl_User]
 
 -- Insert scripts for table: bl_User
 PRINT 'Inserting rows into table: bl_User'
-INSERT INTO [dbo].[bl_User] ([Username], [Password]) VALUES ('admin', 'admin')
+INSERT INTO [dbo].[bl_User] ([Username], [Password], [IsAdmin]) VALUES ('admin', 'admin', 1)
 
 
 -- COMMITTING TRANSACTION DATA

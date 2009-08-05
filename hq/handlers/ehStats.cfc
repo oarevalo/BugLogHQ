@@ -60,8 +60,9 @@
 						WHERE applicationID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#applicationID#">
 					</cfif>
 					GROUP BY entry_#datePartName#
-					ORDER BY entry_year, entry_month, entry_day, entry_hour, entry_minute
+					ORDER BY entry_#datePartName#
 			</cfquery>
+			<!--- entry_year, entry_month, entry_day, entry_hour, entry_minute --->
 
 
 			<cfscript>
@@ -82,7 +83,7 @@
 			</cfscript>
 			
 			<cfcatch type="any">
-				<cfset setMessage("error",e.message)>
+				<cfset setMessage("error",cfcatch.message)>
 				<cfset getService("bugTracker").notifyService(cfcatch.message, cfcatch)>
 				<cfset setNextEvent("ehGeneral.dspMain")>
 			</cfcatch>

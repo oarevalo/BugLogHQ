@@ -1,10 +1,13 @@
 <cfparam name="request.requestState.oEntry">
+<cfparam name="request.requestState.jiraEnabled">
 
 <cfset oEntry = request.requestState.oEntry>
 <cfset oApp = oEntry.getApplication()>
 <cfset oHost = oEntry.getHost()>
 <cfset oSource = oEntry.getSource()>
 <cfset oSeverity = oEntry.getSeverity()>
+
+<cfset jiraEnabled = request.requestState.jiraEnabled>
 
 <script type="text/javascript">
 	function toggle(sec) {
@@ -28,9 +31,12 @@
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<img width="16" height="16" src="images/icons/email.png" align="absmiddle" />
 				<a href="##" onclick="toggle('dSendForm')">Send to email</a>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<img width="16" height="16" src="images/icons/jira.png" align="absmiddle" />
-				<a href="index.cfm?event=ehJira.dspSendToJira&entryID=#entryID#">Send to JIRA</a>
+				
+				<cfif isBoolean(jiraEnabled) and jiraEnabled>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<img width="16" height="16" src="images/icons/jira.png" align="absmiddle" />
+					<a href="index.cfm?event=ehJira.dspSendToJira&entryID=#entryID#">Send to JIRA</a>
+				</cfif>
 			</td>
 			<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
 				<cfset tmpImgName = "images/severity/default.png">

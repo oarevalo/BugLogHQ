@@ -24,7 +24,7 @@
 		<setting name="debugMode" value="true" />
 
 		<!-- JIRA integration settings -->
-		<setting name="jiraEnabled" value="true" />
+		<setting name="jiraEnabled" value="false" />
 		<setting name="jiraWsdl" value="" />
 		<setting name="jiraUsername" value="" />
 		<setting name="jiraPassword" value="" />

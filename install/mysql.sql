@@ -105,6 +105,7 @@ CREATE TABLE `bl_User` (
   `UserID` int(11) NOT NULL auto_increment,
   `Username` varchar(255) NOT NULL COMMENT '\n',
   `Password` varchar(50) NOT NULL COMMENT '\n',
+  `IsAdmin` int(11) NOT NULL default 0,
   PRIMARY KEY  (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -114,7 +115,7 @@ CREATE TABLE `bl_User` (
 
 LOCK TABLES `bl_User` WRITE;
 /*!40000 ALTER TABLE `bl_User` DISABLE KEYS */;
-INSERT INTO `bl_User` VALUES (1,'admin','admin');
+INSERT INTO `bl_User` VALUES (1,'admin','admin',1);
 /*!40000 ALTER TABLE `bl_User` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -216,7 +216,7 @@
 				return 0;		// wrong username
 			}
 			
-			return true;
+			return o.getUserID();
 		</cfscript>		
 	</cffunction>
 
@@ -298,6 +298,32 @@
 	</cffunction>
 
 
+	<!---- User Management ---->
+	<cffunction name="getUserByID" access="public" returntype="bugLog.components.user" hint="return the user for the given userid">
+		<cfargument name="userID" type="numeric" required="true">
+		<cfscript>
+			var oFinder = createModelObject("components.userFinder").init( oUserDAO );
+			return oFinder.findByID( arguments.userID );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="getUsers" access="public" returntype="query" hint="return a query with all users">
+		<cfreturn variables.oUserDAO.getAll()>
+	</cffunction>
+
+	<cffunction name="saveUser" access="public" returntype="void" hint="Creates or updates a user">
+		<cfargument name="userToSave" type="bugLog.components.user" required="true" hint="a user object">
+		<cfset arguments.userToSave.save()>
+	</cffunction>
+
+	<cffunction name="deleteUser" access="public" returntype="void" hint="Deletes a user">
+		<cfargument name="userToDelete" type="bugLog.components.user" required="true" hint="a user object">
+		<cfset variables.oUserDAO.delete( arguments.userToDelete.getUserID() )>
+	</cffunction>
+
+	<cffunction name="getBlankUser" access="public" returntype="bugLog.components.user" hint="return an empty user object">
+		<cfreturn createObject("component","bugLog.components.user").init( variables.oUserDAO ) />
+	</cffunction>
 	
 	<!----- Private Methods ---->
 	<cffunction name="createModelObject" access="private" returntype="any">

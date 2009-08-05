@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<data current_seq="1"><record ID="1"><username>admin</username><password>admin</password></record></data>
+<data current_seq="1"><record ID="1"><username>admin</username><password>admin</password><isAdmin>1</isAdmin></record></data>

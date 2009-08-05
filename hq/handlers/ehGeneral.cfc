@@ -12,6 +12,9 @@
 			var	qs = "";
 			
 			try {
+				if(not structKeyExists(session,"userID")) session.userID = 0;
+				if(not structKeyExists(session,"user")) session.user = 0;
+				
 				// make sure that we always access everything via events
 				if(event eq "") {
 					throw("All requests must specify the event to execute. Direct access to views is not allowed");
@@ -19,7 +22,7 @@
 
 				// check login
 				if(not listFindNoCase("ehGeneral.doLogin,ehGeneral.dspLogin,ehRSS.dspRSS",event) and 
-					(Not structKeyExists(session,"userID") or session.userID eq 0)) {
+					(session.userID eq 0)) {
 					setMessage("Warning","Please enter your username and password");
 					for(key in url) {
 						if(key eq "event")
@@ -38,6 +41,7 @@
 				setValue("applicationTitle", appTitle);
 				setValue("stInfo", stInfo);
 				setValue("versionTag", versionTag);
+				setValue("currentUser", session.user);
 
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -268,6 +272,7 @@
 				}
 				
 				// set values
+				setValue("jiraEnabled", getSetting("jiraEnabled"));
 				setValue("oEntry", oEntry);
 				setView("vwEntry");
 
@@ -368,6 +373,7 @@
 				userID = getService("app").checkLogin(username, password);
 				if(userID eq 0) throw("Invalid username/password combination");
 				session.userID = userID;
+				session.user = getService("app").getUserByID(userID);
 
 				setNextEvent(nextEvent,qs);
 				
@@ -386,6 +392,7 @@
 	
 	<cffunction name="doLogoff" access="public">
 		<cfset structDelete(session,"userID")>
+		<cfset structDelete(session,"user")>
 		<cfset setMessage("information","Thank you for using BugLogHQ")>
 		<cfset setNextEvent("ehGeneral.dspLogin")>
 	</cffunction>

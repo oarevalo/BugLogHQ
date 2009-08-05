@@ -11,5 +11,7 @@
 	&nbsp;&nbsp;&nbsp;
 	[ <a href="index.cfm?event=ehExtensions.dspMain" <cfif event eq "ehExtensions.dspMain">style="font-weight:bold;"</cfif>>Rules</a> ]
 	&nbsp;&nbsp;&nbsp;
+	[ <a href="index.cfm?event=ehAdmin.dspMain" <cfif event eq "ehAdmin.dspMain">style="font-weight:bold;"</cfif>>Admin</a> ]
+	&nbsp;&nbsp;&nbsp;
 	[ <img alt="RSS" width="16" height="16" src="images/icons/feed-icon16x16.gif" border="0" align="absmiddle"/> <a href="index.cfm?event=ehGeneral.dspRSS" <cfif event eq "ehGeneral.dspRSS">style="font-weight:bold;"</cfif>>RSS</a> ]
 </div>
