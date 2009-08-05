@@ -52,8 +52,8 @@
 			var user = getValue("currentUser");
 			
 			try {
-				if(currentPassword neq user.getPassword()) {setMessage("warning","The current password is invalid"); setNextEvent("ehAdmin.dspMain")}
-				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("ehAdmin.dspMain")}
+				if(currentPassword neq user.getPassword()) {setMessage("warning","The current password is invalid"); setNextEvent("ehAdmin.dspMain");}
+				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("ehAdmin.dspMain");}
 				user.setPassword(newPassword);
 				getService("app").saveUser(user);
 				setMessage("info","Password has been changed");
@@ -74,7 +74,7 @@
 			var user = getValue("currentUser");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to purge history"); setNextEvent("ehAdmin.dspMain")}
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to purge history"); setNextEvent("ehAdmin.dspMain");}
 				getService("app").purgeHistory(purgeHistoryDays, deleteOrphans);
 				setMessage("info","History purged");
 				setNextEvent("ehGeneral.dspMain");
