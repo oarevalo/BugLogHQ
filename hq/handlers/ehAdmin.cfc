@@ -44,6 +44,23 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="dspDeleteUser" access="public" returntype="void">
+		<cfscript>
+			var userID = getValue("userID");
+			
+			try {
+				if(userID eq 0) setNextEvent("ehAdmin.dspMain");
+				setValue("userID",userID);				
+				setView("vwDeleteUser");
+				
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehAdmin.dspMain");				
+			}
+		</cfscript>
+	</cffunction>
+	
 	<cffunction name="doChangePassword" access="public" returntype="void">
 		<cfscript>
 			var currentPassword = getValue("currentPassword");
@@ -87,4 +104,53 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="doSaveUser" access="public" returntype="void">
+		<cfscript>
+			var user = getValue("currentUser");
+			var userID = getValue("userID");
+			var username = getValue("username");
+			var password = getValue("password");
+			var isAdmin = getValue("isAdmin",false);
+			
+			try {
+				if(userID gt 0) 
+					oUser = getService("app").getUserByID(userID);
+				else
+					oUser = getService("app").getBlankUser();
+
+				oUser.setUsername(username);
+				oUser.setPassword(password);
+				oUser.setIsAdmin(isAdmin);
+
+				getService("app").saveUser(oUser);
+				setMessage("info","User information has been saved");
+				setNextEvent("ehAdmin.dspMain");
+							
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehAdmin.dspUser","userID=#userID#&username=#username#&isAdmin=#isAdmin#");
+			}
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="doDeleteUser" access="public" returntype="void">
+		<cfscript>
+			var user = getValue("currentUser");
+			var userID = getValue("userID");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to delete a user"); setNextEvent("ehAdmin.dspMain");}
+				getService("app").deleteUser(userID);
+				setMessage("info","User has been deleted");
+				setNextEvent("ehAdmin.dspMain");
+							
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehAdmin.dspUser");
+			}
+		</cfscript>
+	</cffunction>
+		
 </cfcomponent>

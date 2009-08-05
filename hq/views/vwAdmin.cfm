@@ -5,7 +5,7 @@
 <cfset purgeHistoryDays = request.requestState.purgeHistoryDays>
 
 
-<h2 style="margin-bottom:3px;">BugLog RSS Feeds</h2>
+<h2 style="margin-bottom:3px;">BugLog Settings & Management</h2>
 <cfinclude template="../includes/menu.cfm">
 
 <cfoutput>
@@ -38,7 +38,7 @@
 				<cfloop query="qryUsers">
 					<tr>
 						<td width="15">#qryUsers.currentRow#.</td>
-						<td><a href="index.cfm?event=ehAdmin.dspUser&editUserID=#qryUsers.userID#">#qryUsers.username#</a></td>
+						<td><a href="index.cfm?event=ehAdmin.dspUser&userID=#qryUsers.userID#">#qryUsers.username#</a></td>
 						<td align="center">#yesNoFormat(qryUsers.isAdmin)#</td>
 						<td align="center"><a href="index.cfm?event=ehAdmin.dspDeleteUser&userID=#qryUsers.userID#">[Delete]</a></td>
 					</tr>

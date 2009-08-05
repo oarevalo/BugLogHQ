@@ -35,7 +35,10 @@
 	
 	<cffunction name="doSaveRule">
 		<cfscript>
+			var user = getValue("currentUser");
+			
 			try {
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to create or modify a rule"); setNextEvent("ehExtensions.dspMain");}
 				getService("app").saveRule(argumentCollection = form);
 				setMessage("info","Rule saved. Changes will be effective the next time the listener service is started.");
 			
@@ -50,7 +53,10 @@
 
 	<cffunction name="doDeleteRule">
 		<cfscript>
+			var user = getValue("currentUser");
+			
 			try {
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to delete a rule"); setNextEvent("ehExtensions.dspMain");}
 				getService("app").deleteRule(index);
 				setMessage("info","Rule has been removed. Changes will be effective the next time the listener service is started.");
 			
