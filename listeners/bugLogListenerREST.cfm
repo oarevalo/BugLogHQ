@@ -12,19 +12,25 @@
 <cfparam name="userAgent" type="string" default="">
 <cfparam name="templatePath" type="string" default="">
 <cfparam name="HTMLReport" type="string" default="">
+<cfparam name="APIKey" type="string" default="">
 
 
 <!--- Handle service initialization if necessary --->
 <cfset oService = createObject("component", "bugLog.components.service").init()>
 
 <!--- check that the directory service has been started, if not then start it --->
-<cfif Not oService.isRunning()>
+<cfif Not oService.isRunning() and oService.getSetting("autoStart")>
 	<cflock name="bugLogListener_start" timeout="5">
 		<!--- use double-checked locking to make sure there is only one initialization --->
 		<cfif Not oService.isRunning()>
 			<cfset oService.start( )>
 		</cfif>
 	</cflock>
+</cfif>
+
+<!--- validate API Key (if required) --->
+<cfif oService.getSetting("requireAPIKey",false) and apikey neq oService.getSetting("APIKey")>
+	<cfthrow message="Invalid API Key." type="bugLog.invalidAPIKey">
 </cfif>
 
 <cfscript>

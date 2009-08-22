@@ -6,6 +6,7 @@
 	<cfset variables.protocol = "">
 	<cfset variables.useListener = true>
 	<cfset variables.defaultSeverityCode = "ERROR">
+	<cfset variables.apikey = "">
 	
 	<cfset variables.hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName()>
 	<cfset variables.appName = replace(application.applicationName," ","","all")>
@@ -18,6 +19,7 @@
 		<cfargument name="bugEmailRecipients" type="string" required="false" default="">
 		<cfargument name="bugEmailSender" type="string" required="false" default="">
 		<cfargument name="hostname" type="string" required="false" default="">
+		<cfargument name="apikey" type="string" required="false" default="">
 		
 		<cfscript>
 			// determine the protocol based on the bugLogListener location 
@@ -35,6 +37,7 @@
 			variables.bugLogListener = arguments.bugLogListener;
 			variables.bugEmailSender = arguments.bugEmailSender;
 			variables.bugEmailRecipients = arguments.bugEmailRecipients;
+			variables.apikey = arguments.apikey;
 			if(arguments.hostname neq "") variables.hostName = arguments.hostname;
 			
 			if(arguments.bugEmailSender eq "" and arguments.bugEmailRecipients neq "")
@@ -116,6 +119,7 @@
 						<cfhttpparam type="formfield" name="userAgent" value="#cgi.HTTP_USER_AGENT#">
 						<cfhttpparam type="formfield" name="templatePath" value="#GetBaseTemplatePath()#">
 						<cfhttpparam type="formfield" name="HTMLReport" value="#longMessage#">
+						<cfhttpparam type="formfield" name="APIKey" value="#variables.apikey#">
 					</cfhttp>
 				<cfelse>
 					<!--- send bug via a webservice (SOAP) --->
@@ -130,7 +134,8 @@
 																tmpCFTOKEN,
 																cgi.HTTP_USER_AGENT,
 																GetBaseTemplatePath(),
-																sanitizeForXML(longMessage)	)>
+																sanitizeForXML(longMessage),
+																variables.apikey )>
 				</cfif>
 			<cfelse>
 				<cfif variables.bugEmailRecipients neq "">

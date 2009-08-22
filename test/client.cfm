@@ -18,6 +18,7 @@
 <cfparam name="pathToService" default="bugLog.client.bugLogService">
 <cfparam name="severity" default="FATAL">
 <cfparam name="reset" default="true">
+<cfparam name="apikey" default="">
 
 <html>
 	<head>
@@ -42,8 +43,12 @@
 					<cfoutput>
 						... Listener type is: <b>#protocol#</b><br />
 						... Listener is: <a href="#bugLogListener[protocol]#">#bugLogListener[protocol]#</a><br />
+						<cfif apikey neq "">
+						... Listener API Key is: <b>#apikey#</b><br />
+						</cfif>
 					</cfoutput>
-					<cfset application.oBugLogService = createObject("component",pathToService).init(bugLogListener[protocol])>
+					<cfset application.oBugLogService = createObject("component",pathToService).init(bugLogListener = bugLogListener[protocol],
+																									 apiKey = apiKey)>
 				</cfif>
 			</cflock>
 		</cfif>

@@ -12,6 +12,20 @@
 		margin-top:200px;
 		margin-bottom:100px;
 	}
+	#logo {
+		color:red;
+		text-decoration:none;
+		font-size:22px;
+		font-weight:bold;
+	}
+	#versionTag {
+		font-size:10px;
+	}
+	#resetApp {
+		font-size:10px;
+		margin-top:15px;
+		color:#333;	
+	}
 </style>
 <br>
 
@@ -22,8 +36,15 @@
 		<table align="center" border="0" cellpadding="2" cellspacing="0" class="tblLogin">
 			<tr>
 				<td rowspan="5" style="border-right:1px solid ##ccc;width:150px;" valign="middle" align="center">
-					<span style="color:red;text-decoration:none;font-size:20px;">BugLog<span style="color:black;">HQ</span></span>
-					<div style="margin-top:5px;text-align:center;font-size:9px;">#versionTag#</div>
+					<div id="logo">BugLog<span style="color:black;">HQ</span></div>
+					<div id="versionTag">
+						Version: <strong>#versionTag#</strong>
+					</div>
+					<div id="resetApp">
+						<a href="index.cfm?resetApp=1" style="color:##333;" 
+							alt="Resetting the application will force a reload of any configuration settings"
+							title="Resetting the application will force a reload of any configuration settings">Reset BugLogHQ</a>
+					</div>
 				</td>
 				<td colspan="2">&nbsp;</td>
 			</tr>

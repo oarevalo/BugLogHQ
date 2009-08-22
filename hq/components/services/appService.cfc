@@ -52,8 +52,8 @@
 	
 	<cffunction name="startService" access="public" returntype="void">
 		<cfscript>
-			var oService = createModelObject("components.service").init();
-			oService.start( );
+			var oService = createModelObject("components.service").init( true );
+			oService.start();
 		</cfscript>
 	</cffunction>
 

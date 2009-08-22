@@ -36,7 +36,7 @@
 		</cflock>
 	</cffunction>	
 	
-	<cffunction name="processQueue" access="public" returntype="void" hint="Processes all entries on the queue">
+	<cffunction name="processQueue" access="public" returntype="numeric" hint="Processes all entries on the queue">
 		<cfargument name="key" type="string" required="true">
 		<cfset var myQueue = arrayNew(1)>
 		<cfset var i = 0>
@@ -44,6 +44,7 @@
 		
 		<cfif arguments.key neq variables.key>
 			<cfset logMessage("Invalid key received. Exiting.")>
+			<cfreturn -1>
 		</cfif>
 		
 		<cflock name="bugLogListenerAsync_processQueue" type="exclusive" timeout="10">
@@ -71,6 +72,8 @@
 		<cfif arrayLen(errorQueue) gt 0>
 			<cfset logMessage("Failed to add #arrayLen(errorQueue)# entries. Returned entries to main queue. To clear up queue and discard this entries reset the listener.")>
 		</cfif>
+		
+		<cfreturn 0>
 	</cffunction>
 
 	<cffunction name="shutDown" access="public" returntype="void" hint="Performs any clean up action required">
