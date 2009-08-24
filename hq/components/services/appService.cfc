@@ -21,13 +21,13 @@
 		</cfif>
 
 		<!--- Load the DAO objects --->
-		<cfset oDAOFactory = createModelObject("components.lib.dao.DAOFactory").init( expandPath("#variables.path#/config/dao-config.xml.cfm") )>
-		<cfset variables.oApplicationDAO = oDAOFactory.getDAO("application")>
-		<cfset variables.oEntryDAO = oDAOFactory.getDAO("entry")>
-		<cfset variables.oHostDAO = oDAOFactory.getDAO("host")>
-		<cfset variables.oSeverityDAO = oDAOFactory.getDAO("severity")>
-		<cfset variables.oSourceDAO = oDAOFactory.getDAO("source")>
-		<cfset variables.oUserDAO = oDAOFactory.getDAO("user")>
+		<cfset variables.oDAOFactory = createModelObject("components.lib.dao.DAOFactory").init( expandPath("#variables.path#/config/dao-config.xml.cfm") )>
+		<cfset variables.oApplicationDAO = variables.oDAOFactory.getDAO("application")>
+		<cfset variables.oEntryDAO = variables.oDAOFactory.getDAO("entry")>
+		<cfset variables.oHostDAO = variables.oDAOFactory.getDAO("host")>
+		<cfset variables.oSeverityDAO = variables.oDAOFactory.getDAO("severity")>
+		<cfset variables.oSourceDAO = variables.oDAOFactory.getDAO("source")>
+		<cfset variables.oUserDAO = variables.oDAOFactory.getDAO("user")>
 
 		<cfreturn this>		
 	</cffunction>
@@ -62,6 +62,36 @@
 			var oService = createModelObject("components.service").init();
 			oService.stop();
 		</cfscript>
+	</cffunction>
+
+	<cffunction name="getServiceSetting" access="public" returntype="string">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="false" default="">
+		<cfscript>
+			var oService = createModelObject("components.service").init(true);
+			return oService.getSetting(arguments.name, arguments.value);
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="setAPIsecSettings" access="public" returntype="void">
+		<cfargument name="requireAPIKey" type="boolean" required="true">
+		<cfargument name="APIKey" type="string" required="true">
+		<cfset var configPath = expandPath("#variables.path#/config/service-config.xml.cfm")>
+		<cfset var xmlDoc = xmlParse( configPath )>
+		
+		<cfif not structKeyExists(xmlDoc.xmlRoot,"requireAPIKey")>
+			<cfset xmlNode = xmlElemNew(xmlDoc, "requireAPIKey")>
+			<cfset arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode)>
+		</cfif>
+		<cfset xmlDoc.xmlRoot.requireAPIKey.xmlText = arguments.requireAPIKey>
+
+		<cfif not structKeyExists(xmlDoc.xmlRoot,"APIKey")>
+			<cfset xmlNode = xmlElemNew(xmlDoc, "APIKey")>
+			<cfset arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode)>
+		</cfif>
+		<cfset xmlDoc.xmlRoot.APIKey.xmlText = xmlFormat(arguments.APIKey)>
+		
+		<cffile action="write" file="#configPath#" output="#toString(xmlDoc)#">
 	</cffunction>
 
 	<cffunction name="searchEntries" access="public" returntype="query">
@@ -218,6 +248,31 @@
 			
 			return o.getUserID();
 		</cfscript>		
+	</cffunction>
+
+	<cffunction name="purgeHistory" access="public" returntype="void">
+		<cfargument name="purgeHistoryDays" type="numeric" required="true">
+		<cfargument name="deleteOrphans" type="boolean" required="false" default="false">
+		
+		<cfset var oDataProvider = variables.oDAOFactory.getDataProvider()>
+		<cfset var sql = "">
+		<cfset var dbType = oDataProvider.getConfig().getDBType()>
+		
+		<!--- delete entries --->
+		<cfsavecontent variable="sql">
+			<cfoutput>
+				DELETE 
+					FROM bl_Entry
+					WHERE
+					<cfif dbType eq "mysql">
+						createdOn < NOW() - INTERVAL #purgeHistoryDays# DAY
+					<cfelseif dbType contains "mssql" or dbType eq "access">
+						DATEDIFF(day, GETDATE(), createdOn) > #purgeHistoryDays#
+					</cfif>
+			</cfoutput>
+		</cfsavecontent>
+		<cfset oDataProvider.exec(sql)>
+		
 	</cffunction>
 
 

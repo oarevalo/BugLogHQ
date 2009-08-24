@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<serviceCFC>bugLog.components.bugLogListenerAsync</serviceCFC>
 	<autoStart>false</autoStart>
-	<requireAPIKey>false</requireAPIKey>
-	<APIKey></APIKey>
+	<requireAPIKey>true</requireAPIKey>
+	<APIKey>2CF20630-DD24-491F-BA44314842183AFC</APIKey>
 </config>

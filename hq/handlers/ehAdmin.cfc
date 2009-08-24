@@ -4,13 +4,16 @@
 		<cfscript>
 			var user = getValue("currentUser");
 			var qryUsers = 0;
+			var app = getService("app");
 			
 			try {
 				
 				if( user.getIsAdmin() ) {
-					qryUsers = getService("app").getUsers();
+					qryUsers = app.getUsers();
 				}	
 				
+				setValue("requireAPIKey", app.getServiceSetting("requireAPIKey",false));
+				setValue("APIKey", app.getServiceSetting("APIKey"));
 				setValue("qryUsers",qryUsers);				
 				setView("vwAdmin");
 				
@@ -152,5 +155,27 @@
 			}
 		</cfscript>
 	</cffunction>
+		
+	<cffunction name="doSetAPISecSettings" access="public" returntype="void">
+		<cfscript>
+			var user = getValue("currentUser");
+			var requireAPIKey = getValue("requireAPIKey",false);
+			var APIKey = getValue("APIKey");
+			var generateNewKey = getValue("generateNewKey");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to set the API security settings"); setNextEvent("ehAdmin.dspMain");}
+				if(generateNewKey neq "") APIKey = createUUID();
+				getService("app").setAPIsecSettings(requireAPIKey, APIKey);
+				setMessage("info","API security settings updated. You must restart the BugLogListener service for changes to take effect.");
+				setNextEvent("ehAdmin.dspMain");
+							
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehAdmin.dspMain");
+			}
+		</cfscript>	
+	</cffunction>	
 		
 </cfcomponent>
