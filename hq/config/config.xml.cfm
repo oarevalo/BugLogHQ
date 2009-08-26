@@ -24,10 +24,7 @@
 		<setting name="debugMode" value="true" />
 
 		<!-- JIRA integration settings -->
-		<setting name="jiraEnabled" value="false" />
-		<setting name="jiraWsdl" value="" />
-		<setting name="jiraUsername" value="" />
-		<setting name="jiraPassword" value="" />
+		<setting name="jiraConfigPath" value="/bugLog/config/jira-config.xml.cfm" />
 	</settings>
 
 		
@@ -45,10 +42,8 @@
 		</service>
 
 		<!-- JIRA service -->
-		<service name="jira" class="bugLog.components.jiraService">
-			<init-param name="wsdl" settingName="jiraWsdl" />
-			<init-param name="username" settingName="jiraUsername" />
-			<init-param name="password" settingName="jiraPassword" />
+		<service name="jira" class="bugLog.hq.components.services.jiraService">
+			<init-param name="jiraConfigPath" settingName="jiraConfigPath" />
 		</service>
 		
 	</services>

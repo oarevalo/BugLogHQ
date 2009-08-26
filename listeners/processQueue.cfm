@@ -13,11 +13,17 @@
 	</cflock>
 </cfif>
 
-<!--- process queue --->
-<cfset oBugLogListener = oService.getService()>
-<cfset rtn = oBugLogListener.processQueue(key)>
+<cfif oService.isRunning()>
+	<!--- process queue --->
+	<cfset oBugLogListener = oService.getService()>
+	<cfset rtn = oBugLogListener.processQueue(key)>
+	
+	<!--- check return code --->
+	<cfif rtn lt 0>
+		<cfset oBugLogListener.shutDown()>
+	</cfif>
 
-<!--- check return code --->
-<cfif rtn lt 0>
-	<cfset oBugLogListener.shutDown()>
+<cfelse>
+	<!--- service is not running, so just in case delete the scheduled task --->
+	<cfschedule action="delete"	task="bugLogProcessQueue" />
 </cfif>

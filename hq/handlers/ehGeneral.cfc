@@ -272,7 +272,7 @@
 				}
 				
 				// set values
-				setValue("jiraEnabled", getSetting("jiraEnabled"));
+				setValue("jiraEnabled", getService("jira").getSetting("enabled"));
 				setValue("oEntry", oEntry);
 				setView("vwEntry");
 
