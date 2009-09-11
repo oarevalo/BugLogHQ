@@ -35,14 +35,19 @@
 				to="#arguments.recipient#" 
 				type="html" 
 				subject="#arguments.subject#">
+					
 			<cfif arguments.comment neq "">
 				<div style="font-family:arial;font-size:12px;">
 				#arguments.comment#
 				</div>
-				<hr>
+				<hr />
 			</cfif>
-
+				
 			<table style="font-family:arial;font-size:12px;">
+				<tr>
+					<td><b>Message:</b></td>
+					<td><strong>#stEntry.message#</strong></td>
+				</tr>
 				<tr>
 					<td><b>Date/Time:</b></td>
 					<td>#lsDateFormat(stEntry.dateTime)# - #lsTimeFormat(stEntry.dateTime)#</td>
@@ -54,6 +59,10 @@
 				<tr>
 					<td><b>Host:</b></td>
 					<td>#stEntry.hostName#</td>
+				</tr>
+				<tr>
+					<td><b>Severity:</b></td>
+					<td>#stEntry.severityCode#</td>
 				</tr>
 				<tr>
 					<td><b>Template Path:</b></td>
@@ -69,9 +78,15 @@
 				</tr>
 			</table>			
 			
-			<hr>
-			<br><br><br>
-			<div style="font-family:arial;font-size:11px;">
+			<cfif stEntry.HTMLReport neq "">
+				<hr />
+				<b>HTML Report:</b><br />
+				#stEntry.HTMLReport#
+			</cfif>
+			
+			<hr />
+
+			<div style="font-family:arial;font-size:11px;margin-top:15px;">
 				** This email has been sent automatically from the BugLog server at 
 				<a href="http://#cgi.HTTP_HOST#/bugLog/hq">http://#cgi.HTTP_HOST#/bugLog/hq</a><br />
 				<em>To disable automatic notifications log into the bugLog server and disable the corresponding rule.</em>

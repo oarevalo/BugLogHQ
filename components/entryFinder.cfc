@@ -38,6 +38,8 @@
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
 		<cfargument name="search_cfid" type="string" required="false" default="">
 		<cfargument name="search_cftoken" type="string" required="false" default="">
+		<cfargument name="searchHTMLReport" type="boolean" required="false" default="false">
+		<cfargument name="message" type="string" required="false" default="">
 		
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var dbType = oDataProvider.getType()>
@@ -72,6 +74,7 @@
 		<cfargument name="search_cfid" type="string" required="false" default="">
 		<cfargument name="search_cftoken" type="string" required="false" default="">
 		<cfargument name="searchHTMLReport" type="boolean" required="false" default="false">
+		<cfargument name="message" type="string" required="false" default="">
 
 		<cfset var tmpSQL = "">
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
@@ -124,6 +127,9 @@
 								or HTMLReport LIKE '%#arguments.searchTerm#%'
 							</cfif>
 						)
+					</cfif>
+					<cfif arguments.message neq "">
+						AND message LIKE '#arguments.message#'
 					</cfif>
 					<cfif arguments.applicationID gt 0>
 						AND e.applicationID = #arguments.applicationID# 
