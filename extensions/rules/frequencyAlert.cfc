@@ -73,12 +73,13 @@
 	
 				qry = oEntryFinder.search(argumentCollection = args);
 	
-				if(isBoolean(variables.config.sameMessage) and variables.config.sameMessage)
-					qry = groupMessages(qry);
-	
-				if(qry.recordCount gt variables.config.count)
+				if(isBoolean(variables.config.sameMessage) and variables.config.sameMessage) {
+					qry = groupMessages(qry, variables.config.count);
 					sendEmail(qry);
-			
+		
+				} else if(qry.recordCount gt variables.config.count)
+					sendEmail(qry);
+				}
 			}
 			return true;
 		</cfscript>
