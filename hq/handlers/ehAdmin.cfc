@@ -5,16 +5,24 @@
 			var user = getValue("currentUser");
 			var qryUsers = 0;
 			var app = getService("app");
+			var jira = getService("jira");
+			var jiraConfig = structNew();
 			
 			try {
 				
 				if( user.getIsAdmin() ) {
 					qryUsers = app.getUsers();
+					
+					jiraConfig.enabled = jira.getSetting("enabled",false);
+					jiraConfig.wsdl = jira.getSetting("wsdl");
+					jiraConfig.username = jira.getSetting("username");
+					jiraConfig.password = jira.getSetting("password");
 				}	
 				
 				setValue("requireAPIKey", app.getServiceSetting("requireAPIKey",false));
 				setValue("APIKey", app.getServiceSetting("APIKey"));
 				setValue("qryUsers",qryUsers);				
+				setValue("jiraConfig",jiraConfig);				
 				setView("vwAdmin");
 				
 			} catch(any e) {
@@ -177,5 +185,32 @@
 			}
 		</cfscript>	
 	</cffunction>	
-		
+
+	<cffunction name="doSaveJiraSettings" access="public" returntype="void">
+		<cfscript>
+			var user = getValue("currentUser");
+			var enabled = getValue("enabled",false);
+			var wsdl = getValue("wsdl");
+			var username = getValue("username");
+			var password = getValue("password");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to set the JIRA integration settings"); setNextEvent("ehAdmin.dspMain");}
+				getService("jira").setSetting("enabled", enabled)
+									.setSetting("wsdl", wsdl)
+									.setSetting("username", username)
+									.setSetting("password", password)
+									.saveSettings();
+
+				setMessage("info","JIRA integration settings updated.");
+				setNextEvent("ehAdmin.dspMain");
+							
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehAdmin.dspMain");
+			}
+		</cfscript>	
+	</cffunction>	
+			
 </cfcomponent>

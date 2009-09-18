@@ -34,7 +34,7 @@
 		<br /><br />
 		<input type="submit" name="btngo" value="Apply Changes">
 		&nbsp;&nbsp;
-		<a href="index.cfm?event=ehAdmin.dspMain">Go Back</a>
+		<a href="index.cfm?event=ehAdmin.dspMain&panel=userManagement">Go Back</a>
 	
 	</form>
 </cfoutput>

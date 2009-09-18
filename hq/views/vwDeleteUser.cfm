@@ -11,7 +11,7 @@
 			Are you sure you wish to delete the user?<br /><br />
 			<input type="submit" name="btngo" value="Yes, Delete User">
 			&nbsp;&nbsp;
-			<a href="index.cfm?event=ehAdmin.dspMain">No, do NOT delete user</a>
+			<a href="index.cfm?event=ehAdmin.dspMain&panel=userManagement">No, do NOT delete user</a>
 		</p> 
 	</form>
 </cfoutput>

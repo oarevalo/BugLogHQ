@@ -34,8 +34,29 @@
 		<cfreturn variables.instance.jira.createIssue(argumentCollection = arguments)>
 	</cffunction>
 
+	<cffunction name="getSetting" returnType="string" access="public" hint="Returns the given config setting, if doesnt exist, returns empty or default value">
+		<cfargument name="settingName" type="string" required="true">
+		<cfargument name="defaultValue" type="string" required="false" default="">
+		<cfset var cfg = getConfig()>
+		<cfset var rtn = arguments.defaultValue>
+		<cfif structKeyExists(cfg, arguments.settingName)>
+			<cfset rtn = cfg[arguments.settingName]>
+		</cfif>
+		<cfreturn rtn>
+	</cffunction>
+	
+	<cffunction name="setSetting" returntype="jiraService" access="public">
+		<cfargument name="settingName" type="string" required="true">
+		<cfargument name="settingValue" type="string" required="true">
+		<cfset cfg[arguments.settingName] = arguments.settingValue>
+		<cfreturn this>
+	</cffunction>
 
-
+	<cffunction name="saveSettings" returntype="void" access="public">
+		<cfthrow message="not implemented">
+	</cffunction>
+	
+	
 	<!--- Private Methods --->
 	
 	<cffunction name="loadConfig" returntype="void" access="private" hint="loads config settings into memory">
@@ -60,17 +81,6 @@
 	
 	<cffunction name="getConfig" returnType="struct" access="private" hint="returns the struct with the config settings">
 		<cfreturn variables.instance.config>
-	</cffunction>
-
-	<cffunction name="getSetting" returnType="string" access="public" hint="Returns the given config setting, if doesnt exist, returns empty or default value">
-		<cfargument name="settingName" type="string" required="true">
-		<cfargument name="defaultValue" type="string" required="false" default="">
-		<cfset var cfg = getConfig()>
-		<cfset var rtn = arguments.defaultValue>
-		<cfif structKeyExists(cfg, arguments.settingName)>
-			<cfset rtn = cfg[arguments.settingName]>
-		</cfif>
-		<cfreturn rtn>
 	</cffunction>
 
 </cfcomponent>
