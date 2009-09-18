@@ -40,7 +40,7 @@
 		<cfset var cfg = getConfig()>
 		<cfset var rtn = arguments.defaultValue>
 		<cfif structKeyExists(cfg, arguments.settingName)>
-			<cfset rtn = cfg[arguments.settingName]>
+			<cfset rtn = cfg[arguments.settingName].value>
 		</cfif>
 		<cfreturn rtn>
 	</cffunction>
@@ -48,12 +48,27 @@
 	<cffunction name="setSetting" returntype="jiraService" access="public">
 		<cfargument name="settingName" type="string" required="true">
 		<cfargument name="settingValue" type="string" required="true">
-		<cfset cfg[arguments.settingName] = arguments.settingValue>
+		<cfset cfg[arguments.settingName].value = arguments.settingValue>
 		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="saveSettings" returntype="void" access="public">
-		<cfthrow message="not implemented">
+		<cfset var xmlDoc = xmlNew()>
+		<cfset var cfg = getConfig()>
+		
+		<cfscript>
+			xmlDoc.xmlRoot = xmlELemNew(xmlDoc,"config");
+			
+			for(key in cfg) {
+				xmlNode = xmlElemNew(xmlDoc,cfg[key].name);
+				xmlNode.xmlText = cfg[key].value;
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
+			}
+		</cfscript>
+		
+		<cffile action="write" file="#variables.instance.configPath#" output="#toString(xmlDoc)#">
+
+		<cfset init( variables.instance.configPath )>
 	</cffunction>
 	
 	
@@ -72,7 +87,9 @@
 			
 			for(i=1;i lte arrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
 				xmlNode = xmlDoc.xmlRoot.xmlChildren[i];
-				cfg[xmlNode.xmlName] = xmlNode.xmlText;
+				cfg[xmlNode.xmlName] = structNew();
+				cfg[xmlNode.xmlName].name = xmlNode.xmlName;
+				cfg[xmlNode.xmlName].value = xmlNode.xmlText;
 			}
 
 			variables.instance.config = cfg;		
