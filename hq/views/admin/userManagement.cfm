@@ -16,8 +16,9 @@
 					<td><a href="index.cfm?event=ehAdmin.dspUser&userID=#qryUsers.userID#">#qryUsers.username#</a></td>
 					<td align="center" style="width:90px;">#yesNoFormat(qryUsers.isAdmin)#</td>
 					<td align="center" style="width:110px;">
-						<a href="index.cfm?event=ehAdmin.dspDeleteUser&userID=#qryUsers.userID#">[ Delete ]</a> &nbsp;
 						<a href="index.cfm?event=ehAdmin.dspUser&userID=#qryUsers.userID#">[ Edit ]</a>
+						&nbsp;
+						<a href="index.cfm?event=ehAdmin.dspDeleteUser&userID=#qryUsers.userID#">[ Delete ]</a> 
 					</td>
 				</tr>
 			</cfloop>

@@ -247,13 +247,14 @@
 			
 			// create rule objects and load them into the rule processor
 			for(i=1; i lte arrayLen(aRules);i=i+1) {
-
-				oRule = createObject("component", aRules[i].component ).init( argumentCollection = aRules[i].config );
-
-				// add rule to processor
-				variables.oRuleProcessor.addRule(oRule);
+				
+				if(aRules[i].enabled) {
+					oRule = createObject("component", aRules[i].component ).init( argumentCollection = aRules[i].config );
+	
+					// add rule to processor
+					variables.oRuleProcessor.addRule(oRule);
+				}
 			}
-			
 		</cfscript>
 	</cffunction>
 

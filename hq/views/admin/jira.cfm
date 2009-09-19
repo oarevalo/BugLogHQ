@@ -17,15 +17,15 @@
 				</tr>
 				<tr>
 					<td>WSDL:</td>
-					<td><input type="text" name="wsdl" value="#jiraConfig.wsdl#"></td>
+					<td><input type="text" name="wsdl" value="#jiraConfig.wsdl#" class="formField"></td>
 				</tr>
 				<tr>
 					<td>Username:</td>
-					<td><input type="username" name="username" value="#jiraConfig.username#"></td>
+					<td><input type="username" name="username" value="#jiraConfig.username#" class="formField"></td>
 				</tr>
 				<tr>
 					<td>Password:</td>
-					<td><input type="password" name="password" value="#jiraConfig.password#"></td>
+					<td><input type="password" name="password" value="#jiraConfig.password#" class="formField"></td>
 				</tr>
 			</table>
 			<br />

@@ -17,6 +17,8 @@
 					&nbsp;&nbsp;|&nbsp;&nbsp;
 					#request.requestState.hostName#
 					&nbsp;&nbsp;|&nbsp;&nbsp;
+					<a href="?event=ehAdmin.dspMain">Settings</a>
+					&nbsp;&nbsp;|&nbsp;&nbsp;
 					<a href="?event=ehGeneral.doLogoff">Log off</a>
 					</cfoutput>
 				</span>

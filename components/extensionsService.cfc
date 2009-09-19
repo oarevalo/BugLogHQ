@@ -44,6 +44,11 @@
 				st.component = variables.extensionsPath & "rules." & xmlNode.xmlAttributes.name;
 				st.config = structNew();
 				st.description = xmlNode.xmlText;
+				st.enabled = true;
+
+				// check the enabled/disabled flag; if not specified all rules are enabled by default
+				if(structKeyExists(xmlNode.xmlAttributes,"enabled") and isBoolean(xmlNode.xmlAttributes.enabled) and not xmlNode.xmlAttributes.enabled)
+					st.enabled = false;
 				
 				// each child of a rule tag becomes an argument for the rule constructor
 				// this is how each rule instance is configured
@@ -114,6 +119,22 @@
 			
 			arrayAppend(xmlDoc.xmlRoot.rules.xmlChildren, xmlNode);
 		</cfscript>
+		<cffile action="write" file="#expandPath(variables.configDocHREF)#" output="#toString(xmlDoc)#">
+	</cffunction>
+
+	<cffunction name="enableRule" access="public" returntype="void" hint="enables a rule for processing">
+		<cfargument name="index" type="string" required="true">
+		<cfset var xmlDoc = xmlParse(expandPath(variables.configDocHREF))>
+		<cfset var xmlNode = xmlDoc.xmlRoot.rules.xmlChildren[arguments.index]>
+		<cfset xmlNode.xmlAttributes["enabled"] = true>
+		<cffile action="write" file="#expandPath(variables.configDocHREF)#" output="#toString(xmlDoc)#">
+	</cffunction>
+
+	<cffunction name="disableRule" access="public" returntype="void" hint="disables a rule for processing">
+		<cfargument name="index" type="string" required="true">
+		<cfset var xmlDoc = xmlParse(expandPath(variables.configDocHREF))>
+		<cfset var xmlNode = xmlDoc.xmlRoot.rules.xmlChildren[arguments.index]>
+		<cfset xmlNode.xmlAttributes["enabled"] = false>
 		<cffile action="write" file="#expandPath(variables.configDocHREF)#" output="#toString(xmlDoc)#">
 	</cffunction>
 	

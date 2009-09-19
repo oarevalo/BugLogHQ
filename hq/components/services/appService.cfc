@@ -352,6 +352,22 @@
 		</cfscript>		
 	</cffunction>
 
+	<cffunction name="enableRule" access="public" returntype="void" hint="enables a rule">
+		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfscript>
+			var oExtensionsService = createModelObject("components.extensionsService").init();
+			oExtensionsService.enableRule(arguments.index);
+		</cfscript>		
+	</cffunction>
+
+	<cffunction name="disableRule" access="public" returntype="void" hint="disables a rule">
+		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfscript>
+			var oExtensionsService = createModelObject("components.extensionsService").init();
+			oExtensionsService.disableRule(arguments.index);
+		</cfscript>		
+	</cffunction>
+
 
 	<!---- User Management ---->
 	<cffunction name="getUserByID" access="public" returntype="bugLog.components.user" hint="return the user for the given userid">

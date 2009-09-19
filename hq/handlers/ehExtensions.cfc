@@ -69,4 +69,40 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="doDisableRule">
+		<cfscript>
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to enable or disable a rule"); setNextEvent("ehExtensions.dspMain");}
+				getService("app").disableRule(index);
+				setMessage("info","Rule has been disabled. Changes will be effective the next time the listener service is started.");
+			
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+			}
+
+			setNextEvent("ehExtensions.dspMain");
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="doEnableRule">
+		<cfscript>
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to enable or disable a rule"); setNextEvent("ehExtensions.dspMain");}
+				getService("app").enableRule(index);
+				setMessage("info","Rule has been enabled. Changes will be effective the next time the listener service is started.");
+			
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+			}
+
+			setNextEvent("ehExtensions.dspMain");
+		</cfscript>
+	</cffunction>	
+	
 </cfcomponent>

@@ -5,7 +5,7 @@
 
 <cfoutput>
 	<h3>API Security:</h3>
-	<div style="margin-left:30px;line-height:24px;">
+	<div style="margin-left:30px;line-height:30px;">
 		<form name="frmSecurity" action="index.cfm" method="post">
 			<input type="hidden" name="event" value="ehAdmin.doSetAPISecSettings">
 			
@@ -13,7 +13,7 @@
 
 			API Key:
 			<input type="text" name="APIKey" value="#APIKey#" class="formField">
-			<input type="submit" name="generateNewKey" value="Generate New Key">
+			<input type="submit" name="generateNewKey" value="Generate New Key" onclick="return(confirm('WARNING:\n\nExisting clients will not be able to submit bug reports until updated with the new key'))">
 			<br /><br />
 
 			<input type="submit" name="btn" value="Apply Changes">

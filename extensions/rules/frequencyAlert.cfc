@@ -77,7 +77,7 @@
 					qry = groupMessages(qry, variables.config.count);
 					sendEmail(qry);
 		
-				} else if(qry.recordCount gt variables.config.count)
+				} else if(qry.recordCount gt variables.config.count) {
 					sendEmail(qry);
 				}
 			}

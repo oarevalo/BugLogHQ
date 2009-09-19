@@ -7,9 +7,13 @@
 								}>
 								
 	<cffunction name="init" access="public" returntype="jiraService">
-		<cfargument name="jiraConfigPath" required="true" type="string">
+		<cfargument name="jiraConfigPath" required="false" type="string" default="">
 
-		<cfset loadConfig( expandPath(arguments.jiraConfigPath) )>
+		<cfif arguments.jiraConfigPath neq "">
+			<cfset variables.instance.configPath = arguments.jiraConfigPath>
+		</cfif>
+
+		<cfset loadConfig()>
 		
 		<cfset variables.instance.jira  = createObject("component","bugLog.components.jiraService").init( wsdl = getSetting("wsdl"),
 																											username = getSetting("username"),
@@ -48,13 +52,14 @@
 	<cffunction name="setSetting" returntype="jiraService" access="public">
 		<cfargument name="settingName" type="string" required="true">
 		<cfargument name="settingValue" type="string" required="true">
-		<cfset cfg[arguments.settingName].value = arguments.settingValue>
+		<cfset variables.instance.config[arguments.settingName].value = arguments.settingValue>
 		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="saveSettings" returntype="void" access="public">
 		<cfset var xmlDoc = xmlNew()>
 		<cfset var cfg = getConfig()>
+		<cfset var xmlNode = 0>
 		
 		<cfscript>
 			xmlDoc.xmlRoot = xmlELemNew(xmlDoc,"config");
@@ -66,24 +71,21 @@
 			}
 		</cfscript>
 		
-		<cffile action="write" file="#variables.instance.configPath#" output="#toString(xmlDoc)#">
+		<cffile action="write" file="#expandPath(variables.instance.configPath)#" output="#toString(xmlDoc)#">
 
-		<cfset init( variables.instance.configPath )>
+		<cfset init()>
 	</cffunction>
 	
 	
 	<!--- Private Methods --->
 	
 	<cffunction name="loadConfig" returntype="void" access="private" hint="loads config settings into memory">
-		<cfargument name="configPath" required="true" type="string">
 		<cfscript>
 			var cfg = structNew();
 			var xmlDoc = 0;
 			var xmlNode = 0;
 		
-			variables.instance.configPath = arguments.configPath;
-			
-			xmlDoc = xmlParse( variables.instance.configPath );
+			xmlDoc = xmlParse( expandPath( variables.instance.configPath ) );
 			
 			for(i=1;i lte arrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
 				xmlNode = xmlDoc.xmlRoot.xmlChildren[i];

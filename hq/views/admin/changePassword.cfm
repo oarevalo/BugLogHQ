@@ -4,12 +4,22 @@
 		<form name="frmChangePassword" action="index.cfm" method="post">
 			<input type="hidden" name="event" value="ehAdmin.doChangePassword">
 			
-			Current Password: <input type="password" name="currentPassword" value="" class="formField" style="width:120px;"><br />
-			New Password: <input type="password" name="newPassword" value="" class="formField" style="width:120px;"><br />
-			Confirm New Password: <input type="password" name="newPassword2" value="" class="formField" style="width:120px;"><br /><br />
-			
+			<table>
+				<tr>
+					<td>Current Password:</td>
+					<td><input type="password" name="currentPassword" value="" class="formField" style="width:120px;"></td>
+				</tr>
+				<tr>
+					<td>New Password:</td>
+					<td><input type="password" name="newPassword" value="" class="formField" style="width:120px;"></td>
+				</tr>
+				<tr>
+					<td>Confirm New Password:</td>
+					<td><input type="password" name="newPassword2" value="" class="formField" style="width:120px;"></td>
+				</tr>
+			</table>
+			<br />
 			<input type="submit" name="btn" value="Change Password">
 		</form>
-		<br />
 	</div>
 </cfoutput>
