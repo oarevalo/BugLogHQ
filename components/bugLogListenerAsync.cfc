@@ -94,8 +94,8 @@
 		<cfset var txt = timeFormat(now(), 'HH:mm:ss') & ": " & msg>
 		<cfset System.out.println("BugLogListenerAsync: " & txt) />
 		<cflock name="bugLogListenerAsync_logMessage" type="exclusive" timeout="10">
-			<cfif arrayLen(variables.queue) gt variables.maxQueueSize>
-				<cfset arrayDeleteAt(variables.msgLog, ArrayLen(variables.maxLogSize)+1)>
+			<cfif arrayLen(variables.msgLog) gt variables.maxLogSize>
+				<cfset arrayDeleteAt(variables.msgLog, ArrayLen(variables.msgLog))>
 			</cfif>
 			<cfset arrayPrepend(variables.msgLog,txt)>
 		</cflock>
