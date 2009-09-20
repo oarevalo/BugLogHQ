@@ -1,39 +1,58 @@
 <cfcomponent extends="eventHandler">
 
-	<cffunction name="dspMain">
+	<cffunction name="dspMain" access="public" returntype="void">
 		<cfscript>
-			aRules = getService("app").getRules();
-			aActiveRules = getService("app").getActiveRules();
+			try {
+				aRules = getService("app").getRules();
+				aActiveRules = getService("app").getActiveRules();
+	
+				setValue("aRules", aRules);
+				setValue("aActiveRules", aActiveRules);
+	
+				setView("vwExtensions");
 
-			setValue("aRules", aRules);
-			setValue("aActiveRules", aActiveRules);
-
-			setView("vwExtensions");
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehGeneral.dspMain");
+			}
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="dspRule">
+	<cffunction name="dspRule" access="public" returntype="void">
 		<cfscript>
-			index = getValue("index",0);
-			ruleName = getValue("ruleName","");
-			if(ruleName eq "") throw("Please select a valid rule type");
-			
-			stRule = getService("app").getRuleInfo(ruleName);
+			var index = getValue("index",0);
+			var ruleName = getValue("ruleName","");
 
-			setValue("stRule", stRule);
-			setValue("index", index);
-			setValue("ruleName", ruleName);
-			
-			if(index gt 0) {
-				aActiveRules = getService("app").getActiveRules();
-				setValue("aActiveRule", aActiveRules[index]);
+			try {
+				if(ruleName eq "") throw("Please select a valid rule type","validation");
+				
+				stRule = getService("app").getRuleInfo(ruleName);
+	
+				setValue("stRule", stRule);
+				setValue("index", index);
+				setValue("ruleName", ruleName);
+				
+				if(index gt 0) {
+					aActiveRules = getService("app").getActiveRules();
+					setValue("aActiveRule", aActiveRules[index]);
+				}
+
+				setView("vwRule");
+
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("ehExtensions.dspMain");
+
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehExtensions.dspMain");
 			}
-			
-			setView("vwRule");
 		</cfscript>
 	</cffunction>
 	
-	<cffunction name="doSaveRule">
+	<cffunction name="doSaveRule" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
 			
@@ -51,7 +70,7 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="doDeleteRule">
+	<cffunction name="doDeleteRule" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
 			
@@ -69,7 +88,7 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="doDisableRule">
+	<cffunction name="doDisableRule" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
 			
@@ -87,7 +106,7 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="doEnableRule">
+	<cffunction name="doEnableRule" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
 			
