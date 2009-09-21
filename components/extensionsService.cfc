@@ -1,7 +1,7 @@
 <cfcomponent displayName="extensionsService" hint="This component provides interaction with the extensions mechanism for buglog">
 	
 	<!--- this is the location of where the extensions are defined --->
-	<cfset variables.configDocHREF = "/bugLog/extensions/extensions.xml">
+	<cfset variables.configDocHREF = "/bugLog/config/extensions-config.xml.cfm">
 	
 	<!--- this is the path to the extensions components --->
 	<cfset variables.extensionsPath = "bugLog.extensions.">
