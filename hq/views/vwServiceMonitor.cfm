@@ -47,7 +47,15 @@
 			</td>
 			<td>
 				<table class="browseTable" style="width:100%">
-					<tr><th colspan="5">Entries in Queue (#arrayLen(aQueue)#)</th></tr>
+					<tr>
+						<th colspan="5">
+							Entries in Queue (#arrayLen(aQueue)#)
+							&nbsp;
+							<span style="font-size:10px;color:##43505a;">
+								( <a href="index.cfm?event=ehServiceMonitor.doProcessQueue" style="color:##43505a;">Process</a> )
+							</span>
+						</th>
+					</tr>
 					<tr>
 						<th width="15">&nbsp;</th>
 						<th>Date/Time</th>

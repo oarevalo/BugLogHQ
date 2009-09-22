@@ -42,6 +42,7 @@
 		<cfset var myQueue = arrayNew(1)>
 		<cfset var i = 0>
 		<cfset var errorQueue = arrayNew(1)>
+		<cfset var count = 0>
 		
 		<cfif arguments.key neq variables.key>
 			<cfset logMessage("Invalid key received. Exiting.")>
@@ -56,6 +57,7 @@
 				<cfloop from="1" to="#arrayLen(myQueue)#" index="i">
 					<cftry>
 						<cfset super.logEntry(myQueue[i])>
+						<cfset count = count + 1>
 						<cfcatch type="any">
 							<!--- log error and save entry in another queue --->
 							<cfset arrayAppend(errorQueue,myQueue[i])>
@@ -74,7 +76,7 @@
 			<cfset logMessage("Failed to add #arrayLen(errorQueue)# entries. Returned entries to main queue. To clear up queue and discard this entries reset the listener.")>
 		</cfif>
 		
-		<cfreturn 0>
+		<cfreturn count>
 	</cffunction>
 
 	<cffunction name="shutDown" access="public" returntype="void" hint="Performs any clean up action required">
