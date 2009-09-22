@@ -25,7 +25,7 @@
 		<cfreturn rtn>
 	</cffunction>
 
-	<cffunction name="setSetting" access="public" returntype="void">
+	<cffunction name="setSetting" access="public" returntype="config">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="value" type="any" required="false">
 		<cfset variables.config[arguments.name] = structNew()>
@@ -33,6 +33,7 @@
 		<cfset variables.config[arguments.name].value = arguments.value>
 		<cfset variables.configProvider.save(variables.config)>
 		<cfset variables.config = variables.configProvider.load()>
+		<cfreturn this>
 	</cffunction>
 	
 </cfcomponent>

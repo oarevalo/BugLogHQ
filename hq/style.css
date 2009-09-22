@@ -30,6 +30,12 @@ h2 {
     padding:1px;
     width:300px;
 }
+.formFieldTip {
+    font-size:10px;
+	line-height:15px;
+    color:#808080;
+	margin-bottom:10px;
+}
 
 #header {
 /*	height:	82px;

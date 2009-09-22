@@ -3,28 +3,55 @@
 	<cffunction name="dspMain" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
-			var qryUsers = 0;
 			var app = getService("app");
+			var cfg = getService("config");
 			var jira = getService("jira");
 			var jiraConfig = structNew();
+			var panel = getValue("panel","changePassword");
 			
 			try {
+				switch(panel) {
+					case "general":
+						if(not user.getIsAdmin()) throw("You must be an administrator to access this section","validation");
+						setValue("adminEmail", cfg.getSetting("general.adminEmail",""));
+						setValue("autoStart", cfg.getSetting("service.autoStart",true));
+						break;
+
+					case "changePassword":
+						break;
+
+					case "userManagement":
+						if(not user.getIsAdmin()) throw("You must be an administrator to access this section","validation");
+						setValue("qryUsers", app.getUsers() );
+						break;
+
+					case "purgeHistory":
+						if(not user.getIsAdmin()) throw("You must be an administrator to access this section","validation");
+						break;
+
+					case "APISecurity":
+						if(not user.getIsAdmin()) throw("You must be an administrator to access this section","validation");
+						setValue("requireAPIKey", app.getServiceSetting("requireAPIKey",false));
+						setValue("APIKey", app.getServiceSetting("APIKey"));
+						break;
+
+					case "jira":
+						if(not user.getIsAdmin()) throw("You must be an administrator to access this section","validation");
+						jiraConfig.enabled = jira.getSetting("enabled",false);
+						jiraConfig.wsdl = jira.getSetting("wsdl");
+						jiraConfig.username = jira.getSetting("username");
+						jiraConfig.password = jira.getSetting("password");
+						setValue("jiraConfig",jiraConfig);				
+						break;
+				}
 				
-				if( user.getIsAdmin() ) {
-					qryUsers = app.getUsers();
-					
-					jiraConfig.enabled = jira.getSetting("enabled",false);
-					jiraConfig.wsdl = jira.getSetting("wsdl");
-					jiraConfig.username = jira.getSetting("username");
-					jiraConfig.password = jira.getSetting("password");
-				}	
-				
-				setValue("requireAPIKey", app.getServiceSetting("requireAPIKey",false));
-				setValue("APIKey", app.getServiceSetting("APIKey"));
-				setValue("qryUsers",qryUsers);				
-				setValue("jiraConfig",jiraConfig);				
+				setValue("panel", panel);
 				setView("vwAdmin");
 				
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("ehGeneral.dspMain");				
+
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
@@ -85,12 +112,12 @@
 				user.setPassword(newPassword);
 				getService("app").saveUser(user);
 				setMessage("info","Password has been changed");
-				setNextEvent("ehGeneral.dspMain");
+				setNextEvent("ehGeneral.dspMain","panel=changePassword");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain");				
+				setNextEvent("ehAdmin.dspMain","panel=changePassword");				
 			}
 		</cfscript>
 	</cffunction>
@@ -105,12 +132,12 @@
 				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to purge history"); setNextEvent("ehAdmin.dspMain");}
 				getService("app").purgeHistory(purgeHistoryDays, deleteOrphans);
 				setMessage("info","History purged");
-				setNextEvent("ehGeneral.dspMain");
+				setNextEvent("ehGeneral.dspMain","panel=purgeHistory");
 			
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain");				
+				setNextEvent("ehAdmin.dspMain","panel=purgeHistory");				
 			}
 		</cfscript>
 	</cffunction>
@@ -135,7 +162,7 @@
 
 				getService("app").saveUser(oUser);
 				setMessage("info","User information has been saved");
-				setNextEvent("ehAdmin.dspMain");
+				setNextEvent("ehAdmin.dspMain","panel=userManagement");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -154,12 +181,12 @@
 				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to delete a user"); setNextEvent("ehAdmin.dspMain");}
 				getService("app").deleteUser(userID);
 				setMessage("info","User has been deleted");
-				setNextEvent("ehAdmin.dspMain");
+				setNextEvent("ehAdmin.dspMain","panel=userManagement");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspUser");
+				setNextEvent("ehAdmin.dspMain","panel=userManagement");
 			}
 		</cfscript>
 	</cffunction>
@@ -176,12 +203,12 @@
 				if(generateNewKey neq "") APIKey = createUUID();
 				getService("app").setAPIsecSettings(requireAPIKey, APIKey);
 				setMessage("info","API security settings updated. You must restart the BugLogListener service for changes to take effect.");
-				setNextEvent("ehAdmin.dspMain");
+				setNextEvent("ehAdmin.dspMain","panel=apisecurity");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain");
+				setNextEvent("ehAdmin.dspMain","panel=apisecurity");
 			}
 		</cfscript>	
 	</cffunction>	
@@ -199,18 +226,39 @@
 				getService("jira").setSetting("enabled", enabled)
 									.setSetting("wsdl", wsdl)
 									.setSetting("username", username)
-									.setSetting("password", password)
-									.saveSettings();
+									.setSetting("password", password);
 
 				setMessage("info","JIRA integration settings updated.");
-				setNextEvent("ehAdmin.dspMain");
+				setNextEvent("ehAdmin.dspMain","panel=jira");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain");
+				setNextEvent("ehAdmin.dspMain","panel=jira");
 			}
 		</cfscript>	
 	</cffunction>	
+			
+	<cffunction name="doSaveGeneralSettings" access="public" returntype="void">
+		<cfscript>
+			var user = getValue("currentUser");
+			var autoStart = getValue("autoStart",false);
+			var adminEmail = getValue("adminEmail");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to update the general settings"); setNextEvent("ehAdmin.dspMain");}
+				getService("config").setSetting("service.autoStart", autoStart)
+									.setSetting("general.adminEmail", adminEmail);
+
+				setMessage("info","General settings updated.");
+				setNextEvent("ehAdmin.dspMain","panel=general");
+							
+			} catch(lock e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehAdmin.dspMain","panel=general");
+			}
+		</cfscript>	
+	</cffunction>		
 			
 </cfcomponent>

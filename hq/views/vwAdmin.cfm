@@ -1,9 +1,10 @@
-<cfparam name="request.requestState.panel" default="changePassword">
+<cfparam name="request.requestState.panel" default="">
 <cfset panel = request.requestState.panel>
 <cfset currentUser = request.requestState.currentUser>
 <cfset isAdmin = currentUser.getIsAdmin()>
 
 <cfset aPanels = [
+				{ id = "general", label = "General Settings", display = isAdmin },
 				{ id = "changePassword", label = "Change Password", display = true },
 				{ id = "userManagement", label = "User Management", display = isAdmin },
 				{ id = "purgeHistory", label = "Purge History", display = isAdmin },

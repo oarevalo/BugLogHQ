@@ -30,18 +30,22 @@
 		<cfset var xmlDoc = xmlNew()>
 		<cfset var cfg = arguments.configStruct>
 		<cfset var xmlNode = 0>
+		<cfset var formatter = createObject("component","xmlStringFormatter").init()>
+		<cfset var keyList = listSort(structKeyList(cfg),"textnocase")>
 		
 		<cfscript>
 			xmlDoc.xmlRoot = xmlELemNew(xmlDoc,"config");
 			
-			for(key in cfg) {
-				xmlNode = xmlElemNew(xmlDoc,cfg[key].name);
+			for(i=1;i lte listLen(keyList);i=i+1) {
+				key = listGetAt(keyList,i);
+				xmlNode = xmlElemNew(xmlDoc,"setting");
+				xmlNode.xmlAttributes["name"] = cfg[key].name;
 				xmlNode.xmlText = cfg[key].value;
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
 		</cfscript>
 		
-		<cffile action="write" file="#expandPath(variables.configDoc)#" output="#toString(xmlDoc)#">
+		<cffile action="write" file="#expandPath(variables.configDoc)#" output="#formatter.makePretty(xmlDoc.xmlRoot)#">
 	</cffunction>
 	
 </cfcomponent>

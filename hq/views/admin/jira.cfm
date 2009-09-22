@@ -21,7 +21,7 @@
 				</tr>
 				<tr>
 					<td>Username:</td>
-					<td><input type="username" name="username" value="#jiraConfig.username#" class="formField"></td>
+					<td><input type="text" name="username" value="#jiraConfig.username#" class="formField"></td>
 				</tr>
 				<tr>
 					<td>Password:</td>
