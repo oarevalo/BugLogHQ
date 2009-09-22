@@ -2,17 +2,20 @@
 	
 	<cfset variables.queue = arrayNew(1)>
 	<cfset variables.msgLog = arrayNew(1)>
-	<cfset variables.maxQueueSize = 1000>
-	<cfset variables.maxLogSize = 20>
-	<cfset variables.schedulerIntervalSecs = 120>
+	<cfset variables.maxQueueSize = 0>
+	<cfset variables.maxLogSize = 0>
+	<cfset variables.schedulerIntervalSecs = 0>
 	<cfset variables.key = createUUID()>
 	
 	<cffunction name="init" access="public" returntype="bugLogListenerAsync" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
 		<cfscript>
-			// reset queue
+			// initialize variables and read settings
 			variables.queue = arrayNew(1);
 			variables.msgLog = arrayNew(1);
+			variables.maxQueueSize = arguments.config.getSetting("service.maxQueueSize");
+			variables.maxLogSize = arguments.config.getSetting("service.maxLogSize");
+			variables.schedulerIntervalSecs = arguments.config.getSetting("service.schedulerIntervalSecs");
 
 			// do the normal initialization
 			super.init( arguments.config );
