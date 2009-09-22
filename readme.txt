@@ -4,7 +4,7 @@
 /**************************************************************/	
 
 /*
-  Copyright 2007 - Oscar Arevalo (http://www.oscararevalo.com)
+  Copyright 2009 - Oscar Arevalo (http://www.oscararevalo.com)
 
   Licensed under the Apache License, Version 2.0 (the "License"); 
   you may not use this file except in compliance with the License. 
@@ -49,6 +49,25 @@ to leverage this information.
 
 -----------------------------------------------------------------------
 2. Release Notes
+-----------------------------------------------------------------------
+ > New in 1.4 (11/2009)
+-----------------------------------------------------------------------
+* Bug reports and rules are now processed asynchronously and not at the time they arrive. 
+This largely increases the response and scalability of the system. The default interval
+for execution is 2 minutes but this can be configured easily.
+* Reduced the number of configuration files (only 2) and moved them to a single location.
+* Added a "settings" screen to the main interface to allow administrators to configure multiple aspects of
+BugLogHQ as well as perform user management.
+* Added support for multiple users in two roles: administrators and regular users. 
+* Added option to change user password.
+* Added option to require an API key that each application must send in order to submit bug reports.
+* Added option to disable rules without having to delete them.
+* Added more rule types and extended configuration options for existing types.
+* Added option to purge history so that old data can be deleted
+* Multiple bug fixes.
+* Deprecated support for storing data in XML files (it really really didn't make any sense)
+
+
 -----------------------------------------------------------------------
  > New in 1.3
 -----------------------------------------------------------------------
@@ -143,27 +162,26 @@ installed on a directory or mapping named /bugLog.
 * Run the corresponding SQL script for your database. The script can be found in the /install directory. This 
 will create the necessary tables.
 
-* By default bugLogHQ uses a datasource named "bugLog" with no password, to change this go to:
-		/bugLog/config/dao-config.xml.cfm
-	Change the appropriate <property /> tags.
-	
-	NOTE: You can test drive bugLog without setting up a database by setting the <dataProviderType /> tag value
-		to "xml" and uncommenting the <dataRoot /> tag (this tag points to a directory where the data files will
-		be stored). BugLog can work normally with XML files, but this is not scalable and who know what may 
-		happen if the XML files get too big!!
+* By default bugLogHQ uses a datasource named "bugLog" with no password, to change this go to: 
+	/bugLog/config/buglog-config.xml.cfm
+	Change the <setting /> tags for "db.dsn", "db.dbtype", "db.username", and/or "db.password" as needed.
 	
 * To access the bugLogHQ interface, go to /bugLog. The default username/password is:
 		username: admin
 		password: admin
-	IMPORTANT: To change the admin password, you must edit the bl_Users table directly.
+	IMPORTANT: To change the admin password or to create additional users click on the "Settings" link on
+		the upper right corner of the screen.
 
-* You may also want to setup proper email addresses for sending bug reports when things do not work as they should: 
-		/bugLog/hq/Application.cfc (lines 13-14)
-		/bugLog/hq/config/config.xml (lines 5-6)
-	(this step is optional)
-
-* After installation use your browser to go to /bugLog/test and follow the links to test both the client 
+* TESTING AND VERIFICATION:
+	After installation use your browser to go to /bugLog/test and follow the links to test both the client 
 	and server side of buglog.
+
+* FOR DEBUGGING ONLY (OPTIONAL):
+	If you wish to receive email notices when the application itself has a problem, setup proper email 
+	at the following locations: 
+		/bugLog/hq/Application.cfc (lines 14-15)
+		/bugLog/hq/config/config.xml.cfm (lines 10-11)
+
 
 
 
@@ -175,7 +193,6 @@ Currently BugLogHQ supports the following databases:
 * Microsoft SQL Server 2000
 * Microsoft SQL Server 2005
 * Microsoft Access
-* XML files
 
 
 -----------------------------------------------------------------------
@@ -185,6 +202,7 @@ Currently BugLogHQ supports the following databases:
 * Lots of icons from the "Silk" icon set by Mark James (http://www.famfamfam.com/)
 * Thanks to Tom DeManincor for creating the SQL script for MSSQL
 * Thanks to Chuck Weidler for updating and providing the SQL scripts for Access, MS SQL Server 2000, MSSQL Server 2005
+* Thanks to WST crew at Mentor Graphics for the great suggestions and ideas to improve BugLog
 
 
 
