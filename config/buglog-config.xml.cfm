@@ -14,7 +14,7 @@
 	<setting name="service.API">2CF20630-DD24-491F-BA44314842183AFC</setting>
 
 	<setting name="jira.enabled">false</setting>
-	<setting name="jira.wsdl">false</setting>
-	<setting name="jira.username">false</setting>
-	<setting name="jira.password">false</setting>
+	<setting name="jira.wsdl"></setting>
+	<setting name="jira.username"></setting>
+	<setting name="jira.password"></setting>
 </config>
