@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <cfparam name="request.requestState.applicationTitle" default="#application.applicationName#">
+<cfparam name="request.requestState.viewTemplatePath" default="">
 <cfoutput>
 	<html>
 		<head>
@@ -17,8 +18,8 @@
 					<table style="width:90%;font-size:11px;" align="center">
 						<tr>	
 							<td>
-								<cfif request.requestState.view neq "">
-									<cfinclude template="../views/#request.requestState.view#.cfm">
+								<cfif request.requestState.viewTemplatePath neq "">
+									<cfinclude template="#request.requestState.viewTemplatePath#">
 								</cfif>
 							</td>
 						</tr>

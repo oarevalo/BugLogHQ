@@ -13,14 +13,17 @@
 	<cfset variables.startedOn = 0>
 	<cfset variables.oDAOFactory = 0>
 	<cfset variables.oRuleProcessor = 0>
+	<cfset variables.oConfig = 0>
 
 	<cffunction name="init" access="public" returntype="bugLogListener" hint="This is the constructor">
-	
+		<cfargument name="config" required="true" type="config">
 		<cfscript>
 			var cacheTTL = 300;		// timeout in minutes for cache entries
 			
+			variables.oConfig = arguments.config;		// global configuration
+			
 			// load DAO Factory
-			variables.oDAOFactory = createObject("component","bugLog.components.lib.dao.DAOFactory").init( expandPath("/bugLog/config/dao-config.xml.cfm") );
+			variables.oDAOFactory = createObject("component","bugLog.components.DAOFactory").init( variables.oConfig );
 					
 			// load the finder objects
 			variables.oAppFinder = createObject("component","bugLog.components.appFinder").init( variables.oDAOFactory.getDAO("application") );

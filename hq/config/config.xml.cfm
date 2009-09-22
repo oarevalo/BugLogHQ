@@ -13,26 +13,28 @@
 		<!-- This is the directory/mapping where the application is located -->
 		<setting name="bugLogPath" value="/bugLog/" />
 		
-		<!-- This email address is used as the sender when sending
-			copies of received bug reports via email. This setting
-			needs to be set with an email address in order for the
-			emailing feature to work -->
-		<setting name="contactEmail" value="" />
-
 		<!-- This flag controls wether detailed error information is displayed
 			in case the application encounters an unhandled exception -->
 		<setting name="debugMode" value="true" />
 
-		<!-- JIRA integration settings -->
-		<setting name="jiraConfigPath" value="/bugLog/config/jira-config.xml.cfm" />
+		<!-- main config -->
+		<setting name="configProviderType" value="xml" />
+		<setting name="configPath" value="/bugLog/config/buglog-config.xml.cfm" />
 	</settings>
 
 		
 	<!-- This section describes all services that will be loaded into the application -->
 	<services>
+		<!-- General config settings -->
+		<service name="config" class="bugLog.components.config">
+			<init-param name="configProviderType" settingName="configProviderType" />
+			<init-param name="configDoc" settingName="configPath" />
+		</service>
+
 		<!-- Application service (service layer) -->
 		<service name="app" class="bugLog.hq.components.services.appService">
 			<init-param name="path" settingName="bugLogPath" />
+			<init-param name="config" serviceName="config" />
 		</service>
 	
 		<!-- error reporting service -->
@@ -43,8 +45,7 @@
 
 		<!-- JIRA service -->
 		<service name="jira" class="bugLog.hq.components.services.jiraService">
-			<init-param name="jiraConfigPath" settingName="jiraConfigPath" />
+			<init-param name="config" serviceName="config" />
 		</service>
-		
 	</services>
 </config>

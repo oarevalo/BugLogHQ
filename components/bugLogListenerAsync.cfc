@@ -8,16 +8,17 @@
 	<cfset variables.key = createUUID()>
 	
 	<cffunction name="init" access="public" returntype="bugLogListenerAsync" hint="This is the constructor">
+		<cfargument name="config" required="true" type="config">
 		<cfscript>
 			// reset queue
 			variables.queue = arrayNew(1);
 			variables.msgLog = arrayNew(1);
 
+			// do the normal initialization
+			super.init( arguments.config );
+
 			// start scheduler
 			startScheduler();
-			
-			// continue with normal initialization
-			super.init();
 			
 			logMessage("BugLogListenerAsync Started");
 			

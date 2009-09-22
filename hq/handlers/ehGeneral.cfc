@@ -330,7 +330,7 @@
 		<cfscript>
 			try {
 				entryID = getValue("entryID",0);
-				sender = getSetting("contactEmail");
+				sender = getService("config").getSetting("general.adminEmail");
 				recipient = getValue("to","");
 				comment = getValue("comment","");
 				

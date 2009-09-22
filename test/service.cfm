@@ -9,7 +9,7 @@
 <cfset hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName()>
 
 <!--- get handle to service controller object --->
-<cfset oService = createObject("component","bugLog.components.service").init()>
+<cfset oService = createObject("component","bugLog.components.service").init(true)>
 
 <html>
 	<head>

@@ -1,7 +1,7 @@
 <cfcomponent>
 	
 	<cfset variables.serviceName = "_bugLogListener">
-	<cfset variables.configDoc = "/bugLog/config/service-config.xml.cfm">
+	<cfset variables.configDoc = "/bugLog/config/buglog-config.xml.cfm">
 	<cfset variables.DEFAULT_SERVICE_CFC = "bugLog.components.bugLogListener">
 
 	<cffunction name="init" returntype="service" access="public" hint="constructor">
@@ -22,7 +22,7 @@
 			
 			// create the bug log listener
 			oListener = createObject("component", serviceCFC);
-			oListener.init();
+			oListener.init( getConfig() );
 			
 			// store the service on the application scope
 			server[variables.serviceName] = oListener;				
@@ -54,12 +54,7 @@
 	<cffunction name="getSetting" returnType="string" access="public" hint="Returns the given config setting, if doesnt exist, returns empty or default value">
 		<cfargument name="settingName" type="string" required="true">
 		<cfargument name="defaultValue" type="string" required="false" default="">
-		<cfset var cfg = getConfig()>
-		<cfset var rtn = arguments.defaultValue>
-		<cfif structKeyExists(cfg, arguments.settingName)>
-			<cfset rtn = cfg[arguments.settingName]>
-		</cfif>
-		<cfreturn rtn>
+		<cfreturn getConfig().getSetting("service." & arguments.settingName, arguments.defaultValue)>
 	</cffunction>
 	
 	
@@ -70,21 +65,11 @@
 	</cffunction>
 	
 	<cffunction name="loadConfig" returntype="void" access="private" hint="loads config settings into memory">
-		<cfscript>
-			var cfg = structNew();
-			var xmlDoc = xmlParse(expandPath(variables.configDoc));
-			var xmlNode = 0;
-			
-			for(i=1;i lte arrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
-				xmlNode = xmlDoc.xmlRoot.xmlChildren[i];
-				cfg[xmlNode.xmlName] = xmlNode.xmlText;
-			}
-
-			server[variables.serviceName & "Config"] = cfg;		
-		</cfscript>
+		<cfset server[variables.serviceName & "Config"] = createObject("component","config").init(configProviderType = "xml",
+																									configDoc = variables.configDoc)>
 	</cffunction>
 	
-	<cffunction name="getConfig" returnType="struct" access="private" hint="returns the struct with the config settings">
+	<cffunction name="getConfig" returnType="any" access="private" hint="returns the config settings">
 		<cfreturn server[variables.serviceName & "Config"]>
 	</cffunction>
 

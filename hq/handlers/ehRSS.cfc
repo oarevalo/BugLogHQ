@@ -83,4 +83,22 @@
 		</cfsavecontent>
 		<cfreturn tmpHTML>
 	</cffunction>
+
+	
+	<cffunction name="sortQuery" access="private" hint="Sorts a query by the given field">
+		<cfargument name="qry" type="query" required="yes">
+		<cfargument name="sortBy" type="string" required="yes">
+		<cfargument name="sortOrder" type="string" required="no" default="ASC">
+		
+		<cfset var qryNew = QueryNew("")>
+		
+		<cfquery name="qryNew" dbtype="query">
+			SELECT *
+				FROM arguments.qry
+				ORDER BY #Arguments.SortBy# #Arguments.SortOrder#
+		</cfquery>		
+		
+		<cfreturn qryNew>
+	</cffunction>	
+	
 </cfcomponent>

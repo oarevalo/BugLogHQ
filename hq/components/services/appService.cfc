@@ -2,14 +2,16 @@
 	
 	<cfset variables.path = "">
 	<cfset variables.cfcPath = "">
+	<cfset variables.extensionsPath = "">
 	<cfset variables.OSPathSeparator = createObject("java","java.lang.System").getProperty("file.separator")>
-	<cfset variables.extensionsPath = "bugLog.extensions.">
+	<cfset variables.config = 0>
 
 	<cffunction name="init" access="public" returntype="appService">
 		<cfargument name="path" type="string" required="true">
-		<cfset var oDAOFactory = 0>
-		
+		<cfargument name="config" type="any" required="true">
+
 		<cfset variables.path = arguments.path>
+		<cfset variables.config = arguments.config>
 
 		<!--- get the path in dot notation --->
 		<cfset variables.cfcPath = replace(variables.path, variables.OSPathSeparator, ".", "ALL")>
@@ -19,9 +21,12 @@
 		<cfif right(variables.cfcPath,1) eq ".">
 			<cfset variables.cfcPath = left(variables.cfcPath, len(variables.cfcPath)-1)>
 		</cfif>
+		
+		<!--- set the path for extensions --->
+		<cfset variables.extensionsPath = variables.cfcPath & ".extensions.">
 
 		<!--- Load the DAO objects --->
-		<cfset variables.oDAOFactory = createModelObject("components.lib.dao.DAOFactory").init( expandPath("#variables.path#/config/dao-config.xml.cfm") )>
+		<cfset variables.oDAOFactory = createModelObject("components.DAOFactory").init( variables.config )>
 		<cfset variables.oApplicationDAO = variables.oDAOFactory.getDAO("application")>
 		<cfset variables.oEntryDAO = variables.oDAOFactory.getDAO("entry")>
 		<cfset variables.oHostDAO = variables.oDAOFactory.getDAO("host")>
