@@ -89,7 +89,7 @@
 			oEntry.save();
 		
 			// process rules
-			variables.oRuleProcessor.processRules(bean, oDF.getDataProvider() );
+			variables.oRuleProcessor.processRules(bean, oDF.getDataProvider(), variables.oConfig );
 		
 		</cfscript>
 	</cffunction>

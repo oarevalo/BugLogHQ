@@ -1,19 +1,16 @@
 <cfcomponent extends="bugLog.components.baseRule" 
 			hint="This rule sends an email everytime a bug matching a given set of conditions is received">
 
-	<cfproperty name="senderEmail" type="string" hint="An email address to use as sender of the email notifications">
-	<cfproperty name="recipientEmail" type="string" hint="The email address to which to send the notifications">
-	<cfproperty name="severityCode" type="string" hint="The severity code (fatal,critical,error,etc) that will trigger the rule. Leave empty to look for all severity codes">
-	<cfproperty name="application" type="string" hint="The application name that will trigger the rule. Leave empty to look for all applications">
-	<cfproperty name="keywords" type="string" hint="A list of keywords that will trigger the rule. The keywords are searched within the bug message text">
+	<cfproperty name="recipientEmail" type="string" displayName="Recipient Email" hint="The email address to which to send the notifications">
+	<cfproperty name="severityCode" type="string" displayName="Severity Code" hint="The severity code (fatal,critical,error,etc) that will trigger the rule. Leave empty to look for all severity codes">
+	<cfproperty name="application" type="string" displayName="Application" hint="The application name that will trigger the rule. Leave empty to look for all applications">
+	<cfproperty name="keywords" type="string" displayName="Keywords" hint="A list of keywords that will trigger the rule. The keywords are searched within the bug message text">
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
-		<cfargument name="senderEmail" type="string" required="true">
 		<cfargument name="recipientEmail" type="string" required="true">
 		<cfargument name="severityCode" type="string" required="false" default="">
 		<cfargument name="application" type="string" required="false" default="">
 		<cfargument name="keywords" type="string" required="false" default="">
-		<cfset variables.config.senderEmail = arguments.senderEmail>
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.severityCode = trim(arguments.severityCode)>
 		<cfset variables.config.application = trim(arguments.application)>
@@ -24,7 +21,7 @@
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		
+		<cfargument name="configObj" type="bugLog.components.config" required="true">
 		<cfscript>
 			var stEntry = arguments.rawEntry.getMemento();
 			var evalCond1 = true;
@@ -44,22 +41,16 @@
 			}
 
 			// if all conditions are met, then send the alert
-			if(evalCond1 and evalCond2 and evalCond3)
-				sendEmail(arguments.rawEntry);
+			if(evalCond1 and evalCond2 and evalCond3) {
+				sendToEmail(rawEntryBean = arguments.rawEntry, 
+							sender = arguments.configObj.getSetting("general.adminEmail"),
+							recipient = variables.config.recipientEmail,
+							subject = "BugLog: #arguments.rawEntry.getMessage()#",
+							comment = "This message has been sent because the following bug report matched the given criteria. To review or modify the criteria please log into the bugLog server and go into the Rules section.");
+			}
 				
 			return true;
 		</cfscript>
 	</cffunction>
-
-	<cffunction name="sendEmail" access="private" returntype="void">
-		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
-		
-		<cfset sendToEmail(rawEntryBean = arguments.rawEntry, 
-							sender = variables.config.senderEmail,
-							recipient = variables.config.recipientEmail,
-							subject = "BugLog: #arguments.rawEntry.getMessage()#",
-							comment = "This message has been sent because the following bug report matched the given criteria. To review or modify the criteria please log into the bugLog server and go into the Rules section.")>
-	</cffunction>
-
 
 </cfcomponent>

@@ -1,17 +1,15 @@
 <cfcomponent extends="bugLog.components.baseRule" 
 			hint="This rule checks the amount of messages received on a given timespan and if the number of bugs received is greater than a given threshold, send an email alert">
 	
-	<cfproperty name="senderEmail" type="string" hint="An email address to use as sender of the email notifications">
-	<cfproperty name="recipientEmail" type="string" hint="The email address to which to send the notifications">
-	<cfproperty name="count" type="numeric" hint="The number of bugreports that will trigger the rule">
-	<cfproperty name="timespan" type="numeric" hint="The number in minutes for which to count the amount of bug reports received">
-	<cfproperty name="application" type="string" hint="The application name that will trigger the rule. Leave empty to look for all applications">
-	<cfproperty name="host" type="string" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
-	<cfproperty name="severity" type="string" hint="The severity that will trigger the rule. Leave empty to look for all severities">
-	<cfproperty name="sameMessage" type="boolean" hint="Set to True to counts only bug reports that have the same text on their message. Leave empty or False to count all messages">
+	<cfproperty name="recipientEmail" type="string" displayName="Recipient Email" hint="The email address to which to send the notifications">
+	<cfproperty name="count" type="numeric" displayName="Count" hint="The number of bugreports that will trigger the rule">
+	<cfproperty name="timespan" type="numeric" displayName="Timespan" hint="The number in minutes for which to count the amount of bug reports received">
+	<cfproperty name="application" type="string" displayName="Application" hint="The application name that will trigger the rule. Leave empty to look for all applications">
+	<cfproperty name="host" type="string" displayName="Host Name" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
+	<cfproperty name="severity" type="string" displayName="Severity Code" hint="The severity that will trigger the rule. Leave empty to look for all severities">
+	<cfproperty name="sameMessage" type="boolean" displayName="Same Message?" hint="Set to True to counts only bug reports that have the same text on their message. Leave empty or False to count all messages">
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
-		<cfargument name="senderEmail" type="string" required="true">
 		<cfargument name="recipientEmail" type="string" required="true">
 		<cfargument name="count" type="numeric" required="true">
 		<cfargument name="timespan" type="numeric" required="true">
@@ -19,7 +17,6 @@
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="severity" type="string" required="false" default="">
 		<cfargument name="sameMessage" type="string" required="false" default="">
-		<cfset variables.config.senderEmail = arguments.senderEmail>
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.count = arguments.count>
 		<cfset variables.config.timespan = arguments.timespan>
@@ -37,12 +34,13 @@
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		
+		<cfargument name="configObj" type="bugLog.components.config" required="true">
 		<cfscript>
 			var qry = 0;
 			var oEntryFinder = 0;
 			var oEntryDAO = 0;
 			var args = structNew();
+			var sender = arguments.configObj.getSetting("general.adminEmail");
 			
 			// only evaluate this rule if the amount of timespan minutes has passed after the last email was sent
 			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan ) {
@@ -75,10 +73,10 @@
 	
 				if(isBoolean(variables.config.sameMessage) and variables.config.sameMessage) {
 					qry = groupMessages(qry, variables.config.count);
-					sendEmail(qry);
+					sendEmail(qry, sender);
 		
 				} else if(qry.recordCount gt variables.config.count) {
-					sendEmail(qry);
+					sendEmail(qry, sender);
 				}
 			}
 			return true;
@@ -87,6 +85,7 @@
 
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
+		<cfargument name="sender" type="string" required="true" hint="the sender of the email">
 		<cfset var qryEntries = 0>
 		
 		<cfquery name="qryEntries" dbtype="query">
@@ -101,7 +100,7 @@
 				ORDER BY createdOn DESC
 		</cfquery>
 		
-		<cfmail from="#variables.config.senderEmail#" 
+		<cfmail from="#arguments.sender#" 
 				to="#variables.config.recipientEmail#"
 				subject="BugLog: bug frequency alert!" 
 				type="text/html">

@@ -3,9 +3,8 @@
 	
 	<rules>
 		
-		<rule name="mailAlert">
-			<!-- sender/recipient of email -->
-			<senderEmail>buglog@xyz.com</senderEmail>
+		<rule name="mailAlert" enabled="false">
+			<!-- recipient of email -->
 			<recipientEmail>someone@xyz.com</recipientEmail>
 
 			<!-- severity code to trigger the alert, leave empty for any severity code -->
@@ -18,9 +17,8 @@
 			<keywords></keywords>
 		</rule>
 
-		<rule name="frequencyAlert">
-			<!-- sender/recipient of email -->
-			<senderEmail>buglog@xyz.com</senderEmail>
+		<rule name="frequencyAlert" enabled="false">
+			<!-- recipient of email -->
 			<recipientEmail>someone@xyz.com</recipientEmail>
 
 			<!-- number of bugs that will trigger the rule -->

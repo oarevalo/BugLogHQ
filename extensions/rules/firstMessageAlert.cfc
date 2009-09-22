@@ -1,21 +1,19 @@
 <cfcomponent extends="bugLog.components.baseRule" 
+			displayName="First Message Alert"
 			hint="This rule checks for the first time a given bug report is received on the last X minutes and send an email">
 	
-	<cfproperty name="senderEmail" type="string" hint="An email address to use as sender of the email notifications">
-	<cfproperty name="recipientEmail" type="string" hint="The email address to which to send the notifications">
-	<cfproperty name="timespan" type="numeric" hint="The number in minutes for which to count the amount of bug reports received">
-	<cfproperty name="application" type="string" hint="The application name that will trigger the rule. Leave empty to look for all applications">
-	<cfproperty name="host" type="string" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
-	<cfproperty name="severity" type="string" hint="The severity that will trigger the rule. Leave empty to look for all severities">
+	<cfproperty name="recipientEmail" type="string" displayName="Recipient Email" hint="The email address to which to send the notifications">
+	<cfproperty name="timespan" type="numeric" displayName="Timespan" hint="The number in minutes for which to count the amount of bug reports received">
+	<cfproperty name="application" type="string" displayName="Application" hint="The application name that will trigger the rule. Leave empty to look for all applications">
+	<cfproperty name="host" type="string" displayName="Host Name" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
+	<cfproperty name="severity" type="string" displayName="Severity Code" hint="The severity that will trigger the rule. Leave empty to look for all severities">
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
-		<cfargument name="senderEmail" type="string" required="true">
 		<cfargument name="recipientEmail" type="string" required="true">
 		<cfargument name="timespan" type="numeric" required="true">
 		<cfargument name="application" type="string" required="false" default="">
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="severity" type="string" required="false" default="">
-		<cfset variables.config.senderEmail = arguments.senderEmail>
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.timespan = arguments.timespan>
 		<cfset variables.config.application = arguments.application>
@@ -30,12 +28,13 @@
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		
+		<cfargument name="configObj" type="bugLog.components.config" required="true">
 		<cfscript>
 			var qry = 0;
 			var oEntryFinder = 0;
 			var oEntryDAO = 0;
 			var args = structNew();
+			var sender = arguments.configObj.getSetting("general.adminEmail");
 			
 			// check fast fail conditions
 			if(variables.config.application neq "" and arguments.rawEntry.getApplicationCode() neq variables.config.application) return true;
@@ -70,7 +69,7 @@
 			qry = oEntryFinder.search(argumentCollection = args);
 			
 			if(qry.recordCount eq 1) {
-				sendEmail(qry, rawEntry);
+				sendEmail(qry, rawEntry, sender);
 			}
 		
 			return true;
@@ -80,6 +79,7 @@
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
+		<cfargument name="sender" type="string" required="true" hint="the sender of the email">
 		
 		<cfset var q = arguments.data>
 		<cfset var numHours = int(variables.config.timespan / 60)>
@@ -110,7 +110,7 @@
 		</cfsavecontent>			
 		
 		<cfset sendToEmail(rawEntryBean = arguments.rawEntry,
-							sender = variables.config.senderEmail,
+							sender = arguments.sender,
 							recipient = variables.config.recipientEmail,
 							subject= "BugLog: [First Message Alert] #q.message#", 
 							comment = intro)>

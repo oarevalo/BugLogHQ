@@ -18,6 +18,7 @@
 						need to be evaluated.">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
+		<cfargument name="configObj" type="bugLog.components.config" required="true">
 		<!--- this method must be implemented by rules that extend the base rule --->
 		<cfreturn true>
 	</cffunction>
