@@ -15,6 +15,7 @@
 <cfparam name="request.requestState.qryHosts" default="#queryNew('')#">
 <cfparam name="request.requestState.qrySeverities" default="#queryNew('')#">
 <cfparam name="request.requestState.severityID" default="_ALL_">
+<cfparam name="request.requestState.searchHTMLReport" default="false">
 
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
@@ -36,9 +37,10 @@
 <cfset qryHosts = request.requestState.qryHosts>
 <cfset qrySeverities = request.requestState.qrySeverities>
 <cfset severityID = request.requestState.severityID>
+<cfset searchHTMLReport = request.requestState.searchHTMLReport>
 
 <!--- base URL for reloading --->
-<cfset pageURL = "index.cfm?event=ehGeneral.dspMain&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#searchTerm#&groupByApp=#groupByApp#&groupByHost=#groupByHost#&numDays=#numDays#&severityID=#severityID#">
+<cfset pageURL = "index.cfm?event=ehGeneral.dspMain&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#searchTerm#&groupByApp=#groupByApp#&groupByHost=#groupByHost#&numDays=#numDays#&severityID=#severityID#&searchHTMLReport=#searchHTMLReport#">
 
 <!--- setup variables for paging records --->
 <cfset numPages = ceiling(qryEntries.recordCount / rowsPerPage)>
@@ -79,6 +81,7 @@
 				
 				frm.groupByApp.value = document.getElementById("groupByApp").checked;
 				frm.groupByHost.value = document.getElementById("groupByHost").checked;
+				frm.searchHTMLReport.value = document.getElementById("searchHTMLReportChk").checked;
 				
 				frm.submit();
 			}
@@ -120,6 +123,7 @@
 	<form name="frmSearch" action="index.cfm" method="get" style="margin:0px;padding-top:10px;">
 		<input type="hidden" name="groupByApp" value="#groupByApp#">
 		<input type="hidden" name="groupByHost" value="#groupByHost#">
+		<input type="hidden" name="searchHTMLReport" value="#searchHTMLReport#">
 		
 		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 			<tr align="center">
@@ -137,6 +141,15 @@
 				<td>
 					<span <cfif searchTerm neq "">style="color:red;"</cfif>>Search:</span> &nbsp;&nbsp;
 					<input type="text" name="searchTerm" value="#searchTerm#" style="width:200px;" onchange="doSearch()">
+					<div style="font-size:10p;">
+						<input type="checkbox" 
+								name="searchHTMLReportChk" 
+								id="searchHTMLReportChk" 
+								value="true"
+								onclick="doSearch()" 
+								<cfif searchHTMLReport>checked</cfif>>
+						Search HTML Report content
+					</div>
 				</td>
 				<td>
 					<span <cfif applicationID gt 0>style="color:red;"</cfif>>Application:</span> &nbsp;&nbsp;
@@ -313,9 +326,6 @@
 			</td>
 		</tr>
 	</cfloop>
-	<cfif qryEntries.recordCount eq 0>
-		<td colspan="7"><em>No entries found.</em></td>
-	</cfif>
 	</table>
 	
 	

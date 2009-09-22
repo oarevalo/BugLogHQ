@@ -62,7 +62,9 @@
 
 	<cffunction name="dspMain" access="public" returntype="void">
 		<cfscript>
-			resetCriteria = getValue("resetCriteria", false);
+			var criteria = structNew();
+			var resetCriteria = getValue("resetCriteria", false);
+
 			if(resetCriteria) {
 				structDelete(cookie,"criteria");
 				writeCookie("criteria","","now");
@@ -70,20 +72,22 @@
 			
 			if(structKeyExists(cookie,"criteria") and isJSON(cookie.criteria)) {
 				criteria = deserializeJSON(cookie.criteria);
-			} else {
-				// set default values
-				criteria = structNew();
-				criteria.numDays = 1;
-				criteria.searchTerm = "";
-				criteria.applicationID = 0;
-				criteria.hostID = 0;
-				criteria.severityID = "_ALL_";
-				criteria.search_cfid = "";
-				criteria.search_cftoken = "";
-				criteria.enddate = "1/1/3000";
-				criteria.groupByApp = true;
-				criteria.groupByHost = true;
 			}
+			
+			// make sure we have a complete criteria struct w/ default values
+			if(not isStruct(criteria)) criteria = structNew();
+			if(not structKeyExists(criteria,"numdays")) criteria.numDays = 1;
+			if(not structKeyExists(criteria,"searchTerm")) criteria.searchTerm = "";
+			if(not structKeyExists(criteria,"applicationID")) criteria.applicationID = 0;
+			if(not structKeyExists(criteria,"hostID")) criteria.hostID = 0;
+			if(not structKeyExists(criteria,"severityID")) criteria.severityID = "_ALL_";
+			if(not structKeyExists(criteria,"search_cfid")) criteria.search_cfid = "";
+			if(not structKeyExists(criteria,"search_cftoken")) criteria.search_cftoken = "";
+			if(not structKeyExists(criteria,"enddate")) criteria.enddate = "1/1/3000";
+			if(not structKeyExists(criteria,"groupByApp")) criteria.groupByApp = true;
+			if(not structKeyExists(criteria,"groupByHost")) criteria.groupByHost = true;
+			if(not structKeyExists(criteria,"searchHTMLReport")) criteria.searchHTMLReport = false;
+			
 			
 			// page params
 			numDays = getValue("numDays", criteria.numDays);
@@ -94,6 +98,7 @@
 			search_cfid = getValue("search_cfid", criteria.search_cfid);
 			search_cftoken = getValue("search_cftoken", criteria.search_cftoken);
 			endDate = getValue("endDate", criteria.enddate);
+			searchHTMLReport = getValue("searchHTMLReport", criteria.searchHTMLReport);
 
 			groupByApp = getValue("groupByApp", criteria.groupByApp);
 			groupByHost = getValue("groupByHost", criteria.groupByHost);
@@ -102,7 +107,7 @@
 			startDate = dateAdd("d", val(numDays) * -1, now());
 							
 			// perform search				
-			qryEntries = getService("app").searchEntries(searchTerm, applicationID, hostID, severityID, startDate, endDate, search_cfid, search_cftoken);
+			qryEntries = getService("app").searchEntries(searchTerm, applicationID, hostID, severityID, startDate, endDate, search_cfid, search_cftoken, searchHTMLReport);
 
 			// set some default values			
 			if(applicationID neq "" and Not isNumeric(applicationID)) setValue("applicationID", qryEntries.applicationID);
@@ -131,6 +136,7 @@
 			criteria.enddate = enddate;
 			criteria.groupByApp = groupByApp;
 			criteria.groupByHost = groupByHost;
+			criteria.searchHTMLReport = searchHTMLReport;
 			writeCookie("criteria",serializeJSON(criteria),30);
 		</cfscript>
 			
@@ -193,6 +199,7 @@
 		<cfset setValue("search_cfid", search_cfid)>	
 		<cfset setValue("search_cftoken", search_cftoken)>	
 		<cfset setValue("endDate", endDate)>	
+		<cfset setValue("searchHTMLReport", searchHTMLReport)>	
 		<cfset setValue("groupByApp", groupByApp)>	
 		<cfset setValue("groupByHost", groupByHost)>	
 		<cfset setValue("qryApplications", qryApplications)>	
