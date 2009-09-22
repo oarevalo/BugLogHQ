@@ -58,6 +58,7 @@ for execution is 2 minutes but this can be configured easily.
 * Reduced the number of configuration files (only 2) and moved them to a single location.
 * Added a "settings" screen to the main interface to allow administrators to configure multiple aspects of
 BugLogHQ as well as perform user management.
+* Added support for integrating with JIRA. When enabled allows sending issues directly from BugLog to a JIRA instance.
 * Added support for multiple users in two roles: administrators and regular users. 
 * Added option to change user password.
 * Added option to require an API key that each application must send in order to submit bug reports.
