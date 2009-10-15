@@ -16,8 +16,10 @@
 		<cfargument name="rawEntry" type="rawEntryBean" required="true">
 		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
 		<cfargument name="config" type="config" required="true" >
-		
 		<cfscript>
+			var i = 0;
+			var rtn = false;
+			
 			for(i=1;i lte arrayLen(variables.aRules);i=i+1) {
 				try {
 					// process rule with current entry bean					

@@ -27,6 +27,7 @@
 			var evalCond1 = true;
 			var evalCond2 = true;
 			var evalCond3 = true;
+			var i = 0;
 
 			// evaluate conditions
 			evalCond1 = (variables.config.application eq "")
@@ -47,6 +48,8 @@
 							recipient = variables.config.recipientEmail,
 							subject = "BugLog: #arguments.rawEntry.getMessage()#",
 							comment = "This message has been sent because the following bug report matched the given criteria. To review or modify the criteria please log into the bugLog server and go into the Rules section.");
+				
+				writeToCFLog("MailAlertRule. Rule fired. Email sent.");
 			}
 				
 			return true;
