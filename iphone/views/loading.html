@@ -1,0 +1,18 @@
+<html>
+	<head>
+		<title>BugLogMini: Loading</title>
+		<link href="../style.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript">
+			function displayError(e) {
+				var div = document.getElementById("contentArea");
+				div.innerHTML = "<div class='entryError'>An error ocurred while retrieving the bugLog data from the server:<br><br>" + e + "</div>";
+			}
+		</script>
+	</head>
+	<body>
+		<div style="text-align:center;margin-top:100px;" id="contentArea">
+			<img src="../images/ajax-loader.gif"><br>
+			Connecting...
+		</div>
+	</body>
+</html>

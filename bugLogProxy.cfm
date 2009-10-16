@@ -6,7 +6,8 @@
 <cfset errorMessage = "">
 
 <cftry>
-	<cfset oAppService = createObject("component","bugLog.hq.components.services.appService").init(bugLogPath)>
+	<cfset oConfig = createObject("component","bugLog.components.config").init(configProviderType = "xml", configDoc = "/bugLog/config/buglog-config.xml.cfm")>
+	<cfset oAppService = createObject("component","bugLog.hq.components.services.appService").init(bugLogPath,oConfig)>
 	
 	<cfswitch expression="#action#">
 		
@@ -61,12 +62,20 @@
 			<cfparam name="token" default="">
 			<cfparam name="applicationID" default="0">
 			<cfparam name="hostID" default="0">
-			<cfparam name="message" default="">
+			<cfparam name="msgFromEntryID" default="">
+			<cfparam name="searchTerm" default="">
 			
 			<!--- to do: validate token --->
 			
 			<!--- get listing --->
-			<cfset qryEntries = oAppService.searchEntries(searchTerm = message,
+			<cfscript>
+				// if we are passing an entryID, then get the message from there
+				if(val(msgFromEntryID) gt 0) {
+					oEntry = oAppService.getEntry( msgFromEntryID );
+					searchTerm = oEntry.getMessage();
+				}				
+			</cfscript>
+			<cfset qryEntries = oAppService.searchEntries(searchTerm = searchTerm,
 															startDate = dateAdd("d",now(),-1),
 															applicationID=applicationID,
 															hostID=hostID)>
