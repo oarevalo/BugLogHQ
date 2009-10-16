@@ -16,9 +16,10 @@
 			<cfparam name="password" default="">
 	
 			<cfset userID = oAppService.checkLogin(username, password)>
+			<cfset session.token = createUUID()>
 			
 			<cfif userID gt 0>
-				<cfset results = userID>
+				<cfset results = session.token>
 			<cfelse>
 				<cfset error = true>
 				<cfset errorMessage = "Invalid user/password">
@@ -30,7 +31,10 @@
 			<cfparam name="numDays" default="1">
 			<cfparam name="token" default="">
 			
-			<!--- to do: validate token --->
+			<!--- validate token --->
+			<cfif not validateToken(token)>
+				<cfthrow message="Invalid token. Please login first" type="invalidToken">
+			</cfif>
 			
 			<!--- get listing --->
 			<cfset qryEntries = oAppService.searchEntries(searchTerm = "",startDate = dateAdd("d",now(),-1 * numDays))>
@@ -65,7 +69,10 @@
 			<cfparam name="msgFromEntryID" default="">
 			<cfparam name="searchTerm" default="">
 			
-			<!--- to do: validate token --->
+			<!--- validate token --->
+			<cfif not validateToken(token)>
+				<cfthrow message="Invalid token. Please login first" type="invalidToken">
+			</cfif>
 			
 			<!--- get listing --->
 			<cfscript>
@@ -105,7 +112,10 @@
 			<cfparam name="entryID" default="0" type="numeric">
 			<cfparam name="token" default="">
 			
-			<!--- to do: validate token --->
+			<!--- validate token --->
+			<cfif not validateToken(token)>
+				<cfthrow message="Invalid token. Please login first" type="invalidToken">
+			</cfif>
 			
 			<!--- get listing --->
 			<cfset oEntry = oAppService.getEntry(entryID)>
@@ -158,3 +168,7 @@
 
 <cfcontent type="text/xml" reset="true"><cfoutput>#toString(xmlDoc)#</cfoutput>
 
+<cffunction name="validateToken" access="private" returntype="false">
+	<cfargument name="token" type="string" required="true">
+	<cfreturn structKeyExists(session,"token") and session.token eq arguments.token>
+</cffunction>
