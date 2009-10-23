@@ -24,12 +24,16 @@ function initApp() {
 	// load any stored login credentials
 	loadServerInfo();
 
-	// display connect page
-	setView("connect");
+	if(serverInfo.rememberMe)
+		doConnect(serverInfo.server,serverInfo.username,serverInfo.password,serverInfo.rememberMe);
+	else {
+		// display connect page
+		setView("connect");
+	}
 }
 
 function setView(vw) {
-	document.getElementById('UI').contentWindow.location="views/" + vw + ".html";
+	document.getElementById('UI').contentWindow.location="/bugLog/iphone/views/" + vw + ".html";
 } 
 
 function resizeUI(e) {
@@ -74,7 +78,7 @@ function doConnect(srv,usr,pwd,rem) {
 		url += "&username="+usr;
 		url += "&password="+pwd;
 
-	setView("../loading");
+	setView("loading");
 
 	xmlhttp = new XMLHttpRequest();
 	xmlhttp.open("POST", url, true);
