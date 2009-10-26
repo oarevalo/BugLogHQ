@@ -182,7 +182,9 @@ will create the necessary tables.
 	at the following locations: 
 		/bugLog/hq/Application.cfc (lines 14-15)
 		/bugLog/hq/config/config.xml.cfm (lines 10-11)
-
+	
+	Also, on /bugLog/hq/Application.cfc, line 19, change it to:
+		this.emailErrors = true
 
 
 
