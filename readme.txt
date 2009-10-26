@@ -67,7 +67,7 @@ BugLogHQ as well as perform user management.
 * Added option to purge history so that old data can be deleted
 * Multiple bug fixes.
 * Deprecated support for storing data in XML files (it really really didn't make any sense)
-
+* UPDATE: Added custom web interface for iPhone/iPod Touch. See /bugLog/iphone
 
 -----------------------------------------------------------------------
  > New in 1.3
@@ -165,7 +165,12 @@ will create the necessary tables.
 
 * By default bugLogHQ uses a datasource named "bugLog" with no password, to change this go to: 
 	/bugLog/config/buglog-config.xml.cfm
-	Change the <setting /> tags for "db.dsn", "db.dbtype", "db.username", and/or "db.password" as needed.
+
+	Change the <setting /> tags for:
+	 db.dsn :	datasource name as defined in the CF administrator (by default is bugLog)
+	 db.dbtype : database type. Can be either mysql or mssql. The default is mysql
+	 db.username : username for the datasource (if needed)
+	 db.password : password for the datasource (if needed)
 	
 * To access the bugLogHQ interface, go to /bugLog. The default username/password is:
 		username: admin
