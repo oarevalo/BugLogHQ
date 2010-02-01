@@ -9,7 +9,8 @@
 				{ id = "userManagement", label = "User Management", display = isAdmin },
 				{ id = "purgeHistory", label = "Purge History", display = isAdmin },
 				{ id = "APISecurity", label = "API Security", display = isAdmin },
-				{ id = "jira", label = "JIRA Integration", display = isAdmin }
+				{ id = "jira", label = "JIRA Integration", display = isAdmin },
+				{ id = "listeners", label = "BugLog Listeners", display = true },
 			]>
 <cfset lstPanelIDs = "">
 			

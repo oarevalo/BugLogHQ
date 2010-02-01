@@ -5,7 +5,7 @@
 	<cfset variables.maxQueueSize = 0>
 	<cfset variables.maxLogSize = 0>
 	<cfset variables.schedulerIntervalSecs = 0>
-	<cfset variables.key = createUUID()>
+	<cfset variables.key = "123456knowthybugs654321"> <!--- this is a simple protection to avoid calling processqueue() too easily. This is NOT the apiKey setting --->
 	
 	<cffunction name="init" access="public" returntype="bugLogListenerAsync" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
