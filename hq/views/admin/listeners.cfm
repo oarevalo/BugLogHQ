@@ -7,13 +7,13 @@
 	<div style="margin-left:30px;line-height:24px;">
 		You can use the following BugLog listeners for this server:<br /><br />
 		
-		<b>SOAP / Webservice:</b><br />
+		<b>SOAP / Webservice:</b> ( <a href="/bugLog/test/client.cfm?protocol=soap">Test</a> )<br />
 		<a href="#bugLogListener.soap#">#bugLogListener.soap#</a><br /><br />
 		
-		<b>HTTP POST / REST:</b><br />
+		<b>HTTP POST / REST:</b> ( <a href="/bugLog/test/client.cfm?protocol=rest">Test</a> )<br />
 		<a href="#bugLogListener.rest#">#bugLogListener.rest#</a><br /><br />
 
-		<b>CFC:</b><br />
+		<b>CFC:</b> ( <a href="/bugLog/test/client.cfm?protocol=cfc">Test</a> )<br />
 		<a href="#bugLogListener.cfc#">#bugLogListener.cfc#</a>
 	</div>
 </cfoutput>
