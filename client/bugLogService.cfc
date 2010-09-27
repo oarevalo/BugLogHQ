@@ -8,9 +8,13 @@
 	<cfset variables.defaultSeverityCode = "ERROR">
 	<cfset variables.apikey = "">
 	
-	<cfset variables.hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName()>
-	<cfset variables.appName = replace(application.applicationName," ","","all")>
-	
+	<!--- Handle cases in which the application scope is not defined (Fix contributed by Morgan Dennithorne) --->
+	<cfif isDefined("application.applicationName")>
+		<cfset variables.appName = replace(application.applicationName," ","","all") />
+	<cfelse>
+		<cfset variables.appName = "undefined" />
+	</cfif>
+			
 	<cfset variables.escapePattern = createObject('java','java.util.regex.Pattern').compile("[^\u0009\u000a\u000d\u0020-\ud7ff\ud800\udc00\ue000-\ufffd\u100000-\u10ffff]") /> 
 
 	
@@ -38,10 +42,22 @@
 			variables.bugEmailSender = arguments.bugEmailSender;
 			variables.bugEmailRecipients = arguments.bugEmailRecipients;
 			variables.apikey = arguments.apikey;
-			if(arguments.hostname neq "") variables.hostName = arguments.hostname;
 			
 			if(arguments.bugEmailSender eq "" and arguments.bugEmailRecipients neq "")
 				arguments.bugEmailSender = listFirst(arguments.bugEmailRecipients);
+
+			// figure out an appropriate hostname
+			if(arguments.hostname neq "") {
+				variables.hostName = arguments.hostname;
+			} else {
+				// get the hostname via reverse lookup
+				try {
+					variables.hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName();
+				} catch(any e) {
+					// the reverse lookup can sometimes fail depending on the network configuration
+					variables.hostName = CGI.SERVER_NAME;
+				}
+			}
 
 			// Instantiate appropriate reference to listener		
 			switch(variables.protocol) {
