@@ -25,7 +25,7 @@ CREATE TABLE  `bl_Application` (
   `Name` varchar(250) NOT NULL COMMENT '\n',
   PRIMARY KEY  (`ApplicationID`),
   UNIQUE KEY `Code` (`Code`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 --
@@ -37,7 +37,7 @@ CREATE TABLE `bl_Host` (
   `HostID` int(11) NOT NULL auto_increment,
   `HostName` varchar(255) NOT NULL,
   PRIMARY KEY  (`HostID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Definition of table `bl_Severity`
@@ -49,7 +49,7 @@ CREATE TABLE  `bl_Severity` (
   `Name` varchar(250) NOT NULL COMMENT '\n',
   `Code` varchar(10) NOT NULL,
   PRIMARY KEY  (`SeverityID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 --
@@ -61,7 +61,7 @@ CREATE TABLE  `bl_Source` (
   `sourceID` int(11) NOT NULL auto_increment,
   `Name` varchar(255) NOT NULL,
   PRIMARY KEY  (`sourceID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 --
@@ -94,7 +94,7 @@ CREATE TABLE `bl_Entry` (
   CONSTRAINT `FK_Entry_SeverityID` FOREIGN KEY (`SeverityID`) REFERENCES `bl_Severity` (`SeverityID`),
   CONSTRAINT `FK_Entry_SourceID` FOREIGN KEY (`SourceID`) REFERENCES `bl_Source` (`sourceID`),
   CONSTRAINT `FK_Entry_ApplicationID` FOREIGN KEY (`ApplicationID`) REFERENCES `bl_Application` (`ApplicationID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Table structure for table `bl_User`
@@ -107,7 +107,7 @@ CREATE TABLE `bl_User` (
   `Password` varchar(50) NOT NULL COMMENT '\n',
   `IsAdmin` int(11) NOT NULL default 0,
   PRIMARY KEY  (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `bl_User`
