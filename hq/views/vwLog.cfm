@@ -10,6 +10,7 @@
 <cfparam name="request.requestState.hostID" default="0">
 <cfparam name="request.requestState.qryApplications" default="#queryNew('')#">
 <cfparam name="request.requestState.qryHosts" default="#queryNew('')#">
+<cfparam name="request.requestState.msgFromEntryID" default="">
 
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
@@ -27,10 +28,11 @@
 <cfset hostID = request.requestState.hostID>
 <cfset qryApplications = request.requestState.qryApplications>
 <cfset qryHosts = request.requestState.qryHosts>
+<cfset msgFromEntryID = request.requestState.msgFromEntryID>
 
 
 <!--- base URL for reloading --->
-<cfset pageURL = "index.cfm?event=ehGeneral.dspLog&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#searchTerm#">
+<cfset pageURL = "index.cfm?event=ehGeneral.dspLog&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#urlEncodedFormat(searchTerm)#&msgFromEntryID=#msgFromEntryID#">
 
 <!--- setup variables for paging records --->
 <cfset numPages = ceiling(qryEntries.recordCount / rowsPerPage)>
@@ -70,7 +72,7 @@
 		
 		<script type="text/javascript">
 			function search(term, appID, hostID) {
-				location.replace('index.cfm?event=ehGeneral.dspLog&applicationID='+appID+'&hostID='+hostID+'&searchTerm='+term);
+				location.replace('index.cfm?event=ehGeneral.dspLog&applicationID='+appID+'&hostID='+hostID+'&searchTerm='+escape(term)+'&msgFromEntryID=#msgFromEntryID#');
 			}
 		</script>	
 	</cfoutput>
@@ -86,15 +88,16 @@
 				
 	<!--- Search Criteria / Filters --->			
 	<form name="frmSearch" action="index.cfm" method="post" style="margin:0px;padding-top:10px;">
+		<input type="hidden" name="event" value="ehGeneral.dspLog">
 		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 			<tr align="center">
 				<td>
 					<span <cfif searchTerm neq "">style="color:red;"</cfif>>Search:</span> &nbsp;&nbsp;
-					<input type="text" name="searchTerm" value="#searchTerm#" style="width:200px;" onchange="search(this.value,#applicationID#,#hostID#)">
+					<input type="text" name="searchTerm" value="#htmlEditFormat(searchTerm)#" style="width:200px;" onchange="search(this.value,#applicationID#,#hostID#)">
 				</td>
 				<td>
 					<span <cfif applicationID gt 0>style="color:red;"</cfif>>Application:</span> &nbsp;&nbsp;
-					<select name="applicationID" style="width:200px;" onchange="search('#searchTerm#',this.value,#hostID#)">
+					<select name="applicationID" style="width:200px;" onchange="search('#jsStringFormat(searchTerm)#',this.value,#hostID#)">
 						<option value="0">All</option>
 						<cfset tmp = applicationID>
 						<cfloop query="qryApplications">
@@ -104,7 +107,7 @@
 				</td>
 				<td>
 					<span <cfif hostID gt 0>style="color:red;"</cfif>>Host:</span> &nbsp;&nbsp;
-					<select name="hostID" style="width:200px;" onchange="search('#searchTerm#',#applicationID#,this.value)">
+					<select name="hostID" style="width:200px;" onchange="search('#jsStringFormat(searchTerm)#',#applicationID#,this.value)">
 						<option value="0">All</option>
 						<cfset tmp = hostID>
 						<cfloop query="qryHosts">

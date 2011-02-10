@@ -222,10 +222,13 @@
 			search_cftoken = getValue("search_cftoken","");
 							
 			// if we are passing an entryID, then get the message from there
-			if(val(msgFromEntryID) gt 0) {
+			if(searchTerm eq "" and val(msgFromEntryID) gt 0) {
 				oEntry = getService("app").getEntry( msgFromEntryID );
 				searchTerm = oEntry.getMessage();
-			}				
+				setValue("searchTerm", searchTerm);
+			} else {
+				setValue("msgFromEntryID", "");
+			}
 							
 			// perform search				
 			qryEntries = getService("app").searchEntries(searchTerm, applicationID, hostID, severityID, startDate, endDate, search_cfid, search_cftoken);
