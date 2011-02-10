@@ -126,7 +126,7 @@
 		</cfmail>
 		<cfset variables.lastEmailTimestamp = now()>
 		
-		<cfset writeToCFLog("frequencyAlert. Rule fired. Email sent.")>
+		<cfset writeToCFLog("'frequencyAlert' rule fired. Email sent.")>
 	</cffunction>
 
 	<cffunction name="getApplicationID" access="private" returntype="numeric">

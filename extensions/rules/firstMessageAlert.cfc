@@ -112,10 +112,10 @@
 		<cfset sendToEmail(rawEntryBean = arguments.rawEntry,
 							sender = arguments.sender,
 							recipient = variables.config.recipientEmail,
-							subject= "BugLog: [First Message Alert] #q.message#", 
+							subject= "BugLog: [First Message Alert][#q.ApplicationCode#][#q.hostName#] #q.message#", 
 							comment = intro)>
 		
-		<cfset writeToCFLog("firstMessageAlert. Rule fired. Email sent.")>
+		<cfset writeToCFLog("'firstMessageAlert' rule fired. Email sent. Msg: '#q.message#'")>
 	</cffunction>
 
 	<cffunction name="getApplicationID" access="private" returntype="numeric">
