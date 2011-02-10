@@ -10,6 +10,9 @@
 	<cfproperty name="sameMessage" type="boolean" displayName="Same Message?" hint="Set to True to counts only bug reports that have the same text on their message. Leave empty or False to count all messages">
 	<cfproperty name="oneTimeAlertRecipient" type="string" hint="An email address to receive a one time short notification. This is sent only up to once per day.">
 
+	<cfset ID_NOT_SET = -9999999 />
+	<cfset ID_NOT_FOUND = -9999990 />
+
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
 		<cfargument name="count" type="numeric" required="true">
@@ -29,9 +32,10 @@
 		<cfset variables.config.oneTimeAlertRecipient = arguments.oneTimeAlertRecipient>
 		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 		<cfset variables.lastOneTimeEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
-		<cfset variables.applicationID = -1>
-		<cfset variables.hostID = -1>
-		<cfset variables.severityID = -1>
+		<cfset variables.applicationID = ID_NOT_SET>
+		<cfset variables.hostID = ID_NOT_SET>
+		<cfset variables.severityID = ID_NOT_SET>
+		<cfset variables.sameMessage = (isBoolean(variables.config.sameMessage) and variables.config.sameMessage)>
 		<cfreturn this>
 	</cffunction>
 	
@@ -52,38 +56,41 @@
 				oEntryDAO = createObject("component","bugLog.components.db.entryDAO").init(arguments.dataProvider);
 				oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
 	
-				if(variables.config.application neq "" and variables.applicationID eq -1) {
+				if(variables.config.application neq "" and (variables.applicationID eq ID_NOT_SET or variables.applicationID eq ID_NOT_FOUND)) {
 					variables.applicationID = getApplicationID(arguments.dataProvider);
-					if(variables.applicationID eq 0) variables.config.application = "";
 				}
-				if(variables.config.host neq "" and variables.hostID eq -1) {
+				if(variables.config.host neq "" and (variables.hostID eq ID_NOT_SET or variables.hostID eq ID_NOT_FOUND)) {
 					variables.hostID = getHostID(arguments.dataProvider);
-					if(variables.hostID eq 0) variables.config.host = "";
 				}
-				if(variables.config.severity neq "" and variables.severityID eq -1) {
+				if(variables.config.severity neq "" and (variables.severityID eq ID_NOT_SET or variables.severityID eq ID_NOT_FOUND)) {
 					variables.severityID = getSeverityID(arguments.dataProvider);
-					if(variables.severityID eq 0) variables.config.severity = "";
 				}
 				
 				args = structNew();
 				args.searchTerm = "";
 				args.startDate = dateAdd("n", variables.config.timespan * (-1), now() );
 				args.endDate = now();
-				if(variables.applicationID gt 0) args.applicationID = variables.applicationID;
-				if(variables.hostID gt 0) args.hostID = variables.hostID;
-				if(variables.severityID gt 0) args.severityID = variables.severityID;
-	
+				if(variables.applicationID neq ID_NOT_SET) args.applicationID = variables.applicationID;
+				if(variables.hostID neq ID_NOT_SET) args.hostID = variables.hostID;
+				if(variables.severityID neq ID_NOT_SET) args.severityID = variables.severityID;
+
 				qry = oEntryFinder.search(argumentCollection = args);
-	
-				if(isBoolean(variables.config.sameMessage) and variables.config.sameMessage) {
-					qry = groupMessages(qry, variables.config.count);
-					sendEmail(qry, sender);
-					sendAlert(qry, sender);
-		
-				} else if(qry.recordCount gt variables.config.count) {
-					sendEmail(qry, sender);
-					sendAlert(qry, sender);
+
+				if(qry.recordCount gt 0) {
+					if(variables.sameMessage) {
+						qry = groupMessages(qry, variables.config.count);
+						
+						if(qry.recordCount gt 0) {
+							sendEmail(qry, sender);
+							sendAlert(qry, sender);
+						}
+			
+					} else if(qry.recordCount gt variables.config.count) {
+						sendEmail(qry, sender);
+						sendAlert(qry, sender);
+					}
 				}
+			
 			}
 			return true;
 		</cfscript>
@@ -93,6 +100,13 @@
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
 		<cfargument name="sender" type="string" required="true" hint="the sender of the email">
 		<cfset var qryEntries = 0>
+		<cfset var thisHost = "">
+
+		<cfscript>
+			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
+			thisHost = thisHost & cgi.server_name;
+			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
+		</cfscript>
 		
 		<cfquery name="qryEntries" dbtype="query">
 			SELECT ApplicationCode, ApplicationID, 
@@ -106,30 +120,36 @@
 				ORDER BY createdOn DESC
 		</cfquery>
 		
-		<cfmail from="#arguments.sender#" 
-				to="#variables.config.recipientEmail#"
-				subject="BugLog: bug frequency alert!" 
-				type="text/html">
-			BugLog has received more than <strong>#variables.config.count#</strong> bug reports 
-			<cfif variables.config.application neq "">
-				for application <strong>#variables.config.application#</strong>
-			</cfif>
-			<cfif variables.config.host neq "">
-				on host <strong>#variables.config.host#</strong>
-			</cfif>
-			<cfif variables.config.severity neq "">
-				with a severity of <strong>#variables.config.severity#</strong>
-			</cfif>
-			on the last <strong>#variables.config.timespan#</strong> minutes.
-			<br /><br />
-			<cfloop query="qryEntries">
-				<cfset tmpURL = "http://#cgi.HTTP_HOST#/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#qryEntries.EntryID#">
-				&bull; <a href="#tmpURL#">[#qryEntries.severityCode#][#qryEntries.applicationCode#][#qryEntries.hostName#] #qryEntries.message# (#qryEntries.bugCount#)</a><br />
-			</cfloop>
-			<br /><br /><br />
-			** This email has been sent from the BugLog server at 
-			<a href="http://#cgi.HTTP_HOST#/bugLog/hq">http://#cgi.HTTP_HOST#/bugLog/hq</a>
-		</cfmail>
+		<cfif variables.config.recipientEmail neq "" and arguments.sender neq "">
+			<cfmail from="#arguments.sender#" 
+					to="#variables.config.recipientEmail#"
+					subject="BugLog: bug frequency alert!" 
+					type="text/html">
+				BugLog has received more than <strong>#variables.config.count#</strong> bug reports 
+				<cfif variables.sameMessage>
+					<strong>with the same message</strong>
+				</cfif>
+				<cfif variables.config.application neq "">
+					for application <strong>#variables.config.application#</strong>
+				</cfif>
+				<cfif variables.config.host neq "">
+					on host <strong>#variables.config.host#</strong>
+				</cfif>
+				<cfif variables.config.severity neq "">
+					with a severity of <strong>#variables.config.severity#</strong>
+				</cfif>
+				on the last <strong>#variables.config.timespan#</strong> minutes.
+				<br /><br />
+				<cfloop query="qryEntries">
+					<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#qryEntries.EntryID#">
+					&bull; <a href="#tmpURL#">[#qryEntries.severityCode#][#qryEntries.applicationCode#][#qryEntries.hostName#] #qryEntries.message# <cfif !variables.sameMessage>(#qryEntries.bugCount#)</cfif></a><br />
+				</cfloop>
+				<br /><br /><br />
+				** This email has been sent from the BugLog server at 
+				<a href="#thisHost#/bugLog/hq">#thisHost#/bugLog/hq</a>
+			</cfmail>
+		</cfif>
+
 		<cfset variables.lastEmailTimestamp = now()>
 		
 		<cfset writeToCFLog("'frequencyAlert' rule fired. Email sent.")>
@@ -144,7 +164,7 @@
 			<cfset o = oFinder.findByCode(variables.config.application)>
 			<cfreturn o.getApplicationID()>
 			<cfcatch type="appFinderException.ApplicationCodeNotFound">
-				<cfreturn 0>
+				<cfreturn ID_NOT_FOUND>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -158,7 +178,7 @@
 			<cfset o = oFinder.findByName(variables.config.host)>
 			<cfreturn o.getHostID()>
 			<cfcatch type="hostFinderException.HostNameNotFound">
-				<cfreturn 0>
+				<cfreturn ID_NOT_FOUND>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -172,7 +192,7 @@
 			<cfset o = oFinder.findByCode(variables.config.severity)>
 			<cfreturn o.getSeverityID()>
 			<cfcatch type="severityFinderException.codeNotFound">
-				<cfreturn 0>
+				<cfreturn ID_NOT_FOUND>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -188,16 +208,6 @@
 					SeverityCode, SeverityID,
 					Message, COUNT(*) AS bugCount, MAX(createdOn) as createdOn, MAX(entryID) AS EntryID
 				FROM arguments.data
-				WHERE (1=1)
-					<cfif variables.applicationID gt 0>
-						AND applicationID = #variables.applicationID#
-					</cfif>
-					<cfif variables.hostID gt 0>
-						AND hostID = #variables.hostID#
-					</cfif>
-					<cfif variables.severityID gt 0>
-						AND SeverityID = #variables.SeverityID#
-					</cfif>
 				GROUP BY 
 						ApplicationCode, ApplicationID, 
 						HostName, HostID, 
