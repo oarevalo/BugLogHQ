@@ -51,7 +51,37 @@
 			}
 		</cfscript>
 	</cffunction>
-	
+
+	<cffunction name="dspRulesLog" access="public" returntype="void">
+		<cfscript>
+			var logcontents = "";
+			var logsdir = getValue("logsdir");
+			var logpath = "";
+
+			if(logsdir eq "") {
+				if(structKeyExists(cookie,"logsdir"))
+					logsdir = cookie.logsdir;
+				else {
+					logsdir = Server.ColdFusion.RootDir & "/logs/";
+					writeCookie("logsdir",logsdir,180);
+				}
+			} else {
+				writeCookie("logsdir",logsdir,180);
+			}
+
+			logpath = logsdir & "bugLog_ruleProcessor.log";
+
+			if(fileExists(logpath))
+				logcontents = fileRead(logpath,"utf-8");
+			else 
+				setMessage("warning","Cannot find rule Processor log file. Make sure you enter the correct path to your logs directory. It may also be that the log has not been created yet. The log file is automatically created once a rule is fired.");
+
+			setValue("logcontents", logcontents);
+			setValue("logsdir", logsdir);
+			setView("vwRulesLog");
+		</cfscript>
+	</cffunction>
+		
 	<cffunction name="doSaveRule" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
@@ -123,5 +153,12 @@
 			setNextEvent("ehExtensions.dspMain");
 		</cfscript>
 	</cffunction>	
-	
+
+	<cffunction name="writeCookie" access="private">
+		<cfargument name="name" type="string">
+		<cfargument name="value" type="string">
+		<cfargument name="expires" type="string">
+		<cfcookie name="#arguments.name#" value="#arguments.value#" expires="#arguments.expires#">
+	</cffunction>
+		
 </cfcomponent>
