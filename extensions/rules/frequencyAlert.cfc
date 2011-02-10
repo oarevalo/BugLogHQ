@@ -8,6 +8,7 @@
 	<cfproperty name="host" type="string" displayName="Host Name" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
 	<cfproperty name="severity" type="string" displayName="Severity Code" hint="The severity that will trigger the rule. Leave empty to look for all severities">
 	<cfproperty name="sameMessage" type="boolean" displayName="Same Message?" hint="Set to True to counts only bug reports that have the same text on their message. Leave empty or False to count all messages">
+	<cfproperty name="oneTimeAlertRecipient" type="string" hint="An email address to receive a one time short notification. This is sent only up to once per day.">
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
@@ -17,6 +18,7 @@
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="severity" type="string" required="false" default="">
 		<cfargument name="sameMessage" type="string" required="false" default="">
+		<cfargument name="oneTimeAlertRecipient" type="string" required="false" default="">
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.count = arguments.count>
 		<cfset variables.config.timespan = arguments.timespan>
@@ -24,7 +26,9 @@
 		<cfset variables.config.host = arguments.host>
 		<cfset variables.config.severity = arguments.severity>
 		<cfset variables.config.sameMessage = arguments.sameMessage>
+		<cfset variables.config.oneTimeAlertRecipient = arguments.oneTimeAlertRecipient>
 		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
+		<cfset variables.lastOneTimeEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 		<cfset variables.applicationID = -1>
 		<cfset variables.hostID = -1>
 		<cfset variables.severityID = -1>
@@ -74,9 +78,11 @@
 				if(isBoolean(variables.config.sameMessage) and variables.config.sameMessage) {
 					qry = groupMessages(qry, variables.config.count);
 					sendEmail(qry, sender);
+					sendAlert(qry, sender);
 		
 				} else if(qry.recordCount gt variables.config.count) {
 					sendEmail(qry, sender);
+					sendAlert(qry, sender);
 				}
 			}
 			return true;
@@ -212,4 +218,35 @@
 		<cfreturn qryEntries>
 	</cffunction>
 
+	<cffunction name="sendAlert" access="private" returntype="void" output="true">
+		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
+		<cfargument name="sender" type="string" required="true" hint="the sender of the email">
+		<cfset var qryEntries = 0>
+		<cfset var msg = "">
+		
+		<cfif variables.config.oneTimeAlertRecipient neq "" 
+				and dateDiff("n", variables.lastOneTimeEmailTimestamp, now()) gt 60*24>
+			
+			<cfset msg = "BugLog has received more than #variables.config.count# bug reports ">
+			<cfif variables.config.application neq "">
+				<cfset msg = msg & "for application #variables.config.application# ">
+			</cfif>
+			<cfif variables.config.host neq "">
+				<cfset msg = msg & "on host #variables.config.host# ">
+			</cfif>
+			<cfif variables.config.severity neq "">
+				<cfset msg = msg & "with a severity of #variables.config.severity# ">
+			</cfif>
+			<cfset msg = msg & "on the last #variables.config.timespan# minutes.">
+		
+			<cfmail from="#arguments.sender#" 
+					to="#variables.config.oneTimeAlertRecipient#"
+					subject="BugLog: Frequency alert" 
+					type="text">#msg#</cfmail>
+			<cfset variables.lastOneTimeEmailTimestamp = now()>
+			
+			<cfset writeToCFLog("'frequencyAlert' rule fired. One-time alert sent.")>
+		</cfif>
+	</cffunction>
+	
 </cfcomponent>
