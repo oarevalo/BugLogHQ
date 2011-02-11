@@ -78,27 +78,15 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="setAPIsecSettings" access="public" returntype="void">
-		<cfargument name="requireAPIKey" type="boolean" required="true">
-		<cfargument name="APIKey" type="string" required="true">
-		<cfset var configPath = expandPath("#variables.path#/config/service-config.xml.cfm")>
-		<cfset var xmlDoc = xmlParse( configPath )>
-		
-		<cfif not structKeyExists(xmlDoc.xmlRoot,"requireAPIKey")>
-			<cfset xmlNode = xmlElemNew(xmlDoc, "requireAPIKey")>
-			<cfset arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode)>
-		</cfif>
-		<cfset xmlDoc.xmlRoot.requireAPIKey.xmlText = arguments.requireAPIKey>
-
-		<cfif not structKeyExists(xmlDoc.xmlRoot,"APIKey")>
-			<cfset xmlNode = xmlElemNew(xmlDoc, "APIKey")>
-			<cfset arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode)>
-		</cfif>
-		<cfset xmlDoc.xmlRoot.APIKey.xmlText = xmlFormat(arguments.APIKey)>
-		
-		<cffile action="write" file="#configPath#" output="#toString(xmlDoc)#">
+	<cffunction name="setServiceSetting" access="public" returntype="string">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="false" default="">
+		<cfscript>
+			var oService = createModelObject("components.service").init(true);
+			return oService.setSetting(arguments.name, arguments.value);
+		</cfscript>
 	</cffunction>
-
+	
 	<cffunction name="searchEntries" access="public" returntype="query">
 		<cfargument name="searchTerm" type="string" required="true">
 		<cfargument name="applicationID" type="string" required="false" default="0">

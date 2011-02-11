@@ -11,6 +11,10 @@
 		<cfreturn this>
 	</cffunction>
 	
+	<cffunction name="reload" access="public" returntype="void" hint="Reloads all config settings">
+		<cfset variables.config = variables.configProvider.load()>
+	</cffunction>
+	
 	<cffunction name="getSetting" access="public" returntype="any">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="default" type="any" required="false">
@@ -34,6 +38,10 @@
 		<cfset variables.configProvider.save(variables.config)>
 		<cfset variables.config = variables.configProvider.load()>
 		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="getConfigKey" access="public" returntype="string">
+		<cfreturn  variables.configProvider.getConfigKey() />
 	</cffunction>
 	
 </cfcomponent>

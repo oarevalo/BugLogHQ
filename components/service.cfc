@@ -56,6 +56,12 @@
 		<cfargument name="defaultValue" type="string" required="false" default="">
 		<cfreturn getConfig().getSetting("service." & arguments.settingName, arguments.defaultValue)>
 	</cffunction>
+
+	<cffunction name="setSetting" returntype="void" access="public" hint="Sets a config setting within the 'service' block">
+		<cfargument name="settingName" type="string" required="true">
+		<cfargument name="settingValue" type="string" required="true">
+		<cfset getConfig().setSetting("service." & arguments.settingName, arguments.settingValue)>
+	</cffunction>
 	
 	
 	<!--- Private Methods --->

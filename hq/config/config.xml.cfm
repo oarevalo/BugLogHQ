@@ -20,6 +20,12 @@
 		<!-- main config -->
 		<setting name="configProviderType" value="xml" />
 		<setting name="configPath" value="/bugLog/config/buglog-config.xml.cfm" />
+		
+		<!-- This is used to enable/disable editing of settings via the UI,
+			of disabled all settings change must be done directly on the config file.
+			This can also be a comma-delimited list of config keys (environments)
+			in which editing is allowed -->
+		<setting name="allowConfigEditing" value="true" />
 	</settings>
 
 		

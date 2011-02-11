@@ -2,6 +2,9 @@
 <cfset panel = request.requestState.panel>
 <cfset currentUser = request.requestState.currentUser>
 <cfset isAdmin = currentUser.getIsAdmin()>
+<cfset allowConfigEditing = request.requestState.allowConfigEditing>
+
+<cfset editingSettingsNotAllowedMsg = "Editing of settings is currently not allowed. All configuration changes must be done directly in the config file.">
 
 <cfset aPanels = [
 				{ id = "general", label = "General Settings", display = isAdmin },

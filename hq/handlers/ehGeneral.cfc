@@ -314,11 +314,12 @@
 		</cfscript>	
 	</cffunction>
 	
-	<cffunction name="doStart" access="public">
+	<cffunction name="doStart" access="public" returnType="void">
 		<cfscript>
 			try {
 				// start service
 				getService("app").startService();
+				getService("config").reload();
 				setMessage("info","BugLogListener has been started!");
 
 			} catch(any e) {
@@ -330,7 +331,7 @@
 		</cfscript>	
 	</cffunction>
 	
-	<cffunction name="doStop">
+	<cffunction name="doStop" access="public" returnType="void">
 		<cfset getService("app").stopService()>
 		<cfset setMessage("info","BugLogListener has been stopped!")>
 		<cfset setNextEvent("ehGeneral.dspMain")>
@@ -414,5 +415,4 @@
 		<cfcookie name="#arguments.name#" value="#arguments.value#" expires="#arguments.expires#">
 	</cffunction>
 	
-
 </cfcomponent>

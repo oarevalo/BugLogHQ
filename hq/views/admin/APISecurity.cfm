@@ -6,17 +6,22 @@
 <cfoutput>
 	<h3>API Security:</h3>
 	<div style="margin-left:30px;line-height:30px;">
+		<cfif !allowConfigEditing><div style="color:##990000;line-height:18px;font-weight:bold;margin-bottom:10px;">#editingSettingsNotAllowedMsg#</div></cfif>
 		<form name="frmSecurity" action="index.cfm" method="post">
 			<input type="hidden" name="event" value="ehAdmin.doSetAPISecSettings">
 			
-			<input type="checkbox" name="requireAPIKey" value="true" <cfif requireAPIKey>checked</cfif>> Require the use of an API key to submit bug reports.<br />
+			<input type="checkbox" name="requireAPIKey" value="true" 
+					<cfif requireAPIKey>checked</cfif>
+					 <cfif !allowConfigEditing>disabled</cfif>> Require the use of an API key to submit bug reports.<br />
 
 			API Key:
-			<input type="text" name="APIKey" value="#APIKey#" class="formField">
-			<input type="submit" name="generateNewKey" value="Generate New Key" onclick="return(confirm('WARNING:\n\nExisting clients will not be able to submit bug reports until updated with the new key'))">
+			<input type="text" name="APIKey" value="#APIKey#" class="formField"  <cfif !allowConfigEditing>disabled</cfif>>
+			<input type="submit" name="generateNewKey" value="Generate New Key" 
+					onclick="return(confirm('WARNING:\n\nExisting clients will not be able to submit bug reports until updated with the new key'))"
+					 <cfif !allowConfigEditing>disabled</cfif>>
 			<br /><br />
 
-			<input type="submit" name="btn" value="Apply Changes">
+			<input type="submit" name="btn" value="Apply Changes" <cfif !allowConfigEditing>disabled</cfif>>
 		</form>
 	</div>
 </cfoutput>

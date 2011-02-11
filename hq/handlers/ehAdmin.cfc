@@ -1,5 +1,11 @@
 <cfcomponent extends="eventHandler">
 	
+	<cfset variables.msgs = {
+				userNotAllowed = "You must be an administrator to access this section",
+				userNotAllowedAction = "You must be an administrator to modify application settings",
+				editingSettingsNotAllowed = "Editing of settings is currently not allowed. All configuration changes must be done directly in the config file. To allow editing settings through the UI you must enable it in your BugLogHQ config file."
+			}>
+	
 	<cffunction name="dspMain" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
@@ -7,36 +13,36 @@
 			var cfg = getService("config");
 			var jira = getService("jira");
 			var jiraConfig = structNew();
-			var panel = getValue("panel","changePassword");
+			var panel = getValue("panel","general");
 			
 			try {
 				switch(panel) {
 					case "general":
-						if(not user.getIsAdmin()) throw("You must be an administrator to access this section","validation");
+						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
 						setValue("adminEmail", cfg.getSetting("general.adminEmail",""));
-						setValue("autoStart", cfg.getSetting("service.autoStart",true));
+						setValue("autoStart", app.getServiceSetting("autoStart",true));
 						break;
 
 					case "changePassword":
 						break;
 
 					case "userManagement":
-						if(not user.getIsAdmin()) throw("You must be an administrator to access this section","validation");
+						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
 						setValue("qryUsers", app.getUsers() );
 						break;
 
 					case "purgeHistory":
-						if(not user.getIsAdmin()) throw("You must be an administrator to access this section","validation");
+						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
 						break;
 
 					case "APISecurity":
-						if(not user.getIsAdmin()) throw("You must be an administrator to access this section","validation");
+						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
 						setValue("requireAPIKey", app.getServiceSetting("requireAPIKey",false));
 						setValue("APIKey", app.getServiceSetting("APIKey"));
 						break;
 
 					case "jira":
-						if(not user.getIsAdmin()) throw("You must be an administrator to access this section","validation");
+						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
 						jiraConfig.enabled = jira.getSetting("enabled",false);
 						jiraConfig.wsdl = jira.getSetting("wsdl");
 						jiraConfig.username = jira.getSetting("username");
@@ -46,6 +52,7 @@
 				}
 				
 				setValue("panel", panel);
+				setValue("allowConfigEditing", isConfigEditingAllowed());
 				setView("vwAdmin");
 				
 			} catch(validation e) {
@@ -129,7 +136,7 @@
 			var user = getValue("currentUser");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to purge history"); setNextEvent("ehAdmin.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=purgeHistory");}
 				getService("app").purgeHistory(purgeHistoryDays, deleteOrphans);
 				setMessage("info","History purged");
 				setNextEvent("ehGeneral.dspMain","panel=purgeHistory");
@@ -178,7 +185,7 @@
 			var userID = getValue("userID");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to delete a user"); setNextEvent("ehAdmin.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=userManagement");}
 				getService("app").deleteUser(userID);
 				setMessage("info","User has been deleted");
 				setNextEvent("ehAdmin.dspMain","panel=userManagement");
@@ -199,16 +206,18 @@
 			var generateNewKey = getValue("generateNewKey");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to set the API security settings"); setNextEvent("ehAdmin.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=APISecurity");}
+				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("ehAdmin.dspMain","panel=APISecurity");}
 				if(generateNewKey neq "") APIKey = createUUID();
-				getService("app").setAPIsecSettings(requireAPIKey, APIKey);
+				getService("app").setServiceSetting("requireAPIKey", requireAPIKey);
+				getService("app").setServiceSetting("APIKey", APIKey);
 				setMessage("info","API security settings updated. You must restart the BugLogListener service for changes to take effect.");
 				setNextEvent("ehAdmin.dspMain","panel=apisecurity");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain","panel=apisecurity");
+				setNextEvent("ehAdmin.dspMain","panel=APISecurity");
 			}
 		</cfscript>	
 	</cffunction>	
@@ -222,7 +231,8 @@
 			var password = getValue("password");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to set the JIRA integration settings"); setNextEvent("ehAdmin.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=jira");}
+				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("ehAdmin.dspMain","panel=jira");}
 				getService("jira").setSetting("enabled", enabled)
 									.setSetting("wsdl", wsdl)
 									.setSetting("username", username)
@@ -246,19 +256,34 @@
 			var adminEmail = getValue("adminEmail");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to update the general settings"); setNextEvent("ehAdmin.dspMain");}
-				getService("config").setSetting("service.autoStart", autoStart)
-									.setSetting("general.adminEmail", adminEmail);
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain");}
+				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("ehAdmin.dspMain");}
+				getService("app").setServiceSetting("autoStart", autoStart);
+				getService("config").reload();
+				getService("config").setSetting("general.adminEmail", adminEmail);
 
 				setMessage("info","General settings updated.");
 				setNextEvent("ehAdmin.dspMain","panel=general");
 							
-			} catch(lock e) {
+			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
 				setNextEvent("ehAdmin.dspMain","panel=general");
 			}
 		</cfscript>	
 	</cffunction>		
-			
+	
+	<cffunction name="isConfigEditingAllowed" access="private" returntype="boolean">
+		<cfset var rtn = false>
+		<cfset var allowConfigEditing = getSetting("allowConfigEditing")>
+		<cfif isBoolean(allowConfigEditing)>
+			<cfset rtn = allowConfigEditing />
+		<cfelseif allowConfigEditing eq "">
+			<cfset rtn = false />
+		<cfelse>
+			<cfset rtn = listFindNoCase(allowConfigEditing, getService("config").getConfigKey())>
+		</cfif>
+		<cfreturn rtn />
+	</cffunction>
+	
 </cfcomponent>
