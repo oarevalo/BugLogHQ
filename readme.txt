@@ -1,5 +1,5 @@
 /**************************************************************/	
-/* BugLogHQ  (v1.4)										  */
+/* BugLogHQ  (v1.5)										  */
 /* http://buglogHQ.riaforge.org
 /**************************************************************/	
 
@@ -50,6 +50,17 @@ to leverage this information.
 -----------------------------------------------------------------------
 2. Release Notes
 -----------------------------------------------------------------------
+ > New in 1.5 (2/2011)
+-----------------------------------------------------------------------
+* Extensions are now stored on a database instead of an XML file
+* Creating a rule instance is now much more user friendly because application, host and severity
+codes can be selected via dropdowns; or can also be prepopulated from an existing bug report.
+* Added support for defining settings for multiple environments (dev,qa,prod1,prod2,etc). Once
+the environment is detected buglog can override any setting with custom values.
+* Added option to disable editing settings through the UI (useful if you have your config file versioned
+	and only want to configure buglog that way)
+* Multiple bug fixes 
+
  > New in 1.4 (11/2009)
 -----------------------------------------------------------------------
 * Bug reports and rules are now processed asynchronously and not at the time they arrive. 
@@ -191,6 +202,24 @@ will create the necessary tables.
 	Also, on /bugLog/hq/Application.cfc, line 19, change it to:
 		this.emailErrors = true
 
+* TO CONFIGURE MULTIPLE ENVIRONMENTS
+	You can override any setting on the main config on a per-environment basis. To determine which is the current
+	environment, BugLog will look for a file named "severkey.txt" on your /bugLog/config directory. This file should
+	only contain a single work that is used to name the environment. For example: "dev" or "prod-server-1" or something like that.
+	
+	Then on your buglog-config.xml.cfm add an <envSettings /> section like the following example:
+
+	<envSettings name="dev">
+		<setting name="db.dsn">bugLog_dev</setting>
+		<setting name="general.adminEmail">devteam@somedomain.org</setting>
+	</envSettings>
+
+	Where the "name" attribute of the envSettings tag must match what you provide on your serverkey.txt file. Inside you
+	can place any number of <settings/> tags you want. These will override the settings of the same name defined on
+	the general part of the config.
+	
+	You can have as many <envSettings/> sections as you want. However only one will be used (the one that matches your serverkey.txt).
+	If none matches the serverkey, then BugLog will use the default settings.	
 
 
 -----------------------------------------------------------------------
@@ -201,6 +230,9 @@ Currently BugLogHQ supports the following databases:
 * Microsoft SQL Server 2000
 * Microsoft SQL Server 2005
 * Microsoft Access
+
+IMPORTANT: Make sure you enable CLOB/BLOB support on the CF datasource settings in the ColdFusion Administrator, otherwise
+your bug reports might get truncated.
 
 
 -----------------------------------------------------------------------
