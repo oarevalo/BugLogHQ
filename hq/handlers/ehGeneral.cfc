@@ -282,6 +282,7 @@
 				}
 				
 				// set values
+				setValue("ruleTypes", getService("app").getRules());
 				setValue("jiraEnabled", getService("jira").getSetting("enabled"));
 				setValue("oEntry", oEntry);
 				setView("vwEntry");

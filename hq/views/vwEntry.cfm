@@ -8,6 +8,9 @@
 <cfset oSeverity = oEntry.getSeverity()>
 
 <cfset jiraEnabled = request.requestState.jiraEnabled>
+<cfset ruleTypes = request.requestState.ruleTypes>
+
+<cfset tmpCreateRuleURL = "?event=ehExtensions.dspRule&application=#oApp.getCode()#&host=#oHost.getHostName()#&severity=#oSeverity.getCode()#">
 
 <script type="text/javascript">
 	function toggle(sec) {
@@ -28,17 +31,26 @@
 			<td style="border-right:1px solid ##666;">
 				<img alt="" width="16" height="16" src="images/icons/arrow_undo.png" align="absmiddle" />
 				<a href="index.cfm">Return To Log</a>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;
 				<img width="16" height="16" src="images/icons/email.png" align="absmiddle" />
 				<a href="##" onclick="toggle('dSendForm')">Send to email</a>
 				
-				<cfif isBoolean(jiraEnabled) and jiraEnabled>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<cfif true or isBoolean(jiraEnabled) and jiraEnabled>
+					&nbsp;&nbsp;&nbsp;&nbsp;
 					<img width="16" height="16" src="images/icons/jira.png" align="absmiddle" />
 					<a href="index.cfm?event=ehJira.dspSendToJira&entryID=#entryID#">Send to JIRA</a>
 				</cfif>
+
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<select name="ruleName" style="width:100px;" onchange="if(this.value!='') document.location='#tmpCreateRuleURL#&ruleName='+this.value">
+					<option value="">Create rule...</option>
+					<cfloop array="#ruleTypes#" index="rule">
+						<cfset ruleName = listLast(rule.name,".")>
+						<option value="#ruleName#">#ruleName#</option>
+					</cfloop>
+				</select>
 			</td>
-			<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
+			<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;width:100px;">
 				<cfset tmpImgName = "images/severity/default.png">
 				<cfif tmpSeverity neq "">
 					<cfif fileExists(expandPath("images/severity/#lcase(tmpSeverity)#.png"))>

@@ -47,6 +47,7 @@
 				<cfset tmpName = aProps[i].name>
 				<cfset tmpValue = "">
 				<cfset tmpLabel = tmpName>
+				<cfset tmpType = "text">
 				<cfset tmpBugLogType = "">
 				<cfif isDefined("rs.aActiveRule.config.#tmpName#")>
 					<cfset tmpValue = rs.aActiveRule.config[tmpName]>
@@ -58,6 +59,9 @@
 				</cfif>
 				<cfif structKeyExists(aProps[i],"buglogType")>
 					<cfset tmpBugLogType = aProps[i].buglogType>
+				</cfif>
+				<cfif structKeyExists(aProps[i],"type")>
+					<cfset tmpType = aProps[i].type>
 				</cfif>
 				<tr valign="top">
 					<td><b>#tmpLabel#:</b></td>
@@ -113,13 +117,21 @@
 							</cfcase>
 							<cfcase value="email">
 								<cfif !isDefined("rs.aActiveRule.config.#tmpName#")>
-									<input type="text" name="#tmpName#" value="#rs.adminEmail#" class="formField">			
+									<input type="text" name="#tmpName#" value="#rs.defaultEmail#" class="formField">			
 								<cfelse>
 									<input type="text" name="#tmpName#" value="#tmpValue#" class="formField">			
 								</cfif>
 							</cfcase>
 							<cfdefaultcase>
-								<input type="text" name="#tmpName#" value="#tmpValue#" class="formField">			
+								<cfswitch expression="#tmpType#">
+									<cfcase value="boolean">
+										<input type="radio" name="#tmpName#" value="true" <cfif isBoolean(tmpValue) and tmpValue>checked</cfif>> True &nbsp;&nbsp;
+										<input type="radio" name="#tmpName#" value="false" <cfif !isBoolean(tmpValue) or isBoolean(tmpValue) and !tmpValue>checked</cfif>> False &nbsp;&nbsp;
+									</cfcase>
+									<cfdefaultcase>
+										<input type="text" name="#tmpName#" value="#tmpValue#" class="formField">			
+									</cfdefaultcase>
+								</cfswitch>
 							</cfdefaultcase>
 						</cfswitch>
 						<cfif structKeyExists(aProps[i],"hint")>
