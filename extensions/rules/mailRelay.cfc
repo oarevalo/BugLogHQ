@@ -1,7 +1,7 @@
 <cfcomponent extends="bugLog.components.baseRule" 
 			hint="This rule sends an email everytime a bug is received">
 
-	<cfproperty name="recipientEmail" displayName="Recipient Email" type="string" hint="The email address to which to send the notifications">
+	<cfproperty name="recipientEmail" buglogType="email" displayName="Recipient Email" type="string" hint="The email address to which to send the notifications">
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">

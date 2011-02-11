@@ -26,18 +26,24 @@
 		<cfscript>
 			var index = getValue("index",0);
 			var ruleName = getValue("ruleName","");
+			var app = getService("app");
 
 			try {
 				if(ruleName eq "") throw("Please select a valid rule type","validation");
 				
-				stRule = getService("app").getRuleInfo(ruleName);
+				stRule = app.getRuleInfo(ruleName);
 	
+				setValue("qryApplications", app.getApplications());
+				setValue("qryHosts", app.getHosts());
+				setValue("qrySeverities", app.getSeverities());
+				setValue("adminEmail", getService("config").getSetting("general.adminEmail",""))
+
 				setValue("stRule", stRule);
 				setValue("index", index);
 				setValue("ruleName", ruleName);
 				
 				if(index gt 0) {
-					aActiveRules = getService("app").getActiveRules();
+					aActiveRules = app.getActiveRules();
 					setValue("aActiveRule", aActiveRules[index]);
 				}
 
@@ -88,10 +94,26 @@
 	<cffunction name="doSaveRule" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
+			var args = {};
+			var lstIgnoreFields = "event,fieldnames,btnSave";
 			
 			try {
 				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to create or modify a rule"); setNextEvent("ehExtensions.dspMain");}
-				getService("app").saveRule(argumentCollection = form);
+				for(fld in form) {
+					if(!listFindNoCase(lstIgnoreFields,fld)) {
+						if(structKeyExists(form,fld & "_other")) {
+							if(form[fld] eq "__OTHER__")
+								args[fld] = form[fld & "_other"];
+							else
+								args[fld] = form[fld];
+						} else if(listLast(fld,"_") eq "other" and structKeyExists(form,listDeleteAt(fld,listLen(fld,"_"),"_"))){
+							// this is the 'other' field, ignore it
+						} else {
+							args[fld] = form[fld];
+						}
+					}
+				}
+				getService("app").saveRule(argumentCollection = args);
 				setMessage("info","Rule saved. Changes will be effective the next time the listener service is started.");
 			
 			} catch(any e) {

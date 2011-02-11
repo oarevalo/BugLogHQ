@@ -80,7 +80,7 @@
 <hr />
 
 <cfif currentUser.getIsAdmin()>
-	<form name="frm" method="post" action="index.cfm" style="margin:15px;margin-left:0px;margin-bottom:25px;">
+	<form name="frm" method="get" action="index.cfm" style="margin:15px;margin-left:0px;margin-bottom:25px;">
 		<input type="hidden" name="event" value="ehExtensions.dspRule">
 
 		<strong style="font-size:12px;">&raquo; Create a new rule of type: </strong>

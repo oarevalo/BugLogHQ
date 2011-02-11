@@ -11,6 +11,18 @@
 	<cfset ruleLabel = rs.stRule.displayName>
 </cfif>
 
+<script type="text/javascript">
+	function toggleOther(fieldName, fieldValue) {
+		if(fieldValue == "__OTHER__") {
+			document.getElementById(fieldName+"_other").style.display = "inline";
+		} else if(fieldValue == "") {
+			document.getElementById(fieldName+"_other").style.display = "none";
+		} else {
+			document.getElementById(fieldName+"_other").style.display = "none";
+		}
+	}
+</script>
+
 <cfoutput>
 	<h2 style="margin-bottom:3px;">BugLog Add/Edit Rule</h2>
 	<cfinclude template="../includes/menu.cfm">
@@ -35,16 +47,81 @@
 				<cfset tmpName = aProps[i].name>
 				<cfset tmpValue = "">
 				<cfset tmpLabel = tmpName>
+				<cfset tmpBugLogType = "">
 				<cfif isDefined("rs.aActiveRule.config.#tmpName#")>
 					<cfset tmpValue = rs.aActiveRule.config[tmpName]>
+				<cfelseif structKeyExists(rs,tmpName)>
+					<cfset tmpValue = rs[tmpName]>
 				</cfif>
 				<cfif structKeyExists(aProps[i],"displayName")>
 					<cfset tmpLabel = aProps[i].displayName>
 				</cfif>
+				<cfif structKeyExists(aProps[i],"buglogType")>
+					<cfset tmpBugLogType = aProps[i].buglogType>
+				</cfif>
 				<tr valign="top">
 					<td><b>#tmpLabel#:</b></td>
 					<td>
-						<input type="text" name="#aProps[i].name#" value="#tmpValue#" class="formField">			
+						<cfswitch expression="#tmpBugLogType#">
+							<cfcase value="application">
+								<cfset valueFound = (tmpValue eq "")>
+								<select name="#tmpName#" id="#tmpName#" onchange="toggleOther(this.name, this.value)" class="formField">
+									<option value=""></option>
+									<cfloop query="rs.qryApplications">
+										<option value="#rs.qryApplications.code#"
+												<cfif rs.qryApplications.code eq tmpValue>selected</cfif>
+												>#rs.qryApplications.code#</option>
+										<cfif rs.qryApplications.code eq tmpValue>
+											<cfset valueFound = true>
+										</cfif>
+									</cfloop>
+									<option value="__OTHER__" <cfif !valueFound>selected</cfif>>Other...</option>
+								</select>
+								<input type="text" name="#tmpName#_other" id="#tmpName#_other" value="#tmpValue#" <cfif valueFound>style="display:none;"</cfif>>
+							</cfcase>
+							<cfcase value="host">
+								<cfset valueFound = (tmpValue eq "")>
+								<select name="#tmpName#" id="#tmpName#" onchange="toggleOther(this.name, this.value)" class="formField">
+									<option value=""></option>
+									<cfloop query="rs.qryHosts">
+										<option value="#rs.qryHosts.HostName#"
+												<cfif rs.qryHosts.HostName eq tmpValue>selected</cfif>
+												>#rs.qryHosts.HostName#</option>
+										<cfif rs.qryHosts.HostName eq tmpValue>
+											<cfset valueFound = true>
+										</cfif>
+									</cfloop>
+									<option value="__OTHER__" <cfif !valueFound>selected</cfif>>Other...</option>
+								</select>
+								<input type="text" name="#tmpName#_other" id="#tmpName#_other" value="#tmpValue#" <cfif valueFound>style="display:none;"</cfif>>
+							</cfcase>
+							<cfcase value="severity">
+								<cfset valueFound = (tmpValue eq "")>
+								<select name="#tmpName#" id="#tmpName#" onchange="toggleOther(this.name, this.value)" class="formField">
+									<option value=""></option>
+									<cfloop query="rs.qrySeverities">
+										<option value="#rs.qrySeverities.code#"
+												<cfif rs.qrySeverities.code eq tmpValue>selected</cfif>
+												>#rs.qrySeverities.code#</option>
+										<cfif rs.qrySeverities.code eq tmpValue>
+											<cfset valueFound = true>
+										</cfif>
+									</cfloop>
+									<option value="__OTHER__" <cfif !valueFound>selected</cfif>>Other...</option>
+								</select>
+								<input type="text" name="#tmpName#_other" id="#tmpName#_other" value="#tmpValue#" <cfif valueFound>style="display:none;"</cfif>>
+							</cfcase>
+							<cfcase value="email">
+								<cfif !isDefined("rs.aActiveRule.config.#tmpName#")>
+									<input type="text" name="#tmpName#" value="#rs.adminEmail#" class="formField">			
+								<cfelse>
+									<input type="text" name="#tmpName#" value="#tmpValue#" class="formField">			
+								</cfif>
+							</cfcase>
+							<cfdefaultcase>
+								<input type="text" name="#tmpName#" value="#tmpValue#" class="formField">			
+							</cfdefaultcase>
+						</cfswitch>
 						<cfif structKeyExists(aProps[i],"hint")>
 							<div style="margin-top:3px;font-size:11px;">
 								<em>#aProps[i].hint#</em>
