@@ -49,7 +49,7 @@
 		
 		<cfif arguments.key neq variables.key>
 			<cfset logMessage("Invalid key received. Exiting.")>
-			<cfreturn -1>
+			<cfreturn 0>
 		</cfif>
 		
 		<cflock name="bugLogListenerAsync_processQueue" type="exclusive" timeout="10">
