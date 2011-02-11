@@ -168,7 +168,7 @@
 
 <cfcontent type="text/xml" reset="true"><cfoutput>#toString(xmlDoc)#</cfoutput>
 
-<cffunction name="validateToken" access="private" returntype="false">
+<cffunction name="validateToken" access="private" returntype="boolean">
 	<cfargument name="token" type="string" required="true">
 	<cfreturn structKeyExists(session,"token") and session.token eq arguments.token>
 </cffunction>
