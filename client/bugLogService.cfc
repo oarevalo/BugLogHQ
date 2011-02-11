@@ -26,6 +26,10 @@
 		<cfargument name="apikey" type="string" required="false" default="">
 		
 		<cfscript>
+			var wsParams = structNew();
+			wsParams.refreshWsdl = true;
+			wsParams.timeout = 30;
+			
 			// determine the protocol based on the bugLogListener location 
 			// this will tell us how to locate and talk to the listener
 			if(left(arguments.bugLogListener,4) eq "http" and right(arguments.bugLogListener,5) eq "?WSDL") 
@@ -63,7 +67,11 @@
 			switch(variables.protocol) {
 				case "SOAP":
 					try {
-						variables.oBugLogListener = createObject("webservice", variables.bugLogListener);
+						if(val(left(server.coldfusion.productVersion,1)) lte 7 or structKeyExists(server,"railo"))
+							variables.oBugLogListener = createObject("webservice", variables.bugLogListener);
+						else
+							variables.oBugLogListener = createObject("webservice", variables.bugLogListener, wsParams);
+						
 					} catch(any e) {
 						if(variables.bugEmailRecipients neq "") sendEmail("",e.detail,e.message);
 						variables.useListener = false;
@@ -84,7 +92,7 @@
 					break;
 					
 				default:
-					throw("The location provided for the bugLogListener is invalid.");	
+					throwError("The location provided for the bugLogListener is invalid.");	
 			}
 		</cfscript>
 		<cfreturn this>
@@ -280,8 +288,16 @@
 					<td>#cgi.HTTP_USER_AGENT#</td>
 				</tr>
 				<tr>
+					<td><b>Referrer:</b></td>
+					<td>#cgi.HTTP_REFERER#</td>
+				</tr>
+				<tr>
 					<td><b>Query String:</b></td>
 					<td>#cgi.QUERY_STRING#</td>
+				</tr>
+				<tr>
+					<td><b>Request Method:</b></td>
+					<td>#cgi.REQUEST_METHOD#</td>
 				</tr>
 				<tr valign="top">
 					<td><strong>Coldfusion ID:</strong></td>
@@ -346,7 +362,7 @@
 		<cfreturn tmpHTML>
 	</cffunction>
 
-	<cffunction name="throw" access="private" returntype="void" hint="facade for cfthrow">
+	<cffunction name="throwError" access="private" returntype="void" hint="facade for cfthrow">
 		<cfargument name="message" type="String" required="true">
 		<cfthrow message="#arguments.message#">
 	</cffunction>
