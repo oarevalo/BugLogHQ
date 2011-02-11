@@ -22,9 +22,6 @@
 			<cfset variables.cfcPath = left(variables.cfcPath, len(variables.cfcPath)-1)>
 		</cfif>
 		
-		<!--- set the path for extensions --->
-		<cfset variables.extensionsPath = variables.cfcPath & ".extensions.">
-
 		<!--- Load the DAO objects --->
 		<cfset variables.oDAOFactory = createModelObject("components.DAOFactory").init( variables.config )>
 		<cfset variables.oApplicationDAO = variables.oDAOFactory.getDAO("application")>
@@ -33,6 +30,10 @@
 		<cfset variables.oSeverityDAO = variables.oDAOFactory.getDAO("severity")>
 		<cfset variables.oSourceDAO = variables.oDAOFactory.getDAO("source")>
 		<cfset variables.oUserDAO = variables.oDAOFactory.getDAO("user")>
+
+		<!--- setup extensions --->
+		<cfset variables.extensionsPath = variables.cfcPath & ".extensions.">
+		<cfset variables.oExtensionsService = createModelObject("components.extensionsService").init( variables.oDAOFactory.getDAO("extension") )>
 
 		<cfreturn this>		
 	</cffunction>
@@ -293,11 +294,7 @@
 	</cffunction>
 	
 	<cffunction name="getActiveRules" access="public" returnType="array" hint="Returns all rules that are active">
-		<cfscript>
-			// create the extensions service
-			var oExtensionsService = createModelObject("components.extensionsService").init();
-			return oExtensionsService.getRules();
-		</cfscript>
+		<cfreturn variables.oExtensionsService.getRules() />
 	</cffunction>
 
 	<cffunction name="getRuleInfo" access="public" returnType="struct" hint="Returns information about a given rule">
@@ -311,13 +308,12 @@
 		<!--- rule settings are passed as individual arguments --->
 		
 		<cfscript>
-			var stRule = 0; var oExtensionsService = 0;
+			var stRule = 0;
 			var stProperties = 0; var i=0; var prop = "";
 			var desc = "";
 			
 			// get rule info
 			stRule = getCFCInfo(variables.extensionsPath & "rules." & arguments.ruleName);
-			oExtensionsService = createModelObject("components.extensionsService").init();
 			
 			stProperties = structNew();
 			for(i=1;i lte arrayLen(stRule.properties);i=i+1) {
@@ -340,7 +336,6 @@
 	<cffunction name="deleteRule" access="public" returntype="void" hint="delete a rule">
 		<cfargument name="index" type="numeric" required="false" default="0">
 		<cfscript>
-			var oExtensionsService = createModelObject("components.extensionsService").init();
 			oExtensionsService.removeRule(arguments.index);
 		</cfscript>		
 	</cffunction>
@@ -348,7 +343,6 @@
 	<cffunction name="enableRule" access="public" returntype="void" hint="enables a rule">
 		<cfargument name="index" type="numeric" required="false" default="0">
 		<cfscript>
-			var oExtensionsService = createModelObject("components.extensionsService").init();
 			oExtensionsService.enableRule(arguments.index);
 		</cfscript>		
 	</cffunction>
@@ -356,7 +350,6 @@
 	<cffunction name="disableRule" access="public" returntype="void" hint="disables a rule">
 		<cfargument name="index" type="numeric" required="false" default="0">
 		<cfscript>
-			var oExtensionsService = createModelObject("components.extensionsService").init();
 			oExtensionsService.disableRule(arguments.index);
 		</cfscript>		
 	</cffunction>

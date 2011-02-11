@@ -30,6 +30,13 @@
 	font-size:11px;
 	border:1px solid silver;
 }
+.migrationNotice {
+	margin:20px;
+	padding:10px;
+	font-size:14px;
+	border:1px dashed silver;
+	background-color:#FFFFE0;
+}
 </style>
 <script type="text/javascript"> 
 	function confirmDeleteRule(index) {
@@ -57,8 +64,20 @@
 	</div>
 </p>
 
-<hr />
+<cfif rs.hasExtensionsXMLFile and currentUser.getIsAdmin()>
+	<div class="migrationNotice">
+		<b style="color:##990000">UPGRADE REQUIRED:</b>
+		BugLog has detected that you have rules defined using the <b>extensions-config.xml.cfm</b> file. This file is no longer
+		supported and rules are now stored on the database. BugLog can migrate these rules automatically if you want, 
+		or alternatively it can delete this file and you can
+		the rules manually.<br /><br />
+		<input type="button" name="btn" value="Yes, migrate my rules" onclick="document.location='?event=ehExtensions.doMigrateExtensionsXML'">
+		&nbsp;
+		<input type="button" name="btn" value="No, just delete the file" onclick="if(confirm('Are you sure?')) document.location='?event=ehExtensions.doDeleteExtensionsXML'">
+	</div>
+</cfif>
 
+<hr />
 
 <cfif currentUser.getIsAdmin()>
 	<form name="frm" method="post" action="index.cfm" style="margin:15px;margin-left:0px;margin-bottom:25px;">

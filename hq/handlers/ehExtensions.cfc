@@ -1,11 +1,14 @@
 <cfcomponent extends="eventHandler">
 
+	<cfset variables.extensionsXMLPath = "/bugLog/config/extensions-config.xml.cfm">
+
 	<cffunction name="dspMain" access="public" returntype="void">
 		<cfscript>
 			try {
 				aRules = getService("app").getRules();
 				aActiveRules = getService("app").getActiveRules();
 	
+				setValue("hasExtensionsXMLFile", fileExists(expandPath(variables.extensionsXMLPath)));
 				setValue("aRules", aRules);
 				setValue("aActiveRules", aActiveRules);
 	
@@ -153,6 +156,80 @@
 			setNextEvent("ehExtensions.dspMain");
 		</cfscript>
 	</cffunction>	
+
+	<cffunction name="doMigrateExtensionsXML" access="public" returntype="void">
+		<cfscript>
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to do this"); setNextEvent("ehExtensions.dspMain");}
+				if(!fileExists(expandPath(variables.extensionsXMLPath))) {
+					setMessage("warning","The file '#variables.extensionsXMLPath#' could not be found.");
+					setNextEvent("ehExtensions.dspMain");
+				}
+	
+				// read file
+				xmlDoc = xmlParse(expandPath(variables.extensionsXMLPath))
+
+				// get rule definitions
+				aNodes = xmlSearch(xmlDoc, "//rules/rule");
+			
+				for(i=1;i lte arrayLen(aNodes);i=i+1) {
+					xmlNode = aNodes[i];
+					
+					// build rule info node
+					st = structNew();
+					st.ruleName = xmlNode.xmlAttributes.name;
+					st.description = xmlNode.xmlText;
+					st.enabled = true;
+	
+					// check the enabled/disabled flag; if not specified all rules are enabled by default
+					if(structKeyExists(xmlNode.xmlAttributes,"enabled") and isBoolean(xmlNode.xmlAttributes.enabled) and not xmlNode.xmlAttributes.enabled)
+						st.enabled = false;
+					
+					// each child of a rule tag becomes an argument for the rule constructor
+					// this is how each rule instance is configured
+					for(j=1;j lte arrayLen(xmlNode.xmlChildren);j=j+1) {
+						xmlChildNode = xmlNode.xmlChildren[j];
+						st[xmlChildNode.xmlName] = xmlChildNode.xmlText;
+					}				
+					
+					getService("app").saveRule(argumentCollection = st);
+				}
+							
+				// now delete file
+				fileDelete(expandPath(variables.extensionsXMLPath));
+
+				setMessage("info","Rules have been migrated.");
+			
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+			}
+
+			setNextEvent("ehExtensions.dspMain");
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="doDeleteExtensionsXML" access="public" returntype="void">
+		<cfscript>
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to do this"); setNextEvent("ehExtensions.dspMain");}
+				if(fileExists(expandPath(variables.extensionsXMLPath))) {
+					fileDelete(expandPath(variables.extensionsXMLPath));
+				}
+				setMessage("info","The extensions XML file has been deleted.");
+			
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+			}
+
+			setNextEvent("ehExtensions.dspMain");
+		</cfscript>
+	</cffunction>
 
 	<cffunction name="writeCookie" access="private">
 		<cfargument name="name" type="string">

@@ -243,9 +243,11 @@
 			var oExtensionsService = 0;
 			var aRules = arrayNew(1);
 			var i = 0;
+			var dao = 0;
 			
 			// get the rule definitions from the extensions service
-			oExtensionsService = createObject("component","bugLog.components.extensionsService").init();
+			dao = variables.oDAOFactory.getDAO("extension");
+			oExtensionsService = createObject("component","bugLog.components.extensionsService").init( dao );
 			aRules = oExtensionsService.getRules();
 			
 			// create rule objects and load them into the rule processor
