@@ -19,7 +19,8 @@
 					&nbsp;&nbsp;|&nbsp;&nbsp;
 					<a href="?event=ehAdmin.dspMain">Settings</a>
 					&nbsp;&nbsp;|&nbsp;&nbsp;
-					<a href="?event=ehGeneral.doLogoff">Log off</a>
+					#request.requestState.currentUser.getUsername()#
+					( <a href="?event=ehGeneral.doLogoff">Log off</a> )
 					</cfoutput>
 				</span>
 			</cfif>
