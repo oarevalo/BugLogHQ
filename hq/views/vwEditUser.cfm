@@ -19,10 +19,12 @@
 				<td><b>Username:</b></td>
 				<td><input type="text" name="username" value="#username#" class="formField"></td>
 			</tr>
-			<tr>
-				<td><b>Password:</b></td>
-				<td><input type="text" name="password" value="#password#" class="formField"></td>
-			</tr>
+			<cfif userID eq 0>
+				<tr>
+					<td><b>Password:</b></td>
+					<td><input type="text" name="password" value="#password#" class="formField"></td>
+				</tr>
+			</cfif>
 			<tr>
 				<td><b>Administrator?:</b></td>
 				<td>

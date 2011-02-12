@@ -382,6 +382,14 @@
 		<cfreturn createObject("component","bugLog.components.user").init( variables.oUserDAO ) />
 	</cffunction>
 	
+	<cffunction name="setUserPassword" access="public" returntype="void" hint="Updates the password for a user">
+		<cfargument name="userToSave" type="bugLog.components.user" required="true" hint="a user object">
+		<cfargument name="newPassword" type="string" required="true" hint="the new password">
+		<cfset arguments.userToSave.setPassword(arguments.newPassword)>
+		<cfset arguments.userToSave.save()>
+	</cffunction>
+	
+	
 	<!----- Private Methods ---->
 	<cffunction name="createModelObject" access="private" returntype="any">
 		<cfargument name="cfc" type="string" required="true">

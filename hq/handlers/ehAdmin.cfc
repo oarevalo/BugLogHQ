@@ -114,10 +114,9 @@
 			var user = getValue("currentUser");
 			
 			try {
-				if(currentPassword neq user.getPassword()) {setMessage("warning","The current password is invalid"); setNextEvent("ehAdmin.dspMain");}
-				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("ehAdmin.dspMain");}
-				user.setPassword(newPassword);
-				getService("app").saveUser(user);
+				if(getService("app").checkLogin(user.getUsername(), currentPassword) eq 0) {setMessage("warning","The current password is invalid"); setNextEvent("ehAdmin.dspMain","panel=changePassword");}
+				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("ehAdmin.dspMain","panel=changePassword");}
+				getService("app").setUserPassword(user, newPassword);
 				setMessage("info","Password has been changed");
 				setNextEvent("ehGeneral.dspMain","panel=changePassword");
 							
@@ -164,7 +163,7 @@
 					oUser = getService("app").getBlankUser();
 
 				oUser.setUsername(username);
-				oUser.setPassword(password);
+				if(userID eq 0) oUser.setPassword(password);
 				oUser.setIsAdmin(isAdmin);
 
 				getService("app").saveUser(oUser);
