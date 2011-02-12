@@ -115,6 +115,7 @@
 			
 			try {
 				if(getService("app").checkLogin(user.getUsername(), currentPassword) eq 0) {setMessage("warning","The current password is invalid"); setNextEvent("ehAdmin.dspMain","panel=changePassword");}
+				if(newPassword eq "") {setMessage("warning","Password cannot be empty"); setNextEvent("ehAdmin.dspMain","panel=changePassword");}
 				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("ehAdmin.dspMain","panel=changePassword");}
 				getService("app").setUserPassword(user, newPassword);
 				setMessage("info","Password has been changed");
@@ -157,6 +158,9 @@
 			var isAdmin = getValue("isAdmin",false);
 			
 			try {
+				if(username eq "") throw("Username cannot be empty","validation");
+				if(password eq "") throw("Password cannot be empty","validation");
+
 				if(userID gt 0) 
 					oUser = getService("app").getUserByID(userID);
 				else
@@ -170,6 +174,9 @@
 				setMessage("info","User information has been saved");
 				setNextEvent("ehAdmin.dspMain","panel=userManagement");
 							
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("ehAdmin.dspUser","userID=#userID#&username=#username#&isAdmin=#isAdmin#");
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
