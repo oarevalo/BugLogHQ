@@ -156,10 +156,11 @@
 			var username = getValue("username");
 			var password = getValue("password");
 			var isAdmin = getValue("isAdmin",false);
+			var email = getValue("email");
 			
 			try {
 				if(username eq "") throw("Username cannot be empty","validation");
-				if(password eq "") throw("Password cannot be empty","validation");
+				if(val(userID) eq 0 and password eq "") throw("Password cannot be empty","validation");
 
 				if(userID gt 0) 
 					oUser = getService("app").getUserByID(userID);
@@ -169,6 +170,7 @@
 				oUser.setUsername(username);
 				if(userID eq 0) oUser.setPassword(hash(password));
 				oUser.setIsAdmin(isAdmin);
+				oUser.setEmail(email);
 
 				getService("app").saveUser(oUser);
 				setMessage("info","User information has been saved");

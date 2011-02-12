@@ -10,3 +10,6 @@ CREATE TABLE `bl_Extension` (
   `createdOn` timestamp NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`ExtensionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE buglog.bl_user
+ ADD Email VARCHAR(255) AFTER IsAdmin;

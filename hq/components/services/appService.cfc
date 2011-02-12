@@ -377,8 +377,8 @@
 	</cffunction>
 
 	<cffunction name="deleteUser" access="public" returntype="void" hint="Deletes a user">
-		<cfargument name="userToDelete" type="bugLog.components.user" required="true" hint="a user object">
-		<cfset variables.oUserDAO.delete( arguments.userToDelete.getUserID() )>
+		<cfargument name="userIDToDelete" type="numeric" required="true" hint="a user id">
+		<cfset variables.oUserDAO.delete( arguments.userIDToDelete )>
 	</cffunction>
 
 	<cffunction name="getBlankUser" access="public" returntype="bugLog.components.user" hint="return an empty user object">

@@ -3,6 +3,7 @@
 <cfset userName = oUser.getUsername()>
 <cfset password = oUser.getPassword()>
 <cfset isAdmin = oUser.getIsAdmin()>
+<cfset email = oUser.getEmail()>
 
 <cfoutput>
 	<h2 style="margin-bottom:3px;">BugLog Settings & Management</h2>
@@ -25,6 +26,10 @@
 					<td><input type="text" name="password" value="#password#" class="formField"></td>
 				</tr>
 			</cfif>
+			<tr>
+				<td><b>Email:</b></td>
+				<td><input type="text" name="email" value="#email#" class="formField"></td>
+			</tr>
 			<tr>
 				<td><b>Administrator?:</b></td>
 				<td>

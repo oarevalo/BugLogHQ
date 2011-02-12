@@ -7,6 +7,7 @@
 		
 		<cfset addColumn("Username", "cf_sql_varchar")>
 		<cfset addColumn("Password", "cf_sql_varchar")>
+		<cfset addColumn("Email", "cf_sql_varchar")>
 		<cfset addColumn("IsAdmin", "cf_sql_numeric")>
 	</cffunction>
 	

@@ -36,7 +36,11 @@
 				setValue("qryApplications", app.getApplications());
 				setValue("qryHosts", app.getHosts());
 				setValue("qrySeverities", app.getSeverities());
-				setValue("defaultEmail", getService("config").getSetting("general.adminEmail",""))
+
+				if(getValue("currentUser").getEmail() neq "")
+					setValue("defaultEmail", getValue("currentUser").getEmail());
+				else
+					setValue("defaultEmail", getService("config").getSetting("general.adminEmail",""));
 
 				setValue("stRule", stRule);
 				setValue("index", index);
