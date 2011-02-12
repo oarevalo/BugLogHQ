@@ -118,7 +118,7 @@
 				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("ehAdmin.dspMain","panel=changePassword");}
 				getService("app").setUserPassword(user, newPassword);
 				setMessage("info","Password has been changed");
-				setNextEvent("ehGeneral.dspMain","panel=changePassword");
+				setNextEvent("ehAdmin.dspMain","panel=changePassword");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -138,7 +138,7 @@
 				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=purgeHistory");}
 				getService("app").purgeHistory(purgeHistoryDays, deleteOrphans);
 				setMessage("info","History purged");
-				setNextEvent("ehGeneral.dspMain","panel=purgeHistory");
+				setNextEvent("ehAdmin.dspMain","panel=purgeHistory");
 			
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -163,7 +163,7 @@
 					oUser = getService("app").getBlankUser();
 
 				oUser.setUsername(username);
-				if(userID eq 0) oUser.setPassword(password);
+				if(userID eq 0) oUser.setPassword(hash(password));
 				oUser.setIsAdmin(isAdmin);
 
 				getService("app").saveUser(oUser);

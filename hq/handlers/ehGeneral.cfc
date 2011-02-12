@@ -33,6 +33,13 @@
 					setNextEvent("ehGeneral.dspLogin",qs);
 				}
 
+				// check if user needs to change password
+				if(structKeyExists(session,"requirePasswordChange")
+					and not listFindNoCase("ehGeneral.dspUpdatePassword,ehGeneral.doUpdatePassword",event)) {
+					setMessage("warning","Please update your password");
+					setNextEvent("ehGeneral.dspUpdatePassword");
+				}
+
 				// get status of buglog server
 				stInfo = getService("app").getServiceInfo();
 				
@@ -315,6 +322,10 @@
 			}
 		</cfscript>	
 	</cffunction>
+
+	<cffunction name="dspUpdatePassword" access="public" returntype="void">
+		<cfset setView("vwUpdatePassword")>
+	</cffunction>
 	
 	<cffunction name="doStart" access="public" returnType="void">
 		<cfscript>
@@ -339,7 +350,7 @@
 		<cfset setNextEvent("ehGeneral.dspMain")>
 	</cffunction>
 
-	<cffunction name="doSend" access="public">
+	<cffunction name="doSend" access="public" returnType="void">
 		<cfscript>
 			try {
 				entryID = getValue("entryID",0);
@@ -367,7 +378,7 @@
 		</cfscript>		
 	</cffunction>
 	
-	<cffunction name="doLogin" access="public">
+	<cffunction name="doLogin" access="public" returnType="void">
 		<cfscript>
 			var username = "";
 			var password = "";
@@ -385,8 +396,14 @@
 				
 				userID = getService("app").checkLogin(username, password);
 				if(userID eq 0) throw("Invalid username/password combination");
-				session.userID = userID;
-				session.user = getService("app").getUserByID(userID);
+				session.userID = abs(userID);
+				session.user = getService("app").getUserByID(abs(userID));
+
+				if(userID lt 0) {
+					session.requirePasswordChange = true;
+					setMessage("warning","Please update your password");
+					setNextEvent("ehGeneral.dspUpdatePassword");
+				}
 
 				setNextEvent(nextEvent,qs);
 				
@@ -403,13 +420,37 @@
 		</cfscript>		
 	</cffunction>
 	
-	<cffunction name="doLogoff" access="public">
+	<cffunction name="doUpdatePassword" access="public" returnType="void">
+		<cfscript>
+			var newPassword = getValue("newPassword");
+			var newPassword2 = getValue("newPassword2");
+			var user = session.user;
+			
+			try {
+				if(!structKeyExists(session,"requirePasswordChange")) setNextEvent("ehGeneral.dspMain");
+				if(newPassword eq "") {setMessage("warning","Your password cannot be empty"); setNextEvent("ehGeneral.dspUpdatePassword");}
+				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("ehGeneral.dspUpdatePassword");}
+				getService("app").setUserPassword(user, newPassword);
+				structDelete(session,"requirePasswordChange");
+				setMessage("info","Your password has been updated");
+				setNextEvent("ehGeneral.dspMain");
+							
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehAdmin.dspMain","panel=changePassword");				
+			}
+		</cfscript>
+	</cffunction>
+
+	
+	<cffunction name="doLogoff" access="public" returnType="void">
 		<cfset structDelete(session,"userID")>
 		<cfset structDelete(session,"user")>
 		<cfset setMessage("information","Thank you for using BugLogHQ")>
 		<cfset setNextEvent("ehGeneral.dspLogin")>
 	</cffunction>
-		
+				
 	<cffunction name="writeCookie" access="private">
 		<cfargument name="name" type="string">
 		<cfargument name="value" type="string">

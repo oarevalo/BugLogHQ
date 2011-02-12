@@ -232,7 +232,10 @@
 			// see if the user exists
 			try {
 				o = oFinder.findByUsername( arguments.username );
-				if(o.getPassword() neq arguments.password) {
+				if(len(o.getPassword()) lt 32 and o.getPassword() eq arguments.password) {
+					return o.getUserID() * -1;	// good password but needs to be changed
+				}
+				if(o.getPassword() neq hash(arguments.password)) {
 					return 0;	// wrong password
 				}
 			
@@ -385,7 +388,7 @@
 	<cffunction name="setUserPassword" access="public" returntype="void" hint="Updates the password for a user">
 		<cfargument name="userToSave" type="bugLog.components.user" required="true" hint="a user object">
 		<cfargument name="newPassword" type="string" required="true" hint="the new password">
-		<cfset arguments.userToSave.setPassword(arguments.newPassword)>
+		<cfset arguments.userToSave.setPassword(hash(arguments.newPassword))>
 		<cfset arguments.userToSave.save()>
 	</cffunction>
 	
