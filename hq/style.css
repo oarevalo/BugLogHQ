@@ -120,3 +120,24 @@ h2 {
      font-size:12px;
      border:1px solid silver;
 }
+
+
+/****** User Defined Rules **********/
+/*
+You can define custom CSS rules to apply to rows with specific applicatio/host/severity 
+values on the summary and detail views.
+
+Each row is applied CSS classes with the following conventions:
+.row_app_[app name]
+.row_host_[host name]
+.row_sev_[severity]
+
+In each case, the value (app, host, severity) is turned to lowercase 
+and all blank spaces are removed. For example: ".row_sev_fatal"
+
+Additionally, each cell on the table is assigned its own class:
+.cell_severity, .cell_application, .cell_hostname, .cell_message, etc.
+
+See /bugLog/hq/views/vwMain.cfm and /bugLog/hq/views/vwLog.cfm for more details
+
+*/

@@ -145,6 +145,9 @@
 						<cfhttpparam type="formfield" name="HTMLReport" value="#longMessage#">
 						<cfhttpparam type="formfield" name="APIKey" value="#variables.apikey#">
 					</cfhttp>
+					<cfif NOT find( 200 , cfhttp.StatusCode )>
+						<cfthrow message="Invalid HTTP Response Received" detail="#cfhttp.FileContent#" />
+					</cfif>
 				<cfelse>
 					<!--- send bug via a webservice (SOAP) --->
 					<cfset variables.oBugLogListener.logEntry(Now(), 
@@ -245,11 +248,11 @@
 			<table style="font-size:11px;font-family:arial;">
 				<tr>
 					<td><b>Application:</b></td>
-					<td>#variables.appName#</td>
+						<td>#HtmlEditFormat(variables.appName)#</td>
 				</tr>
 				<tr>
 					<td><b>Host:</b></td>
-					<td>#variables.hostName#</td>
+						<td>#HtmlEditFormat(variables.hostName)#</td>
 				</tr>
 				<tr>
 					<td><b>Server Date/Time:</b></td>
@@ -257,17 +260,17 @@
 				</tr>
 				<tr>
 					<td><b>Message:</b></td>
-					<td>#arguments.exception.message#</td>
+							<td>#HtmlEditFormat(arguments.exception.message)#</td>
 				</tr>
 				<cfif structKeyExists(arguments.exception,"type")>
 					<tr>
 						<td><b>Type:</b></td>
-						<td>#arguments.exception.type#</td>
+						<td>#HtmlEditFormat(arguments.exception.type)#</td>
 					</tr>
 				</cfif>
 				<tr>
 					<td><b>Detail:</b></td>
-					<td>#arguments.exception.detail#</td>
+							<td>#HtmlEditFormat(arguments.exception.detail)#</td>
 				</tr>
 				<cfif arrayLen(aTags) gt 0>
 					<tr valign="top">
@@ -281,23 +284,23 @@
 				</cfif>
 				<tr>
 					<td><b>Script Name (CGI):</b></td>
-					<td>#cgi.SCRIPT_NAME#</td>
+					<td>#HtmlEditFormat(cgi.SCRIPT_NAME)#</td>
 				</tr>
 				<tr>
 					<td><b>User Agent:</b></td>
-					<td>#cgi.HTTP_USER_AGENT#</td>
+					<td>#HtmlEditFormat(cgi.HTTP_USER_AGENT)#</td>
 				</tr>
 				<tr>
 					<td><b>Referrer:</b></td>
-					<td>#cgi.HTTP_REFERER#</td>
+					<td>#HtmlEditFormat(cgi.HTTP_REFERER)#</td>
 				</tr>
 				<tr>
 					<td><b>Query String:</b></td>
-					<td>#cgi.QUERY_STRING#</td>
+					<td>#HtmlEditFormat(cgi.QUERY_STRING)#</td>
 				</tr>
 				<tr>
 					<td><b>Request Method:</b></td>
-					<td>#cgi.REQUEST_METHOD#</td>
+					<td>#HtmlEditFormat(cgi.REQUEST_METHOD)#</td>
 				</tr>
 				<tr valign="top">
 					<td><strong>Coldfusion ID:</strong></td>
@@ -308,7 +311,7 @@
 							CFTOKEN = #session.cftoken#
 							JSessionID=#session.sessionID#
 							<cfcatch type="any">
-								<span style="color:red;">#cfcatch.message#</span>	
+								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
 						</cftry><br>
 						
@@ -317,7 +320,7 @@
 							CFID = #client.cfid#;
 							CFTOKEN = #client.cftoken#
 							<cfcatch type="any">
-								<span style="color:red;">#cfcatch.message#</span>	
+								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
 						</cftry><br>
 						
@@ -326,7 +329,7 @@
 							CFID = #cookie.cfid#;
 							CFTOKEN = #cookie.cftoken#
 							<cfcatch type="any">
-								<span style="color:red;">#cfcatch.message#</span>	
+								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
 						</cftry><br>
 						
@@ -334,7 +337,7 @@
 							[J2EE SESSION] &nbsp;&nbsp;
 							JSessionID = #session.JSessionID#;
 							<cfcatch type="any">
-								<span style="color:red;">#cfcatch.message#</span>	
+								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
 						</cftry>
 					</td>

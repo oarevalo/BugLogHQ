@@ -9,6 +9,8 @@
 	<cfset oConfig = createObject("component","bugLog.components.config").init(configProviderType = "xml", configDoc = "/bugLog/config/buglog-config.xml.cfm")>
 	<cfset oAppService = createObject("component","bugLog.hq.components.services.appService").init(bugLogPath,oConfig)>
 	
+	<cfset dateFormatMask = oConfig.getSetting("general.dateFormat")>
+	
 	<cfswitch expression="#action#">
 		
 		<cfcase value="checkLogin">
@@ -53,7 +55,7 @@
 						<ApplicationID>#ApplicationID#</ApplicationID>
 						<Message>#xmlFormat(qryEntries.message)#</Message>
 						<bugCount>#qryEntries.bugCount#</bugCount>
-						<createdOn>#dateFormat(qryEntries.createdOn,"mm/dd/yyyy")# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
+						<createdOn>#dateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
 						<EntryID>#qryEntries.entryID#</EntryID>
 						<SeverityCode>#qryEntries.severityCode#</SeverityCode>
 					</entry>
@@ -100,7 +102,7 @@
 						<HostName>#xmlFormat(qryEntries.hostname)#</HostName>
 						<HostID>#qryEntries.hostid#</HostID>
 						<Message>#xmlFormat(qryEntries.message)#</Message>
-						<createdOn>#dateFormat(qryEntries.createdOn,"mm/dd/yyyy")# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
+						<createdOn>#dateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
 						<EntryID>#qryEntries.entryID#</EntryID>
 						<SeverityCode>#qryEntries.severityCode#</SeverityCode>
 					</entry>
@@ -128,7 +130,7 @@
 						<HostName>#xmlFormat(oEntry.getHost().getHostname())#</HostName>
 						<HostID>#oEntry.getHostID()#</HostID>
 						<Message>#xmlFormat(oEntry.getMessage())#</Message>
-						<createdOn>#lsDateFormat(oEntry.getDateTime())# - #lsTimeFormat(oEntry.getDateTime())#</createdOn>
+						<createdOn>#dateFormat(oEntry.getDateTime(),dateFormatMask)# - #lsTimeFormat(oEntry.getDateTime())#</createdOn>
 						<EntryID>#oEntry.getEntryID()#</EntryID>
 						<SeverityCode>#oEntry.getSeverity().getCode()#</SeverityCode>
 						<ExceptionMessage>#xmlFormat(oEntry.getExceptionMessage())#</ExceptionMessage>

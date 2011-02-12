@@ -97,11 +97,11 @@
 				<table style="font-size:11px;font-family:arial;">
 					<tr>
 						<td><b>Application:</b></td>
-						<td>#variables.appName#</td>
+						<td>#HtmlEditFormat(variables.appName)#</td>
 					</tr>
 					<tr>
 						<td><b>Host:</b></td>
-						<td>#variables.hostName#</td>
+						<td>#HtmlEditFormat(variables.hostName)#</td>
 					</tr>
 					<tr>
 						<td><b>Server Date/Time:</b></td>
@@ -110,13 +110,13 @@
 					<cfif structKeyExists(arguments.exception,"message")>
 						<tr>
 							<td><b>Message:</b></td>
-							<td>#arguments.exception.message#</td>
+							<td>#HtmlEditFormat(arguments.exception.message)#</td>
 						</tr>
 					</cfif>
 					<cfif structKeyExists(arguments.exception,"detail")>
 						<tr>
 							<td><b>Detail:</b></td>
-							<td>#arguments.exception.detail#</td>
+							<td>#HtmlEditFormat(arguments.exception.detail)#</td>
 						</tr>
 					</cfif>
 					<cfif structKeyExists(arguments.exception,"tagContext")>
@@ -131,11 +131,11 @@
 					</cfif>
 					<tr>
 						<td><b>User Agent:</b></td>
-						<td>#cgi.HTTP_USER_AGENT#</td>
+						<td>#HtmlEditFormat(cgi.HTTP_USER_AGENT)#</td>
 					</tr>
 					<tr>
 						<td><b>Query String:</b></td>
-						<td>#cgi.QUERY_STRING#</td>
+						<td>#HtmlEditFormat(cgi.QUERY_STRING)#</td>
 					</tr>
 					<tr valign="top">
 						<td><strong>Coldfusion ID:</strong></td>
@@ -146,7 +146,7 @@
 								CFTOKEN = #session.cftoken#
 								JSessionID=#session.sessionID#
 								<cfcatch type="any">
-									<span style="color:red;">#cfcatch.message#</span>	
+									<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 								</cfcatch>
 							</cftry><br>
 							
@@ -155,7 +155,7 @@
 								CFID = #client.cfid#;
 								CFTOKEN = #client.cftoken#
 								<cfcatch type="any">
-									<span style="color:red;">#cfcatch.message#</span>	
+									<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 								</cfcatch>
 							</cftry><br>
 							
@@ -164,7 +164,7 @@
 								CFID = #cookie.cfid#;
 								CFTOKEN = #cookie.cftoken#
 								<cfcatch type="any">
-									<span style="color:red;">#cfcatch.message#</span>	
+									<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 								</cfcatch>
 							</cftry><br>
 							
@@ -172,7 +172,7 @@
 								[J2EE SESSION] &nbsp;&nbsp;
 								JSessionID = #session.JSessionID#;
 								<cfcatch type="any">
-									<span style="color:red;">#cfcatch.message#</span>	
+									<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 								</cfcatch>
 							</cftry>
 						</td>

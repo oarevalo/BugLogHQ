@@ -2,6 +2,7 @@
 <config>
 	<setting name="general.adminEmail">admin@somedomain.org</setting>
 	<setting name="general.externalURL"></setting>
+	<setting name="general.dateFormat">mm/dd/yy</setting>
 	
 	<setting name="db.dsn">bugLog</setting>
 	<setting name="db.dbtype">mysql</setting>

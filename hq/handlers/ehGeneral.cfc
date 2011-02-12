@@ -42,6 +42,7 @@
 				setValue("stInfo", stInfo);
 				setValue("versionTag", versionTag);
 				setValue("currentUser", session.user);
+				setValue("dateFormatMask", getService("config").getSetting("general.dateFormat"));
 
 			} catch(any e) {
 				setMessage("error",e.message);

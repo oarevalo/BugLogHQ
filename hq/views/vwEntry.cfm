@@ -35,7 +35,7 @@
 				<img width="16" height="16" src="images/icons/email.png" align="absmiddle" />
 				<a href="##" onclick="toggle('dSendForm')">Send to email</a>
 				
-				<cfif true or isBoolean(jiraEnabled) and jiraEnabled>
+				<cfif isBoolean(jiraEnabled) and jiraEnabled>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 					<img width="16" height="16" src="images/icons/jira.png" align="absmiddle" />
 					<a href="index.cfm?event=ehJira.dspSendToJira&entryID=#entryID#">Send to JIRA</a>
@@ -50,19 +50,19 @@
 					</cfloop>
 				</select>
 			</td>
-			<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;width:100px;">
-				<cfset tmpImgName = "images/severity/default.png">
-				<cfif tmpSeverity neq "">
+			<cfif tmpSeverity neq "">
+				<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;width:100px;">
+					<cfset tmpImgName = "images/severity/default.png">
 					<cfif fileExists(expandPath("images/severity/#lcase(tmpSeverity)#.png"))>
 						<cfset tmpImgName = "images/severity/#lcase(tmpSeverity)#.png">
 					</cfif>
-				</cfif>
-				<img src="#tmpImgName#" 
-						align="bottom"
-						alt="#lcase(tmpSeverity)#" 
-						title="#lcase(tmpSeverity)#">
-				#tmpSeverity#		
-			</td>
+					<img src="#tmpImgName#" 
+							align="bottom"
+							alt="#lcase(tmpSeverity)#" 
+							title="#lcase(tmpSeverity)#">
+					#tmpSeverity#		
+				</td>
+			</cfif>
 			<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
 				<a href="index.cfm?event=ehGeneral.dspMain&applicationID=#oApp.getApplicationID()#">#oApp.getCode()#</a>
 			</td>

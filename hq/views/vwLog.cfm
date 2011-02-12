@@ -29,7 +29,7 @@
 <cfset qryApplications = request.requestState.qryApplications>
 <cfset qryHosts = request.requestState.qryHosts>
 <cfset msgFromEntryID = request.requestState.msgFromEntryID>
-
+<cfset dateFormatMask = request.requestState.dateFormatMask>
 
 <!--- base URL for reloading --->
 <cfset pageURL = "index.cfm?event=ehGeneral.dspLog&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#urlEncodedFormat(searchTerm)#&msgFromEntryID=#msgFromEntryID#">
@@ -172,8 +172,12 @@
 		</tr>
 	<cfloop query="qryEntries" startrow="#startRow#" endrow="#startRow+rowsPerPage-1#">
 		<cfset isNew = qryEntries.entryID gt lastbugread>
-		<tr <cfif qryEntries.currentRow mod 2>class="altRow"</cfif> <cfif isNew>style="font-weight:bold;"</cfif>>
-			<td width="15" align="center" style="padding:0px;">
+		<cfset tmpRowClass = "row_app_" & replace(qryEntries.applicationCode," ","","ALL") & " "
+							 & "row_host_" & replace(qryEntries.hostName," ","","ALL") & " "
+						 	 & "row_sev_" & replace(qryEntries.SeverityCode," ","","ALL")>
+
+		<tr class="#LCase(tmpRowClass)#<cfif qryEntries.currentRow mod 2> altRow</cfif>" <cfif isNew>style="font-weight:bold;"</cfif>>
+			<td class="cell_severity" width="15" align="center" style="padding:0px;">
 				<cfset tmpImgName = "images/severity/default.png">
 				<cfif qryEntries.SeverityCode neq "">
 					<cfif fileExists(expandPath("images/severity/#lcase(qryEntries.SeverityCode)#.png"))>
@@ -185,16 +189,16 @@
 						alt="#lcase(qryEntries.SeverityCode)#" 
 						title="#lcase(qryEntries.SeverityCode)#">
 			</td>
-			<td width="15">
+			<td class="cell_entry" width="15">
 				<a href="?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#qryEntries.entryID#</a>
 			</td>
-			<td align="center" width="110">#DateFormat(qryEntries.createdOn,'mm/dd/yy')# #lsTimeFormat(qryEntries.createdOn)#</td>
-			<td width="120"><a href="index.cfm?event=ehGeneral.dspLog&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a></td>
-			<td width="120"><a href="index.cfm?event=ehGeneral.dspLog&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a></td>
-			<td onclick="document.location='?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#'" 
+			<td class="cell_datetime" align="center" width="110">#DateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</td>
+			<td class="cell_application" width="120"><a href="index.cfm?event=ehGeneral.dspLog&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a></td>
+			<td class="cell_hostname" width="120"><a href="index.cfm?event=ehGeneral.dspLog&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a></td>
+			<td class="cell_message" onclick="document.location='?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#'" 
 				title="Click to view full details of bug"
-				style="cursor:pointer;">#qryEntries.message#</td>
-			<td align="center">
+				style="cursor:pointer;">#HtmlEditFormat(qryEntries.message)#</td>
+			<td class="cell_details" align="center">
 				<a href="?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">
 					<img alt="View details" width="16" height="16" src="images/icons/zoom.png" align="absmiddle" border="0" /></a>
 			</td>

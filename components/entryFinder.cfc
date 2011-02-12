@@ -81,8 +81,12 @@
 		<cfset var dbType = oDataProvider.getConfig().getDBType()>
 		<cfset var qry = 0>
 
-		<cfif arguments.searchTerm neq "" and dbType eq "mysql">
-			<cfset arguments.searchTerm = replace(arguments.searchTerm,"'","\'","ALL")>
+		<cfif arguments.searchTerm neq "">
+			<cfif dbType eq "mysql">
+				<cfset arguments.searchTerm = replace(arguments.searchTerm,"'","\'","ALL")>
+			<cfelse>
+				<cfset arguments.searchTerm = replace(arguments.searchTerm,"'","''","ALL")>
+			</cfif>
 		</cfif>
 
 		<cfsavecontent variable="tmpSQL">
@@ -218,7 +222,7 @@
 					ON src.SourceID = e.SourceID
 				
 				WHERE (1=1)
-				<cfif arguments.searchTerm neq "">
+				<cfif trim(arguments.searchTerm) neq "">
 					AND (
 						message LIKE '%#arguments.searchTerm#%'
 						or
