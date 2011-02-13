@@ -31,6 +31,12 @@
 		<cfargument name="comment" type="string" required="false" default="">
 		
 		<cfset var stEntry = arguments.rawEntryBean.getMemento()>
+		<cfset var thisHost = "">
+		<cfscript>
+			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
+			thisHost = thisHost & cgi.server_name;
+			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
+		</cfscript>
 
 		<cfmail from="#arguments.sender#" 
 				to="#arguments.recipient#" 
@@ -89,7 +95,7 @@
 
 			<div style="font-family:arial;font-size:11px;margin-top:15px;">
 				** This email has been sent automatically from the BugLog server at 
-				<a href="http://#cgi.HTTP_HOST#/bugLog/hq">http://#cgi.HTTP_HOST#/bugLog/hq</a><br />
+				<a href="#thisHost#/bugLog/hq">#thisHost#/bugLog/hq</a><br />
 				<em>To disable automatic notifications log into the bugLog server and disable the corresponding rule.</em>
 			</div>
 		</cfmail>

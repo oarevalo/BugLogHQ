@@ -21,7 +21,9 @@
 	<setting name="jira.wsdl"></setting>
 	<setting name="jira.username"></setting>
 	<setting name="jira.password"></setting>
-	
+
+	<setting name="purging.numberOfDays">90</setting>
+	<setting name="purging.enabled">false</setting>
 	
 	<!-- Environment-specific Settings: 
 		

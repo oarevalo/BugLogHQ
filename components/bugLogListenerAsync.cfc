@@ -6,6 +6,7 @@
 	<cfset variables.maxLogSize = 0>
 	<cfset variables.schedulerIntervalSecs = 0>
 	<cfset variables.key = "123456knowthybugs654321"> <!--- this is a simple protection to avoid calling processqueue() too easily. This is NOT the apiKey setting --->
+	<cfset variables.purgeHistoryEnabled = false>
 	
 	<cffunction name="init" access="public" returntype="bugLogListenerAsync" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
@@ -16,6 +17,7 @@
 			variables.maxQueueSize = arguments.config.getSetting("service.maxQueueSize");
 			variables.maxLogSize = arguments.config.getSetting("service.maxLogSize");
 			variables.schedulerIntervalSecs = arguments.config.getSetting("service.schedulerIntervalSecs");
+			variables.purgeHistoryEnabled = arguments.config.getSetting("purging.enabled");
 
 			// do the normal initialization
 			super.init( arguments.config );
@@ -108,15 +110,35 @@
 	</cffunction>
 	
 	<cffunction name="startScheduler" access="private" output="false" returntype="void">
+		<cfscript>
+			var thisHost = "";
+			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
+			thisHost = thisHost & cgi.server_name;
+			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
+		</cfscript>
+
 		<cfschedule action="update"
 			task="bugLogProcessQueue"
 			operation="HTTPRequest"
 			startDate="#createDate(1990,1,1)#"
 			startTime="00:00"
 			endTime="23:59"
-			url="http://#cgi.HTTP_HOST#/bugLog/listeners/processQueue.cfm?key=#variables.KEY#"
+			url="#thisHost#/bugLog/util/processQueue.cfm?key=#variables.KEY#"
 			interval="#variables.schedulerIntervalSecs#"
 		/>		
+		
+		<cfif variables.purgeHistoryEnabled>
+			<cfschedule action="update"
+				task="bugLogPurgeHistory"
+				operation="HTTPRequest"
+				startDate="#createDate(1990,1,1)#"
+				startTime="03:00"
+				url="#thisHost#/bugLog/util/purgeHistory.cfm"
+				interval="daily"
+			/>		
+		<cfelse>
+			<cfschedule action="delete"	task="bugLogPurgeHistory" />
+		</cfif>
 	</cffunction>
 	
 	

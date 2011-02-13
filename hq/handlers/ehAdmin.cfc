@@ -33,6 +33,8 @@
 
 					case "purgeHistory":
 						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
+						setValue("purgeHistoryDays", cfg.getSetting("purging.numberOfDays",30));
+						setValue("enabled", cfg.getSetting("purging.enabled",false));
 						break;
 
 					case "APISecurity":
@@ -132,13 +134,20 @@
 	<cffunction name="doPurgeHistory" access="public" returntype="void">
 		<cfscript>
 			var purgeHistoryDays = val(getValue("purgeHistoryDays"));
-			var deleteOrphans = getValue("deleteOrphans",false);
+			var runnow = getValue("runnow",false);
+			var enabled = getValue("enabled",false);
 			var user = getValue("currentUser");
 			
 			try {
 				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=purgeHistory");}
-				getService("app").purgeHistory(purgeHistoryDays, deleteOrphans);
-				setMessage("info","History purged");
+				getService("config").setSetting("purging.numberOfDays", purgeHistoryDays);
+				getService("config").setSetting("purging.enabled", enabled);
+				if(runnow) {
+					getService("app").purgeHistory(purgeHistoryDays);
+					setMessage("info","Settings saved and History purged. The BugLog service must be restarted for changes to take effect.");
+				} else {
+					setMessage("info","Purge History settings saved. The BugLog service must be restarted for changes to take effect.");
+				}
 				setNextEvent("ehAdmin.dspMain","panel=purgeHistory");
 			
 			} catch(any e) {

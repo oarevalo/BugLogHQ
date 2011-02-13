@@ -106,6 +106,7 @@ CREATE TABLE `bl_User` (
   `Username` varchar(255) NOT NULL COMMENT '\n',
   `Password` varchar(50) NOT NULL COMMENT '\n',
   `IsAdmin` int(11) NOT NULL default 0,
+  `Email` varchar(255) NULL,
   PRIMARY KEY  (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 

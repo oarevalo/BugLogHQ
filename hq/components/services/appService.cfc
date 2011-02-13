@@ -249,7 +249,6 @@
 
 	<cffunction name="purgeHistory" access="public" returntype="void">
 		<cfargument name="purgeHistoryDays" type="numeric" required="true">
-		<cfargument name="deleteOrphans" type="boolean" required="false" default="false">
 		
 		<cfset var oDataProvider = variables.oDAOFactory.getDataProvider()>
 		<cfset var sql = "">
