@@ -195,7 +195,7 @@
 				}
 	
 				// read file
-				xmlDoc = xmlParse(expandPath(variables.extensionsXMLPath))
+				xmlDoc = xmlParse(expandPath(variables.extensionsXMLPath));
 
 				// get rule definitions
 				aNodes = xmlSearch(xmlDoc, "//rules/rule");
