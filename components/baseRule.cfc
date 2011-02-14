@@ -36,6 +36,9 @@
 			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
 			thisHost = thisHost & cgi.server_name;
 			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
+
+			if(arguments.sender eq "") {writeToCFLog("Missing 'sender' email address. Cannot send alert email!"); return;}
+			if(arguments.recipient eq "") {writeToCFLog("Missing 'recipient' email address. Cannot send alert email!"); return;}
 		</cfscript>
 
 		<cfmail from="#arguments.sender#" 
@@ -105,7 +108,14 @@
 	<cffunction name="writeToCFLog" access="private" returntype="void" hint="writes a message to the internal cf logs">
 		<cfargument name="message" type="string" required="true">
 		<cflog application="true" file="bugLog_ruleProcessor" text="#arguments.message#">
-		<cfdump var="BugLog::BaseRule: #arguments.message#" output="console">
+		<cfif structKeyExists(variables,"listener")>
+			<cfset variables.listener.logMessage(arguments.message)>
+		</cfif>
 	</cffunction>
 	
+	<cffunction name="setListener" access="public" returntype="void" hint="Adds a reference to the bugLogListener instance">
+		<cfargument name="listener" type="any" required="true">
+		<cfset variables.listener = arguments.listener>
+	</cffunction>
+
 </cfcomponent>

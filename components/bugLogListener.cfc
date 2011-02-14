@@ -116,6 +116,20 @@
 		<cfset logMessage("BugLogListener service stopped.")>
 	</cffunction>
 
+	<cffunction name="logMessage" access="public" output="false" returntype="void" hint="this method appends an entry to the messages log as well as displays the message on the console">
+		<cfargument name="msg" type="string" required="true" />
+		<cfset var System = CreateObject('java','java.lang.System') />
+		<cfset var txt = timeFormat(now(), 'HH:mm:ss') & ": " & msg>
+		<cfset System.out.println("BugLogListener: " & txt) />
+		<cflock name="bugLogListener_logMessage" type="exclusive" timeout="10">
+			<cfif arrayLen(variables.msgLog) gt variables.maxLogSize>
+				<cfset arrayDeleteAt(variables.msgLog, ArrayLen(variables.msgLog))>
+			</cfif>
+			<cfset arrayPrepend(variables.msgLog,txt)>
+		</cflock>
+	</cffunction>
+	
+	
 	<!---- Private Methods ---->
 	
 	<cffunction name="getApplicationFromBean" access="private" returntype="app" hint="Uses the information on the rawEntryBean to retrieve the corresponding Application object">
@@ -269,25 +283,13 @@
 				
 				if(aRules[i].enabled) {
 					oRule = createObject("component", aRules[i].component ).init( argumentCollection = aRules[i].config );
+					oRule.setListener(this);
 	
 					// add rule to processor
 					variables.oRuleProcessor.addRule(oRule);
 				}
 			}
 		</cfscript>
-	</cffunction>
-
-	<cffunction name="logMessage" access="private" output="false" returntype="void" hint="this method writes output to the console">
-		<cfargument name="msg" type="string" required="true" />
-		<cfset var System = CreateObject('java','java.lang.System') />
-		<cfset var txt = timeFormat(now(), 'HH:mm:ss') & ": " & msg>
-		<cfset System.out.println("BugLogListener: " & txt) />
-		<cflock name="bugLogListener_logMessage" type="exclusive" timeout="10">
-			<cfif arrayLen(variables.msgLog) gt variables.maxLogSize>
-				<cfset arrayDeleteAt(variables.msgLog, ArrayLen(variables.msgLog))>
-			</cfif>
-			<cfset arrayPrepend(variables.msgLog,txt)>
-		</cflock>
 	</cffunction>
 
 	<cffunction name="configureHistoryPurging" access="private" output="false" returntype="void">

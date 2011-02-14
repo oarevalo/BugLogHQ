@@ -17,7 +17,7 @@
 							sender = arguments.configObj.getSetting("general.adminEmail"),
 							recipient = variables.config.recipientEmail,
 							subject = "BugLog: #arguments.rawEntry.getMessage()#")>
-		
+		<cfset writeToCFLog("'mailRelay' rule fired. Email sent. Msg: '#arguments.rawEntry.getMessage()#'")>
 		<cfreturn true>
 	</cffunction>
 
