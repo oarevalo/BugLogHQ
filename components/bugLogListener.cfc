@@ -14,6 +14,9 @@
 	<cfset variables.oDAOFactory = 0>
 	<cfset variables.oRuleProcessor = 0>
 	<cfset variables.oConfig = 0>
+	<cfset variables.msgLog = arrayNew(1)>
+	<cfset variables.maxLogSize = 10>
+	<cfset variables.purgeHistoryEnabled = false>
 
 	<cffunction name="init" access="public" returntype="bugLogListener" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
@@ -21,6 +24,12 @@
 			var cacheTTL = 300;		// timeout in minutes for cache entries
 			
 			variables.oConfig = arguments.config;		// global configuration
+
+			logMessage("Starting BugLogListener service...");
+	
+			// load settings
+			variables.maxLogSize = arguments.config.getSetting("service.maxLogSize");
+			variables.purgeHistoryEnabled = arguments.config.getSetting("purging.enabled");
 			
 			// load DAO Factory
 			variables.oDAOFactory = createObject("component","bugLog.components.DAOFactory").init( variables.oConfig );
@@ -43,8 +52,13 @@
 			variables.oSeverityCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);
 			variables.oSourceCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);		
 						
+			// configure history purging
+			configureHistoryPurging();
+
 			// record the date at which the service started 
 			variables.startedOn = Now();
+
+			logMessage("BugLogListener Service Started");
 		</cfscript>
 	
 		<cfreturn this>
@@ -99,7 +113,7 @@
 	</cffunction>
 
 	<cffunction name="shutDown" access="public" returntype="void" hint="Performs any clean up action required">
-		<!--- empty --->
+		<cfset logMessage("BugLogListener service stopped.")>
 	</cffunction>
 
 	<!---- Private Methods ---->
@@ -263,5 +277,39 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="logMessage" access="private" output="false" returntype="void" hint="this method writes output to the console">
+		<cfargument name="msg" type="string" required="true" />
+		<cfset var System = CreateObject('java','java.lang.System') />
+		<cfset var txt = timeFormat(now(), 'HH:mm:ss') & ": " & msg>
+		<cfset System.out.println("BugLogListener: " & txt) />
+		<cflock name="bugLogListener_logMessage" type="exclusive" timeout="10">
+			<cfif arrayLen(variables.msgLog) gt variables.maxLogSize>
+				<cfset arrayDeleteAt(variables.msgLog, ArrayLen(variables.msgLog))>
+			</cfif>
+			<cfset arrayPrepend(variables.msgLog,txt)>
+		</cflock>
+	</cffunction>
 
+	<cffunction name="configureHistoryPurging" access="private" output="false" returntype="void">
+		<cfscript>
+			var thisHost = "";
+			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
+			thisHost = thisHost & cgi.server_name;
+			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
+		</cfscript>
+
+		<cfif variables.purgeHistoryEnabled>
+			<cfschedule action="update"
+				task="bugLogPurgeHistory"
+				operation="HTTPRequest"
+				startDate="#createDate(1990,1,1)#"
+				startTime="03:00"
+				url="#thisHost#/bugLog/util/purgeHistory.cfm"
+				interval="daily"
+			/>		
+		<cfelse>
+			<cfschedule action="delete"	task="bugLogPurgeHistory" />
+		</cfif>
+	</cffunction>
+	
 </cfcomponent>

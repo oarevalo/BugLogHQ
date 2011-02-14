@@ -1,12 +1,9 @@
-<cfcomponent extends="bugLogListener" hint="This listener modified the standard listener so that it processes all bug in an asynchronouse manner">
+<cfcomponent extends="bugLogListener" hint="This listener modified the standard listener so that it processes all bug in an asynchronous manner">
 	
 	<cfset variables.queue = arrayNew(1)>
-	<cfset variables.msgLog = arrayNew(1)>
 	<cfset variables.maxQueueSize = 0>
-	<cfset variables.maxLogSize = 0>
 	<cfset variables.schedulerIntervalSecs = 0>
 	<cfset variables.key = "123456knowthybugs654321"> <!--- this is a simple protection to avoid calling processqueue() too easily. This is NOT the apiKey setting --->
-	<cfset variables.purgeHistoryEnabled = false>
 	
 	<cffunction name="init" access="public" returntype="bugLogListenerAsync" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
@@ -15,18 +12,14 @@
 			variables.queue = arrayNew(1);
 			variables.msgLog = arrayNew(1);
 			variables.maxQueueSize = arguments.config.getSetting("service.maxQueueSize");
-			variables.maxLogSize = arguments.config.getSetting("service.maxLogSize");
 			variables.schedulerIntervalSecs = arguments.config.getSetting("service.schedulerIntervalSecs");
-			variables.purgeHistoryEnabled = arguments.config.getSetting("purging.enabled");
 
 			// do the normal initialization
 			super.init( arguments.config );
 
 			// start scheduler
 			startScheduler();
-			
-			logMessage("BugLogListenerAsync Started");
-			
+						
 			return this;
 		</cfscript>
 	</cffunction>
@@ -85,30 +78,17 @@
 	</cffunction>
 
 	<cffunction name="shutDown" access="public" returntype="void" hint="Performs any clean up action required">
-		<cfset logMessage("Stopping BugLogListenerAsync service...")>
-		<cfset logMessage("Stopping scheduled task...")>
+		<cfset logMessage("Stopping BugLogListener service...")>
+		<cfset logMessage("Stopping ProcessQueue scheduled task...")>
 		<cfschedule action="delete"	task="bugLogProcessQueue" />	
 		<cfset logMessage("Processing remaining elements in queue...")>
 		<cfset processQueue(variables.key)>
-		<cfset logMessage("BugLogListenerAsync stopped.")>
+		<cfset logMessage("BugLogListener service stopped.")>
 	</cffunction>
 	
 	
 	<!--- Private methods --->
-	
-	<cffunction name="logMessage" access="private" output="false" returntype="void">
-		<cfargument name="msg" type="string" required="true" />
-		<cfset var System = CreateObject('java','java.lang.System') />
-		<cfset var txt = timeFormat(now(), 'HH:mm:ss') & ": " & msg>
-		<cfset System.out.println("BugLogListenerAsync: " & txt) />
-		<cflock name="bugLogListenerAsync_logMessage" type="exclusive" timeout="10">
-			<cfif arrayLen(variables.msgLog) gt variables.maxLogSize>
-				<cfset arrayDeleteAt(variables.msgLog, ArrayLen(variables.msgLog))>
-			</cfif>
-			<cfset arrayPrepend(variables.msgLog,txt)>
-		</cflock>
-	</cffunction>
-	
+		
 	<cffunction name="startScheduler" access="private" output="false" returntype="void">
 		<cfscript>
 			var thisHost = "";
@@ -126,19 +106,6 @@
 			url="#thisHost#/bugLog/util/processQueue.cfm?key=#variables.KEY#"
 			interval="#variables.schedulerIntervalSecs#"
 		/>		
-		
-		<cfif variables.purgeHistoryEnabled>
-			<cfschedule action="update"
-				task="bugLogPurgeHistory"
-				operation="HTTPRequest"
-				startDate="#createDate(1990,1,1)#"
-				startTime="03:00"
-				url="#thisHost#/bugLog/util/purgeHistory.cfm"
-				interval="daily"
-			/>		
-		<cfelse>
-			<cfschedule action="delete"	task="bugLogPurgeHistory" />
-		</cfif>
 	</cffunction>
 	
 	
