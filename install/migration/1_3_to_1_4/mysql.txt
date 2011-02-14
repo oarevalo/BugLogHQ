@@ -11,5 +11,5 @@ CREATE TABLE `bl_Extension` (
   PRIMARY KEY  (`ExtensionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-ALTER TABLE buglog.bl_user
+ALTER TABLE bl_User
  ADD Email VARCHAR(255) AFTER IsAdmin;
