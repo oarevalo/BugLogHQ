@@ -271,6 +271,50 @@
 		
 	</cffunction>
 
+	<cffunction name="getDigestSettings" access="public" returntype="struct">
+		<cfset var digestConfig = {}>
+		<cfset digestConfig.enabled = isBoolean(variables.config.getSetting("digest.enabled", false)) and variables.config.getSetting("digest.enabled", false)>
+		<cfset digestConfig.recipients = variables.config.getSetting("digest.recipients", "")>
+		<cfset digestConfig.schedulerIntervalHours = val(variables.config.getSetting("digest.schedulerIntervalHours", 24))>
+		<cfset digestConfig.schedulerStartTime = variables.config.getSetting("digest.schedulerStartTime", "06:00")>
+		<cfset digestConfig.sendIfEmpty = isBoolean(variables.config.getSetting("digest.sendIfEmpty", false)) and variables.config.getSetting("digest.sendIfEmpty", false)>
+		<cfreturn digestConfig>
+	</cffunction>
+
+	<cffunction name="setDigestSettings" access="public" returntype="void">
+		<cfargument name="enabled" type="boolean" required="true">
+		<cfargument name="recipients" type="string" required="true">
+		<cfargument name="interval" type="numeric" required="true">
+		<cfargument name="startTime" type="string" required="true">
+		<cfargument name="sendIfEmpty" type="boolean" required="true">
+		
+		<cfset variables.config.setSetting("digest.enabled", arguments.enabled)>
+		<cfset variables.config.setSetting("digest.recipients", arguments.recipients)>
+		<cfset variables.config.setSetting("digest.schedulerIntervalHours", arguments.interval)>
+		<cfset variables.config.setSetting("digest.schedulerStartTime", arguments.startTime)>
+		<cfset variables.config.setSetting("digest.sendIfEmpty", arguments.sendIfEmpty)>
+
+		<cfscript>
+			var thisHost = "";
+			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
+			thisHost = thisHost & cgi.server_name;
+			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
+		</cfscript>
+
+		<cfif arguments.enabled>
+			<cfschedule action="update"
+				task="bugLogSendDigest"
+				operation="HTTPRequest"
+				startDate="#createDate(1990,1,1)#"
+				startTime="#arguments.startTime#"
+				url="#thisHost#/bugLog/util/sendDigest.cfm"
+				interval="#arguments.interval*3600#"
+			/>		
+		<cfelse>
+			<cfschedule action="delete"	task="bugLogSendDigest" />
+		</cfif>
+	</cffunction>
+
 
 	<!----- Extensions ----->	
 	<cffunction name="getRules" access="public" returnType="array" hint="Returns all rules that are available">

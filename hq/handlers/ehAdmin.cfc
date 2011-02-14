@@ -51,8 +51,18 @@
 						jiraConfig.password = jira.getSetting("password");
 						setValue("jiraConfig",jiraConfig);				
 						break;
+
+					case "digest":
+						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
+						digestConfig = app.getDigestSettings();
+						setValue("enabled", digestConfig.enabled);			
+						setValue("recipients", digestConfig.recipients);			
+						setValue("interval", digestConfig.schedulerIntervalHours);			
+						setValue("startTime", digestConfig.schedulerStartTime);			
+						setValue("sendIfEmpty", digestConfig.sendIfEmpty);			
+						break;
 				}
-				
+
 				setValue("panel", panel);
 				setValue("allowConfigEditing", isConfigEditingAllowed());
 				setView("vwAdmin");
@@ -229,7 +239,7 @@
 				getService("app").setServiceSetting("requireAPIKey", requireAPIKey);
 				getService("app").setServiceSetting("APIKey", APIKey);
 				setMessage("info","API security settings updated. You must restart the BugLogListener service for changes to take effect.");
-				setNextEvent("ehAdmin.dspMain","panel=apisecurity");
+				setNextEvent("ehAdmin.dspMain","panel=APISecurity");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -289,7 +299,33 @@
 			}
 		</cfscript>	
 	</cffunction>		
-	
+
+	<cffunction name="doSaveDigestSettings" access="public" returntype="void">
+		<cfscript>
+			var user = getValue("currentUser");
+			var enabled = getValue("enabled",false);
+			var recipients = getValue("recipients");
+			var interval = getValue("interval");
+			var startTime = getValue("startTime");
+			var sendIfEmpty = getValue("sendIfEmpty",false);
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=digest");}
+				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("ehAdmin.dspMain","panel=digest");}
+				if(interval eq "") {setMessage("warning","Please set the digest interval"); setNextEvent("ehAdmin.dspMain","panel=digest");};
+				if(startTime eq "") {setMessage("warning","Please enter the start time"); setNextEvent("ehAdmin.dspMain","panel=digest");};
+				getService("app").setDigestSettings(enabled, recipients, interval, startTime, sendIfEmpty);
+				setMessage("info","Digest settings updated.");
+				setNextEvent("ehAdmin.dspMain","panel=digest");
+							
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehAdmin.dspMain","panel=digest");
+			}
+		</cfscript>	
+	</cffunction>	
+		
 	<cffunction name="isConfigEditingAllowed" access="private" returntype="boolean">
 		<cfset var rtn = false>
 		<cfset var allowConfigEditing = getSetting("allowConfigEditing")>

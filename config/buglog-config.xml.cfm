@@ -25,6 +25,12 @@
 	<setting name="purging.numberOfDays">90</setting>
 	<setting name="purging.enabled">false</setting>
 	
+	<setting name="digest.enabled">false</setting>
+	<setting name="digest.recipients"></setting>
+	<setting name="digest.schedulerIntervalHours">24</setting>
+	<setting name="digest.schedulerStartTime">06:00</setting>
+	<setting name="digest.sendIfEmpty">false</setting>
+	
 	<!-- Environment-specific Settings: 
 		
 		You can override any of the above settings for specific environments. 
