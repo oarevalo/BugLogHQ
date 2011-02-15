@@ -14,6 +14,14 @@
 		<cfset variables.instance.wsdl = arguments.wsdl>
 		<cfset variables.instance.username = arguments.username>
 		<cfset variables.instance.password = arguments.password>
+		<cfscript>
+			if(left(variables.instance.wsdl,1) eq "/") {
+				if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
+				thisHost = thisHost & cgi.server_name;
+				if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
+				variables.instance.wsdl = thisHost & variables.instance.wsdl;
+			}
+		</cfscript>
 		<cfreturn this>
 	</cffunction>
 
