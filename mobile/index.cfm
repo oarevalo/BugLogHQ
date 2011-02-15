@@ -4,8 +4,8 @@
 		<title>BugLogMini</title>
 		<meta name="viewport" content="width=320" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<link rel="apple-touch-icon" href="/bugLog/iphone/images/bug_48.png"/>
-		<link rel="apple-touch-startup-image" href="/bugLog/iphone/images/startup.png">
+		<link rel="apple-touch-icon" href="/bugLog/mobile/images/bug_48.png"/>
+		<link rel="apple-touch-startup-image" href="/bugLog/mobile/images/startup.png">
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="main.js"></script>
 		<script type="text/javascript">

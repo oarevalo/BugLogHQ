@@ -1,5 +1,5 @@
 var bugLogDefaultPath = ""
-var bugLogMiniPath = "/bugLog/iphone/"
+var bugLogMiniPath = "/bugLog/mobile/"
 var bugLogHQPath = "/bugLog/hq/"
 var bugLogProxyPath = "/bugLog/bugLogProxy.cfm"
 var bugLogProtocol = "http"
