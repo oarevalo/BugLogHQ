@@ -45,89 +45,41 @@
 
 <cfsavecontent variable="tmpHTML">
 <cfoutput>
-	<style type="text/css">
-		p {
-			font-family: "trebuchet MS", Arial, Helvetica, "Sans Serif";
-		}
-		.footer {
-			color:##666;
-			font-size:11px;
-		}
-		.browseTable {
-			border-bottom:1px solid ##333;
-			width:95%;
-		}
-		
-		.browseTable th {
-			font-family: "trebuchet MS", Arial, Helvetica, "Sans Serif";
-		    background-color:##90A4B5;
-			line-height: 18px;
-			color: ##FFFFFF;
-			padding: 3px 9px 3px 9px;
-			font-size:13px;
-			font-weight:bold;
-		}
-		.browseTable td {
-			font-family: "trebuchet MS", Arial, Helvetica, "Sans Serif";
-			line-height: 16px;
-			color: ##333;
-			padding: 3px 3px 3px 9px;
-			font-size:12px;
-			border-bottom:1px dotted silver;
-		}
-		
-		.altRow {
-		    background-color:##F6F6F6;
-		}
-		
-		.listTI {
-		    background-color:##6b8091;
-		}
-		.browseTable tr:hover {
-		    background-color:##ebebeb;
-		}
-		.browseTable th a {
-		    color:white;
-		    text-decoration:none;
-		}
-		.browseTable th a:hover {
-		    text-decoration:underline;
-		}
-	</style>
-
-	<h1>BugLogHQ Digest</h1>
-
-	<p>BugLog has received the following bug reports since <b>#lsDateFormat(digestStartDate)# #lsTimeFormat(digestStartDate)#</b>:</p>
+	<div style="font-family: arial,sans-serif;">
+		<h1><span style="color:red;">BugLog</span>HQ Digest</h1>
 	
-	<table class="browseTable">
-		<tr>
-			<th>Severity</th>
-			<th>Application</th>
-			<th>Host</th>
-			<th>Message</th>
-			<th>Count</th>
-			<th>Most Recent</th>
-		</tr>
-		<cfloop query="qryData">
-			<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#qryData.EntryID#">
+		<p>BugLog has received the following bug reports since <b>#DateFormat(digestStartDate,"long")# #lsTimeFormat(digestStartDate)#</b>:</p>
+		
+		<table style="border-bottom:1px solid ##333;width:95%;font-family: arial,sans-serif;" cellpadding="4" cellspacing="2">
 			<tr>
-				<td align="center">#qryData.SeverityCode#</td>
-				<td>#qryData.applicationCode#</td>
-				<td>#qryData.HostName#</td>
-				<td>#qryData.Message#</td>
-				<td align="right">#qryData.bugCount#</td>
-				<td align="center"><a href="#tmpURL#">#dateFormat(qryData.createdOn,dateMask)# #lsTimeFormat(qryData.createdOn)#</a></td>
+				<th style="background-color:##90A4B5;line-height: 18px;color: ##FFFFFF;font-size:13px;padding: 3px 9px 3px 9px;">Severity</th>
+				<th style="background-color:##90A4B5;line-height: 18px;color: ##FFFFFF;font-size:13px;padding: 3px 9px 3px 9px;">Application</th>
+				<th style="background-color:##90A4B5;line-height: 18px;color: ##FFFFFF;font-size:13px;padding: 3px 9px 3px 9px;">Host</th>
+				<th style="background-color:##90A4B5;line-height: 18px;color: ##FFFFFF;font-size:13px;padding: 3px 9px 3px 9px;">Message</th>
+				<th style="background-color:##90A4B5;line-height: 18px;color: ##FFFFFF;font-size:13px;padding: 3px 9px 3px 9px;">Count</th>
+				<th style="background-color:##90A4B5;line-height: 18px;color: ##FFFFFF;font-size:13px;padding: 3px 9px 3px 9px;">Most Recent</th>
 			</tr>
-		</cfloop>
-		<cfif qryData.recordCount eq 0>
-			<tr><td colspan="6"><em>No bug reports received! Yay!</em></td></tr>
-		</cfif>
-	</table>
-	<br />
-	<p class="footer">
-		** This email has been sent from the BugLogHQ server at 
-		<a href="#thisHost#/bugLog/hq">#thisHost#/bugLog/hq</a>
-	</p>
+			<cfloop query="qryData">
+				<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#qryData.EntryID#">
+				<tr>
+					<td align="center" style="line-height:16px;color:##333;font-size:12px;padding: 3px 3px 3px 9px;border-bottom:1px dotted silver;">#qryData.SeverityCode#</td>
+					<td style="line-height:16px;color:##333;font-size:12px;padding: 3px 3px 3px 9px;border-bottom:1px dotted silver;">#qryData.applicationCode#</td>
+					<td style="line-height:16px;color:##333;font-size:12px;padding: 3px 3px 3px 9px;border-bottom:1px dotted silver;">#qryData.HostName#</td>
+					<td style="line-height:16px;color:##333;font-size:12px;padding: 3px 3px 3px 9px;border-bottom:1px dotted silver;">#qryData.Message#</td>
+					<td align="right" style="line-height:16px;color:##333;font-size:12px;padding: 3px 3px 3px 9px;border-bottom:1px dotted silver;">#qryData.bugCount#</td>
+					<td align="center" style="line-height:16px;color:##333;font-size:12px;padding: 3px 3px 3px 9px;border-bottom:1px dotted silver;"><a href="#tmpURL#">#dateFormat(qryData.createdOn,dateMask)# #lsTimeFormat(qryData.createdOn)#</a></td>
+				</tr>
+			</cfloop>
+			<cfif qryData.recordCount eq 0>
+				<tr><td colspan="6" style="line-height:16px;color:##333;font-size:12px;padding: 3px 3px 3px 9px;border-bottom:1px dotted silver;"><em>No bug reports received! Yay!</em></td></tr>
+			</cfif>
+		</table>
+		<br />
+		<p style="font-family: arial,sans-serif;color:##666;font-size:11px;">
+			** This email has been sent from the BugLogHQ server at 
+			<a href="#thisHost#/bugLog/hq">#thisHost#/bugLog/hq</a>
+		</p>
+	</div>
 </cfoutput>
 </cfsavecontent>		
 
