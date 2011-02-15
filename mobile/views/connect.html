@@ -1,0 +1,73 @@
+<html>
+	<head>
+		<title>BugLogMini: Connect</title>
+		<link href="../style.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript">
+			function initPage() {
+				serverInfo = parent.doGetServerInfo();
+				
+				document.getElementById("server").value = serverInfo.server;
+				document.getElementById("username").value = serverInfo.username;
+				document.getElementById("password").value = serverInfo.password;
+				document.getElementById("rememberMe").checked = serverInfo.rememberMe;
+			}
+			
+			function doConnect(frm) {
+				var srv = document.getElementById("server");
+				var usr = document.getElementById("username");
+				var pwd = document.getElementById("password");
+				var rem = document.getElementById("rememberMe");
+				parent.doConnect(srv.value,usr.value,pwd.value,rem.checked);
+			}
+			function displayLoading() {
+				var div = document.getElementById("contentArea");
+				var tmpHTML = "<div style='text-align:center;margin-top:100px;'>";
+					tmpHTML += "<img src='../images/ajax-loader.gif'><br />";
+					tmpHTML += "Loading Data...";
+					tmpHTML += "</div>";
+				div.innerHTML = tmpHTML;				
+			}
+		</script>		
+	</head>
+	<body onload="initPage()">
+		<div id="contentArea">
+			<form name="frm" method="post" action="#" class="dataForm" id="frmConnect">
+				<table align="center">
+					<tr>
+						<td colspan="2" style="font-weight:bold;font-size:14px;padding-top:30px;padding-bottom:30px;">
+							Connect to a BugLog server:
+						</td>
+					</tr>
+					<tr>
+						<td>Server:</td>
+						<td>
+							<span style="font-size:9px;">http://</span>
+							<input type="text" name="server" id="server" value="" class="formField" style="width:165px;" />
+						</td>
+					</tr>
+					<tr>
+						<td>User:</td>
+						<td><input type="text" name="username" id="username" value="" class="formField" /></td>
+					</tr>
+					<tr>
+						<td>Password:</td>
+						<td><input type="password" name="password" id="password" value="" class="formField" /></td>
+					</tr>
+					<tr><td colspan="2" align="right">&nbsp;</td></tr>
+					<tr>
+						<td colspan="2">
+							<div style="float:right;">
+								<input type="button" value="Connect" name="btnConnect" onclick="doConnect(this.form);displayLoading()"/>
+							</div>
+							<input type="checkbox" name="rememberMe" id="rememberMe" value="1"> Remember me
+						</td>
+					</tr>
+				</table>
+			</form>
+			<div class="copyright">
+				<span style="color:red;font-weight:bold;">BugLog</span><strong>Mini</strong> 0.3 (mobile)<br>
+				<a href="http://www.bugloghq.com/">www.bugLogHQ.com</a>
+			</div>
+		</div>
+	</body>
+</html>

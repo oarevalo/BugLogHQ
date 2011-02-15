@@ -1,0 +1,151 @@
+<html>
+	<head>
+		<title>BugLogMini: Main</title>
+		<link href="../style.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript">
+			function initPage() {
+				displayLoading();
+				parent.doGetSummary();
+			}
+
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}			
+			
+			function displayError(e) {
+				var div = document.getElementById("contentArea");
+				div.innerHTML = "<div class='entryError'>An error ocurred while retrieving the bugLog data from the server:<br><br>" + e + "</div>";
+			}
+			function displayLoading() {
+				var div = document.getElementById("contentArea");
+				var tmpHTML = "<div style='text-align:center;margin-top:100px;'>";
+					tmpHTML += "<img src='../images/ajax-loader.gif'><br />";
+					tmpHTML += "Loading Data...";
+					tmpHTML += "</div>";
+				div.innerHTML = tmpHTML;				
+			}
+			function displaySummary(data) {
+				var div = document.getElementById("contentArea");
+				div.innerHTML = "";
+				
+				if(data.length > 0) {
+					for(var i=0;i < data.length;i++) {
+						div.innerHTML = div.innerHTML + createSummaryCapsuleHTML(data[i]);
+					}
+	
+					for(var i=0;i<200000;i++) {
+						//sleep
+					}
+						
+					for (var i = 0; i < data.length; i++) {
+						document.getElementById("summaryCapsule_" + data[i].EntryID).addEventListener("click", viewListing, false);
+					}
+	
+					for(var i=0;i < data.length;i++) {
+						var divID = "summaryCapsule_"+data[i].EntryID;
+						document.getElementById(divID).addEventListener("click", viewListing, false);
+					}
+				} else {
+					div.innerHTML = "<br /><p align='center' style='font-size:16px;'>No bug reports received on the last 7 days. Yay!</a>"
+				}
+				
+				// set the timer
+				parent.doSetListingRefreshTimer();
+			}
+			function displayListing(data) {
+				var div = document.getElementById("contentArea");
+				div.innerHTML = "";
+				
+				if(data.length > 0) {
+					var tmpHTML = "<div class='entryListingHeader'>"
+						tmpHTML += "<div class='entryCapsuleApplication'>" + data[0].ApplicationCode + "</div>";
+						tmpHTML += "<div class='entryCapsuleMessage'>" + data[0].Message + "</div>";
+						tmpHTML += "</div>"
+					div.innerHTML = div.innerHTML + tmpHTML;
+
+					for(var i=0;i < data.length;i++) {
+						div.innerHTML = div.innerHTML + createListingCapsuleHTML(data[i]);
+					}
+
+					for (var i = 0; i < data.length; i++) {
+						var divID = "entryCapsule_"+data[i].EntryID;
+						document.getElementById(divID).addEventListener("click", viewEntry, false);
+					}
+					
+				}
+
+				document.getElementById("goBackHandle").style.display = "block";
+				document.getElementById("goBackHandle").addEventListener("click", doGoBack, false);
+			}
+			function displayEntry(data) {
+				var div = document.getElementById("contentArea");
+				
+				var tmpHTML = "<table class='entryDetailTable'>";
+					tmpHTML += "<tr><td colspan='2' class='entryDetailTitle'>" 
+					tmpHTML += "<img src='../images/severity/" + data.SeverityCode.trim().toLowerCase()  + ".png' align='absmiddle' style='float:left;margin-right:3px;margin-top:5px;'>"
+					tmpHTML += data.Message + "</td></tr>";
+					tmpHTML += "<tr><th>Application:</th><td>" + data.ApplicationCode+ "</td></tr>";
+					tmpHTML += "<tr><th>Host:</th><td>" + data.HostName+ "</td></tr>";
+					tmpHTML += "<tr><th>Date/Time:</th><td>" + data.createdOn + "</td></tr>";
+					tmpHTML += "<tr><th>Severity:</th><td>" + data.SeverityCode + "</td></tr>";
+					tmpHTML += "<tr><th>Exception Message:</th><td>" + data.ExceptionMessage + "&nbsp;</td></tr>";
+					tmpHTML += "<tr><th>Exception Details:</th><td>" + data.ExceptionDetails + "&nbsp;</td></tr>";
+					tmpHTML += "<tr><th>CFID:</th><td>" + data.BugCFID + "</td></tr>";
+					tmpHTML += "<tr><th>CFTOKEN:</th><td>" + data.BugCFTOKEN + "</td></tr>";
+					tmpHTML += "<tr><th>User Agent:</th><td>" + data.UserAgent + "</td></tr>";
+					tmpHTML += "<tr><th>Template Path:</th><td>" + data.TemplatePath + "</td></tr>";
+					tmpHTML += "</table>";
+				
+				div.innerHTML = tmpHTML;
+				document.getElementById("goBackHandle").style.display = "block";
+				document.getElementById("goBackHandle").addEventListener("click", doGoBack, false);
+			}
+
+
+			function viewListing(e) {
+				var entryID = this.getAttribute("entryID");
+				var applicationID = this.getAttribute("ApplicationID");
+				displayLoading();
+				parent.doGetListing(applicationID,entryID);
+			}
+			function viewEntry(e) {
+				var entryID = this.getAttribute("entryID");
+				displayLoading();
+				parent.doGetEntry(entryID);
+			}
+			function doGoBack() {
+				parent.setView("main");
+			}
+
+
+
+			function createSummaryCapsuleHTML(entry) {
+				var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "' applicationID='" + entry.ApplicationID + "' id='summaryCapsule_" + entry.EntryID + "'>";
+					tmpHTML += "<div class='entryCapsuleBugCount'>"
+					tmpHTML += "<img src='../images/severity/" + entry.SeverityCode.toLowerCase() + ".png'><br>"
+					tmpHTML += entry.bugCount 
+					tmpHTML += "</div>";
+					tmpHTML += "<div class='entryCapsuleApplication'>" + entry.ApplicationCode + "</div>";
+					tmpHTML += "<div class='entryCapsuleMessage' id='entryMessage_" + entry.EntryID + "'>" + entry.Message + "</div>";
+					tmpHTML += "<div class='entryCapsuleDate'>Last: " + entry.createdOn + "</div>";
+					tmpHTML += "</div>";
+				return tmpHTML;				
+			}
+			function createListingCapsuleHTML(entry) {
+				var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "' id='entryCapsule_" + entry.EntryID + "'>";
+					tmpHTML += "<div class='entryCapsuleHost' style='float:right;'>" + entry.HostName + "</div>";
+					tmpHTML += "<div class='entryCapsuleDate'>";
+					tmpHTML += "<img src='../images/severity/" + entry.SeverityCode.toLowerCase() + ".png' align='absmiddle'>&nbsp;"
+					tmpHTML += entry.createdOn + "</div>"
+					tmpHTML += "</div>";
+				return tmpHTML;				
+			}
+		</script>
+	</head>
+	<body onload="initPage()">
+		<div class='goBack' id='goBackHandle' style="display:none;">&laquo; Back</div>
+		<div id="contentArea">
+		</div>
+	</body>
+</html>
+		
