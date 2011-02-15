@@ -90,7 +90,7 @@
 				<td>
 					<select name="project" class="formField" style="padding:2px;">
 						<cfloop array="#projects#" index="project">
-							<option value="#project.projectID#">#project.name# (#project.projectkey#)</option>
+							<option value="#project.getID()#">#project.getName()# (#project.getKey()#)</option>
 						</cfloop>
 					</select>
 				</td>
@@ -100,7 +100,7 @@
 				<td>
 					<select name="issueType" class="formField" style="padding:2px;">
 						<cfloop array="#issueTypes#" index="issueType">
-							<option value="#issueType.issueTypeID#">#issueType.name#</option>
+							<option value="#issueType.getID()#">#issueType.getName()#</option>
 						</cfloop>
 					</select>
 				</td>
@@ -111,7 +111,11 @@
 			</tr>
 			<tr valign="top">
 				<td><b>Description:</b></td>
-				<td><textarea name="description" rows="25" style="width:90%;padding:2px;" class="formField">#description#</textarea></td>
+				<td>
+					<textarea name="description" rows="25" style="width:90%;padding:2px;" class="formField">#description#</textarea>
+					<br />
+					<a href="http://jira.atlassian.com/secure/WikiRendererHelpAction.jspa?section=all">Click Here to view the JIRA wiki syntax guide</a>
+				</td>
 			</tr>
 		</table>
 		<input type="submit" value="Send" name="btnSubmit">

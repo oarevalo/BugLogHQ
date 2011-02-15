@@ -10,7 +10,7 @@
 	<!--- Framework settings --->
 	<cfset this.appFrameworkVersion = "1.3">
 	<cfset this.defaultEvent = "ehGeneral.dspMain">
-	<cfset this.defaultLayout = "layout.Main">
+	<cfset this.defaultLayout = "Layout.Main">
 	<cfset this.topLevelErrorRecipient = "">
 	<cfset this.topLevelErrorSender = "">
 	<cfset this.restartKey = "cookieMonster">

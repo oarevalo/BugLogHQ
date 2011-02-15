@@ -55,7 +55,12 @@
 	</cffunction>
 
 	<cffunction name="getAuthToken" access="private" returntype="string">
-		<cfset variables.instance.jiraws = createObject("webservice",variables.instance.wsdl)>
+		<cfif left(variables.instance.wsdl,4) eq "http">
+			<cfset variables.instance.jiraws = createObject("webservice",variables.instance.wsdl)>
+		<cfelse>
+			<!--- if wsdl is not a URL, then we will assume its a CFC proxy for the JIRA SOAP interface --->
+			<cfset variables.instance.jiraws = createObject("component",variables.instance.wsdl)>
+		</cfif>
 		<cfreturn variables.instance.jiraws.login(variables.instance.username, variables.instance.password)>
 	</cffunction>
 
