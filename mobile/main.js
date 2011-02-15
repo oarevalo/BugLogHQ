@@ -10,7 +10,11 @@ var serverInfo = {
 	password: "",
 	server: "",
 	token: "",
-	rememberMe: false
+	rememberMe: false,
+	numDays: 1,
+	applicationID: 0,
+	hostID: 0,
+	severities: ""
 };
 
 var listingRefreshTimer = 0;
@@ -19,10 +23,10 @@ function initApp() {
 	
 	// attach actions
 	document.getElementById("app_main").addEventListener("click", doRefresh, false);
-	document.getElementById("app_refresh").addEventListener("click", doRefresh, false);
-	document.getElementById("app_refresh_text").addEventListener("click", doRefresh, false);
 	document.getElementById("app_logoff").addEventListener("click", doLogOff, false);
 	document.getElementById("app_logoff_text").addEventListener("click", doLogOff, false);
+	document.getElementById("app_config").addEventListener("click", doConfig, false);
+	document.getElementById("app_config_text").addEventListener("click", doConfig, false);
 
 	// load any stored login credentials
 	loadServerInfo();
@@ -63,6 +67,15 @@ function doLogOff() {
 	serverInfo.token = "";
 	clearInterval(listingRefreshTimer);
 	setView("connect");
+}
+
+function doConfig() {
+	if(serverInfo.token!="") {
+		clearInterval(listingRefreshTimer);
+		setView("config");
+	}
+	else
+		setView("connect");
 }
 
 function doConnect(srv,usr,pwd,rem) {
@@ -121,11 +134,13 @@ function doGetSummary() {
 
 	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
 		url += "?action=getSummary";
-		url += "&numDays="+numDays;
+		url += "&numDays="+serverInfo.numDays;
+		url += "&applicationID="+serverInfo.applicationID;
+		url += "&hostID="+serverInfo.hostID;
 		url += "&token="+serverInfo.token;
 
 	clearInterval(listingRefreshTimer);
-	document.getElementById("app_refresh_text").innerHTML = "Loading...";
+	document.getElementById("app_loading_text").innerHTML = "Loading...";
 
 	xmlhttp = new XMLHttpRequest();
 	xmlhttp.open("POST", url, true);
@@ -133,7 +148,7 @@ function doGetSummary() {
 		if (xmlhttp.readyState == 4) {
 			if (xmlhttp.status == 200) {
 
-				document.getElementById("app_refresh_text").innerHTML = "Refresh";
+				document.getElementById("app_loading_text").innerHTML = "";
 
 				// check for errors				
 				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
@@ -186,7 +201,7 @@ function doGetListing(appID,entryID) {
 		url += "&numDays="+numDays;
 
 	clearInterval(listingRefreshTimer);
-	document.getElementById("app_refresh_text").innerHTML = "Loading...";
+	document.getElementById("app_loading_text").innerHTML = "Loading...";
 
 	xmlhttp = new XMLHttpRequest();
 	xmlhttp.open("POST", url, true);
@@ -194,7 +209,7 @@ function doGetListing(appID,entryID) {
 		if (xmlhttp.readyState == 4) {
 			if (xmlhttp.status == 200) {
 
-				document.getElementById("app_refresh_text").innerHTML = "Refresh";
+				document.getElementById("app_loading_text").innerHTML = "";
 
 				// check for errors				
 				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
@@ -247,7 +262,7 @@ function doGetEntry(entryID) {
 		url += "&token="+serverInfo.token;
 
 	clearInterval(listingRefreshTimer);
-	document.getElementById("app_refresh_text").innerHTML = "Loading...";
+	document.getElementById("app_loading_text").innerHTML = "Loading...";
 
 	xmlhttp = new XMLHttpRequest();
 	xmlhttp.open("POST", url, true);
@@ -255,7 +270,7 @@ function doGetEntry(entryID) {
 		if (xmlhttp.readyState == 4) {
 			if (xmlhttp.status == 200) {
 
-				document.getElementById("app_refresh_text").innerHTML = "Refresh";
+				document.getElementById("app_loading_text").innerHTML = "";
 
 				// check for errors				
 				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
@@ -302,7 +317,114 @@ function doGetEntry(entryID) {
 	xmlhttp.send(null); 
 
 }
-
+
+function doPopulateApplications() {
+	var aItems = new Array();
+
+	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
+		url += "?action=getApplications";
+		url += "&token="+serverInfo.token;
+
+	clearInterval(listingRefreshTimer);
+	document.getElementById("app_loading_text").innerHTML = "Loading...";
+
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.open("POST", url, true);
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4) {
+			if (xmlhttp.status == 200) {
+
+				document.getElementById("app_loading_text").innerHTML = "";
+
+				// check for errors				
+				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
+				if(errorNode[0].firstChild.nodeValue == "true") {
+					var errorMsgNode = xmlhttp.responseXML.getElementsByTagName("errorMessage");
+					alert(errorMsgNode[0].firstChild.nodeValue);
+					return;
+				}
+
+				// create an array with the returned entries	
+				try {			
+					var dataNodes = xmlhttp.responseXML.getElementsByTagName("item");
+					for(var i=0; i < dataNodes.length;i++) {
+						var item = {};					
+						item.appID = getElementTextNS("", "appID", dataNodes[i], 0);
+						item.appCode = getElementTextNS("", "appCode", dataNodes[i], 0);
+						aItems[i] = item;
+					}				
+					document.getElementById('UI').contentWindow.doPopulateApplications(aItems);
+
+				} catch(e) {
+					document.getElementById('UI').contentWindow.displayError(e);
+				}
+				
+	
+			} else {
+				alert("There was a problem connecting to the BugLog server:\n" + xmlhttp.statusText);
+			}			
+		}
+	};
+	xmlhttp.send(null); 
+}
+
+function doPopulateHosts() {
+	var aItems = new Array();
+
+	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
+		url += "?action=getHosts";
+		url += "&token="+serverInfo.token;
+
+	clearInterval(listingRefreshTimer);
+	document.getElementById("app_loading_text").innerHTML = "Loading...";
+
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.open("POST", url, true);
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4) {
+			if (xmlhttp.status == 200) {
+
+				document.getElementById("app_loading_text").innerHTML = "";
+
+				// check for errors				
+				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
+				if(errorNode[0].firstChild.nodeValue == "true") {
+					var errorMsgNode = xmlhttp.responseXML.getElementsByTagName("errorMessage");
+					alert(errorMsgNode[0].firstChild.nodeValue);
+					return;
+				}
+
+				// create an array with the returned entries	
+				try {			
+					var dataNodes = xmlhttp.responseXML.getElementsByTagName("item");
+					for(var i=0; i < dataNodes.length;i++) {
+						var item = {};					
+						item.hostID = getElementTextNS("", "hostID", dataNodes[i], 0)
+						item.hostName = getElementTextNS("", "hostName", dataNodes[i], 0)
+						aItems[i] = item;
+					}				
+					document.getElementById('UI').contentWindow.doPopulateHosts(aItems);
+
+				} catch(e) {
+					document.getElementById('UI').contentWindow.displayError(e);
+				}
+				
+	
+			} else {
+				alert("There was a problem connecting to the BugLog server:\n" + xmlhttp.statusText);
+			}			
+		}
+	};
+	xmlhttp.send(null); 
+}
+
+function doSaveSettings(numDays, applicationID, hostID) {
+    serverInfo.numDays = numDays;
+    serverInfo.applicationID = applicationID;
+    serverInfo.hostID = hostID;
+    storeServerInfo();
+    doRefresh();
+}
 function doSetListingRefreshTimer() {
 	listingRefreshTimer = setInterval(listingRefreshTimerHandler, 10000)
 }
@@ -314,20 +436,31 @@ function listingRefreshTimerHandler(event) {
 function loadServerInfo() {
     serverInfo.username = getCookie("username");
     serverInfo.password = getCookie("password");
-//    serverInfo.server = getCookie("server");
     serverInfo.rememberMe = getCookie("rememberMe");
+    serverInfo.numDays = getCookie("numDays");
+    serverInfo.applicationID = getCookie("applicationID");
+    serverInfo.hostID = getCookie("hostID");
+    serverInfo.severities = getCookie("severities");
 }
+
 function storeServerInfo() {
 	setCookie("username",serverInfo.username,30);
 	setCookie("password",serverInfo.password,30);
-//	setCookie("server",serverInfo.server,30);
 	setCookie("rememberMe",serverInfo.rememberMe,30);
+	setCookie("numDays",serverInfo.numDays,30);
+	setCookie("applicationID",serverInfo.applicationID,30);
+	setCookie("hostID",serverInfo.hostID,30);
+	setCookie("severities",serverInfo.severities,30);
 }
+
 function clearServerInfo() {
 	setCookie("username","");
 	setCookie("password","");
-//	setCookie("server","");
 	setCookie("rememberMe",false);
+	setCookie("numDays","");
+	setCookie("applicationID","");
+	setCookie("hostID","");
+	setCookie("severities","");
 }
 
 // retrieve text of an XML document element, including

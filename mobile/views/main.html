@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<title>BugLogMini: Main</title>
+		<meta name="viewport" content="height=device-height,width=device-width" />
 		<link href="../style.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript">
 			function initPage() {
@@ -46,7 +47,7 @@
 						document.getElementById(divID).addEventListener("click", viewListing, false);
 					}
 				} else {
-					div.innerHTML = "<br /><p align='center' style='font-size:16px;'>No bug reports received on the last 7 days. Yay!</a>"
+					div.innerHTML = "<br /><p align='center' style='font-size:16px;'>No bug reports found. Yay!</a>"
 				}
 				
 				// set the timer
@@ -82,7 +83,7 @@
 				
 				var tmpHTML = "<table class='entryDetailTable'>";
 					tmpHTML += "<tr><td colspan='2' class='entryDetailTitle'>" 
-					tmpHTML += "<img src='../images/severity/" + data.SeverityCode.trim().toLowerCase()  + ".png' align='absmiddle' style='float:left;margin-right:3px;margin-top:5px;'>"
+					tmpHTML += "<img src='/bugLog/hq/images/severity/" + data.SeverityCode.trim().toLowerCase()  + ".png' align='absmiddle' style='float:left;margin-right:3px;margin-top:5px;'>"
 					tmpHTML += data.Message + "</td></tr>";
 					tmpHTML += "<tr><th>Application:</th><td>" + data.ApplicationCode+ "</td></tr>";
 					tmpHTML += "<tr><th>Host:</th><td>" + data.HostName+ "</td></tr>";
@@ -122,7 +123,7 @@
 			function createSummaryCapsuleHTML(entry) {
 				var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "' applicationID='" + entry.ApplicationID + "' id='summaryCapsule_" + entry.EntryID + "'>";
 					tmpHTML += "<div class='entryCapsuleBugCount'>"
-					tmpHTML += "<img src='../images/severity/" + entry.SeverityCode.toLowerCase() + ".png'><br>"
+					tmpHTML += "<img src='/bugLog/hq/images/severity/" + entry.SeverityCode.toLowerCase() + ".png'><br>"
 					tmpHTML += entry.bugCount 
 					tmpHTML += "</div>";
 					tmpHTML += "<div class='entryCapsuleApplication'>" + entry.ApplicationCode + "</div>";
@@ -135,7 +136,7 @@
 				var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "' id='entryCapsule_" + entry.EntryID + "'>";
 					tmpHTML += "<div class='entryCapsuleHost' style='float:right;'>" + entry.HostName + "</div>";
 					tmpHTML += "<div class='entryCapsuleDate'>";
-					tmpHTML += "<img src='../images/severity/" + entry.SeverityCode.toLowerCase() + ".png' align='absmiddle'>&nbsp;"
+					tmpHTML += "<img src=''/bugLog/hq/images/severity/" + entry.SeverityCode.toLowerCase() + ".png' align='absmiddle'>&nbsp;"
 					tmpHTML += entry.createdOn + "</div>"
 					tmpHTML += "</div>";
 				return tmpHTML;				

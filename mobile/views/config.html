@@ -1,0 +1,97 @@
+<html>
+	<head>
+		<title>BugLogMini: Main</title>
+		<link href="../style.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript">
+			function initPage() {
+				parent.doPopulateApplications();
+				parent.doPopulateHosts();
+				document.getElementById("numDays").value = parent.serverInfo.numDays;
+			}
+			function doPopulateApplications(items) {
+				var obj = document.getElementById("applicationID");
+				for(var i=0;i < items.length;i++) {
+					var optn = document.createElement("option");
+					optn.text = items[i].appCode;
+					optn.value = items[i].appID;
+					optn.selected = (parent.serverInfo.applicationID==items[i].appID);
+					obj.options.add(optn);
+				}
+				obj.disabled = false;
+			}
+			function doPopulateHosts(items) {
+				var obj = document.getElementById("hostID");
+				for(var i=0;i < items.length;i++) {
+					var optn = document.createElement("option");
+					optn.text = items[i].hostName;
+					optn.value = items[i].hostID;
+					optn.selected = (parent.serverInfo.hostID==items[i].hostID);
+					obj.appendChild(optn);
+				}
+				obj.disabled = false;
+			}
+			function doSaveSettings() {
+				var numDays = document.getElementById("numDays");
+				var applicationID = document.getElementById("applicationID");
+				var hostID = document.getElementById("hostID");
+				//var rem = document.getElementById("rememberMe");
+				parent.doSaveSettings(numDays.value, applicationID.value, hostID.value);
+			}
+			function displayError(e) {
+				var div = document.getElementById("contentArea");
+				div.innerHTML = "<div class='entryError'>An error ocurred while retrieving the bugLog data from the server:<br><br>" + e + "</div>";
+			}
+			function displayLoading() {
+				var div = document.getElementById("contentArea");
+				var tmpHTML = "<div style='text-align:center;margin-top:100px;'>";
+					tmpHTML += "<img src='../images/ajax-loader.gif'><br />";
+					tmpHTML += "Loading Data...";
+					tmpHTML += "</div>";
+				div.innerHTML = tmpHTML;				
+			}
+		</script>
+	</head>
+	<body onload="initPage()">
+		<div id="contentArea">
+			<form name="frmConfig" method="post" action="#">
+				<br />
+				<table>
+					<tr>
+						<td>Number of days:</td>
+						<td>
+							<select name="numDays" id="numDays" class="formField">
+								<option value="1">1</option>
+								<option value="3">3</option>
+								<option value="4">7</option>
+								<option value="14">14</option>
+								<option value="30">30</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>Application:</td>
+						<td>
+							<select name="applicationID" id="applicationID" class="formField" disabled="true">
+								<option value="0">All</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>Host:</td>
+						<td>
+							<select name="hostID" id="hostID" class="formField" disabled="true">
+								<option value="0">All</option>
+							</select>
+						</td>
+					</tr>
+				</table>
+				<br />
+				<br />
+				<p align="center">
+					<input type="button" name="btnSave" value="Apply Changes" onclick="doSaveSettings(this.form);displayLoading()" />
+				</p>
+			</form>
+		</div>
+	</body>
+</html>
+		

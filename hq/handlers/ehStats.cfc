@@ -3,10 +3,20 @@
 	<cffunction name="dspMain">
 		<cftry>
 			<cfscript>
+				criteria = structNew();
+				if(structKeyExists(cookie,"criteria") and isJSON(cookie.criteria)) {
+					criteria = deserializeJSON(cookie.criteria);
+				}
+				
+				// make sure we have a complete criteria struct w/ default values
+				if(not isStruct(criteria)) criteria = structNew();
+				if(not structKeyExists(criteria,"numdays")) criteria.numDays = 30;
+				if(not structKeyExists(criteria,"applicationID")) criteria.applicationID = 0;
+
 				maxRows = getValue("maxRows", 3);
-				numDays = getValue("numDays", 30);
+				numDays = getValue("numDays", criteria.numDays);
 				datePart = getValue("datePart", "d");
-				applicationID = getValue("applicationID", 0);
+				applicationID = getValue("applicationID", criteria.applicationID);
 				
 				startDate = dateAdd("d", val(numDays) * -1, now());
 				datePartName = replaceList(datePart,  "y,m,d,h,n", "year,month,day,hour,minute");

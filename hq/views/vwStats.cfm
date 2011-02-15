@@ -25,13 +25,18 @@
 
 <cfset tmpAppName = "All">
 
+<cfquery name="qryApplications" dbtype="query">
+	SELECT *, upper(code) as u_code
+		FROM qryApplications
+		ORDER BY u_code
+</cfquery>
 
 <h2 style="margin-bottom:3px;">BugLog Stats</h2>
 <cfinclude template="../includes/menu.cfm">
 <br>
 
 <cfoutput>
-	<form name="frmSearch" action="index.cfm" method="post">
+	<form name="frmSearch" action="index.cfm" method="get">
 		<input type="hidden" name="event" value="ehStats.dspMain">
 		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 			<tr align="center">
@@ -87,10 +92,10 @@
 <br>	
 
 <p align="center">
-	<cfchart chartwidth="290" title="Top #maxRows# Applications" show3d="yes" xaxistitle="Application" url="index.cfm?event=ehGeneral.dspMain&applicationID=$ITEMLABEL$">
+	<cfchart chartwidth="290" title="Top #maxRows# Applications" show3d="yes" xaxistitle="Application">
 		<cfchartseries query="qryAppSummary" type="bar" itemcolumn="applicationCode" valuecolumn="numcount" >
 	</cfchart>
-	<cfchart chartwidth="290" title="Top #maxRows# HostNames" show3d="yes" xaxistitle="Host" url="index.cfm?event=ehGeneral.dspMain&hostID=$ITEMLABEL$">
+	<cfchart chartwidth="290" title="Top #maxRows# HostNames" show3d="yes" xaxistitle="Host">
 		<cfchartseries query="qryHostSummary" type="bar" itemcolumn="hostname" valuecolumn="numcount" paintstyle="raise">
 	</cfchart>
 	<cfchart chartwidth="290" title="Top #maxRows# Messages" show3d="yes" xaxistitle="Message" url="index.cfm?event=ehGeneral.dspMain&searchTerm=$ITEMLABEL$">
@@ -99,7 +104,7 @@
 	<br>
 
 	<cfchart chartwidth="700" markersize="5" xaxistitle="#datePartName#"  yaxistitle="Bug count" title="Timeline [#tmpAppName#]">
-		<cfchartseries query="qryTimeline" type="bar" markerstyle="snow" itemcolumn="DatePartValue" valuecolumn="numcount" paintstyle="raise">
+		<cfchartseries query="qryTimeline" type="area" markerstyle="snow" itemcolumn="DatePartValue" valuecolumn="numcount" paintstyle="raise">
 	</cfchart>
 </p>
 

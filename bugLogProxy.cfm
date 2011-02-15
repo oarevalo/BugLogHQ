@@ -28,10 +28,11 @@
 			</cfif>		
 		</cfcase>
 	
-	
 		<cfcase value="getSummary">
 			<cfparam name="numDays" default="1">
 			<cfparam name="token" default="">
+			<cfparam name="applicationID" default="0">
+			<cfparam name="hostID" default="0">
 			
 			<!--- validate token --->
 			<cfif not validateToken(token)>
@@ -39,7 +40,10 @@
 			</cfif>
 			
 			<!--- get listing --->
-			<cfset qryEntries = oAppService.searchEntries(searchTerm = "",startDate = dateAdd("d",now(),-1 * numDays))>
+			<cfset qryEntries = oAppService.searchEntries(searchTerm = "",
+															startDate = dateAdd("d",now(),-1 * val(numDays)), 
+															applicationID=val(applicationID),
+															hostID=val(hostID))>
 			<cfquery name="qryEntries" dbtype="query">
 				SELECT ApplicationCode, ApplicationID,  
 						Message, COUNT(*) AS bugCount, MAX(createdOn) as createdOn, MAX(entryID) AS EntryID, MAX(severityCode) AS SeverityCode
@@ -70,6 +74,8 @@
 			<cfparam name="hostID" default="0">
 			<cfparam name="msgFromEntryID" default="">
 			<cfparam name="searchTerm" default="">
+			<cfparam name="startRow" default="1">
+			<cfparam name="rowsPerPage" default="50">
 			
 			<!--- validate token --->
 			<cfif not validateToken(token)>
@@ -95,7 +101,7 @@
 			</cfquery>
 			
 			<cfsavecontent variable="results">
-				<cfoutput query="qryEntries">
+				<cfoutput query="qryEntries" maxrows="#rowsPerPage#" startrow="#startRow#">
 					<entry>
 						<ApplicationCode>#xmlFormat(qryEntries.ApplicationCode)#</ApplicationCode>
 						<ApplicationID>#ApplicationID#</ApplicationID>
@@ -143,6 +149,73 @@
 				</cfoutput>
 			</cfsavecontent>
 		</cfcase>	
+	
+		<cfcase value="getApplications">
+			<!--- validate token --->
+			<cfif not validateToken(token)>
+				<cfthrow message="Invalid token. Please login first" type="invalidToken">
+			</cfif>
+
+			<cfset qryData = oAppService.getApplications()>
+
+			<cfquery name="qryData" dbtype="query">
+				SELECT *, upper(code) as u_code
+					FROM qryData
+					ORDER BY u_code
+			</cfquery>
+
+			<cfsavecontent variable="results">
+				<cfoutput query="qryData">
+					<item>
+						<appID>#ApplicationID#</appID>
+						<appCode>#xmlFormat(qryData.code)#</appCode>
+					</item>
+				</cfoutput>
+			</cfsavecontent>
+		</cfcase>
+
+		<cfcase value="getHosts">
+			<!--- validate token --->
+			<cfif not validateToken(token)>
+				<cfthrow message="Invalid token. Please login first" type="invalidToken">
+			</cfif>
+
+			<cfset qryData = oAppService.getHosts()>
+
+			<cfquery name="qryData" dbtype="query">
+				SELECT *, upper(HostName) as u_host
+					FROM qryData
+					ORDER BY u_host
+			</cfquery>
+
+			<cfsavecontent variable="results">
+				<cfoutput query="qryData">
+					<item>
+						<hostID>#xmlFormat(qryData.HostID)#</hostID>
+						<hostName>#HostName#</hostName>
+					</item>
+				</cfoutput>
+			</cfsavecontent>
+		</cfcase>
+
+		<cfcase value="getSeverities">
+			<!--- validate token --->
+			<cfif not validateToken(token)>
+				<cfthrow message="Invalid token. Please login first" type="invalidToken">
+			</cfif>
+
+			<cfset qryData = oAppService.getSeverities()>
+
+			<cfsavecontent variable="results">
+				<cfoutput query="qryData">
+					<item>
+						<SeverityID>#xmlFormat(qryData.SeverityID)#</SeverityID>
+						<code>#code#</code>
+						<name>#name#</name>
+					</item>
+				</cfoutput>
+			</cfsavecontent>
+		</cfcase>
 	
 		<cfdefaultcase>
 			<cfset error = true>
