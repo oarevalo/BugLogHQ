@@ -9,13 +9,13 @@
 				if(val(entryID) eq 0) throw("Please select an entry to view");		
 				
 				oEntry = getService("app").getEntry(entryID);
-				qryProjects = oJIRA.getProjects();
-				qryIssueTypes = oJIRA.getIssueTypes();
+				projects = oJIRA.getProjects();
+				issueTypes = oJIRA.getIssueTypes();
 				
 				// set values
 				setValue("oEntry", oEntry);
-				setValue("qryProjects", qryProjects);
-				setValue("qryIssueTypes", qryIssueTypes);
+				setValue("projects", projects);
+				setValue("issueTypes", issueTypes);
 				setView("vwSendToJira");
 
 			} catch(any e) {

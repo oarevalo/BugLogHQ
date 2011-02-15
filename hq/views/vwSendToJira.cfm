@@ -1,12 +1,12 @@
 <cfparam name="request.requestState.entryID">
 <cfparam name="request.requestState.oEntry">
-<cfparam name="request.requestState.qryProjects">
-<cfparam name="request.requestState.qryIssueTypes">
+<cfparam name="request.requestState.projects">
+<cfparam name="request.requestState.issueTypes">
 
 <cfset entryID = request.requestState.entryID>
 <cfset oEntry = request.requestState.oEntry>
-<cfset qryProjects = request.requestState.qryProjects>
-<cfset qryIssueTypes = request.requestState.qryIssueTypes>
+<cfset projects = request.requestState.projects>
+<cfset issueTypes = request.requestState.issueTypes>
 
 <cfset oApp = oEntry.getApplication()>
 <cfset oHost = oEntry.getHost()>
@@ -89,8 +89,8 @@
 				<td style="width:100px;"><b>Project:</b></td>
 				<td>
 					<select name="project" class="formField" style="padding:2px;">
-						<cfloop query="qryProjects">
-							<option value="#qryProjects.projectID#">#qryProjects.name# (#qryProjects.projectkey#)</option>
+						<cfloop array="#projects#" index="project">
+							<option value="#project.projectID#">#project.name# (#project.projectkey#)</option>
 						</cfloop>
 					</select>
 				</td>
@@ -99,8 +99,8 @@
 				<td style="width:100px;"><b>Issue Type:</b></td>
 				<td>
 					<select name="issueType" class="formField" style="padding:2px;">
-						<cfloop query="qryIssueTypes">
-							<option value="#qryIssueTypes.issueTypeID#">#qryIssueTypes.name#</option>
+						<cfloop array="#issueTypes#" index="issueType">
+							<option value="#issueType.issueTypeID#">#issueType.name#</option>
 						</cfloop>
 					</select>
 				</td>
