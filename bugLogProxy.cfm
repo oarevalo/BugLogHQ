@@ -64,7 +64,7 @@
 		</cfcase>
 	
 		<cfcase value="getListing">
-			<cfparam name="numDays" default="-1">
+			<cfparam name="numDays" default="1">
 			<cfparam name="token" default="">
 			<cfparam name="applicationID" default="0">
 			<cfparam name="hostID" default="0">
@@ -85,7 +85,7 @@
 				}				
 			</cfscript>
 			<cfset qryEntries = oAppService.searchEntries(searchTerm = searchTerm,
-															startDate = dateAdd("d",now(),-1),
+															startDate = dateAdd("d",numDays*-1,now()),
 															applicationID=applicationID,
 															hostID=hostID)>
 			<cfquery name="qryEntries" dbtype="query">

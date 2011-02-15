@@ -1,7 +1,9 @@
 var bugLogDefaultPath = ""
+var bugLogMiniPath = "/bugLog/iphone/"
 var bugLogHQPath = "/bugLog/hq/"
 var bugLogProxyPath = "/bugLog/bugLogProxy.cfm"
 var bugLogProtocol = "http"
+var numDays = 7;
 
 var serverInfo = {
 	username: "",
@@ -16,6 +18,7 @@ var listingRefreshTimer = 0;
 function initApp() {
 	
 	// attach actions
+	document.getElementById("app_main").addEventListener("click", doRefresh, false);
 	document.getElementById("app_refresh").addEventListener("click", doRefresh, false);
 	document.getElementById("app_refresh_text").addEventListener("click", doRefresh, false);
 	document.getElementById("app_logoff").addEventListener("click", doLogOff, false);
@@ -33,14 +36,8 @@ function initApp() {
 }
 
 function setView(vw) {
-	document.getElementById('UI').contentWindow.location="/bugLog/iphone/views/" + vw + ".html";
+	document.getElementById('UI').contentWindow.location = bugLogMiniPath + "views/" + vw + ".html";
 } 
-
-function resizeUI(e) {
-	var newWindowHeight = e.afterBounds.height;
-	var ui = document.getElementById('UI');
-	ui.style.height = newWindowHeight-80;
-}
 
 function doRefresh() {
 	if(serverInfo.token!="") 
@@ -77,8 +74,6 @@ function doConnect(srv,usr,pwd,rem) {
 		url += "?action=checkLogin";
 		url += "&username="+usr;
 		url += "&password="+pwd;
-
-	setView("loading");
 
 	xmlhttp = new XMLHttpRequest();
 	xmlhttp.open("POST", url, true);
@@ -126,6 +121,7 @@ function doGetSummary() {
 
 	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
 		url += "?action=getSummary";
+		url += "&numDays="+numDays;
 		url += "&token="+serverInfo.token;
 
 	clearInterval(listingRefreshTimer);
@@ -187,6 +183,7 @@ function doGetListing(appID,entryID) {
 		url += "&applicationID="+appID;
 		url += "&msgFromEntryID="+entryID;
 		url += "&token="+serverInfo.token;
+		url += "&numDays="+numDays;
 
 	clearInterval(listingRefreshTimer);
 	document.getElementById("app_refresh_text").innerHTML = "Loading...";

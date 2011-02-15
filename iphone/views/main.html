@@ -46,7 +46,7 @@
 						document.getElementById(divID).addEventListener("click", viewListing, false);
 					}
 				} else {
-					div.innerHTML = "<br /><p align='center' style='font-size:16px;color:green;'>No bug reports received on the last 24 hours. Yay!</a>"
+					div.innerHTML = "<br /><p align='center' style='font-size:16px;'>No bug reports received on the last 7 days. Yay!</a>"
 				}
 				
 				// set the timer
@@ -82,7 +82,7 @@
 				
 				var tmpHTML = "<table class='entryDetailTable'>";
 					tmpHTML += "<tr><td colspan='2' class='entryDetailTitle'>" 
-					tmpHTML += "<img src='../images/severity/" + data.SeverityCode.trim().toLowerCase()  + ".png' align='absmiddle' style='float:left;margin-right:3px;' onclick='alert(this.src)'>"
+					tmpHTML += "<img src='../images/severity/" + data.SeverityCode.trim().toLowerCase()  + ".png' align='absmiddle' style='float:left;margin-right:3px;margin-top:5px;'>"
 					tmpHTML += data.Message + "</td></tr>";
 					tmpHTML += "<tr><th>Application:</th><td>" + data.ApplicationCode+ "</td></tr>";
 					tmpHTML += "<tr><th>Host:</th><td>" + data.HostName+ "</td></tr>";
@@ -143,7 +143,7 @@
 		</script>
 	</head>
 	<body onload="initPage()">
-		<div class='goBack' id='goBackHandle' style="display:none;">&laquo; Go Back</div>
+		<div class='goBack' id='goBackHandle' style="display:none;">&laquo; Back</div>
 		<div id="contentArea">
 		</div>
 	</body>

@@ -7,66 +7,44 @@ body {
 	width:100%;
 }
 
-#topControls {
-	background: url(images/baseBG_r1_c1.gif) no-repeat top left;	
-	height:30px;
+#header {
+	height:40px;
 }
-#topHeader {
-	background: url(images/baseBG_r1_c2.gif) no-repeat top right;	
-	height:30px;
-	margin-left:6px;
-	padding:5px;
-	padding-left:10px;
-	padding-top:8px;
-}
-#mainBody {
-	padding-top:0px;
-	padding-left:5px;
-	background: url(images/baseBG_r2_c1.gif) no-repeat bottom left;
-}
-#mainBodyInner {
-	background: url(images/baseBG_r2_c2.gif) no-repeat bottom right;
-}
-#bottomControls {
-	height:20px;
-	margin:6px;		
-}
-#bottomControls a:link,
-#bottomControls a:active,
-#bottomControls a:visited   {
+
+#header a:link,
+#header a:active,
+#header a:visited   {
 	text-decoration:none;
 	color:#333;
 	cursor:hand;
+	font-size:12px;
 }
-#bottomControls a:hover {
+#header a:hover {
 	text-decoration:underline;
 	color:#333;
 }
+#app_main img {
+	padding-top:8px;
+	padding-left:5px;
+}
+#topLinksRight {
+	float:right;
+	width:300px;
+	text-align:right;
+	margin-right:10px;
+	padding-top:5px;
+}
 
-.windowControls {
-	float:right;
-	margin-right:5px;
-	
-}
-.windowControls img {
-	cursor:hand;
-}
-#win_resize {
-	height:15px;
-	width:15px;
-	float:right;
-}
-#bottomLinksRight {
-	float:right;
-	margin-right:-7px;
-	width:80px;
+#mainBody {
+	padding-top:0px;
+	padding-left:5px;
 }
 
 #UI {
 	background-color:#fff;
 	width:99%;
-	height:400px;
-	border:1px solid #666;
+	height:80%;
+	border-top:1px solid #666;
 	padding:0px;
 	padding-bottom:-100px;
 }
@@ -107,8 +85,11 @@ body {
 	float:right;
 }
 .entryCapsuleDate {
-	font-size:10px;
+	font-size:12px;
 	color:#999;	
+}
+.entryCapsuleHost {
+	font-size:12px;
 }
 .entryError {
 	padding:5px;
@@ -119,14 +100,15 @@ body {
 	width:100%;
 }
 .entryDetailTable td {
-	font-size:10px;
+	font-size:11px;
 	border-bottom:1px solid silver;
 }
 .entryDetailTable th {
-	font-size:9px;
-	text-align:right;
+	font-size:12px;
+	text-align:left;
 	color:#999;
 	border-bottom:1px solid silver;
+	width:110px;
 }
 .entryDetailTitle {
 	font-weight:bold;
@@ -147,18 +129,21 @@ body {
 	margin:0 auto;
 	text-align:center;
 	font-size:10px;
-	margin-top:100px;
+	margin-top:50px;
 	width:150px;
 	line-height:15px;
 }
 .goBack {
-	line-height:16px;
-	font-size:14px;
+	line-height:18px;
+	font-size:16px;
 	font-weight:bold;
 	padding:3px;
 	background-color:#FFFFE0;
 	font-family: Arial, Helvetica, sans-serif;
 	cursor:pointer;
+	border-bottom:1px solid silver;
+	padding-top:10px;
+	height:30px;
 }
 .goBack a,
 .goBack a:link,
