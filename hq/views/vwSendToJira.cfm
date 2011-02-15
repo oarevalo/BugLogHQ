@@ -90,7 +90,7 @@
 				<td>
 					<select name="project" class="formField" style="padding:2px;">
 						<cfloop array="#projects#" index="project">
-							<option value="#project.getID()#">#project.getName()# (#project.getKey()#)</option>
+							<option value="#project.getKey()#">#project.getName()# (#project.getKey()#)</option>
 						</cfloop>
 					</select>
 				</td>
@@ -114,7 +114,7 @@
 				<td>
 					<textarea name="description" rows="25" style="width:90%;padding:2px;" class="formField">#description#</textarea>
 					<br />
-					<a href="http://jira.atlassian.com/secure/WikiRendererHelpAction.jspa?section=all">Click Here to view the JIRA wiki syntax guide</a>
+					<a href="http://jira.atlassian.com/secure/WikiRendererHelpAction.jspa?section=all" target="_blank">Click Here to view the JIRA wiki syntax guide</a>
 				</td>
 			</tr>
 		</table>
