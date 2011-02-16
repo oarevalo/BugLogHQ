@@ -33,17 +33,23 @@
 			<cfparam name="token" default="">
 			<cfparam name="applicationID" default="0">
 			<cfparam name="hostID" default="0">
+			<cfparam name="severities" default="">
 			
 			<!--- validate token --->
 			<cfif not validateToken(token)>
 				<cfthrow message="Invalid token. Please login first" type="invalidToken">
 			</cfif>
 			
+			<cfif severities eq "">
+				<cfset severities = "_ALL_">
+			</cfif>
+			
 			<!--- get listing --->
 			<cfset qryEntries = oAppService.searchEntries(searchTerm = "",
 															startDate = dateAdd("d",now(),-1 * val(numDays)), 
 															applicationID=val(applicationID),
-															hostID=val(hostID))>
+															hostID=val(hostID),
+															severityID=severities)>
 			<cfquery name="qryEntries" dbtype="query">
 				SELECT ApplicationCode, ApplicationID,  
 						Message, COUNT(*) AS bugCount, MAX(createdOn) as createdOn, MAX(entryID) AS EntryID, MAX(severityCode) AS SeverityCode
@@ -91,7 +97,7 @@
 				}				
 			</cfscript>
 			<cfset qryEntries = oAppService.searchEntries(searchTerm = searchTerm,
-															startDate = dateAdd("d",numDays*-1,now()),
+															startDate = dateAdd("d",now(),-1 * val(numDays)), 
 															applicationID=applicationID,
 															hostID=hostID)>
 			<cfquery name="qryEntries" dbtype="query">

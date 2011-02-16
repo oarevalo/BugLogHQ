@@ -137,6 +137,7 @@ function doGetSummary() {
 		url += "&numDays="+serverInfo.numDays;
 		url += "&applicationID="+serverInfo.applicationID;
 		url += "&hostID="+serverInfo.hostID;
+		url += "&severities="+serverInfo.severities;
 		url += "&token="+serverInfo.token;
 
 	clearInterval(listingRefreshTimer);
@@ -469,10 +470,11 @@ function doPopulateSeverities() {
 	xmlhttp.send(null); 
 }
 
-function doSaveSettings(numDays, applicationID, hostID) {
+function doSaveSettings(numDays, applicationID, hostID, severities) {
     serverInfo.numDays = numDays;
     serverInfo.applicationID = applicationID;
     serverInfo.hostID = hostID;
+    serverInfo.severities = severities;
     storeServerInfo();
     doRefresh();
 }

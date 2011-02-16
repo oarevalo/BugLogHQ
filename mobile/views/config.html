@@ -32,13 +32,28 @@
 				obj.disabled = false;
 			}
 			function doPopulateSeverities(items) {
+				var div = document.getElementById("severitiesContainer");
+				
+				var severities = new Array();
+				severities = parent.serverInfo.severities.split(",");
+				
+				var tmpHTML = "";
+				for(var i=0;i < items.length;i++) {
+					tmpHTML += "<input type='checkbox' name='severityID' value='"+items[i].severityID +"'";
+					if(severities.indexOf(items[i].severityID)!=-1) tmpHTML += " checked";
+					tmpHTML += "><img src='/bugLog/hq/images/severity/" + items[i].code.trim().toLowerCase()  + ".png' align='absmiddle'> ";
+					tmpHTML += items[i].name + "<br/>";
+				}
+				div.innerHTML = tmpHTML;
 			}
-			function doSaveSettings() {
-				var numDays = document.getElementById("numDays");
-				var applicationID = document.getElementById("applicationID");
-				var hostID = document.getElementById("hostID");
-				//var rem = document.getElementById("rememberMe");
-				parent.doSaveSettings(numDays.value, applicationID.value, hostID.value);
+			function doSaveSettings(frm) {
+				var severities = new Array();
+				for(var i=0;i<frm.severityID.length;i++) {
+					if(frm.severityID[i].checked) {
+						severities[severities.length] = frm.severityID[i].value;
+					}
+				}
+				parent.doSaveSettings(frm.numDays.value, frm.applicationID.value, frm.hostID.value, severities.toString());
 			}
 			function displayError(e) {
 				var div = document.getElementById("contentArea");
@@ -86,6 +101,10 @@
 								<option value="0">All</option>
 							</select>
 						</td>
+					</tr>
+					<tr valign="top">
+						<td>Severities:</td>
+						<td id="severitiesContainer"></td>
 					</tr>
 				</table>
 				<br />
