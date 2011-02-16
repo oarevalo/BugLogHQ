@@ -418,6 +418,57 @@ function doPopulateHosts() {
 	xmlhttp.send(null); 
 }
 
+function doPopulateSeverities() {
+	var aItems = new Array();
+
+	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
+		url += "?action=getSeverities";
+		url += "&token="+serverInfo.token;
+
+	clearInterval(listingRefreshTimer);
+	document.getElementById("app_loading_text").innerHTML = "Loading...";
+
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.open("POST", url, true);
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4) {
+			if (xmlhttp.status == 200) {
+
+				document.getElementById("app_loading_text").innerHTML = "";
+
+				// check for errors				
+				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
+				if(errorNode[0].firstChild.nodeValue == "true") {
+					var errorMsgNode = xmlhttp.responseXML.getElementsByTagName("errorMessage");
+					alert(errorMsgNode[0].firstChild.nodeValue);
+					return;
+				}
+
+				// create an array with the returned entries	
+				try {			
+					var dataNodes = xmlhttp.responseXML.getElementsByTagName("item");
+					for(var i=0; i < dataNodes.length;i++) {
+						var item = {};					
+						item.severityID = getElementTextNS("", "severityID", dataNodes[i], 0)
+						item.code = getElementTextNS("", "code", dataNodes[i], 0)
+						item.name = getElementTextNS("", "name", dataNodes[i], 0)
+						aItems[i] = item;
+					}				
+					document.getElementById('UI').contentWindow.doPopulateSeverities(aItems);
+
+				} catch(e) {
+					document.getElementById('UI').contentWindow.displayError(e);
+				}
+				
+	
+			} else {
+				alert("There was a problem connecting to the BugLog server:\n" + xmlhttp.statusText);
+			}			
+		}
+	};
+	xmlhttp.send(null); 
+}
+
 function doSaveSettings(numDays, applicationID, hostID) {
     serverInfo.numDays = numDays;
     serverInfo.applicationID = applicationID;

@@ -209,9 +209,9 @@
 			<cfsavecontent variable="results">
 				<cfoutput query="qryData">
 					<item>
-						<SeverityID>#xmlFormat(qryData.SeverityID)#</SeverityID>
-						<code>#code#</code>
-						<name>#name#</name>
+						<severityID>#qryData.SeverityID#</severityID>
+						<code>#xmlFormat(code)#</code>
+						<name>#xmlFormat(name)#</name>
 					</item>
 				</cfoutput>
 			</cfsavecontent>

@@ -6,6 +6,7 @@
 			function initPage() {
 				parent.doPopulateApplications();
 				parent.doPopulateHosts();
+				parent.doPopulateSeverities();
 				document.getElementById("numDays").value = parent.serverInfo.numDays;
 			}
 			function doPopulateApplications(items) {
@@ -29,6 +30,8 @@
 					obj.appendChild(optn);
 				}
 				obj.disabled = false;
+			}
+			function doPopulateSeverities(items) {
 			}
 			function doSaveSettings() {
 				var numDays = document.getElementById("numDays");
