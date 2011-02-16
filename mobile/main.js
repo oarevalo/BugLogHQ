@@ -196,10 +196,9 @@ function doGetListing(appID,entryID) {
 
 	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
 		url += "?action=getListing";
-		url += "&applicationID="+appID;
 		url += "&msgFromEntryID="+entryID;
 		url += "&token="+serverInfo.token;
-		url += "&numDays="+numDays;
+		url += "&numDays="+serverInfo.numDays;
 
 	clearInterval(listingRefreshTimer);
 	document.getElementById("app_loading_text").innerHTML = "Loading...";
@@ -300,6 +299,7 @@ function doGetEntry(entryID) {
 						entry.BugCFTOKEN = getElementTextNS("", "BugCFTOKEN", dataNodes[0], 0)
 						entry.UserAgent = getElementTextNS("", "UserAgent", dataNodes[0], 0)
 						entry.TemplatePath = getElementTextNS("", "TemplatePath", dataNodes[0], 0)
+						entry.HTMLReport = getElementTextNS("", "HTMLReport", dataNodes[0], 0)
 						
 						// call a method on the view to display the entries
 						document.getElementById('UI').contentWindow.displayEntry(entry);

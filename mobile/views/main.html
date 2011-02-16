@@ -89,13 +89,15 @@
 					tmpHTML += "<tr><th>Host:</th><td>" + data.HostName+ "</td></tr>";
 					tmpHTML += "<tr><th>Date/Time:</th><td>" + data.createdOn + "</td></tr>";
 					tmpHTML += "<tr><th>Severity:</th><td>" + data.SeverityCode + "</td></tr>";
-					tmpHTML += "<tr><th>Exception Message:</th><td>" + data.ExceptionMessage + "&nbsp;</td></tr>";
-					tmpHTML += "<tr><th>Exception Details:</th><td>" + data.ExceptionDetails + "&nbsp;</td></tr>";
-					tmpHTML += "<tr><th>CFID:</th><td>" + data.BugCFID + "</td></tr>";
-					tmpHTML += "<tr><th>CFTOKEN:</th><td>" + data.BugCFTOKEN + "</td></tr>";
+					if(data.ExceptionMessage!='')
+						tmpHTML += "<tr><th>Exception Message:</th><td>" + data.ExceptionMessage + "&nbsp;</td></tr>";
+					if(data.ExceptionDetails!='')
+						tmpHTML += "<tr><th>Exception Details:</th><td>" + data.ExceptionDetails + "&nbsp;</td></tr>";
+					if(data.BugCFID!='' || data.BugCFTOKEN!='')
+						tmpHTML += "<tr><th>CFID/CFTOKEN:</th><td>" + data.BugCFID + " / " + data.BugCFTOKEN + "</td></tr>";
 					tmpHTML += "<tr><th>User Agent:</th><td>" + data.UserAgent + "</td></tr>";
 					tmpHTML += "<tr><th>Template Path:</th><td>" + data.TemplatePath + "</td></tr>";
-					tmpHTML += "</table>";
+					tmpHTML += "</table><br/><b>Full Report:</b><br />" + data.HTMLReport;
 				
 				div.innerHTML = tmpHTML;
 				document.getElementById("goBackHandle").style.display = "block";

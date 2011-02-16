@@ -46,7 +46,7 @@
 			
 			<!--- get listing --->
 			<cfset qryEntries = oAppService.searchEntries(searchTerm = "",
-															startDate = dateAdd("d",now(),-1 * val(numDays)), 
+															startDate = dateAdd("d",-1 * val(numDays),now()), 
 															applicationID=val(applicationID),
 															hostID=val(hostID),
 															severityID=severities)>
@@ -97,7 +97,7 @@
 				}				
 			</cfscript>
 			<cfset qryEntries = oAppService.searchEntries(searchTerm = searchTerm,
-															startDate = dateAdd("d",now(),-1 * val(numDays)), 
+															startDate = dateAdd("d",-1 * val(numDays),now()), 
 															applicationID=applicationID,
 															hostID=hostID)>
 			<cfquery name="qryEntries" dbtype="query">
@@ -151,6 +151,7 @@
 						<BugCFTOKEN>#xmlFormat(oEntry.getCFTOKEN())#</BugCFTOKEN>
 						<UserAgent>#xmlFormat(oEntry.getUserAgent())#</UserAgent>
 						<TemplatePath>#xmlFormat(oEntry.getTemplate_Path())#</TemplatePath>
+						<HTMLReport>#xmlFormat(oEntry.getHTMLReport())#</HTMLReport>
 					</entry>
 				</cfoutput>
 			</cfsavecontent>
