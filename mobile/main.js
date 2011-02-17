@@ -153,7 +153,6 @@ function doGetData(action,qs,func) {
 		url += "?action="+action;
 		url += "&" + qs;
 		url += "&token="+serverInfo.token;
-	clearInterval(listingRefreshTimer);
 	$("#app_loading_text").html("Loading...");
 	$.ajax({
 		type:"GET",
@@ -193,9 +192,17 @@ function doSaveSettings(numDays, applicationID, hostID, severities) {
     doRefresh();
 }
 function doSetListingRefreshTimer() {
+	doClearListingRefreshTimer();
 	listingRefreshTimer = setInterval(listingRefreshTimerHandler, 10000)
+	console.log("Timer SET:"+listingRefreshTimer);
 }
 
+function doClearListingRefreshTimer() {
+	if(listingRefreshTimer) {
+		clearInterval(listingRefreshTimer);
+		console.log("Timer CLEAR:"+listingRefreshTimer);
+	}
+}
 function listingRefreshTimerHandler(event) {
 	doGetSummary();
 }

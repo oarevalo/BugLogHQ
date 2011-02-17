@@ -18,6 +18,7 @@ function initConnectView() {
 function initMainView() {
 	mainViewCallback = displaySummary;
 	doGetSummary();
+	doSetListingRefreshTimer();
 }
 
 function displaySummary(data) {
@@ -32,13 +33,11 @@ function displaySummary(data) {
 	} else {
 		div.html("<br /><p align='center' style='font-size:16px;'>No bug reports found. Yay!</a>");
 	}
-	
-	// set the timer
-	doSetListingRefreshTimer();
 }
 
 function viewListing(e) {
 	var entryID = this.getAttribute("entryID");
+	doClearListingRefreshTimer();
 	doGetListing(entryID, displayListing);
 }
 function displayListing(data) {
@@ -64,6 +63,7 @@ function displayListing(data) {
 
 function viewEntry(e) {
 	var entryID = this.getAttribute("entryID");
+	doClearListingRefreshTimer();
 	doGetEntry(entryID, displayEntry);
 }
 function displayEntry(data) {
