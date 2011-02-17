@@ -40,6 +40,7 @@ function initApp() {
 }
 
 function setView(vw) {
+	clearInterval(listingRefreshTimer);
 	var loc = bugLogMiniPath + "views/" + vw + ".html";
 	if(vw=="main")
 		callback=initMainView;
@@ -59,15 +60,12 @@ function doRefresh() {
 
 function doLogOff() {
 	serverInfo.token = "";
-	clearInterval(listingRefreshTimer);
 	setView("connect");
 }
 
 function doConfig() {
-	if(serverInfo.token!="") {
-		clearInterval(listingRefreshTimer);
+	if(serverInfo.token!="") 
 		setView("config");
-	}
 	else
 		setView("connect");
 }
@@ -122,6 +120,8 @@ function doGetSummary() {
 
 function doGetListing(entryID, callback) {
 	var qs = "msgFromEntryID="+entryID;
+		qs += "&applicationID="+serverInfo.applicationID;
+		qs += "&hostID="+serverInfo.hostID;
 		qs += "&numDays="+serverInfo.numDays;
 	displayLoading();
 	doGetData("getListing", qs, callback);
@@ -170,8 +170,11 @@ function doGetData(action,qs,func) {
 				var children = nodes[i].childNodes;
 				var item = {};	
 				for (var j=0;j<children.length;j++)	{
-					if(children[j].nodeType==1 && children[j].childNodes.length) {
-						item[children[j].nodeName] = children[j].childNodes[0].nodeValue
+					if(children[j].nodeType==1) {
+						if(children[j].childNodes.length)
+							item[children[j].nodeName] = children[j].childNodes[0].nodeValue
+						else
+							item[children[j].nodeName] = "";
 					}
 				}
 				aItems[i] = item;
@@ -204,13 +207,13 @@ function doGetServerInfo() {
 }
 
 function loadServerInfo() {
-    serverInfo.username = getCookie("username");
-    serverInfo.password = getCookie("password");
-    serverInfo.rememberMe = getCookie("rememberMe");
-    serverInfo.numDays = getCookie("numDays");
-    serverInfo.applicationID = getCookie("applicationID");
-    serverInfo.hostID = getCookie("hostID");
-    serverInfo.severities = getCookie("severities");
+    serverInfo.username = getCookie("username","");
+    serverInfo.password = getCookie("password","");
+    serverInfo.rememberMe = getCookie("rememberMe",false);
+    serverInfo.numDays = getCookie("numDays",1);
+    serverInfo.applicationID = getCookie("applicationID","");
+    serverInfo.hostID = getCookie("hostID","");
+    serverInfo.severities = getCookie("severities","");
 }
 
 function storeServerInfo() {
@@ -227,7 +230,7 @@ function clearServerInfo() {
 	setCookie("username","");
 	setCookie("password","");
 	setCookie("rememberMe",false);
-	setCookie("numDays","");
+	setCookie("numDays","1");
 	setCookie("applicationID","");
 	setCookie("hostID","");
 	setCookie("severities","");
@@ -260,7 +263,7 @@ function setCookie(c_name,value,expiredays) {
 	document.cookie=c_name+ "=" +escape(value)+
 	((expiredays==null) ? "" : ";expires="+exdate.toGMTString());
 }
-function getCookie(c_name) {
+function getCookie(c_name,defaultValue) {
 	if (document.cookie.length>0)
 	  {
 	  c_start=document.cookie.indexOf(c_name + "=");
@@ -272,7 +275,7 @@ function getCookie(c_name) {
 	    return unescape(document.cookie.substring(c_start,c_end));
 	    }
 	  }
-	return "";
+	return defaultValue;
 }
 
 function checkForErrors(data) {

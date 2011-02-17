@@ -78,7 +78,7 @@ function doGoBack() {
 function createSummaryCapsuleHTML(entry) {
 	var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "' applicationID='" + entry.ApplicationID + "'>";
 		tmpHTML += "<div class='entryCapsuleBugCount'>"
-		tmpHTML += "<img src='/bugLog/hq/images/severity/" + entry.SeverityCode.toLowerCase() + ".png'><br>"
+		tmpHTML += "<img src='/bugLog/hq/images/severity/" + jQuery.trim(entry.SeverityCode).toLowerCase() + ".png'><br>"
 		tmpHTML += entry.bugCount 
 		tmpHTML += "</div>";
 		tmpHTML += "<div class='entryCapsuleApplication'>" + entry.ApplicationCode + "</div>";
@@ -91,7 +91,7 @@ function createListingCapsuleHTML(entry) {
 	var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "'>";
 		tmpHTML += "<div class='entryCapsuleHost' style='float:right;'>" + entry.HostName + "</div>";
 		tmpHTML += "<div class='entryCapsuleDate'>";
-		tmpHTML += "<img src='/bugLog/hq/images/severity/" + entry.SeverityCode.toLowerCase() + ".png' align='absmiddle'>&nbsp;"
+		tmpHTML += "<img src='/bugLog/hq/images/severity/" + jQuery.trim(entry.SeverityCode).toLowerCase() + ".png' align='absmiddle'>&nbsp;"
 		tmpHTML += entry.createdOn + "</div>"
 		tmpHTML += "</div>";
 	return tmpHTML;				
@@ -120,7 +120,6 @@ function createEntryHTML(entry) {
 
 /************* Config View ***********/
 function initConfigView() {
-	alert('full5')
 	serverInfo = doGetServerInfo();
 	$("#numDays").val(serverInfo.numDays);
 	
@@ -139,7 +138,7 @@ function initConfigView() {
 		doSaveSettings(frm.numDays.value, 
 						frm.applicationID.value, 
 						frm.hostID.value, 
-						"");
+						severities.toString());
 	});
 }
 
@@ -165,13 +164,14 @@ function doPopulateHosts(items) {
 }
 function doPopulateSeverities(items) {
 	var severities = new Array();
-	severities = serverInfo.severities.split(",");
+	if(serverInfo.severities!="")
+		severities = serverInfo.severities.split(",");
 	
 	var tmpHTML = "";
 	for(var i=0;i < items.length;i++) {
 		tmpHTML += "<input type='checkbox' name='severityID' value='"+items[i].severityID +"'";
 		if(severities.indexOf(items[i].severityID)!=-1) tmpHTML += " checked";
-		tmpHTML += "><img src='/bugLog/hq/images/severity/" + items[i].code.trim().toLowerCase()  + ".png' align='absmiddle'> ";
+		tmpHTML += "><img src='/bugLog/hq/images/severity/" + jQuery.trim(items[i].code).toLowerCase()  + ".png' align='absmiddle'> ";
 		tmpHTML += items[i].name + "<br/>";
 	}
 	$("#severitiesContainer").html(tmpHTML);
