@@ -5,12 +5,12 @@ function initConnectView() {
 	$("#username").val(serverInfo.username);
 	$("#password").val(serverInfo.password);
 	$("#rememberMe").attr("checked",serverInfo.rememberMe);
-	$("form").submit(function(){
-		doConnect(this.server.value,
-						this.username.value,
-						this.password.value,
-						this.rememberMe.checked);
-		return false;
+	$("#btnConnect").click(function(){
+		frm = this.form;
+		doConnect(frm.server.value,
+						frm.username.value,
+						frm.password.value,
+						frm.rememberMe.checked);
 	});
 }
 
@@ -120,14 +120,16 @@ function createEntryHTML(entry) {
 
 /************* Config View ***********/
 function initConfigView() {
+	alert('full5')
+	serverInfo = doGetServerInfo();
+	$("#numDays").val(serverInfo.numDays);
+	
 	doGetApplications( doPopulateApplications );
 	doGetHosts( doPopulateHosts );
 	doGetSeverities( doPopulateSeverities );
 	
-	$("#numDays").val(serverInfo.numDays);
-	
-	$("form").submit(function(){
-		var frm = this;
+	$("#btnSave").click(function(){
+		frm = this.form;
 		var severities = new Array();
 		for(var i=0;i<frm.severityID.length;i++) {
 			if(frm.severityID[i].checked) {
@@ -135,10 +137,9 @@ function initConfigView() {
 			}
 		}
 		doSaveSettings(frm.numDays.value, 
-								frm.applicationID.value, 
-								frm.hostID.value, 
-								severities.toString());
-		return false;
+						frm.applicationID.value, 
+						frm.hostID.value, 
+						"");
 	});
 }
 

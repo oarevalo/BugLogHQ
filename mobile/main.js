@@ -41,7 +41,13 @@ function initApp() {
 
 function setView(vw) {
 	var loc = bugLogMiniPath + "views/" + vw + ".html";
-	jQuery("#UI").load(loc);
+	if(vw=="main")
+		callback=initMainView;
+	else if(vw=="connect")
+		callback=initConnectView;
+	else if(vw=="config")
+		callback=initConfigView;
+	jQuery("#UI").load(loc, callback);
 } 
 
 function doRefresh() {

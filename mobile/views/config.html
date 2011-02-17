@@ -2,11 +2,6 @@
 <html>
 	<head>
 		<title>BugLogMini: Settings</title>
-		<script type="text/javascript">
-			$(document).ready(function() {
-				initConfigView();
-			});
-		</script>
 	</head>
 	<body>
 		<div id="contentArea">
@@ -43,13 +38,13 @@
 					</tr>
 					<tr valign="top">
 						<td>Severities:</td>
-						<td id="severitiesContainer"></td>
+						<td><div id="severitiesContainer"></div></td>
 					</tr>
 				</table>
 				<br />
 				<br />
 				<p align="center">
-					<input type="submit" name="btnSave" value="Apply Changes" />
+					<input type="button" name="btnSave" value="Apply Changes" id="btnSave" />
 				</p>
 			</form>
 		</div>
