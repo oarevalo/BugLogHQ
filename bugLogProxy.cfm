@@ -60,7 +60,7 @@
 			
 			<cfsavecontent variable="results">
 				<cfoutput query="qryEntries">
-					<entry>
+					<item>
 						<ApplicationCode>#xmlFormat(qryEntries.ApplicationCode)#</ApplicationCode>
 						<ApplicationID>#ApplicationID#</ApplicationID>
 						<Message>#xmlFormat(qryEntries.message)#</Message>
@@ -68,7 +68,7 @@
 						<createdOn>#dateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
 						<EntryID>#qryEntries.entryID#</EntryID>
 						<SeverityCode>#qryEntries.severityCode#</SeverityCode>
-					</entry>
+					</item>
 				</cfoutput>
 			</cfsavecontent>
 		</cfcase>
@@ -108,7 +108,7 @@
 			
 			<cfsavecontent variable="results">
 				<cfoutput query="qryEntries" maxrows="#rowsPerPage#" startrow="#startRow#">
-					<entry>
+					<item>
 						<ApplicationCode>#xmlFormat(qryEntries.ApplicationCode)#</ApplicationCode>
 						<ApplicationID>#ApplicationID#</ApplicationID>
 						<HostName>#xmlFormat(qryEntries.hostname)#</HostName>
@@ -117,7 +117,7 @@
 						<createdOn>#dateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
 						<EntryID>#qryEntries.entryID#</EntryID>
 						<SeverityCode>#qryEntries.severityCode#</SeverityCode>
-					</entry>
+					</item>
 				</cfoutput>
 			</cfsavecontent>
 		</cfcase>	
@@ -136,7 +136,7 @@
 
 			<cfsavecontent variable="results">
 				<cfoutput>
-					<entry>
+					<item>
 						<ApplicationCode>#xmlFormat(oEntry.getApplication().getCode())#</ApplicationCode>
 						<ApplicationID>#oEntry.getApplicationID()#</ApplicationID>
 						<HostName>#xmlFormat(oEntry.getHost().getHostname())#</HostName>
@@ -152,7 +152,7 @@
 						<UserAgent>#xmlFormat(oEntry.getUserAgent())#</UserAgent>
 						<TemplatePath>#xmlFormat(oEntry.getTemplate_Path())#</TemplatePath>
 						<HTMLReport>#xmlFormat(oEntry.getHTMLReport())#</HTMLReport>
-					</entry>
+					</item>
 				</cfoutput>
 			</cfsavecontent>
 		</cfcase>	

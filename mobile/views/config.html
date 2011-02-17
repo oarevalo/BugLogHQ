@@ -1,39 +1,37 @@
+<!DOCTYPE html> 
 <html>
 	<head>
 		<title>BugLogMini: Main</title>
 		<link href="../style.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
 		<script type="text/javascript">
-			function initPage() {
+			$(document).ready(function() {
 				parent.doPopulateApplications();
 				parent.doPopulateHosts();
 				parent.doPopulateSeverities();
-				document.getElementById("numDays").value = parent.serverInfo.numDays;
-			}
+				$("#numDays").value = parent.serverInfo.numDays;
+			});
 			function doPopulateApplications(items) {
-				var obj = document.getElementById("applicationID");
 				for(var i=0;i < items.length;i++) {
-					var optn = document.createElement("option");
-					optn.text = items[i].appCode;
-					optn.value = items[i].appID;
-					optn.selected = (parent.serverInfo.applicationID==items[i].appID);
-					obj.options.add(optn);
+					$("#applicationID").
+				          append($("<option></option>").
+		                  attr("value",items[i].appID).
+		                  attr("selected",(parent.serverInfo.applicationID==items[i].appID)).
+		                  text(items[i].appCode)); 
 				}
-				obj.disabled = false;
+				$("#applicationID").attr("disabled",false);
 			}
 			function doPopulateHosts(items) {
-				var obj = document.getElementById("hostID");
 				for(var i=0;i < items.length;i++) {
-					var optn = document.createElement("option");
-					optn.text = items[i].hostName;
-					optn.value = items[i].hostID;
-					optn.selected = (parent.serverInfo.hostID==items[i].hostID);
-					obj.appendChild(optn);
+					$("#hostID").
+			          append($("<option></option>").
+	                  attr("value",items[i].hostID).
+	                  attr("selected",(parent.serverInfo.hostID==items[i].hostID)).
+	                  text(items[i].hostName)); 
 				}
-				obj.disabled = false;
+				$("#hostID").attr("disabled",false);
 			}
 			function doPopulateSeverities(items) {
-				var div = document.getElementById("severitiesContainer");
-				
 				var severities = new Array();
 				severities = parent.serverInfo.severities.split(",");
 				
@@ -44,7 +42,7 @@
 					tmpHTML += "><img src='/bugLog/hq/images/severity/" + items[i].code.trim().toLowerCase()  + ".png' align='absmiddle'> ";
 					tmpHTML += items[i].name + "<br/>";
 				}
-				div.innerHTML = tmpHTML;
+				$("#severitiesContainer").html(tmpHTML);
 			}
 			function doSaveSettings(frm) {
 				var severities = new Array();
@@ -56,20 +54,19 @@
 				parent.doSaveSettings(frm.numDays.value, frm.applicationID.value, frm.hostID.value, severities.toString());
 			}
 			function displayError(e) {
-				var div = document.getElementById("contentArea");
+				var div = $("#contentArea");
 				div.innerHTML = "<div class='entryError'>An error ocurred while retrieving the bugLog data from the server:<br><br>" + e + "</div>";
 			}
 			function displayLoading() {
-				var div = document.getElementById("contentArea");
 				var tmpHTML = "<div style='text-align:center;margin-top:100px;'>";
 					tmpHTML += "<img src='../images/ajax-loader.gif'><br />";
 					tmpHTML += "Loading Data...";
 					tmpHTML += "</div>";
-				div.innerHTML = tmpHTML;				
+				$("#contentArea").html(tmpHTML);
 			}
 		</script>
 	</head>
-	<body onload="initPage()">
+	<body>
 		<div id="contentArea">
 			<form name="frmConfig" method="post" action="#">
 				<br />

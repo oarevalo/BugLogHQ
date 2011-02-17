@@ -1,35 +1,35 @@
+<!DOCTYPE html> 
 <html>
 	<head>
 		<title>BugLogMini: Connect</title>
 		<link href="../style.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
 		<script type="text/javascript">
-			function initPage() {
+			$(document).ready(function() {
 				serverInfo = parent.doGetServerInfo();
 				
-				document.getElementById("server").value = serverInfo.server;
-				document.getElementById("username").value = serverInfo.username;
-				document.getElementById("password").value = serverInfo.password;
-				document.getElementById("rememberMe").checked = serverInfo.rememberMe;
-			}
+				$("#server").val(serverInfo.server);
+				$("#username").val(serverInfo.username);
+				$("#password").val(serverInfo.password);
+				$("#rememberMe").attr("checked",serverInfo.rememberMe);
+			});
 			
 			function doConnect(frm) {
-				var srv = document.getElementById("server");
-				var usr = document.getElementById("username");
-				var pwd = document.getElementById("password");
-				var rem = document.getElementById("rememberMe");
-				parent.doConnect(srv.value,usr.value,pwd.value,rem.checked);
+				parent.doConnect($("#server").val(),
+								$("#username").val(),
+								$("#password").val(),
+								$("#rememberMe").attr("checked"));
 			}
 			function displayLoading() {
-				var div = document.getElementById("contentArea");
 				var tmpHTML = "<div style='text-align:center;margin-top:100px;'>";
 					tmpHTML += "<img src='../images/ajax-loader.gif'><br />";
 					tmpHTML += "Loading Data...";
 					tmpHTML += "</div>";
-				div.innerHTML = tmpHTML;				
+				$("#contentArea").html(tmpHTML)
 			}
 		</script>		
 	</head>
-	<body onload="initPage()">
+	<body>
 		<div id="contentArea">
 			<form name="frm" method="post" action="#" class="dataForm" id="frmConnect">
 				<input type="hidden" name="server" id="server" value="" />

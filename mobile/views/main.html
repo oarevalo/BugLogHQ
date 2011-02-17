@@ -1,107 +1,67 @@
+<!DOCTYPE html> 
 <html>
 	<head>
 		<title>BugLogMini: Main</title>
 		<meta name="viewport" content="height=device-height,width=device-width" />
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
 		<link href="../style.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript">
-			function initPage() {
+			$(document).ready(function() {
 				displayLoading();
 				parent.doGetSummary();
-			}
-
-			String.prototype.trim = function() {
-				return this.replace(/^\s+|\s+$/g,"");
-			}			
+			});
 			
 			function displayError(e) {
-				var div = document.getElementById("contentArea");
-				div.innerHTML = "<div class='entryError'>An error ocurred while retrieving the bugLog data from the server:<br><br>" + e + "</div>";
+				$("#contentArea").html("<div class='entryError'>An error ocurred while retrieving the bugLog data from the server:<br><br>" + e + "</div>");
 			}
 			function displayLoading() {
-				var div = document.getElementById("contentArea");
 				var tmpHTML = "<div style='text-align:center;margin-top:100px;'>";
 					tmpHTML += "<img src='../images/ajax-loader.gif'><br />";
 					tmpHTML += "Loading Data...";
 					tmpHTML += "</div>";
-				div.innerHTML = tmpHTML;				
+				$("#contentArea").html(tmpHTML);				
 			}
 			function displaySummary(data) {
-				var div = document.getElementById("contentArea");
-				div.innerHTML = "";
+				var div = $("#contentArea");
+				div.html("");
 				
 				if(data.length > 0) {
 					for(var i=0;i < data.length;i++) {
-						div.innerHTML = div.innerHTML + createSummaryCapsuleHTML(data[i]);
+						div.append(createSummaryCapsuleHTML(data[i]));
 					}
 	
-					for(var i=0;i<200000;i++) {
-						//sleep
-					}
-						
-					for (var i = 0; i < data.length; i++) {
-						document.getElementById("summaryCapsule_" + data[i].EntryID).addEventListener("click", viewListing, false);
-					}
-	
-					for(var i=0;i < data.length;i++) {
-						var divID = "summaryCapsule_"+data[i].EntryID;
-						document.getElementById(divID).addEventListener("click", viewListing, false);
-					}
+					$(".entryCapsule").click(viewListing);
+					
 				} else {
-					div.innerHTML = "<br /><p align='center' style='font-size:16px;'>No bug reports found. Yay!</a>"
+					div.html("<br /><p align='center' style='font-size:16px;'>No bug reports found. Yay!</a>");
 				}
 				
 				// set the timer
 				parent.doSetListingRefreshTimer();
 			}
 			function displayListing(data) {
-				var div = document.getElementById("contentArea");
-				div.innerHTML = "";
+				var div = $("#contentArea");
+				div.html("");
 				
 				if(data.length > 0) {
 					var tmpHTML = "<div class='entryListingHeader'>"
 						tmpHTML += "<div class='entryCapsuleApplication'>" + data[0].ApplicationCode + "</div>";
 						tmpHTML += "<div class='entryCapsuleMessage'>" + data[0].Message + "</div>";
 						tmpHTML += "</div>"
-					div.innerHTML = div.innerHTML + tmpHTML;
+					div.append(tmpHTML);
 
 					for(var i=0;i < data.length;i++) {
-						div.innerHTML = div.innerHTML + createListingCapsuleHTML(data[i]);
+						div.append(createListingCapsuleHTML(data[i]));
 					}
 
-					for (var i = 0; i < data.length; i++) {
-						var divID = "entryCapsule_"+data[i].EntryID;
-						document.getElementById(divID).addEventListener("click", viewEntry, false);
-					}
-					
+					$(".entryCapsule").click(viewEntry);
 				}
 
-				document.getElementById("goBackHandle").style.display = "block";
-				document.getElementById("goBackHandle").addEventListener("click", doGoBack, false);
+				$("#goBackHandle").click(doGoBack).show();
 			}
 			function displayEntry(data) {
-				var div = document.getElementById("contentArea");
-				
-				var tmpHTML = "<table class='entryDetailTable'>";
-					tmpHTML += "<tr><td colspan='2' class='entryDetailTitle'>" 
-					tmpHTML += "<img src='/bugLog/hq/images/severity/" + data.SeverityCode.trim().toLowerCase()  + ".png' align='absmiddle' style='float:left;margin-right:3px;margin-top:5px;'>"
-					tmpHTML += data.Message + "</td></tr>";
-					tmpHTML += "<tr><th>Application:</th><td>" + data.ApplicationCode+ "</td></tr>";
-					tmpHTML += "<tr><th>Host:</th><td>" + data.HostName+ "</td></tr>";
-					tmpHTML += "<tr><th>Date/Time:</th><td>" + data.createdOn + "</td></tr>";
-					tmpHTML += "<tr><th>Severity:</th><td>" + data.SeverityCode + "</td></tr>";
-					if(data.ExceptionMessage!='')
-						tmpHTML += "<tr><th>Exception Message:</th><td>" + data.ExceptionMessage + "&nbsp;</td></tr>";
-					if(data.ExceptionDetails!='')
-						tmpHTML += "<tr><th>Exception Details:</th><td>" + data.ExceptionDetails + "&nbsp;</td></tr>";
-					if(data.BugCFID!='' || data.BugCFTOKEN!='')
-						tmpHTML += "<tr><th>CFID/CFTOKEN:</th><td>" + data.BugCFID + " / " + data.BugCFTOKEN + "</td></tr>";
-					tmpHTML += "<tr><th>User Agent:</th><td>" + data.UserAgent + "</td></tr>";
-					tmpHTML += "<tr><th>Template Path:</th><td>" + data.TemplatePath + "</td></tr>";
-					tmpHTML += "</table><br/><b>Full Report:</b><br />" + data.HTMLReport;
-				
-				div.innerHTML = tmpHTML;
-				document.getElementById("goBackHandle").style.display = "block";
-				document.getElementById("goBackHandle").addEventListener("click", doGoBack, false);
+				$("#contentArea").html(createEntryHTML(data[0]));
+				$("#goBackHandle").click(doGoBack).show();
 			}
 
 
@@ -123,7 +83,7 @@
 
 
 			function createSummaryCapsuleHTML(entry) {
-				var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "' applicationID='" + entry.ApplicationID + "' id='summaryCapsule_" + entry.EntryID + "'>";
+				var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "' applicationID='" + entry.ApplicationID + "'>";
 					tmpHTML += "<div class='entryCapsuleBugCount'>"
 					tmpHTML += "<img src='/bugLog/hq/images/severity/" + entry.SeverityCode.toLowerCase() + ".png'><br>"
 					tmpHTML += entry.bugCount 
@@ -135,7 +95,7 @@
 				return tmpHTML;				
 			}
 			function createListingCapsuleHTML(entry) {
-				var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "' id='entryCapsule_" + entry.EntryID + "'>";
+				var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "'>";
 					tmpHTML += "<div class='entryCapsuleHost' style='float:right;'>" + entry.HostName + "</div>";
 					tmpHTML += "<div class='entryCapsuleDate'>";
 					tmpHTML += "<img src=''/bugLog/hq/images/severity/" + entry.SeverityCode.toLowerCase() + ".png' align='absmiddle'>&nbsp;"
@@ -143,9 +103,29 @@
 					tmpHTML += "</div>";
 				return tmpHTML;				
 			}
+			function createEntryHTML(entry) {
+				var tmpHTML = "<table class='entryDetailTable'>";
+				tmpHTML += "<tr><td colspan='2' class='entryDetailTitle'>" 
+				tmpHTML += "<img src='/bugLog/hq/images/severity/" + jQuery.trim(entry.SeverityCode).toLowerCase()  + ".png' align='absmiddle' style='float:left;margin-right:3px;margin-top:5px;'>"
+				tmpHTML += entry.Message + "</td></tr>";
+				tmpHTML += "<tr><th>Application:</th><td>" + entry["ApplicationCode"] + "</td></tr>";
+				tmpHTML += "<tr><th>Host:</th><td>" + entry.HostName+ "</td></tr>";
+				tmpHTML += "<tr><th>Date/Time:</th><td>" + entry.createdOn + "</td></tr>";
+				tmpHTML += "<tr><th>Severity:</th><td>" + entry.SeverityCode + "</td></tr>";
+				if(entry.ExceptionMessage!='')
+					tmpHTML += "<tr><th>Exception Message:</th><td>" + entry.ExceptionMessage + "&nbsp;</td></tr>";
+				if(entry.ExceptionDetails!='')
+					tmpHTML += "<tr><th>Exception Details:</th><td>" + entry.ExceptionDetails + "&nbsp;</td></tr>";
+				if(entry.BugCFID!='' || entry.BugCFTOKEN!='')
+					tmpHTML += "<tr><th>CFID/CFTOKEN:</th><td>" + entry.BugCFID + " / " + entry.BugCFTOKEN + "</td></tr>";
+				tmpHTML += "<tr><th>User Agent:</th><td>" + entry.UserAgent + "</td></tr>";
+				tmpHTML += "<tr><th>Template Path:</th><td>" + entry.TemplatePath + "</td></tr>";
+				tmpHTML += "</table><br/><b>Full Report:</b><br />" + entry.HTMLReport;
+				return tmpHTML;				
+			}
 		</script>
 	</head>
-	<body onload="initPage()">
+	<body>
 		<div class='goBack' id='goBackHandle' style="display:none;">&laquo; Back</div>
 		<div id="contentArea">
 		</div>

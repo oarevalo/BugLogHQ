@@ -3,7 +3,6 @@ var bugLogMiniPath = "/bugLog/mobile/"
 var bugLogHQPath = "/bugLog/hq/"
 var bugLogProxyPath = "/bugLog/bugLogProxy.cfm"
 var bugLogProtocol = "http"
-var numDays = 7;
 
 var serverInfo = {
 	username: "",
@@ -20,13 +19,12 @@ var serverInfo = {
 var listingRefreshTimer = 0;
 
 function initApp() {
-	
 	// attach actions
-	document.getElementById("app_main").addEventListener("click", doRefresh, false);
-	document.getElementById("app_logoff").addEventListener("click", doLogOff, false);
-	document.getElementById("app_logoff_text").addEventListener("click", doLogOff, false);
-	document.getElementById("app_config").addEventListener("click", doConfig, false);
-	document.getElementById("app_config_text").addEventListener("click", doConfig, false);
+	$("#app_main").click(doRefresh);
+	$("#app_logoff").click(doLogOff);
+	$("#app_logoff_text").click(doLogOff);
+	$("#app_config").click(doConfig);
+	$("#app_config_text").click(doConfig);
 
 	// load any stored login credentials
 	loadServerInfo();
@@ -48,19 +46,6 @@ function doRefresh() {
 		setView("main");
 	else
 		setView("connect");
-}
-
-function doGoHome() {
-	if(serverInfo.token!="") {
-		var url = bugLogProtocol + "://" + serverInfo.server + bugLogHQPath;
-		doOpenURL(url);
-	}
-	else
-		alert("Please connect to a BugLog server");
-}
-
-function doOpenURL(url) {
-	document.location = url;
 }
 
 function doLogOff() {
@@ -88,50 +73,34 @@ function doConnect(srv,usr,pwd,rem) {
 		url += "&username="+usr;
 		url += "&password="+pwd;
 
-	xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", url, true);
-	xmlhttp.onreadystatechange = function() {
-		if (xmlhttp.readyState == 4) {
-			if (xmlhttp.status == 200) {
-	
-				// check for errors				
-				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
-				if(errorNode[0].firstChild.nodeValue == "true") {
-					var errorMsgNode = xmlhttp.responseXML.getElementsByTagName("errorMessage");
-					alert(errorMsgNode[0].firstChild.nodeValue);
-					setView("connect");
-					return;
-				}
-				
-				// get authentication token
-				resultsNode = xmlhttp.responseXML.getElementsByTagName("results");
-				
-				serverInfo.username = usr;
-				serverInfo.password = pwd;
-				serverInfo.server = srv;
-				serverInfo.token = resultsNode[0].firstChild.nodeValue;
-				serverInfo.rememberMe = rem;
-
-				if(rem) 				
-					storeServerInfo();
-				else
-					clearServerInfo();
-				
-				setView("main");
-	
-			} else {
-				alert("There was a problem connecting to the BugLog server:\n" + xmlhttp.statusText);
-				alert(xmlhttp.status);
+	$.ajax({
+		url:url,
+		success: function(data) {
+			if(checkForErrors(data)) {
 				setView("connect");
-			}			
+				return;
+			}
+			
+			// get authentication token
+			resultsNode = data.getElementsByTagName("results");
+			
+			serverInfo.username = usr;
+			serverInfo.password = pwd;
+			serverInfo.server = srv;
+			serverInfo.token = resultsNode[0].firstChild.nodeValue;
+			serverInfo.rememberMe = rem;
+	
+			if(rem) 				
+				storeServerInfo();
+			else
+				clearServerInfo();
+			
+			setView("main");
 		}
-	};
-	xmlhttp.send(null); 
+	});
 }
 
 function doGetSummary() {
-	var aEntries = new Array();
-
 	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
 		url += "?action=getSummary";
 		url += "&numDays="+serverInfo.numDays;
@@ -139,120 +108,16 @@ function doGetSummary() {
 		url += "&hostID="+serverInfo.hostID;
 		url += "&severities="+serverInfo.severities;
 		url += "&token="+serverInfo.token;
-
-	clearInterval(listingRefreshTimer);
-	document.getElementById("app_loading_text").innerHTML = "Loading...";
-
-	xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", url, true);
-	xmlhttp.onreadystatechange = function() {
-		if (xmlhttp.readyState == 4) {
-			if (xmlhttp.status == 200) {
-
-				document.getElementById("app_loading_text").innerHTML = "";
-
-				// check for errors				
-				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
-				if(errorNode[0].firstChild.nodeValue == "true") {
-					var errorMsgNode = xmlhttp.responseXML.getElementsByTagName("errorMessage");
-					alert(errorMsgNode[0].firstChild.nodeValue);
-					return;
-				}
-
-				// create an array with the returned entries	
-				try {			
-					var dataNodes = xmlhttp.responseXML.getElementsByTagName("entry");
-					for(var i=0; i < dataNodes.length;i++) {
-						var entry = {};					
-						entry.ApplicationCode = getElementTextNS("", "ApplicationCode", dataNodes[i], 0)
-						entry.ApplicationID = getElementTextNS("", "ApplicationID", dataNodes[i], 0)
-						entry.Message = getElementTextNS("", "Message", dataNodes[i], 0)
-						entry.bugCount = getElementTextNS("", "bugCount", dataNodes[i], 0)
-						entry.createdOn = getElementTextNS("", "createdOn", dataNodes[i], 0)
-						entry.EntryID = getElementTextNS("", "EntryID", dataNodes[i], 0)
-						entry.SeverityCode = getElementTextNS("", "SeverityCode", dataNodes[i], 0)
-						aEntries[i] = entry;
-					}				
-
-					// call a method on the view to display the entries
-					document.getElementById('UI').contentWindow.displaySummary(aEntries);
-
-				} catch(e) {
-					document.getElementById('UI').contentWindow.displayError(e);
-				}
-				
-	
-			} else {
-				alert("There was a problem connecting to the BugLog server:\n" + xmlhttp.statusText);
-			}			
-		}
-	};
-	xmlhttp.send(null); 
-
+	doGetData(url, document.getElementById('UI').contentWindow.displaySummary);
 }
 
 function doGetListing(appID,entryID) {
-	var aEntries = new Array();
-
 	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
 		url += "?action=getListing";
 		url += "&msgFromEntryID="+entryID;
 		url += "&token="+serverInfo.token;
 		url += "&numDays="+serverInfo.numDays;
-
-	clearInterval(listingRefreshTimer);
-	document.getElementById("app_loading_text").innerHTML = "Loading...";
-
-	xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", url, true);
-	xmlhttp.onreadystatechange = function() {
-		if (xmlhttp.readyState == 4) {
-			if (xmlhttp.status == 200) {
-
-				document.getElementById("app_loading_text").innerHTML = "";
-
-				// check for errors				
-				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
-				if(errorNode[0].firstChild.nodeValue == "true") {
-					var errorMsgNode = xmlhttp.responseXML.getElementsByTagName("errorMessage");
-					alert(errorMsgNode[0].firstChild.nodeValue);
-					return;
-				}
-
-				// create an array with the returned entries	
-				//try {			
-					var dataNodes = xmlhttp.responseXML.getElementsByTagName("entry");
-					for(var i=0; i < dataNodes.length;i++) {
-						var entry = {};					
-						entry.ApplicationCode = getElementTextNS("", "ApplicationCode", dataNodes[i], 0)
-						entry.ApplicationID = getElementTextNS("", "ApplicationID", dataNodes[i], 0)
-						entry.HostName = getElementTextNS("", "HostName", dataNodes[i], 0)
-						entry.HostID = getElementTextNS("", "HostID", dataNodes[i], 0)
-						entry.Message = getElementTextNS("", "Message", dataNodes[i], 0)
-						entry.bugCount = 1
-						entry.createdOn = getElementTextNS("", "createdOn", dataNodes[i], 0)
-						entry.EntryID = getElementTextNS("", "EntryID", dataNodes[i], 0)
-						entry.SeverityCode = getElementTextNS("", "SeverityCode", dataNodes[i], 0)
-						aEntries[i] = entry;
-					}				
-
-					// call a method on the view to display the entries
-					document.getElementById('UI').contentWindow.displayListing(aEntries);
-
-				//} catch(e) {
-				//	document.getElementById('UI').contentWindow.displayError(e);
-				//}
-				
-	
-			} else {
-				alert("There was a problem connecting to the BugLog server:\n" + xmlhttp.statusText);
-			}			
-		}
-	};
-	xmlhttp.send(null); 
-}
-function doGetServerInfo() {
-	return serverInfo;
+	doGetData(url, document.getElementById('UI').contentWindow.displayListing);
 }
 
 function doGetEntry(entryID) {
@@ -260,214 +125,60 @@ function doGetEntry(entryID) {
 		url += "?action=getEntry";
 		url += "&entryID="+entryID;
 		url += "&token="+serverInfo.token;
-
-	clearInterval(listingRefreshTimer);
-	document.getElementById("app_loading_text").innerHTML = "Loading...";
-
-	xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", url, true);
-	xmlhttp.onreadystatechange = function() {
-		if (xmlhttp.readyState == 4) {
-			if (xmlhttp.status == 200) {
-
-				document.getElementById("app_loading_text").innerHTML = "";
-
-				// check for errors				
-				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
-				if(errorNode[0].firstChild.nodeValue == "true") {
-					var errorMsgNode = xmlhttp.responseXML.getElementsByTagName("errorMessage");
-					alert(errorMsgNode[0].firstChild.nodeValue);
-					return;
-				}
-
-				// create an array with the returned entries	
-				try {			
-					var dataNodes = xmlhttp.responseXML.getElementsByTagName("entry");
-					if(dataNodes.length > 0) {
-						var entry = {};					
-						entry.ApplicationCode = getElementTextNS("", "ApplicationCode", dataNodes[0], 0)
-						entry.ApplicationID = getElementTextNS("", "ApplicationID", dataNodes[0], 0)
-						entry.HostName = getElementTextNS("", "HostName", dataNodes[0], 0)
-						entry.HostID = getElementTextNS("", "HostID", dataNodes[0], 0)
-						entry.Message = getElementTextNS("", "Message", dataNodes[0], 0)
-						entry.createdOn = getElementTextNS("", "createdOn", dataNodes[0], 0)
-						entry.EntryID = getElementTextNS("", "EntryID", dataNodes[0], 0)
-						entry.SeverityCode = getElementTextNS("", "SeverityCode", dataNodes[0], 0)
-						entry.ExceptionMessage = getElementTextNS("", "ExceptionMessage", dataNodes[0], 0)
-						entry.ExceptionDetails = getElementTextNS("", "ExceptionDetails", dataNodes[0], 0)
-						entry.BugCFID = getElementTextNS("", "BugCFID", dataNodes[0], 0)
-						entry.BugCFTOKEN = getElementTextNS("", "BugCFTOKEN", dataNodes[0], 0)
-						entry.UserAgent = getElementTextNS("", "UserAgent", dataNodes[0], 0)
-						entry.TemplatePath = getElementTextNS("", "TemplatePath", dataNodes[0], 0)
-						entry.HTMLReport = getElementTextNS("", "HTMLReport", dataNodes[0], 0)
-						
-						// call a method on the view to display the entries
-						document.getElementById('UI').contentWindow.displayEntry(entry);
-					}				
-
-				} catch(e) {
-					document.getElementById('UI').contentWindow.displayError(e);
-				}
-				
-	
-			} else {
-				alert("There was a problem connecting to the BugLog server:\n" + xmlhttp.statusText);
-			}			
-		}
-	};
-	xmlhttp.send(null); 
-
+	doGetData(url, document.getElementById('UI').contentWindow.displayEntry);
 }
 
-function doPopulateApplications() {
-	var aItems = new Array();
-
+function doPopulateApplications(entryID) {
 	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
 		url += "?action=getApplications";
 		url += "&token="+serverInfo.token;
-
-	clearInterval(listingRefreshTimer);
-	document.getElementById("app_loading_text").innerHTML = "Loading...";
-
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", url, true);
-	xmlhttp.onreadystatechange = function() {
-		if (xmlhttp.readyState == 4) {
-			if (xmlhttp.status == 200) {
-
-				document.getElementById("app_loading_text").innerHTML = "";
-
-				// check for errors				
-				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
-				if(errorNode[0].firstChild.nodeValue == "true") {
-					var errorMsgNode = xmlhttp.responseXML.getElementsByTagName("errorMessage");
-					alert(errorMsgNode[0].firstChild.nodeValue);
-					return;
-				}
-
-				// create an array with the returned entries	
-				try {			
-					var dataNodes = xmlhttp.responseXML.getElementsByTagName("item");
-					for(var i=0; i < dataNodes.length;i++) {
-						var item = {};					
-						item.appID = getElementTextNS("", "appID", dataNodes[i], 0);
-						item.appCode = getElementTextNS("", "appCode", dataNodes[i], 0);
-						aItems[i] = item;
-					}				
-					document.getElementById('UI').contentWindow.doPopulateApplications(aItems);
-
-				} catch(e) {
-					document.getElementById('UI').contentWindow.displayError(e);
-				}
-				
-	
-			} else {
-				alert("There was a problem connecting to the BugLog server:\n" + xmlhttp.statusText);
-			}			
-		}
-	};
-	xmlhttp.send(null); 
+	doGetData(url, document.getElementById('UI').contentWindow.doPopulateApplications);
 }
 
-function doPopulateHosts() {
-	var aItems = new Array();
-
+function doPopulateHosts(entryID) {
 	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
 		url += "?action=getHosts";
 		url += "&token="+serverInfo.token;
-
-	clearInterval(listingRefreshTimer);
-	document.getElementById("app_loading_text").innerHTML = "Loading...";
-
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", url, true);
-	xmlhttp.onreadystatechange = function() {
-		if (xmlhttp.readyState == 4) {
-			if (xmlhttp.status == 200) {
-
-				document.getElementById("app_loading_text").innerHTML = "";
-
-				// check for errors				
-				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
-				if(errorNode[0].firstChild.nodeValue == "true") {
-					var errorMsgNode = xmlhttp.responseXML.getElementsByTagName("errorMessage");
-					alert(errorMsgNode[0].firstChild.nodeValue);
-					return;
-				}
-
-				// create an array with the returned entries	
-				try {			
-					var dataNodes = xmlhttp.responseXML.getElementsByTagName("item");
-					for(var i=0; i < dataNodes.length;i++) {
-						var item = {};					
-						item.hostID = getElementTextNS("", "hostID", dataNodes[i], 0)
-						item.hostName = getElementTextNS("", "hostName", dataNodes[i], 0)
-						aItems[i] = item;
-					}				
-					document.getElementById('UI').contentWindow.doPopulateHosts(aItems);
-
-				} catch(e) {
-					document.getElementById('UI').contentWindow.displayError(e);
-				}
-				
-	
-			} else {
-				alert("There was a problem connecting to the BugLog server:\n" + xmlhttp.statusText);
-			}			
-		}
-	};
-	xmlhttp.send(null); 
+	doGetData(url, document.getElementById('UI').contentWindow.doPopulateHosts);
 }
 
-function doPopulateSeverities() {
-	var aItems = new Array();
-
+function doPopulateSeverities(entryID) {
 	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
 		url += "?action=getSeverities";
 		url += "&token="+serverInfo.token;
+	doGetData(url, document.getElementById('UI').contentWindow.doPopulateSeverities);
+}
 
+
+
+
+function doGetData(url,func) {
 	clearInterval(listingRefreshTimer);
-	document.getElementById("app_loading_text").innerHTML = "Loading...";
-
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", url, true);
-	xmlhttp.onreadystatechange = function() {
-		if (xmlhttp.readyState == 4) {
-			if (xmlhttp.status == 200) {
-
-				document.getElementById("app_loading_text").innerHTML = "";
-
-				// check for errors				
-				var errorNode = xmlhttp.responseXML.getElementsByTagName("error");
-				if(errorNode[0].firstChild.nodeValue == "true") {
-					var errorMsgNode = xmlhttp.responseXML.getElementsByTagName("errorMessage");
-					alert(errorMsgNode[0].firstChild.nodeValue);
-					return;
+	$("#app_loading_text").html("Loading...");
+	$.ajax({
+		type:"GET",
+		dataType:"xml",
+		url:url,
+		complete: function() {
+			$("#app_loading_text").html("");
+		},
+		success: function(data) {
+			if(checkForErrors(data)) return;
+			var nodes = data.getElementsByTagName("item");
+			var aItems = new Array();
+			for(var i=0; i < nodes.length;i++) {
+				var children = nodes[i].childNodes;
+				var item = {};	
+				for (var j=0;j<children.length;j++)	{
+					if(children[j].nodeType==1 && children[j].childNodes.length) {
+						item[children[j].nodeName] = children[j].childNodes[0].nodeValue
+					}
 				}
-
-				// create an array with the returned entries	
-				try {			
-					var dataNodes = xmlhttp.responseXML.getElementsByTagName("item");
-					for(var i=0; i < dataNodes.length;i++) {
-						var item = {};					
-						item.severityID = getElementTextNS("", "severityID", dataNodes[i], 0)
-						item.code = getElementTextNS("", "code", dataNodes[i], 0)
-						item.name = getElementTextNS("", "name", dataNodes[i], 0)
-						aItems[i] = item;
-					}				
-					document.getElementById('UI').contentWindow.doPopulateSeverities(aItems);
-
-				} catch(e) {
-					document.getElementById('UI').contentWindow.displayError(e);
-				}
-				
-	
-			} else {
-				alert("There was a problem connecting to the BugLog server:\n" + xmlhttp.statusText);
-			}			
+				aItems[i] = item;
+			}
+			func(aItems);
 		}
-	};
-	xmlhttp.send(null); 
+	});
 }
 
 function doSaveSettings(numDays, applicationID, hostID, severities) {
@@ -484,6 +195,12 @@ function doSetListingRefreshTimer() {
 
 function listingRefreshTimerHandler(event) {
 	doGetSummary();
+}
+
+
+
+function doGetServerInfo() {
+	return serverInfo;
 }
 
 function loadServerInfo() {
@@ -556,4 +273,15 @@ function getCookie(c_name) {
 	    }
 	  }
 	return "";
+}
+
+function checkForErrors(data) {
+	// check for errors				
+	var errorNode = data.getElementsByTagName("error");
+	if(errorNode[0].firstChild.nodeValue == "true") {
+		var errorMsgNode = data.getElementsByTagName("errorMessage");
+		alert(errorMsgNode[0].firstChild.nodeValue);
+		return true;
+	}
+	return false;
 }
