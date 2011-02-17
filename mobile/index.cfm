@@ -18,29 +18,21 @@
 		</script>
 	</head>
 	<body>
-		<div id="mainContainer">
-			<div id="header">
-				<div id="topLinksRight">
-					<img src="images/cog.png" id="app_config" align="absmiddle">
-					<a href="#" id="app_config_text">Settings</a>
-					&nbsp;&nbsp;&nbsp;&nbsp;
-					<img src="images/door_open.png" id="app_logoff" align="absmiddle">
-					<a href="#" id="app_logoff_text">Log Off</a>
-				</div>
-				<div id="headerImage">
-					<a href="#" id="app_main"><img src="images/logo.gif" alt="BugLogMini" align="absmiddle"></a>
-					<a href="#" id="app_loading_text"></a>
-				</div>
+		<div id="header">
+			<div id="topLinksRight">
+				<img src="images/cog.png" id="app_config" align="absmiddle">
+				<a href="#" id="app_config_text">Settings</a>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<img src="images/door_open.png" id="app_logoff" align="absmiddle">
+				<a href="#" id="app_logoff_text">Log Off</a>
 			</div>
-			<div id="mainBody">
-			<!--
-				<iframe id="UI"
-						src=""
-						frameborder="0">
-				</iframe>
-				-->
-				<div id="UI"></div>
+			<div id="headerImage">
+				<a href="#" id="app_main"><img src="images/logo.gif" alt="BugLogMini" align="absmiddle"></a>
+				<a href="#" id="app_loading_text"></a>
 			</div>
+		</div>
+		<div id="mainBody">
+			<div id="UI"></div>
 		</div>
 	</body>	
 </html>
