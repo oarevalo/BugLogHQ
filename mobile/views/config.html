@@ -1,69 +1,11 @@
 <!DOCTYPE html> 
 <html>
 	<head>
-		<title>BugLogMini: Main</title>
-		<link href="../style.css" rel="stylesheet" type="text/css">
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+		<title>BugLogMini: Settings</title>
 		<script type="text/javascript">
 			$(document).ready(function() {
-				parent.doPopulateApplications();
-				parent.doPopulateHosts();
-				parent.doPopulateSeverities();
-				$("#numDays").value = parent.serverInfo.numDays;
+				initConfigView();
 			});
-			function doPopulateApplications(items) {
-				for(var i=0;i < items.length;i++) {
-					$("#applicationID").
-				          append($("<option></option>").
-		                  attr("value",items[i].appID).
-		                  attr("selected",(parent.serverInfo.applicationID==items[i].appID)).
-		                  text(items[i].appCode)); 
-				}
-				$("#applicationID").attr("disabled",false);
-			}
-			function doPopulateHosts(items) {
-				for(var i=0;i < items.length;i++) {
-					$("#hostID").
-			          append($("<option></option>").
-	                  attr("value",items[i].hostID).
-	                  attr("selected",(parent.serverInfo.hostID==items[i].hostID)).
-	                  text(items[i].hostName)); 
-				}
-				$("#hostID").attr("disabled",false);
-			}
-			function doPopulateSeverities(items) {
-				var severities = new Array();
-				severities = parent.serverInfo.severities.split(",");
-				
-				var tmpHTML = "";
-				for(var i=0;i < items.length;i++) {
-					tmpHTML += "<input type='checkbox' name='severityID' value='"+items[i].severityID +"'";
-					if(severities.indexOf(items[i].severityID)!=-1) tmpHTML += " checked";
-					tmpHTML += "><img src='/bugLog/hq/images/severity/" + items[i].code.trim().toLowerCase()  + ".png' align='absmiddle'> ";
-					tmpHTML += items[i].name + "<br/>";
-				}
-				$("#severitiesContainer").html(tmpHTML);
-			}
-			function doSaveSettings(frm) {
-				var severities = new Array();
-				for(var i=0;i<frm.severityID.length;i++) {
-					if(frm.severityID[i].checked) {
-						severities[severities.length] = frm.severityID[i].value;
-					}
-				}
-				parent.doSaveSettings(frm.numDays.value, frm.applicationID.value, frm.hostID.value, severities.toString());
-			}
-			function displayError(e) {
-				var div = $("#contentArea");
-				div.innerHTML = "<div class='entryError'>An error ocurred while retrieving the bugLog data from the server:<br><br>" + e + "</div>";
-			}
-			function displayLoading() {
-				var tmpHTML = "<div style='text-align:center;margin-top:100px;'>";
-					tmpHTML += "<img src='../images/ajax-loader.gif'><br />";
-					tmpHTML += "Loading Data...";
-					tmpHTML += "</div>";
-				$("#contentArea").html(tmpHTML);
-			}
 		</script>
 	</head>
 	<body>
@@ -107,7 +49,7 @@
 				<br />
 				<br />
 				<p align="center">
-					<input type="button" name="btnSave" value="Apply Changes" onclick="doSaveSettings(this.form);displayLoading()" />
+					<input type="submit" name="btnSave" value="Apply Changes" />
 				</p>
 			</form>
 		</div>

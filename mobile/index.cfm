@@ -9,6 +9,7 @@
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
 		<script type="text/javascript" src="main.js"></script>
+		<script type="text/javascript" src="views.js"></script>
 		<script type="text/javascript">
 			<cfoutput>serverInfo.server = "#cgi.SERVER_NAME#<cfif cgi.server_port neq 80>:#cgi.server_port#</cfif>";</cfoutput>
 			$(document).ready(function() {
@@ -16,7 +17,7 @@
 			});
 		</script>
 	</head>
-	<body class="main">
+	<body>
 		<div id="mainContainer">
 			<div id="header">
 				<div id="topLinksRight">
@@ -32,10 +33,13 @@
 				</div>
 			</div>
 			<div id="mainBody">
+			<!--
 				<iframe id="UI"
 						src=""
 						frameborder="0">
 				</iframe>
+				-->
+				<div id="UI"></div>
 			</div>
 		</div>
 	</body>	

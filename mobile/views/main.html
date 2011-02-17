@@ -2,131 +2,14 @@
 <html>
 	<head>
 		<title>BugLogMini: Main</title>
-		<meta name="viewport" content="height=device-height,width=device-width" />
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
-		<link href="../style.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript">
 			$(document).ready(function() {
-				displayLoading();
-				parent.doGetSummary();
+				initMainView();
 			});
-			
-			function displayError(e) {
-				$("#contentArea").html("<div class='entryError'>An error ocurred while retrieving the bugLog data from the server:<br><br>" + e + "</div>");
-			}
-			function displayLoading() {
-				var tmpHTML = "<div style='text-align:center;margin-top:100px;'>";
-					tmpHTML += "<img src='../images/ajax-loader.gif'><br />";
-					tmpHTML += "Loading Data...";
-					tmpHTML += "</div>";
-				$("#contentArea").html(tmpHTML);				
-			}
-			function displaySummary(data) {
-				var div = $("#contentArea");
-				div.html("");
-				
-				if(data.length > 0) {
-					for(var i=0;i < data.length;i++) {
-						div.append(createSummaryCapsuleHTML(data[i]));
-					}
-	
-					$(".entryCapsule").click(viewListing);
-					
-				} else {
-					div.html("<br /><p align='center' style='font-size:16px;'>No bug reports found. Yay!</a>");
-				}
-				
-				// set the timer
-				parent.doSetListingRefreshTimer();
-			}
-			function displayListing(data) {
-				var div = $("#contentArea");
-				div.html("");
-				
-				if(data.length > 0) {
-					var tmpHTML = "<div class='entryListingHeader'>"
-						tmpHTML += "<div class='entryCapsuleApplication'>" + data[0].ApplicationCode + "</div>";
-						tmpHTML += "<div class='entryCapsuleMessage'>" + data[0].Message + "</div>";
-						tmpHTML += "</div>"
-					div.append(tmpHTML);
-
-					for(var i=0;i < data.length;i++) {
-						div.append(createListingCapsuleHTML(data[i]));
-					}
-
-					$(".entryCapsule").click(viewEntry);
-				}
-
-				$("#goBackHandle").click(doGoBack).show();
-			}
-			function displayEntry(data) {
-				$("#contentArea").html(createEntryHTML(data[0]));
-				$("#goBackHandle").click(doGoBack).show();
-			}
-
-
-			function viewListing(e) {
-				var entryID = this.getAttribute("entryID");
-				var applicationID = this.getAttribute("ApplicationID");
-				displayLoading();
-				parent.doGetListing(applicationID,entryID);
-			}
-			function viewEntry(e) {
-				var entryID = this.getAttribute("entryID");
-				displayLoading();
-				parent.doGetEntry(entryID);
-			}
-			function doGoBack() {
-				parent.setView("main");
-			}
-
-
-
-			function createSummaryCapsuleHTML(entry) {
-				var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "' applicationID='" + entry.ApplicationID + "'>";
-					tmpHTML += "<div class='entryCapsuleBugCount'>"
-					tmpHTML += "<img src='/bugLog/hq/images/severity/" + entry.SeverityCode.toLowerCase() + ".png'><br>"
-					tmpHTML += entry.bugCount 
-					tmpHTML += "</div>";
-					tmpHTML += "<div class='entryCapsuleApplication'>" + entry.ApplicationCode + "</div>";
-					tmpHTML += "<div class='entryCapsuleMessage' id='entryMessage_" + entry.EntryID + "'>" + entry.Message + "</div>";
-					tmpHTML += "<div class='entryCapsuleDate'>Last: " + entry.createdOn + "</div>";
-					tmpHTML += "</div>";
-				return tmpHTML;				
-			}
-			function createListingCapsuleHTML(entry) {
-				var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "'>";
-					tmpHTML += "<div class='entryCapsuleHost' style='float:right;'>" + entry.HostName + "</div>";
-					tmpHTML += "<div class='entryCapsuleDate'>";
-					tmpHTML += "<img src=''/bugLog/hq/images/severity/" + entry.SeverityCode.toLowerCase() + ".png' align='absmiddle'>&nbsp;"
-					tmpHTML += entry.createdOn + "</div>"
-					tmpHTML += "</div>";
-				return tmpHTML;				
-			}
-			function createEntryHTML(entry) {
-				var tmpHTML = "<table class='entryDetailTable'>";
-				tmpHTML += "<tr><td colspan='2' class='entryDetailTitle'>" 
-				tmpHTML += "<img src='/bugLog/hq/images/severity/" + jQuery.trim(entry.SeverityCode).toLowerCase()  + ".png' align='absmiddle' style='float:left;margin-right:3px;margin-top:5px;'>"
-				tmpHTML += entry.Message + "</td></tr>";
-				tmpHTML += "<tr><th>Application:</th><td>" + entry["ApplicationCode"] + "</td></tr>";
-				tmpHTML += "<tr><th>Host:</th><td>" + entry.HostName+ "</td></tr>";
-				tmpHTML += "<tr><th>Date/Time:</th><td>" + entry.createdOn + "</td></tr>";
-				tmpHTML += "<tr><th>Severity:</th><td>" + entry.SeverityCode + "</td></tr>";
-				if(entry.ExceptionMessage!='')
-					tmpHTML += "<tr><th>Exception Message:</th><td>" + entry.ExceptionMessage + "&nbsp;</td></tr>";
-				if(entry.ExceptionDetails!='')
-					tmpHTML += "<tr><th>Exception Details:</th><td>" + entry.ExceptionDetails + "&nbsp;</td></tr>";
-				if(entry.BugCFID!='' || entry.BugCFTOKEN!='')
-					tmpHTML += "<tr><th>CFID/CFTOKEN:</th><td>" + entry.BugCFID + " / " + entry.BugCFTOKEN + "</td></tr>";
-				tmpHTML += "<tr><th>User Agent:</th><td>" + entry.UserAgent + "</td></tr>";
-				tmpHTML += "<tr><th>Template Path:</th><td>" + entry.TemplatePath + "</td></tr>";
-				tmpHTML += "</table><br/><b>Full Report:</b><br />" + entry.HTMLReport;
-				return tmpHTML;				
-			}
 		</script>
 	</head>
 	<body>
-		<div class='goBack' id='goBackHandle' style="display:none;">&laquo; Back</div>
+		<div class="goBack" id="goBackHandle" style="display:none;">&laquo; Back</div>
 		<div id="contentArea">
 		</div>
 	</body>

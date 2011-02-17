@@ -2,36 +2,15 @@
 <html>
 	<head>
 		<title>BugLogMini: Connect</title>
-		<link href="../style.css" rel="stylesheet" type="text/css">
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function() {
-				serverInfo = parent.doGetServerInfo();
-				
-				$("#server").val(serverInfo.server);
-				$("#username").val(serverInfo.username);
-				$("#password").val(serverInfo.password);
-				$("#rememberMe").attr("checked",serverInfo.rememberMe);
-			});
-			
-			function doConnect(frm) {
-				parent.doConnect($("#server").val(),
-								$("#username").val(),
-								$("#password").val(),
-								$("#rememberMe").attr("checked"));
-			}
-			function displayLoading() {
-				var tmpHTML = "<div style='text-align:center;margin-top:100px;'>";
-					tmpHTML += "<img src='../images/ajax-loader.gif'><br />";
-					tmpHTML += "Loading Data...";
-					tmpHTML += "</div>";
-				$("#contentArea").html(tmpHTML)
-			}
+				initConnectView();
+			});			
 		</script>		
 	</head>
 	<body>
 		<div id="contentArea">
-			<form name="frm" method="post" action="#" class="dataForm" id="frmConnect">
+			<form name="frm" method="post" action="javascript:void();" class="dataForm">
 				<input type="hidden" name="server" id="server" value="" />
 				<table align="center">
 					<tr>
@@ -51,7 +30,7 @@
 					<tr>
 						<td colspan="2">
 							<div style="float:right;">
-								<input type="button" value="Connect" name="btnConnect" onclick="doConnect(this.form);displayLoading()"/>
+								<input type="submit" value="Connect" name="btnConnect" />
 							</div>
 							<input type="checkbox" name="rememberMe" id="rememberMe" value="1"> Remember me
 						</td>

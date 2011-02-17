@@ -1,8 +1,8 @@
-var bugLogDefaultPath = ""
 var bugLogMiniPath = "/bugLog/mobile/"
 var bugLogHQPath = "/bugLog/hq/"
 var bugLogProxyPath = "/bugLog/bugLogProxy.cfm"
 var bugLogProtocol = "http"
+var bugLogURL = "";
 
 var serverInfo = {
 	username: "",
@@ -17,6 +17,7 @@ var serverInfo = {
 };
 
 var listingRefreshTimer = 0;
+var mainViewCallback = 0;
 
 function initApp() {
 	// attach actions
@@ -28,6 +29,7 @@ function initApp() {
 
 	// load any stored login credentials
 	loadServerInfo();
+	bugLogURL = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
 
 	if(serverInfo.rememberMe)
 		doConnect(serverInfo.server,serverInfo.username,serverInfo.password,serverInfo.rememberMe);
@@ -38,7 +40,8 @@ function initApp() {
 }
 
 function setView(vw) {
-	document.getElementById('UI').contentWindow.location = bugLogMiniPath + "views/" + vw + ".html";
+	var loc = bugLogMiniPath + "views/" + vw + ".html";
+	jQuery("#UI").load(loc);
 } 
 
 function doRefresh() {
@@ -73,6 +76,8 @@ function doConnect(srv,usr,pwd,rem) {
 		url += "&username="+usr;
 		url += "&password="+pwd;
 
+	displayLoading();
+
 	$.ajax({
 		url:url,
 		success: function(data) {
@@ -101,58 +106,47 @@ function doConnect(srv,usr,pwd,rem) {
 }
 
 function doGetSummary() {
-	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
-		url += "?action=getSummary";
-		url += "&numDays="+serverInfo.numDays;
-		url += "&applicationID="+serverInfo.applicationID;
-		url += "&hostID="+serverInfo.hostID;
-		url += "&severities="+serverInfo.severities;
-		url += "&token="+serverInfo.token;
-	doGetData(url, document.getElementById('UI').contentWindow.displaySummary);
+	var qs = "numDays="+serverInfo.numDays;
+		qs += "&applicationID="+serverInfo.applicationID;
+		qs += "&hostID="+serverInfo.hostID;
+		qs += "&severities="+serverInfo.severities;
+	displayLoading();
+	doGetData("getSummary", qs, mainViewCallback);
 }
 
-function doGetListing(appID,entryID) {
-	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
-		url += "?action=getListing";
-		url += "&msgFromEntryID="+entryID;
-		url += "&token="+serverInfo.token;
-		url += "&numDays="+serverInfo.numDays;
-	doGetData(url, document.getElementById('UI').contentWindow.displayListing);
+function doGetListing(entryID, callback) {
+	var qs = "msgFromEntryID="+entryID;
+		qs += "&numDays="+serverInfo.numDays;
+	displayLoading();
+	doGetData("getListing", qs, callback);
 }
 
-function doGetEntry(entryID) {
-	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
-		url += "?action=getEntry";
-		url += "&entryID="+entryID;
-		url += "&token="+serverInfo.token;
-	doGetData(url, document.getElementById('UI').contentWindow.displayEntry);
+function doGetEntry(entryID, callback) {
+	var qs = "entryID="+entryID;
+	displayLoading();
+	doGetData("getEntry", qs, callback);
 }
 
-function doPopulateApplications(entryID) {
-	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
-		url += "?action=getApplications";
-		url += "&token="+serverInfo.token;
-	doGetData(url, document.getElementById('UI').contentWindow.doPopulateApplications);
+function doGetApplications(callback) {
+	doGetData("getApplications", "", callback);
 }
 
-function doPopulateHosts(entryID) {
-	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
-		url += "?action=getHosts";
-		url += "&token="+serverInfo.token;
-	doGetData(url, document.getElementById('UI').contentWindow.doPopulateHosts);
+function doGetHosts(callback) {
+	doGetData("getHosts", "", callback);
 }
 
-function doPopulateSeverities(entryID) {
-	var url = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
-		url += "?action=getSeverities";
-		url += "&token="+serverInfo.token;
-	doGetData(url, document.getElementById('UI').contentWindow.doPopulateSeverities);
+function doGetSeverities(callback) {
+	doGetData("getSeverities", "", callback);
 }
 
 
 
 
-function doGetData(url,func) {
+function doGetData(action,qs,func) {
+	var url = bugLogURL;
+		url += "?action="+action;
+		url += "&" + qs;
+		url += "&token="+serverInfo.token;
 	clearInterval(listingRefreshTimer);
 	$("#app_loading_text").html("Loading...");
 	$.ajax({
@@ -285,3 +279,15 @@ function checkForErrors(data) {
 	}
 	return false;
 }
+function displayLoading() {
+	var tmpHTML = "<div style='text-align:center;margin-top:100px;'>";
+		tmpHTML += "<img src='../images/ajax-loader.gif'><br />";
+		tmpHTML += "Loading Data...";
+		tmpHTML += "</div>";
+	$("#UI").contents().find("#contentArea").html(tmpHTML)
+}
+function displayError(e) {
+	$("#UI").contents().find("#contentArea").html("<div class='entryError'>An error ocurred while retrieving the bugLog data from the server:<br><br>" + e + "</div>");
+}
+		
+		
