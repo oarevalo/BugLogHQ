@@ -36,7 +36,10 @@
 		<h1><span style="color:red;">BugLog</span>HQ Digest</h1>
 	
 		<cfoutput>
-		<p>BugLog has received the following bug reports since <b>#DateFormat(digestStartDate,"long")# #lsTimeFormat(digestStartDate)#</b>:</p>
+			<p>The BugLog Server at <a href="#thisHost#">#thisHost#</a> has received the 
+			following bug reports in the last 
+			<b>#settings.schedulerIntervalHours# hour<cfif settings.schedulerIntervalHours gt 1>s</cfif></b>  
+			since <b>#DateFormat(digestStartDate,"long")# #lsTimeFormat(digestStartDate)#</b>:</p>
 		</cfoutput>
 		
 		<cfinclude template="includes/digest_bugs_by_severity.cfm">
