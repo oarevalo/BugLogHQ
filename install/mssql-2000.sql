@@ -263,7 +263,8 @@ CREATE TABLE [dbo].[bl_User] (
 		[UserID]       int IDENTITY (1,1) NOT NULL,
 		[Username]     varchar(250) NOT NULL,
 		[Password]     varchar(50) NOT NULL,
-		[IsAdmin]	   int NOT NULL
+		[IsAdmin]	   int NOT NULL,
+		[email] 		VARCHAR(255) NULL
 )
 ON [PRIMARY]
 GO

@@ -24,5 +24,5 @@ ALTER TABLE [dbo].[bl_Extension]
 GO
 
 
-ALTER TABLE [bl_User] ADD COLUMN eamil VARCHAR(255) NOT NULL;
+ALTER TABLE [bl_User] ADD COLUMN email VARCHAR(255) NULL;
 GO

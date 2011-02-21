@@ -12,4 +12,4 @@ CREATE TABLE `bl_Extension` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ALTER TABLE bl_User
- ADD Email VARCHAR(255) AFTER IsAdmin;
+ ADD Email VARCHAR(255) NULL AFTER IsAdmin;
