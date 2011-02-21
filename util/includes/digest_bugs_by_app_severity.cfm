@@ -19,32 +19,28 @@
 		<th style="background-color:#90A4B5;line-height: 14px;color: #FFFFFF;font-size:13px;padding:3px;">Most Recent</th>
 	</tr>
 	<cfset prevAppCode = "">
-	<cfoutput query="qrySummary" group="ApplicationCode">
-		<tr valign="top" style="line-height:12px;color:##333;font-size:12px;background-color:##F6F6F6;">
-			<td style="padding:3px;border:1px dotted silver;">
-				<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?applicationID=#ApplicationID#">
-				<a href="#tmpURL#">#ApplicationCode#</a>
+	<cfoutput query="qrySummary">
+		<tr valign="top" style="line-height:12px;color:##333;font-size:12px;<cfif currentRow mod 2>background-color:##F6F6F6;</cfif>">
+			<cfif applicationCode eq prevAppCode>
+				<td style="padding:3px;border:1px dotted silver;">&nbsp;</td>
+			<cfelse>
+				<td style="padding:3px;border:1px dotted silver;">
+					<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?applicationID=#ApplicationID#">
+					<a href="#tmpURL#">#ApplicationCode#</a>
+				</td>
+			</cfif>
+			<td style="padding:3px;border:1px dotted silver;" align="center">
+				<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?applicationID=#ApplicationID#&severityID=#severityID#">
+				<a href="#tmpURL#"><img src="#thisHost#/bugLog/hq/images/severity/#lcase(SeverityCode)#.png" align="absmiddle" alt="#severityCode#" title="Click to see all bugs flagged as '#severityCode#'"></a>
 			</td>
-			<cfoutput>
-				<cfif applicationCode eq prevAppCode>
-					<tr style="line-height:12px;color:##333;font-size:12px;">
-					<td style="padding:3px;border:1px dotted silver;">&nbsp;</td>
-				</cfif>
-				<td style="padding:3px;border:1px dotted silver;" align="center">
-					<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?applicationID=#ApplicationID#&severityID=#severityID#">
-					<a href="#tmpURL#"><img src="#thisHost#/bugLog/hq/images/severity/#lcase(SeverityCode)#.png" align="absmiddle" alt="#severityCode#" title="Click to see all bugs flagged as '#severityCode#'"></a>
-				</td>
-				<td style="padding:3px;border:1px dotted silver;padding-right:10px;" align="right">
-					<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspLog&msgFromEntryID=#EntryID#&applicationID=#ApplicationID#&severityID=#severityID#">
-					<a href="#tmpURL#">#bugCount#</a>
-				</td>
-				<td style="padding:3px;border:1px dotted silver;" align="center">
-					<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#EntryID#">
-					<a href="#tmpURL#">#dateFormat(createdOn,dateMask)# #lsTimeFormat(createdOn)#</a>
-				</td>
-				</tr>
-				<cfset prevAppCode = applicationCode>
-			</cfoutput>
+			<td style="padding:3px;border:1px dotted silver;padding-right:10px;" align="right">
+				<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspLog&msgFromEntryID=#EntryID#&applicationID=#ApplicationID#&severityID=#severityID#">
+				<a href="#tmpURL#">#bugCount#</a>
+			</td>
+			<td style="padding:3px;border:1px dotted silver;" align="center">
+				<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#EntryID#">
+				<a href="#tmpURL#">#dateFormat(createdOn,dateMask)# #lsTimeFormat(createdOn)#</a>
+			</td>
 		</tr>
 		<cfset prevAppCode = applicationCode>
 	</cfoutput>
