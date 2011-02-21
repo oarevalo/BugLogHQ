@@ -59,8 +59,15 @@ codes can be selected via dropdowns; or can also be prepopulated from an existin
 the environment is detected buglog can override any setting with custom values.
 * Added option to disable editing settings through the UI (useful if you have your config file versioned
 	and only want to configure buglog that way)
+* Added the "BugLog Digest" which is a configurable and periodic email summary of all reports received
+in the last X hours.
+* Rewrote the "iphone" UI to be for mobiles in general (now its accessible at /bugLog/mobile), also there
+is an improved platform detection when going to /bugLog. If you go with any mobile browser you should get
+redirected to the new UI, otherwise you go to the regular desktop UI
 * Multiple bug fixes 
 
+
+-----------------------------------------------------------------------
  > New in 1.4 (11/2009)
 -----------------------------------------------------------------------
 * Bug reports and rules are now processed asynchronously and not at the time they arrive. 
@@ -243,13 +250,18 @@ your bug reports might get truncated.
 * Thanks to Tom DeManincor for creating the SQL script for MSSQL
 * Thanks to Chuck Weidler for updating and providing the SQL scripts for Access, MS SQL Server 2000, MSSQL Server 2005
 * Thanks to WST crew at Mentor Graphics for the great suggestions and ideas to improve BugLog
-
+* Thanks to everyone that contributes code and patches to the project!
 
 
 -----------------------------------------------------------------------
 8. Bugs, suggestions, criticisms, well-wishes, good vibrations, etc
 ---------------------------------------------------------------------------
-Please send to oarevalo@gmail.com or share them on the forum at http://bugloghq.riaforge.org/
+There is now a Google Groups for the BugLogHQ project. Use them to ask any questions, 
+ask for help if you get stuck, or if you have any contributions that you would like
+to share.
+Google Groups Page:  http://groups.google.com/group/bugloghq
+
+
 
 
 

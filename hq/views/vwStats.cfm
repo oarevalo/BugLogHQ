@@ -104,7 +104,7 @@
 	<br>
 
 	<cfchart chartwidth="700" markersize="5" xaxistitle="#datePartName#"  yaxistitle="Bug count" title="Timeline [#tmpAppName#]">
-		<cfchartseries query="qryTimeline" type="area" markerstyle="snow" itemcolumn="DatePartValue" valuecolumn="numcount" paintstyle="raise">
+		<cfchartseries query="qryTimeline" type="line" markerstyle="snow" itemcolumn="DatePartValue" valuecolumn="numcount" paintstyle="raise">
 	</cfchart>
 </p>
 
