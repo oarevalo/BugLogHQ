@@ -230,6 +230,7 @@
 			var i = 0;
 			var aTags = arrayNew(1);
 			var qryTagContext = queryNew("template,line");
+			var tmpURL = "";
 			
 			if(structKeyExists(arguments.exception,"tagContext")) {
 				aTags = duplicate(arguments.exception.tagContext);
@@ -239,6 +240,11 @@
 					QuerySetCell(qryTagContext, "line", aTags[i].line);				
 				}
 			}
+
+			// reconstruct full URL
+			tmpURL = getPageContext().getRequest().getRequestURL();
+			if(cgi.QUERY_STRING neq "")
+				tmpURL = tmpURL & "?" & cgi.QUERY_STRING;
 		</cfscript>
 		
 
@@ -252,7 +258,11 @@
 				</tr>
 				<tr>
 					<td><b>Host:</b></td>
-						<td>#HtmlEditFormat(variables.hostName)#</td>
+					<td>#HtmlEditFormat(variables.hostName)#</td>
+				</tr>
+				<tr>
+					<td><b>URL:</b></td>
+					<td><a href="#tmpURL#" target="_blank">#tmpURL#</a></td>
 				</tr>
 				<tr>
 					<td><b>Server Date/Time:</b></td>
