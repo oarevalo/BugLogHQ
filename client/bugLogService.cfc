@@ -29,6 +29,13 @@
 			var wsParams = structNew();
 			wsParams.refreshWsdl = true;
 			wsParams.timeout = 30;
+
+			// trim spaces
+			arguments.bugLogListener = trim(arguments.bugLogListener);
+			arguments.bugEmailRecipients = trim(arguments.bugEmailRecipients);
+			arguments.bugEmailSender = trim(arguments.bugEmailSender);
+			arguments.hostname = trim(arguments.hostname);
+			arguments.apikey = trim(arguments.apikey);
 			
 			// determine the protocol based on the bugLogListener location 
 			// this will tell us how to locate and talk to the listener
