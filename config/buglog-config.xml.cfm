@@ -12,7 +12,7 @@
 	<setting name="service.serviceCFC">bugLog.components.bugLogListenerAsync</setting>
 	<setting name="service.autoStart">true</setting>
 	<setting name="service.requireAPIKey">false</setting>
-	<setting name="service.API">2CF20630-DD24-491F-BA44314842183AFC</setting>
+	<setting name="service.APIKey">2CF20630-DD24-491F-BA44314842183AFC</setting>
 	<setting name="service.maxQueueSize">1000</setting>
 	<setting name="service.maxLogSize">20</setting>
 	<setting name="service.schedulerIntervalSecs">120</setting>
