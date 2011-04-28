@@ -116,7 +116,7 @@ CREATE TABLE `bl_User` (
 
 LOCK TABLES `bl_User` WRITE;
 /*!40000 ALTER TABLE `bl_User` DISABLE KEYS */;
-INSERT INTO `bl_User` VALUES (1,'admin','admin',1,NULL);
+INSERT INTO `bl_User` (UserID,Username,Password,IsAdmin) VALUES (1,'admin','admin',1);
 /*!40000 ALTER TABLE `bl_User` ENABLE KEYS */;
 UNLOCK TABLES;
 
