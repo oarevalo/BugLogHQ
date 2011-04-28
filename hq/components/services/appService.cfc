@@ -287,18 +287,17 @@
 		<cfargument name="interval" type="numeric" required="true">
 		<cfargument name="startTime" type="string" required="true">
 		<cfargument name="sendIfEmpty" type="boolean" required="true">
-		
-		<cfset variables.config.setSetting("digest.enabled", arguments.enabled)>
-		<cfset variables.config.setSetting("digest.recipients", arguments.recipients)>
-		<cfset variables.config.setSetting("digest.schedulerIntervalHours", arguments.interval)>
-		<cfset variables.config.setSetting("digest.schedulerStartTime", arguments.startTime)>
-		<cfset variables.config.setSetting("digest.sendIfEmpty", arguments.sendIfEmpty)>
-
 		<cfscript>
 			var thisHost = "";
 			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
 			thisHost = thisHost & cgi.server_name;
 			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
+
+			variables.config.setSetting("digest.enabled", arguments.enabled);
+			variables.config.setSetting("digest.recipients", arguments.recipients);
+			variables.config.setSetting("digest.schedulerIntervalHours", arguments.interval);
+			variables.config.setSetting("digest.schedulerStartTime", arguments.startTime);
+			variables.config.setSetting("digest.sendIfEmpty", arguments.sendIfEmpty);
 		</cfscript>
 
 		<cfif arguments.enabled>
