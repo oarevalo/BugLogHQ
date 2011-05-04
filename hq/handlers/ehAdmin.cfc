@@ -13,7 +13,14 @@
 			var cfg = getService("config");
 			var jira = getService("jira");
 			var jiraConfig = structNew();
-			var panel = getValue("panel","general");
+			var panel = getValue("panel");
+			
+			if(panel eq "") {
+				if(user.getIsAdmin())
+					panel = "general";
+				else
+					panel = "changePassword";	
+			}
 			
 			try {
 				switch(panel) {
