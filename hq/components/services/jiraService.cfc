@@ -15,6 +15,10 @@
 																											password = getSetting("password") )>
 		<cfreturn this>
 	</cffunction>
+	
+	<cffunction name="reinit" access="public" returntype="void">
+		<cfset init( variables.instance.config )>
+	</cffunction>
 
 	<cffunction name="getProjects" access="public" returntype="array">
 		<cfreturn variables.instance.jira.getProjects()>

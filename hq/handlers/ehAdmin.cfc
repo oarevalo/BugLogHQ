@@ -270,7 +270,8 @@
 				getService("jira").setSetting("enabled", enabled)
 									.setSetting("wsdl", wsdl)
 									.setSetting("username", username)
-									.setSetting("password", password);
+									.setSetting("password", password)
+									.reinit();
 
 				setMessage("info","JIRA integration settings updated.");
 				setNextEvent("ehAdmin.dspMain","panel=jira");
