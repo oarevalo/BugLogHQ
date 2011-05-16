@@ -55,6 +55,9 @@
 	</cffunction>
 
 	<cffunction name="getAuthToken" access="private" returntype="string">
+		<cfif variables.instance.wsdl eq "">
+			<cfthrow message="The URL for the JIRA WSDL is missing. Please update with the correct location.">
+		</cfif>
 		<cfif left(variables.instance.wsdl,4) eq "http">
 			<cfset variables.instance.jiraws = createObject("webservice",variables.instance.wsdl)>
 		<cfelse>
