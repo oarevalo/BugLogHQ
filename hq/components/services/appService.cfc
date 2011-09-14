@@ -263,7 +263,7 @@
 					<cfif dbType eq "mysql">
 						createdOn < NOW() - INTERVAL #purgeHistoryDays# DAY
 					<cfelseif dbType contains "mssql" or dbType eq "access">
-						DATEDIFF(day, GETDATE(), createdOn) > #purgeHistoryDays#
+						DATEDIFF(day, createdOn, GETDATE()) > #purgeHistoryDays#
 					</cfif>
 			</cfoutput>
 		</cfsavecontent>
