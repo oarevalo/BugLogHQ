@@ -284,9 +284,15 @@
 		<cfelse>
 			<cfset zoomURL = "?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#">
 		</cfif>
-		<cfset tmpRowClass = "row_app_" & replace(qryEntries.applicationCode," ","","ALL") & " "
-							 & "row_host_" & replace(qryEntries.hostName," ","","ALL") & " "
-						 	 & "row_sev_" & replace(qryEntries.SeverityCode," ","","ALL")>
+
+		<cfset tmpRowClass = "">		
+		<cfif structKeyExists(qryEntries,"applicationCode")>
+			<cfset tmpRowClass = tmpRowClass & "row_app_" & replace(qryEntries.applicationCode," ","","ALL") & " ">
+		</cfif>
+		<cfif structKeyExists(qryEntries,"hostName")>
+			<cfset tmpRowClass = tmpRowClass & "row_host_" & replace(qryEntries.hostName," ","","ALL") & " ">
+		</cfif>
+		<cfset tmpRowClass = tmpRowClass & "row_sev_" & replace(qryEntries.SeverityCode," ","","ALL")>
 		
 		<tr class="#LCase(tmpRowClass)#<cfif qryEntries.currentRow mod 2> altRow</cfif>" <cfif isNew>style="font-weight:bold;"</cfif>>
 			<td class="cell_severity" width="15" align="center" style="padding:0px;">
