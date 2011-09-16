@@ -19,11 +19,12 @@
 	<cfset this.emailErrors = false>
 
 	<!--- Define mappings and custom tag paths --->
-	<cfset this.customTagPaths = getDirectoryFromPath(getcurrenttemplatepath()) & "customTags">
-	<cfset this.mappings["/config"] = getDirectoryFromPath(getcurrenttemplatepath()) & "config">
-	<cfset this.mappings["/handlers"] = getDirectoryFromPath(getcurrenttemplatepath()) & "handlers">
-	<cfset this.mappings["/layouts"] = getDirectoryFromPath(getcurrenttemplatepath()) & "layouts">
-	<cfset this.mappings["/views"] = getDirectoryFromPath(getcurrenttemplatepath()) & "views">
+	<cfset this.appPath = "/bugLog/hq/">
+	<cfset this.customTagPaths = expandPath(this.appPath& "customTags")>
+	<cfset this.mappings["/config"] = expandPath(this.appPath & "config")>
+	<cfset this.mappings["/handlers"] = expandPath(this.appPath & "handlers")>
+	<cfset this.mappings["/layouts"] = expandPath(this.appPath & "layouts")>
+	<cfset this.mappings["/views"] = expandPath(this.appPath & "views")>
 
 	<cffunction name="onRequestStart">
 		<cfparam name="Event" default=""> <!--- use to determine the action to perform --->
@@ -72,7 +73,8 @@
 	<cffunction name="onRequest">
 		<cfargument name="targetPage" type="String" required="true" />
 		<cfif request.requestState.layout neq "">
-			<cfinclude template="/layouts/#request.requestState.layout#.cfm">
+			<!--- use actual path instead of mapping due to a random missing include error --->
+			<cfinclude template="/bugLog/hq/layouts/#request.requestState.layout#.cfm">
 		<cfelse>
 			<cfinclude template="#targetPage#">
 		</cfif>
