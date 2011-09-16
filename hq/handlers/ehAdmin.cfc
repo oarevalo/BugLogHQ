@@ -21,7 +21,7 @@
 				else
 					panel = "changePassword";	
 			}
-			
+						
 			try {
 				switch(panel) {
 					case "general":
@@ -67,6 +67,9 @@
 						setValue("interval", digestConfig.schedulerIntervalHours);			
 						setValue("startTime", digestConfig.schedulerStartTime);			
 						setValue("sendIfEmpty", digestConfig.sendIfEmpty);			
+						setValue("app", digestConfig.application);			
+						setValue("host", digestConfig.host);			
+						setValue("severity", digestConfig.severity);			
 						break;
 				}
 
@@ -316,13 +319,16 @@
 			var interval = getValue("interval");
 			var startTime = getValue("startTime");
 			var sendIfEmpty = getValue("sendIfEmpty",false);
+			var app = getValue("app");
+			var host = getValue("host");
+			var severity = getValue("severity");
 			
 			try {
 				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=digest");}
 				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("ehAdmin.dspMain","panel=digest");}
 				if(interval eq "") {setMessage("warning","Please set the digest interval"); setNextEvent("ehAdmin.dspMain","panel=digest");};
 				if(startTime eq "") {setMessage("warning","Please enter the start time"); setNextEvent("ehAdmin.dspMain","panel=digest");};
-				getService("app").setDigestSettings(enabled, recipients, interval, startTime, sendIfEmpty);
+				getService("app").setDigestSettings(enabled, recipients, interval, startTime, sendIfEmpty, severity, app, host);
 				setMessage("info","Digest settings updated.");
 				setNextEvent("ehAdmin.dspMain","panel=digest");
 							

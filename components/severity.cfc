@@ -13,6 +13,8 @@
 		function getSeverityID() {return variables.instance.ID;}
 		function getName() {return variables.instance.name;}
 		function getCode() {return variables.instance.code;}
+
+		function getID() {return variables.instance.ID;}
 	</cfscript>
 	
 	<cffunction name="init" access="public" returnType="severity">

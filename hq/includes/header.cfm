@@ -9,22 +9,25 @@
 			</div>
 		</td> 
 		<td align="right" style="padding-right:10px;">
-
-			<cfif request.requestState.hostName neq "">
-				<span style="font-size:10px;font-weight:bold;border-bottom:1px dotted #333;padding-bottom:8px;">
-					<cfoutput>
+			<span style="font-size:10px;font-weight:bold;border-bottom:1px dotted #333;padding-bottom:8px;">
+				<cfoutput>
 					#lsDateFormat(now())#
-					&nbsp;&nbsp;|&nbsp;&nbsp;
-					#request.requestState.hostName#
-					&nbsp;&nbsp;|&nbsp;&nbsp;
-					<a href="?event=ehAdmin.dspMain">Settings</a>
-					&nbsp;&nbsp;|&nbsp;&nbsp;
-					#request.requestState.currentUser.getUsername()#
-					( <a href="?event=ehGeneral.doLogoff">Log off</a> )
-					</cfoutput>
-				</span>
-			</cfif>
-
+					<cfif request.requestState.hostName neq "">
+							&nbsp;&nbsp;|&nbsp;&nbsp;
+							#request.requestState.hostName#
+							<cfif request.requestState.configKey neq "">
+								(#request.requestState.configKey#)
+							</cfif>
+					</cfif>
+					<cfif structKeyExists(request.requestState,"currentUser")>
+						&nbsp;&nbsp;|&nbsp;&nbsp;
+						<a href="?event=ehAdmin.dspMain">Settings</a>
+						&nbsp;&nbsp;|&nbsp;&nbsp;
+						#request.requestState.currentUser.getUsername()#
+						( <a href="?event=ehGeneral.doLogoff">Log off</a> )
+					</cfif>
+				</cfoutput>
+			</span>
 		</td>
 	</tr>
 </table>

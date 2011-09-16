@@ -49,6 +49,8 @@
 		function getTemplate_Path() {return variables.instance.templatePath;}
 		function getHTMLReport() {return variables.instance.HTMLReport;}
 		function getCreatedOn() {return variables.instance.createdOn;}
+
+		function getID() {return variables.instance.ID;}
 	</cfscript>
 	
 	<cffunction name="init" access="public" returnType="entry">

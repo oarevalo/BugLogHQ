@@ -31,7 +31,8 @@
 			</cfif>
 			<td style="padding:3px;border:1px dotted silver;" align="center">
 				<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?applicationID=#ApplicationID#&severityID=#severityID#">
-				<a href="#tmpURL#"><img src="#thisHost#/bugLog/hq/images/severity/#lcase(SeverityCode)#.png" align="absmiddle" alt="#severityCode#" title="Click to see all bugs flagged as '#severityCode#'"></a>
+				<cfset tmpImgURL = thisHost & getSeverityIconURL(severityCode)>
+				<a href="#tmpURL#"><img src="#tmpImgURL#" align="absmiddle" alt="#severityCode#" title="Click to see all bugs flagged as '#severityCode#'"></a>
 			</td>
 			<td style="padding:3px;border:1px dotted silver;padding-right:10px;" align="right">
 				<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspLog&msgFromEntryID=#EntryID#&applicationID=#ApplicationID#&severityID=#severityID#">

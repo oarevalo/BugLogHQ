@@ -30,7 +30,10 @@
 	<setting name="digest.schedulerIntervalHours">24</setting>
 	<setting name="digest.schedulerStartTime">06:00</setting>
 	<setting name="digest.sendIfEmpty">false</setting>
-	
+	<setting name="digest.severity"></setting>
+	<setting name="digest.application"></setting>
+	<setting name="digest.host"></setting>
+		
 	<!-- Environment-specific Settings: 
 		
 		You can override any of the above settings for specific environments. 

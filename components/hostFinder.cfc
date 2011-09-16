@@ -34,4 +34,9 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="findByCode" returnType="host" access="public">
+		<cfargument name="code" type="string" required="true">
+		<cfreturn findByName(arguments.code)>
+	</cffunction>
+
 </cfcomponent>

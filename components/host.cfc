@@ -12,6 +12,8 @@
 		
 		function getHostID() {return variables.instance.hostID;}
 		function getHostName() {return variables.instance.hostName;}
+
+		function getID() {return getHostID();}
 	</cfscript>
 	
 	<cffunction name="init" access="public" returnType="host">

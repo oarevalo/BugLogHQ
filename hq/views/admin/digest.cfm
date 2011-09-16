@@ -71,6 +71,29 @@
 						</div>
 					</td>
 				</tr>
+				<tr valign="top">
+					<td>Filters:</td>
+					<td>
+						<table>
+							<tr>
+								<td>Application:</td>
+								<td><input type="text" name="app" value="#rs.app#" class="formField" <cfif !allowConfigEditing>disabled</cfif>></td>
+							</tr>
+							<tr>
+								<td>Host:</td>
+								<td><input type="text" name="severity" value="#rs.severity#" class="formField" <cfif !allowConfigEditing>disabled</cfif>></td>
+							</tr>
+							<tr>
+								<td>Severity:</td>
+								<td><input type="text" name="host" value="#rs.host#" class="formField" <cfif !allowConfigEditing>disabled</cfif>></td>
+							</tr>
+						</table>
+						<div class="formFieldTip">
+							Use these fields to customize your digest report. Enter one or more values for each field to limit the digest to those values. To explicitly
+							<b><u>exclude</u></b> items from the digest report, start the list with a dash ( - ).
+						</div>
+					</td>
+				</tr>
 			</table>
 			<br />
 			<input type="submit" name="btnSave" value="Apply Changes" <cfif !allowConfigEditing>disabled</cfif>>

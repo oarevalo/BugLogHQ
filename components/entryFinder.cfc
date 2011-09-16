@@ -31,8 +31,8 @@
 
 	<cffunction name="search" returnType="query" access="public">
 		<cfargument name="searchTerm" type="string" required="true">
-		<cfargument name="applicationID" type="numeric" required="false" default="0">
-		<cfargument name="hostID" type="numeric" required="false" default="0">
+		<cfargument name="applicationID" type="string" required="false" default="0">
+		<cfargument name="hostID" type="string" required="false" default="0">
 		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
@@ -66,8 +66,8 @@
 	
 	<cffunction name="searchForSQL" returntype="query" access="private">
 		<cfargument name="searchTerm" type="string" required="true">
-		<cfargument name="applicationID" type="numeric" required="false" default="0">
-		<cfargument name="hostID" type="numeric" required="false" default="0">
+		<cfargument name="applicationID" type="string" required="false" default="0">
+		<cfargument name="hostID" type="string" required="false" default="0">
 		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
@@ -135,14 +135,14 @@
 					<cfif arguments.message neq "">
 						AND message LIKE '#arguments.message#'
 					</cfif>
-					<cfif arguments.applicationID gt 0>
-						AND e.applicationID = #arguments.applicationID# 
+					<cfif arguments.applicationID neq "" and arguments.applicationID neq 0 and arguments.applicationID neq "_ALL_">
+						AND e.applicationID <cfif left(arguments.applicationID,1) eq "-"><cfset arguments.applicationID = removechars(arguments.applicationID,1,1)>NOT</cfif> IN (#arguments.applicationID#) 
 					</cfif>
-					<cfif arguments.hostID gt 0>
-						AND e.hostID = #arguments.hostID# 
+					<cfif arguments.hostID neq "" and arguments.hostID neq 0 and arguments.hostID neq "_ALL_">
+						AND e.hostID <cfif left(arguments.hostID,1) eq "-"><cfset arguments.hostID = removechars(arguments.hostID,1,1)>NOT</cfif> IN (#arguments.hostID#) 
 					</cfif>
 					<cfif arguments.severityID neq "" and arguments.severityID neq 0 and arguments.severityID neq "_ALL_">
-						AND e.severityID IN (#arguments.severityID#) 
+						AND e.severityID <cfif left(arguments.severityID,1) eq "-"><cfset arguments.severityID = removechars(arguments.severityID,1,1)>NOT</cfif> IN (#arguments.severityID#) 
 					</cfif>
 					<cfif arguments.startDate neq "1/1/1800">
 						AND mydateTime >= #arguments.startDate# 
@@ -165,8 +165,8 @@
 
 	<cffunction name="searchForAccess" returntype="query" access="private">
 		<cfargument name="searchTerm" type="string" required="true">
-		<cfargument name="applicationID" type="numeric" required="false" default="0">
-		<cfargument name="hostID" type="numeric" required="false" default="0">
+		<cfargument name="applicationID" type="string" required="false" default="0">
+		<cfargument name="hostID" type="string" required="false" default="0">
 		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
@@ -276,8 +276,8 @@
 
 	<cffunction name="searchForXML" returnType="query" access="private">
 		<cfargument name="searchTerm" type="string" required="true">
-		<cfargument name="applicationID" type="numeric" required="false" default="0">
-		<cfargument name="hostID" type="numeric" required="false" default="0">
+		<cfargument name="applicationID" type="string" required="false" default="0">
+		<cfargument name="hostID" type="string" required="false" default="0">
 		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
@@ -294,8 +294,8 @@
 		<cfset var stSearchParams = structNew()>
 
 		<cfscript>
-			if(arguments.applicationID gt 0) stSearchParams.applicationID = arguments.applicationID;
-			if(arguments.hostID gt 0) stSearchParams.hostID = arguments.hostID;
+			if(arguments.applicationID neq "" and arguments.applicationID neq 0 and arguments.applicationID neq "_ALL_") stSearchParams.applicationID = arguments.applicationID;
+			if(arguments.hostID neq "" and arguments.hostID neq 0 and arguments.hostID neq "_ALL_") stSearchParams.hostID = arguments.hostID;
 			if(arguments.severityID neq "" and arguments.severityID neq 0 and arguments.severityID neq "_ALL_") stSearchParams.severityID = arguments.severityID;
 			if(arguments.searchTerm neq "") stSearchParams.message = "%arguments.searchTerm%";
 			if(arguments.search_cfid neq "") arguments.cfid = "arguments.search_cfid%";

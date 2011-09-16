@@ -10,6 +10,7 @@
 			var hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName();
 			var versionTag = getSetting("versionTag");
 			var	qs = "";
+			var configKey = "";
 			
 			try {
 				if(not structKeyExists(session,"userID")) session.userID = 0;
@@ -50,6 +51,7 @@
 				setValue("versionTag", versionTag);
 				setValue("currentUser", session.user);
 				setValue("dateFormatMask", getService("config").getSetting("general.dateFormat"));
+				setValue("configKey", getService("config").getConfigKey());
 
 			} catch(any e) {
 				setMessage("error",e.message);

@@ -169,8 +169,17 @@
 		<cfargument name="recipient" type="string" required="true">
 		<cfargument name="comment" type="string" required="false" default="">
 		
-		<cfset var oEntry = getEntry(arguments.entryID)>
-		<cfset var bugURL = "http://#cgi.HTTP_HOST##cgi.script_name#?event=ehGeneral.dspEntry&entryID=#arguments.entryID#">
+		<cfscript>
+			var oEntry = getEntry(arguments.entryID);
+			var thisHost = "";
+			var bugURL = "";
+
+			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
+			thisHost = thisHost & cgi.server_name;
+			if(cgi.server_port neq 80 and cgi.server_port neq 443) thisHost = thisHost & ":" & cgi.server_port;
+			
+			bugURL = "#thisHost#/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#arguments.entryID#"
+		</cfscript>
 		
 		<cfmail from="#arguments.sender#" 
 				to="#arguments.recipient#" 
@@ -213,7 +222,7 @@
 			<a href="#bugURL#">#bugURL#</a>
 			<br><br><br>
 			** This email has been sent from the BugLog server at 
-			<a href="http://#cgi.HTTP_HOST##cgi.script_name#">http://#cgi.HTTP_HOST##cgi.script_name#</a>
+			<a href="#thisHost#/bugLog">#thisHost#/bugLog</a>
 		</cfmail>
 		
 	</cffunction>
@@ -278,6 +287,9 @@
 		<cfset digestConfig.schedulerIntervalHours = val(variables.config.getSetting("digest.schedulerIntervalHours", 24))>
 		<cfset digestConfig.schedulerStartTime = variables.config.getSetting("digest.schedulerStartTime", "06:00")>
 		<cfset digestConfig.sendIfEmpty = isBoolean(variables.config.getSetting("digest.sendIfEmpty", false)) and variables.config.getSetting("digest.sendIfEmpty", false)>
+		<cfset digestConfig.severity = variables.config.getSetting("digest.severity", "")>
+		<cfset digestConfig.application = variables.config.getSetting("digest.application", "")>
+		<cfset digestConfig.host = variables.config.getSetting("digest.host", "")>
 		<cfreturn digestConfig>
 	</cffunction>
 
@@ -287,17 +299,24 @@
 		<cfargument name="interval" type="numeric" required="true">
 		<cfargument name="startTime" type="string" required="true">
 		<cfargument name="sendIfEmpty" type="boolean" required="true">
+		<cfargument name="severity" type="string" required="true">
+		<cfargument name="application" type="string" required="true">
+		<cfargument name="host" type="string" required="true">
+		
+		<cfset variables.config.setSetting("digest.enabled", arguments.enabled)>
+		<cfset variables.config.setSetting("digest.recipients", arguments.recipients)>
+		<cfset variables.config.setSetting("digest.schedulerIntervalHours", arguments.interval)>
+		<cfset variables.config.setSetting("digest.schedulerStartTime", arguments.startTime)>
+		<cfset variables.config.setSetting("digest.sendIfEmpty", arguments.sendIfEmpty)>
+		<cfset variables.config.setSetting("digest.severity", arguments.severity)>
+		<cfset variables.config.setSetting("digest.application", arguments.application)>
+		<cfset variables.config.setSetting("digest.host", arguments.host)>
+
 		<cfscript>
 			var thisHost = "";
 			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
 			thisHost = thisHost & cgi.server_name;
-			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
-
-			variables.config.setSetting("digest.enabled", arguments.enabled);
-			variables.config.setSetting("digest.recipients", arguments.recipients);
-			variables.config.setSetting("digest.schedulerIntervalHours", arguments.interval);
-			variables.config.setSetting("digest.schedulerStartTime", arguments.startTime);
-			variables.config.setSetting("digest.sendIfEmpty", arguments.sendIfEmpty);
+			if(cgi.server_port neq 80 and cgi.server_port neq 443) thisHost = thisHost & ":" & cgi.server_port;
 		</cfscript>
 
 		<cfif arguments.enabled>
@@ -313,6 +332,10 @@
 			<cfschedule action="delete"	task="bugLogSendDigest" />
 		</cfif>
 	</cffunction>
+
+	<cffunction name="getConfigKey" access="public" returntype="string">
+		<cfreturn variables.config.getConfigKey()>
+	</cffunction>	
 
 
 	<!----- Extensions ----->	

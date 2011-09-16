@@ -19,6 +19,8 @@
 		function getPassword() {return variables.instance.password;}
 		function getIsAdmin() {return variables.instance.isAdmin;}
 		function getEmail() {return variables.instance.email;}
+
+		function getID() {return variables.instance.ID;}
 	</cfscript>
 	
 	<cffunction name="init" access="public" returnType="user">

@@ -10,6 +10,8 @@
 		
 		function getSourceID() {return variables.instance.ID;}
 		function getName() {return variables.instance.name;}
+
+		function getID() {return variables.instance.ID;}
 	</cfscript>
 	
 	<cffunction name="init" access="public" returnType="source">
