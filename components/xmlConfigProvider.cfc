@@ -1,11 +1,17 @@
 <cfcomponent>
 	<cfset variables.configDoc = "">
 	<cfset variables.configKey = "">
+	
+	<!--- If we define the config key on a file in the config dir, then this is the filename we will look for --->
 	<cfset variables.configKeyFilename = "serverkey.txt">
+
+	<!--- If we defined the config key on the servlet context, then this is the parameter name --->
+	<cfset variables.configKeyParameter = "serverkey">
 	
 	<cffunction name="init" access="public" returntype="xmlConfigProvider">
 		<cfargument name="configDoc" type="string" required="true">	
 		<cfargument name="configKey" type="string" required="false" default="">	
+		<cfset var tempKey = "">
 		<cfset variables.configDoc = arguments.configDoc>
 		<cfset variables.configKey = arguments.configKey>
 		
@@ -19,6 +25,15 @@
 		<cfelseif fileExists(expandPath(replace(variables.configDoc,getFileFromPath(variables.configDoc),variables.configKeyFilename)))>
 			<!--- this line checks the existence of a default text file containing the config key (must be on same directory as config file) --->
 			<cfset variables.configKey = fileRead(expandPath(replace(variables.configDoc,getFileFromPath(variables.configDoc),variables.configKeyFilename)),"utf-8")>
+		<cfelse>
+			<!--- we will try also to see if the server key has been provided by the servlet context (yes, we are getting funky!) --->
+		 	<cftry>
+			 	<cfset tempKey = getPageContext().getServletContext().getInitParameter(variables.configKeyParameter) />
+			 	<cfif isDefined("tempKey") and len(tempKey) gt 0>
+					<cfset variables.configKey = tempKey />
+				</cfif>
+				<cfcatch type="any"><!--- key not defined ---></cfcatch>
+			</cftry>
 		</cfif>
 		
 		<cfreturn this>

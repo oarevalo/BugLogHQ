@@ -37,13 +37,23 @@
 	<!-- Environment-specific Settings: 
 		
 		You can override any of the above settings for specific environments. 
+		
 		The environment can be given in any of the following ways:
-			1. Create a file named "serverkey.txt" on the same directory as your config file.
+		
+			1. Create a file named "serverkey.txt" on the same directory as this config file.
 				This file should contain only a single word to use as the environment name (i.e. "dev", "production1", "test", etc)
-			2. Pass the environment name using the configKey argument to the init() method on config.cfc whenever is created
-			3. Pass the path to a file containing the environment key to config.cfc
-		NOTE: the first method is way more easier since there are at least 3 places where the config.cfc object is created
-			and you would need to update all three if you use method #2 or #3
+			2. Create a servlet context parameter named "serverkey" with the value you want to use for your environment
+				In Tomcat, this would be done by editing the file {TOMCAT_HOME}/conf/context.xml
+				and adding a line like:
+					 <Parameter name="serverkey" value="someNameHere" override="false" />
+			3. Pass the environment name using the configKey argument to the init() method on config.cfc whenever is created
+			4. Pass the path to a file containing the environment key to config.cfc
+			
+		NOTE: the first two methods are way more easier and portable since there are at least 3 places where the config.cfc object is created
+			and you would need to update all three if you use method #3 or #4
+		
+		NOTE 2: If you are using methods #1 or #2, you can change the value of the filename or the context parameter
+			by editing /bugLog/components/xmlConfigProvider.cfc, lines 6 and 9.
 			
 	<envSettings name="dev">
 		<setting name="db.dsn">bugLog_dev</setting>
