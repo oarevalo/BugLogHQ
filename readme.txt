@@ -209,10 +209,10 @@ will create the necessary tables.
 	Also, on /bugLog/hq/Application.cfc, line 19, change it to:
 		this.emailErrors = true
 
-* TO CONFIGURE MULTIPLE ENVIRONMENTS
+* CONFIGURING MULTIPLE ENVIRONMENTS
 	You can override any setting on the main config on a per-environment basis. To determine which is the current
 	environment, BugLog will look for a file named "severkey.txt" on your /bugLog/config directory. This file should
-	only contain a single work that is used to name the environment. For example: "dev" or "prod-server-1" or something like that.
+	only contain a single word that is used to name the environment. For example: "dev" or "prod-server-1" or something like that.
 	
 	Then on your buglog-config.xml.cfm add an <envSettings /> section like the following example:
 
@@ -227,6 +227,20 @@ will create the necessary tables.
 	
 	You can have as many <envSettings/> sections as you want. However only one will be used (the one that matches your serverkey.txt).
 	If none matches the serverkey, then BugLog will use the default settings.	
+	
+	An alternative way of providing the "serverkey" value is by using a Context Parameter. The advantage is that this
+	method does not require you to add any new files to your BugLog installation. Of course, this only works if you have
+	access to the config files of your application server.
+	
+	For example in Tomcat, to set your serverkey as "dev", you would set a context parameter 
+	by editing "{Tomcat Path}/conf/context.xml" like this:
+	
+	<Context>
+		...
+		<Parameter name="serverkey" value="dev" override="false" />
+		...
+	</Context>
+	
 
 
 -----------------------------------------------------------------------
