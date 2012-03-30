@@ -1,7 +1,7 @@
 <cfset variables.sourceName = "Post">
 
-<cfparam name="message" type="string">
-<cfparam name="applicationCode" type="string">
+<cfparam name="message" type="string" default="">
+<cfparam name="applicationCode" type="string" default="Unknown">
 <cfparam name="dateTime" type="date" default="#now()#">
 <cfparam name="severityCode" type="string" default="ERROR">
 <cfparam name="hostName" type="string" default="#cgi.REMOTE_ADDR#">
