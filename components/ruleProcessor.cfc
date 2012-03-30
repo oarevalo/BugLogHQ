@@ -19,9 +19,13 @@
 		<cfscript>
 			var i = 0;
 			var rtn = false;
+			var ruleName = "";
 			
 			for(i=1;i lte arrayLen(variables.aRules);i=i+1) {
+				ruleName = "Rule ###i#"; // a temporary name just in case the getMetaData() call fails
 				try {
+					ruleName = getMetaData(variables.aRules[i]).name;
+								
 					// process rule with current entry bean					
 					rtn = variables.aRules[i].processRule(arguments.rawEntry, arguments.dataProvider, arguments.config);
 
@@ -30,7 +34,7 @@
 
 				} catch(any e) {
 					// if an error occurs while a rule executes, then write to normal log file
-					writeToCFLog(e.message & e.detail);	
+					writeToCFLog(ruleName & ": " & e.message & e.detail);	
 				}
 			}
 		</cfscript>
