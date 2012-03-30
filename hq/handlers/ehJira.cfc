@@ -4,6 +4,12 @@
 		<cfscript>
 			var oJIRA = getService("jira");
 			var entryID = getValue("entryID");
+			var thisHost = '';
+
+			// get the url for the current host
+			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
+			thisHost = thisHost & cgi.server_name;
+			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
 			
 			try {
 				if(val(entryID) eq 0) throw("Please select an entry to view");		
@@ -16,6 +22,7 @@
 				setValue("oEntry", oEntry);
 				setValue("projects", projects);
 				setValue("issueTypes", issueTypes);
+				setValue("thisHost", thisHost);
 				setView("vwSendToJira");
 
 			} catch(any e) {

@@ -2,11 +2,13 @@
 <cfparam name="request.requestState.oEntry">
 <cfparam name="request.requestState.projects">
 <cfparam name="request.requestState.issueTypes">
+<cfparam name="request.requestState.thisHost">
 
 <cfset entryID = request.requestState.entryID>
 <cfset oEntry = request.requestState.oEntry>
 <cfset projects = request.requestState.projects>
 <cfset issueTypes = request.requestState.issueTypes>
+<cfset thisHost = request.requestState.thisHost>
 
 <cfset oApp = oEntry.getApplication()>
 <cfset oHost = oEntry.getHost()>
@@ -17,6 +19,8 @@
 
 <cfsavecontent variable="defaultDescription">
 <cfoutput>
+[Bug ###entryID#|#thisHost#/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#oEntry.getEntryID()#]
+
 * *Date/Time:* #lsDateFormat(oEntry.getDateTime())# - #lsTimeFormat(oEntry.getDateTime())#
 * *Application:* #oApp.getCode()#
 * *Host:* #oHost.getHostname()#
