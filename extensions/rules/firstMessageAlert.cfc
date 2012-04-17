@@ -22,6 +22,7 @@
 		<cfset variables.applicationID = -1>
 		<cfset variables.hostID = -1>
 		<cfset variables.severityID = -1>
+		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 		<cfreturn this>
 	</cffunction>
 	
@@ -68,8 +69,9 @@
 
 			qry = oEntryFinder.search(argumentCollection = args);
 			
-			if(qry.recordCount eq 1) {
+			if(qry.recordCount eq 1 or (qry.recordCount gt 1 and dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan)) {
 				sendEmail(qry, rawEntry, sender);
+				variables.lastEmailTimestamp = now();
 			}
 		
 			return true;
