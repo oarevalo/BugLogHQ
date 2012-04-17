@@ -9,6 +9,7 @@
 			errors of the HQ application -->
 		<setting name="bugEmailRecipients" value="" />
 		<setting name="bugEmailSender" value="" />
+		<setting name="bugLogListener" value="bugLog.listeners.bugLogListenerWS" />
 		
 		<!-- This is the directory/mapping where the application is located -->
 		<setting name="bugLogPath" value="/bugLog/" />
@@ -44,7 +45,8 @@
 		</service>
 	
 		<!-- error reporting service -->
-		<service name="bugTracker" class="bugLog.hq.components.services.bugTrackerService">
+		<service name="bugTracker" class="bugLog.client.bugLogService">
+			<init-param name="bugLogListener" settingName="bugLogListener" />
 			<init-param name="bugEmailSender" settingName="bugEmailSender" />
 			<init-param name="bugEmailRecipients" settingName="bugEmailRecipients" />
 		</service>
