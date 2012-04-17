@@ -80,6 +80,7 @@
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var dbType = oDataProvider.getConfig().getDBType()>
 		<cfset var qry = 0>
+		<cfset var dsn = oDataProvider.getConfig().getDSN()>
 
 		<cfif arguments.searchTerm neq "">
 			<cfif dbType eq "mysql">
@@ -89,8 +90,7 @@
 			</cfif>
 		</cfif>
 
-		<cfsavecontent variable="tmpSQL">
-			<cfoutput>
+		<cfquery name="qry" datasource="#dsn#">
 			SELECT e.entryID, e.message, e.cfid, e.cftoken, e.mydateTime, e.exceptionMessage, e.exceptionDetails, 
 					e.templatePath, e.userAgent, a.code as ApplicationCode, h.hostName, s.code AS SeverityCode,
 					src.name AS SourceName, e.applicationID, e.hostID, e.severityID, e.sourceID, e.createdOn,
@@ -118,48 +118,50 @@
 				WHERE (1=1)
 					<cfif arguments.searchTerm neq "">
 						AND (
-							message LIKE '%#arguments.searchTerm#%'
+							message LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%"> 
 							or
-							exceptionMessage LIKE '%#arguments.searchTerm#%'
+							exceptionMessage LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%"> 
 							or
-							exceptionDetails LIKE '%#arguments.searchTerm#%'
+							exceptionDetails LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%"> 
 							or
-							templatePath LIKE '%#arguments.searchTerm#%'
+							templatePath LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%"> 
 							or
-							userAgent LIKE '%#arguments.searchTerm#%'
+							userAgent LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%"> 
 							<cfif arguments.searchHTMLReport>
-								or HTMLReport LIKE '%#arguments.searchTerm#%'
+								or HTMLReport LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.searchTerm#%"> 
 							</cfif>
 						)
 					</cfif>
 					<cfif arguments.message neq "">
-						AND message LIKE '#arguments.message#'
+						AND message LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.message#">
 					</cfif>
 					<cfif arguments.applicationID neq "" and arguments.applicationID neq 0 and arguments.applicationID neq "_ALL_">
-						AND e.applicationID <cfif left(arguments.applicationID,1) eq "-"><cfset arguments.applicationID = removechars(arguments.applicationID,1,1)>NOT</cfif> IN (#arguments.applicationID#) 
+						AND e.applicationID <cfif left(arguments.applicationID,1) eq "-"><cfset arguments.applicationID = removechars(arguments.applicationID,1,1)>NOT</cfif> IN 
+    						(<cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.applicationID#" list="true">)
 					</cfif>
 					<cfif arguments.hostID neq "" and arguments.hostID neq 0 and arguments.hostID neq "_ALL_">
-						AND e.hostID <cfif left(arguments.hostID,1) eq "-"><cfset arguments.hostID = removechars(arguments.hostID,1,1)>NOT</cfif> IN (#arguments.hostID#) 
+						AND e.hostID <cfif left(arguments.hostID,1) eq "-"><cfset arguments.hostID = removechars(arguments.hostID,1,1)>NOT</cfif> IN
+                            (<cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.hostID#" list="true">)
 					</cfif>
 					<cfif arguments.severityID neq "" and arguments.severityID neq 0 and arguments.severityID neq "_ALL_">
-						AND e.severityID <cfif left(arguments.severityID,1) eq "-"><cfset arguments.severityID = removechars(arguments.severityID,1,1)>NOT</cfif> IN (#arguments.severityID#) 
+						AND e.severityID <cfif left(arguments.severityID,1) eq "-"><cfset arguments.severityID = removechars(arguments.severityID,1,1)>NOT</cfif> IN
+                            (<cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.severityID#" list="true">)
 					</cfif>
 					<cfif arguments.startDate neq "1/1/1800">
-						AND mydateTime >= #arguments.startDate# 
+						AND mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#arguments.startDate#">
 					</cfif>
 					<cfif arguments.endDate neq "1/1/3000">
-						AND mydateTime <= #arguments.endDate#
+						AND mydateTime <= <cfqueryparam cfsqltype="cf_sql_date" value="#arguments.endDate#">
 					</cfif>
 					<cfif arguments.search_cfid neq "">
-						AND cfid LIKE '#arguments.search_cfid#%' 
+						AND cfid LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.search_cfid#%">
 					</cfif>
 					<cfif arguments.search_cftoken neq "">
-						AND cftoken LIKE '#arguments.search_cftoken#%' 
+						AND cftoken LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.search_cftoken#%"> 
 					</cfif>
 				ORDER BY createdOn DESC, entryID DESC
-			</cfoutput>
-		</cfsavecontent>
-		<cfset qry = oDataProvider.exec(tmpSQL)>
+		</cfquery>
+
 		<cfreturn qry>
 	</cffunction>
 
