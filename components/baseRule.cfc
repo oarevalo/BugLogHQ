@@ -23,16 +23,36 @@
 		<cfreturn true>
 	</cffunction>
 
+	<cffunction name="processQueueStart" access="public" returntype="boolean" hint="This method gets called BEFORE each processing of the queue (only invoked when using the asynch listener)">
+		<cfargument name="queue" type="array" required="true">
+		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
+		<cfargument name="configObj" type="bugLog.components.config" required="true">
+		<!--- this method must be implemented by rules that extend the base rule --->
+		<cfreturn true>
+	</cffunction>
+
+	<cffunction name="processQueueEnd" access="public" returntype="boolean" hint="This method gets called AFTER each processing of the queue (only invoked when using the asynch listener)">
+		<cfargument name="queue" type="array" required="true">
+		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
+		<cfargument name="configObj" type="bugLog.components.config" required="true">
+		<!--- this method must be implemented by rules that extend the base rule --->
+		<cfreturn true>
+	</cffunction>
+
 	<cffunction name="sendToEmail" access="public" returntype="void">
-		<cfargument name="rawEntryBean" type="bugLog.components.rawEntryBean" required="true">
+		<cfargument name="rawEntryBean" type="bugLog.components.rawEntryBean" required="false">
 		<cfargument name="sender" type="string" required="true">
 		<cfargument name="recipient" type="string" required="true">
 		<cfargument name="subject" type="string" required="false" default="BugLog: bug received">
 		<cfargument name="comment" type="string" required="false" default="">
-		
-		<cfset var stEntry = arguments.rawEntryBean.getMemento()>
-		<cfset var thisHost = "">
 		<cfscript>
+			var stEntry = {};
+			var thisHost = "";
+
+			if(structKeyExists(arguments,"rawEntryBean")) {
+				stEntry = arguments.rawEntryBean.getMemento();
+			}
+
 			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
 			thisHost = thisHost & cgi.server_name;
 			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
@@ -53,48 +73,49 @@
 				<hr />
 			</cfif>
 				
-			<table style="font-family:arial;font-size:12px;">
-				<tr>
-					<td><b>Message:</b></td>
-					<td><strong>#stEntry.message#</strong></td>
-				</tr>
-				<tr>
-					<td><b>Date/Time:</b></td>
-					<td>#lsDateFormat(stEntry.dateTime)# - #lsTimeFormat(stEntry.dateTime)#</td>
-				</tr>
-				<tr>
-					<td><b>Application:</b></td>
-					<td>#stEntry.applicationCode#</td>
-				</tr>
-				<tr>
-					<td><b>Host:</b></td>
-					<td>#stEntry.hostName#</td>
-				</tr>
-				<tr>
-					<td><b>Severity:</b></td>
-					<td>#stEntry.severityCode#</td>
-				</tr>
-				<tr>
-					<td><b>Template Path:</b></td>
-					<td>#stEntry.templatePath#</td>
-				</tr>
-				<tr valign="top">
-					<td><b>Exception Message:</b></td>
-					<td>#stEntry.exceptionMessage#</td>
-				</tr>
-				<tr valign="top">
-					<td><b>Exception Detail:</b></td>
-					<td>#stEntry.exceptionDetails#</td>
-				</tr>
-			</table>			
-			
-			<cfif stEntry.HTMLReport neq "">
+			<cfif structKeyExists(arguments,"rawEntryBean")>
+				<table style="font-family:arial;font-size:12px;">
+					<tr>
+						<td><b>Message:</b></td>
+						<td><strong>#stEntry.message#</strong></td>
+					</tr>
+					<tr>
+						<td><b>Date/Time:</b></td>
+						<td>#lsDateFormat(stEntry.dateTime)# - #lsTimeFormat(stEntry.dateTime)#</td>
+					</tr>
+					<tr>
+						<td><b>Application:</b></td>
+						<td>#stEntry.applicationCode#</td>
+					</tr>
+					<tr>
+						<td><b>Host:</b></td>
+						<td>#stEntry.hostName#</td>
+					</tr>
+					<tr>
+						<td><b>Severity:</b></td>
+						<td>#stEntry.severityCode#</td>
+					</tr>
+					<tr>
+						<td><b>Template Path:</b></td>
+						<td>#stEntry.templatePath#</td>
+					</tr>
+					<tr valign="top">
+						<td><b>Exception Message:</b></td>
+						<td>#stEntry.exceptionMessage#</td>
+					</tr>
+					<tr valign="top">
+						<td><b>Exception Detail:</b></td>
+						<td>#stEntry.exceptionDetails#</td>
+					</tr>
+				</table>			
+				
+				<cfif stEntry.HTMLReport neq "">
+					<hr />
+					<b>HTML Report:</b><br />
+					#stEntry.HTMLReport#
+				</cfif>
 				<hr />
-				<b>HTML Report:</b><br />
-				#stEntry.HTMLReport#
 			</cfif>
-			
-			<hr />
 
 			<div style="font-family:arial;font-size:11px;margin-top:15px;">
 				** This email has been sent automatically from the BugLog server at 

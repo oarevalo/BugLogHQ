@@ -41,6 +41,7 @@
 		<cfset var i = 0>
 		<cfset var errorQueue = arrayNew(1)>
 		<cfset var count = 0>
+		<cfset var dp = variables.oDAOFactory.getDataProvider()>
 		
 		<cfif arguments.key neq variables.key>
 			<cfset logMessage("Invalid key received. Exiting.")>
@@ -50,6 +51,7 @@
 		<cflock name="bugLogListenerAsync_processQueue" type="exclusive" timeout="10">
 			<cfset myQueue = duplicate(variables.queue)> <!--- get a snapshot of the queue as of right now --->
 			<cfset variables.queue = arrayNew(1)>	<!--- clear the queue now --->
+			<cfset variables.oRuleProcessor.processQueueStart(myQueue, dp, variables.oConfig )>
 			<cfif arrayLen(myQueue) gt 0>
 				<cfset logMessage("Processing queue. Queue size: #arrayLen(myQueue)#")>
 				<cfloop from="1" to="#arrayLen(myQueue)#" index="i">
@@ -64,6 +66,7 @@
 					</cftry>
 				</cfloop>
 			</cfif>
+			<cfset variables.oRuleProcessor.processQueueEnd(myQueue, dp, variables.oConfig )>
 		</cflock>
 			
 		<!--- add back all entries on the error queue to the main queue --->
