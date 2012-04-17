@@ -7,6 +7,7 @@
 	<cfproperty name="application" type="string" buglogType="application" displayName="Application" hint="The application name that will trigger the rule. Leave empty to look for all applications">
 	<cfproperty name="host" type="string" buglogType="host" displayName="Host Name" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
 	<cfproperty name="severity" type="string" buglogType="severity" displayName="Severity Code" hint="The severity that will trigger the rule. Leave empty to look for all severities">
+	<cfproperty name="alertInterval" type="numeric" displayName="Alert Interval" hint="The number of minutes to wait between alert messages">
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
@@ -14,14 +15,17 @@
 		<cfargument name="application" type="string" required="false" default="">
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="severity" type="string" required="false" default="">
+		<cfargument name="alertInterval" type="string" required="false" default="">
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.timespan = arguments.timespan>
 		<cfset variables.config.application = arguments.application>
 		<cfset variables.config.host = arguments.host>
 		<cfset variables.config.severity = arguments.severity>
+		<cfset variables.config.alertInterval = val(arguments.alertInterval)>
 		<cfset variables.applicationID = -1>
 		<cfset variables.hostID = -1>
 		<cfset variables.severityID = -1>
+		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 		<cfreturn this>
 	</cffunction>
 	
@@ -36,36 +40,42 @@
 			var args = structNew();
 			var sender = arguments.configObj.getSetting("general.adminEmail");
 	
-			// get necessary IDs
-			if(variables.config.application neq "" and variables.applicationID eq -1) {
-				variables.applicationID = getApplicationID(arguments.dataProvider);
-			}
-			if(variables.config.host neq "" and variables.hostID eq -1) {
-				variables.hostID = getHostID(arguments.dataProvider);
-			}
-			if(variables.config.severity neq "" and variables.severityID eq -1) {
-				variables.severityID = getSeverityID(arguments.dataProvider);
-			}
+			// only evaluate this rule if 'alertInterval' minutes has passed after the last email was sent
+			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.alertInterval ) {
 
-			
-			oEntryDAO = createObject("component","bugLog.components.db.entryDAO").init(arguments.dataProvider);
-			oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
-
-			
-			args = structNew();
-			args.searchTerm = "";
-			args.startDate = dateAdd("n", variables.config.timespan * (-1), now() );
-			args.endDate = now();
-			if(variables.applicationID gt 0) args.applicationID = variables.applicationID;
-			if(variables.hostID gt 0) args.hostID = variables.hostID;
-			if(variables.severityID gt 0) args.severityID = variables.severityID;
-
-			qry = oEntryFinder.search(argumentCollection = args);
-			
-			if(qry.recordCount eq 0) {
-				sendEmail(sender);
+				// get necessary IDs
+				if(variables.config.application neq "" and variables.applicationID eq -1) {
+					variables.applicationID = getApplicationID(arguments.dataProvider);
+				}
+				if(variables.config.host neq "" and variables.hostID eq -1) {
+					variables.hostID = getHostID(arguments.dataProvider);
+				}
+				if(variables.config.severity neq "" and variables.severityID eq -1) {
+					variables.severityID = getSeverityID(arguments.dataProvider);
+				}
+	
+				
+				oEntryDAO = createObject("component","bugLog.components.db.entryDAO").init(arguments.dataProvider);
+				oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
+	
+				
+				args = structNew();
+				args.searchTerm = "";
+				args.startDate = dateAdd("n", variables.config.timespan * (-1), now() );
+				args.endDate = now();
+				if(variables.applicationID gt 0) args.applicationID = variables.applicationID;
+				if(variables.hostID gt 0) args.hostID = variables.hostID;
+				if(variables.severityID gt 0) args.severityID = variables.severityID;
+	
+				qry = oEntryFinder.search(argumentCollection = args);
+				
+				if(qry.recordCount eq 0) {
+					sendEmail(sender);
+					variables.lastEmailTimestamp = now();
+				}
+				
 			}
-		
+			
 			return true;
 		</cfscript>
 	</cffunction>
