@@ -148,10 +148,10 @@
                             (<cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.severityID#" list="true">)
 					</cfif>
 					<cfif arguments.startDate neq "1/1/1800">
-						AND mydateTime >= <cfqueryparam cfsqltype="cf_sql_date" value="#arguments.startDate#">
+						AND mydateTime >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.startDate#">
 					</cfif>
 					<cfif arguments.endDate neq "1/1/3000">
-						AND mydateTime <= <cfqueryparam cfsqltype="cf_sql_date" value="#arguments.endDate#">
+						AND mydateTime <= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.endDate#">
 					</cfif>
 					<cfif arguments.search_cfid neq "">
 						AND cfid LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.search_cfid#%">
