@@ -219,10 +219,10 @@ will create the necessary tables.
 	
 	Then on your buglog-config.xml.cfm add an <envSettings /> section like the following example:
 
-	<envSettings name="dev">
-		<setting name="db.dsn">bugLog_dev</setting>
-		<setting name="general.adminEmail">devteam@somedomain.org</setting>
-	</envSettings>
+    <envSettings name="dev">
+        <setting name="db.dsn">bugLog_dev</setting>
+        <setting name="general.adminEmail">devteam@somedomain.org</setting>
+    </envSettings>
 
 	Where the "name" attribute of the envSettings tag must match what you provide on your serverkey.txt file. Inside you
 	can place any number of <settings/> tags you want. These will override the settings of the same name defined on
@@ -238,11 +238,11 @@ will create the necessary tables.
 	For example in Tomcat, to set your serverkey as "dev", you would set a context parameter 
 	by editing "{Tomcat Path}/conf/context.xml" like this:
 	
-	<Context>
-		...
-		<Parameter name="serverkey" value="dev" override="false" />
-		...
-	</Context>
+    <Context>
+        ...
+        <Parameter name="serverkey" value="dev" override="false" />
+        ...
+    </Context>
 	
 
 
