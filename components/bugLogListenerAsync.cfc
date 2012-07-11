@@ -83,7 +83,17 @@
 	<cffunction name="shutDown" access="public" returntype="void" hint="Performs any clean up action required">
 		<cfset logMessage("Stopping BugLogListener service...")>
 		<cfset logMessage("Stopping ProcessQueue scheduled task...")>
-		<cfschedule action="delete"	task="bugLogProcessQueue" />	
+		<cftry>
+			<cfschedule action="delete" task="bugLogProcessQueue" />
+			<cfcatch type="any">
+				<cfif findNoCase("coldfusion.scheduling.SchedulingNoSuchTaskException",cfcatch.stackTrace)>
+					<!--- it's ok, nothing to do here --->
+					<cfset logMessage("Scheduled task was not running.")>
+				<cfelse>
+					<cfrethrow>
+				</cfif>
+			</cfcatch>				
+		</cftry>
 		<cfset logMessage("Processing remaining elements in queue...")>
 		<cfset processQueue(variables.key)>
 		<cfset logMessage("BugLogListener service stopped.")>

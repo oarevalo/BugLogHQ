@@ -310,7 +310,16 @@
 				interval="daily"
 			/>		
 		<cfelse>
-			<cfschedule action="delete"	task="bugLogPurgeHistory" />
+			<cftry>
+				<cfschedule action="delete" task="bugLogPurgeHistory" />
+				<cfcatch type="any">
+					<cfif findNoCase("coldfusion.scheduling.SchedulingNoSuchTaskException",cfcatch.stackTrace)>
+						<!--- it's ok, nothing to do here --->
+					<cfelse>
+						<cfrethrow>
+					</cfif>
+				</cfcatch>				
+			</cftry>
 		</cfif>
 	</cffunction>
 	

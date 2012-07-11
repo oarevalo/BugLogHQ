@@ -25,5 +25,14 @@
 
 <cfelse>
 	<!--- service is not running, so just in case delete the scheduled task --->
-	<cfschedule action="delete"	task="bugLogProcessQueue" />
+	<cftry>
+		<cfschedule action="delete" task="bugLogProcessQueue" />
+		<cfcatch type="any">
+			<cfif findNoCase("coldfusion.scheduling.SchedulingNoSuchTaskException",cfcatch.stackTrace)>
+				<!--- it's ok, nothing to do here --->
+			<cfelse>
+				<cfrethrow>
+			</cfif>
+		</cfcatch>				
+	</cftry>		
 </cfif>
