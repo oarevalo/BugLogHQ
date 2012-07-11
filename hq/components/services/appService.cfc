@@ -178,7 +178,7 @@
 			thisHost = thisHost & cgi.server_name;
 			if(cgi.server_port neq 80 and cgi.server_port neq 443) thisHost = thisHost & ":" & cgi.server_port;
 			
-			bugURL = "#thisHost#/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#arguments.entryID#"
+			bugURL = "#thisHost#/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#arguments.entryID#";
 		</cfscript>
 		
 		<cfmail from="#arguments.sender#" 
