@@ -44,5 +44,9 @@
 		<service name="jira" class="bugLog.hq.components.services.jiraService">
 			<init-param name="appService" serviceName="app" />
 		</service>
+
+		<!-- RSS service -->
+		<service name="rss" class="bugLog.hq.components.rss">
+		</service>
 	</services>
 </config>

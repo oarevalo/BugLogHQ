@@ -25,6 +25,10 @@
 <!--- Used for the default query --->
 <cfset variables.defaultQueryList = "title,description,link,date,enclosure">
 
+<cffunction name="init" access="public" returntype="rss">
+	<cfreturn this />
+</cffunction>
+
 <cffunction name="generateRSS" access="public" returnType="string" output="true"
 			hint="Translates a query into RSS.">
 	<cfargument name="type" type="string" required="true" hint="RSS Type: RSS091,RSS092,RSS1,RSS2, or Atom3">
