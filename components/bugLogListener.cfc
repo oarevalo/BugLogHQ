@@ -17,15 +17,18 @@
 	<cfset variables.msgLog = arrayNew(1)>
 	<cfset variables.maxLogSize = 10>
 	<cfset variables.purgeHistoryEnabled = false>
+	<cfset variables.instanceName = "">
 
 	<cffunction name="init" access="public" returntype="bugLogListener" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
+		<cfargument name="instanceName" type="string" required="true">
 		<cfscript>
 			var cacheTTL = 300;		// timeout in minutes for cache entries
 			
 			variables.oConfig = arguments.config;		// global configuration
-
-			logMessage("Starting BugLogListener service...");
+			variables.instanceName = arguments.instanceName;
+			
+			logMessage("Starting BugLogListener (#instanceName#) service...");
 	
 			// load settings
 			variables.maxLogSize = arguments.config.getSetting("service.maxLogSize");
@@ -58,7 +61,7 @@
 			// record the date at which the service started 
 			variables.startedOn = Now();
 
-			logMessage("BugLogListener Service Started");
+			logMessage("BugLogListener Service (#instanceName#) Started");
 		</cfscript>
 	
 		<cfreturn this>

@@ -7,9 +7,9 @@
 								}>
 								
 	<cffunction name="init" access="public" returntype="jiraService">
-		<cfargument name="config" type="any" required="true">
+		<cfargument name="appService" type="any" required="true">
 	
-		<cfset variables.instance.config = arguments.config>
+		<cfset variables.instance.app = arguments.appService>
 		<cfset variables.instance.jira  = createObject("component","bugLog.components.jiraService").init( wsdl = getSetting("wsdl"),
 																											username = getSetting("username"),
 																											password = getSetting("password") )>
@@ -17,7 +17,7 @@
 	</cffunction>
 	
 	<cffunction name="reinit" access="public" returntype="void">
-		<cfset init( variables.instance.config )>
+		<cfset init( variables.instance.app )>
 	</cffunction>
 
 	<cffunction name="getProjects" access="public" returntype="array">
@@ -39,13 +39,13 @@
 	<cffunction name="getSetting" returnType="string" access="public" hint="Returns the given config setting, if doesnt exist, returns empty or default value">
 		<cfargument name="settingName" type="string" required="true">
 		<cfargument name="defaultValue" type="string" required="false" default="">
-		<cfreturn variables.instance.config.getSetting("jira." & arguments.settingName, arguments.defaultValue)>
+		<cfreturn variables.instance.app.getConfig().getSetting("jira." & arguments.settingName, arguments.defaultValue)>
 	</cffunction>
 	
 	<cffunction name="setSetting" returntype="jiraService" access="public">
 		<cfargument name="settingName" type="string" required="true">
 		<cfargument name="settingValue" type="string" required="true">
-		<cfset variables.instance.config.setSetting("jira." & arguments.settingName, arguments.settingValue)>
+		<cfset variables.instance.app.getConfig().setSetting("jira." & arguments.settingName, arguments.settingValue)>
 		<cfreturn this>
 	</cffunction>
 

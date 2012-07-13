@@ -10,7 +10,7 @@
 		<cfscript>
 			var user = getValue("currentUser");
 			var app = getService("app");
-			var cfg = getService("config");
+			var cfg = app.getConfig();
 			var jira = getService("jira");
 			var jiraConfig = structNew();
 			var panel = getValue("panel");
@@ -157,11 +157,12 @@
 			var runnow = getValue("runnow",false);
 			var enabled = getValue("enabled",false);
 			var user = getValue("currentUser");
+			var config = getService("app").getConfig();
 			
 			try {
 				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=purgeHistory");}
-				getService("config").setSetting("purging.numberOfDays", purgeHistoryDays);
-				getService("config").setSetting("purging.enabled", enabled);
+				config.setSetting("purging.numberOfDays", purgeHistoryDays);
+				config.setSetting("purging.enabled", enabled);
 				if(runnow) {
 					getService("app").purgeHistory(purgeHistoryDays);
 					setMessage("info","Settings saved and History purged. The BugLog service must be restarted for changes to take effect.");
@@ -292,13 +293,14 @@
 			var user = getValue("currentUser");
 			var autoStart = getValue("autoStart",false);
 			var adminEmail = getValue("adminEmail");
+			var config = getService("app").getConfig();
 			
 			try {
 				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain");}
 				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("ehAdmin.dspMain");}
 				getService("app").setServiceSetting("autoStart", autoStart);
-				getService("config").reload();
-				getService("config").setSetting("general.adminEmail", adminEmail);
+				config.reload();
+				config.setSetting("general.adminEmail", adminEmail);
 
 				setMessage("info","General settings updated.");
 				setNextEvent("ehAdmin.dspMain","panel=general");
@@ -343,12 +345,13 @@
 	<cffunction name="isConfigEditingAllowed" access="private" returntype="boolean">
 		<cfset var rtn = false>
 		<cfset var allowConfigEditing = getSetting("allowConfigEditing")>
+		<cfset var config = getService("app").getConfig()>
 		<cfif isBoolean(allowConfigEditing)>
 			<cfset rtn = allowConfigEditing />
 		<cfelseif allowConfigEditing eq "">
 			<cfset rtn = false />
 		<cfelse>
-			<cfset rtn = listFindNoCase(allowConfigEditing, getService("config").getConfigKey())>
+			<cfset rtn = listFindNoCase(allowConfigEditing, config.getConfigKey())>
 		</cfif>
 		<cfreturn rtn />
 	</cffunction>

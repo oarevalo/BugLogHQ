@@ -30,8 +30,3 @@
 		</body>
 	</html>
 </cfoutput>
-
-
-
-
-

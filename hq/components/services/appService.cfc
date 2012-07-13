@@ -1,19 +1,21 @@
 <cfcomponent>
 	
+	<cfset variables.DEFAULT_BUGLOG_PATH = "/bugLog/">
+	<cfset variables.DEFAULT_BUGLOG_INSTANCE = "default">
+	
 	<cfset variables.path = "">
 	<cfset variables.cfcPath = "">
 	<cfset variables.extensionsPath = "">
 	<cfset variables.OSPathSeparator = createObject("java","java.lang.System").getProperty("file.separator")>
 	<cfset variables.config = 0>
+	<cfset variables.instanceName = "">
 
 	<cffunction name="init" access="public" returntype="appService">
-		<cfargument name="path" type="string" required="true">
-		<cfargument name="config" type="any" required="true">
-
-		<cfset variables.path = arguments.path>
-		<cfset variables.config = arguments.config>
+		<cfargument name="buglogpath" type="string" required="false" default="#variables.DEFAULT_BUGLOG_PATH#">
+		<cfargument name="instanceName" type="string" required="false" default="">
 
 		<!--- get the path in dot notation --->
+		<cfset variables.path = arguments.path>
 		<cfset variables.cfcPath = replace(variables.path, variables.OSPathSeparator, ".", "ALL")>
 		<cfif left(variables.cfcPath,1) eq ".">
 			<cfset variables.cfcPath = right(variables.cfcPath, len(variables.cfcPath)-1)>
@@ -21,7 +23,23 @@
 		<cfif right(variables.cfcPath,1) eq ".">
 			<cfset variables.cfcPath = left(variables.cfcPath, len(variables.cfcPath)-1)>
 		</cfif>
-		
+
+		<!--- set instance --->
+		<cfif arguments.instanceName eq "">
+			<!--- allow setting the buglog instance using a global request-level variable --->
+			<cfif structKeyExists(request,"bugLogInstance") and request.bugLogInstance neq "">
+				<cfset instanceName = request.bugLogInstance>
+			<cfelse>
+				<cfset instanceName = variables.DEFAULT_BUGLOG_INSTANCE>
+			</cfif>
+		</cfif>
+		<cfset variables.instanceName = arguments.instanceName>
+		<cfdump var="BuglogHQ Init. Using instance: #variables.instanceName# #chr(10)#" output="console">
+
+		<!--- load the config object --->
+		<cfset var loader = getServiceLoader( true )>
+		<cfset variables.config = loader.getConfig()>
+
 		<!--- Load the DAO objects --->
 		<cfset variables.oDAOFactory = createModelObject("components.DAOFactory").init( variables.config )>
 		<cfset variables.oApplicationDAO = variables.oDAOFactory.getDAO("application")>
@@ -39,17 +57,23 @@
 	</cffunction>
 
 	<!--- Interface for BugLogListener Running Instance ---->
+	<cffunction name="getServiceLoader" access="public" returntype="bugLog.components.service">
+		<cfargument name="forceReload" type="boolean" required="false" default="false">
+		<cfset var service = createModelObject("components.service").init( reloadConfig = arguments.forceReload,
+																										instanceName = variables.instanceName )>
+		<cfreturn service>
+	</cffunction>
 
 	<cffunction name="getServiceInfo" access="public" returntype="struct">
 		<cfscript>
 			var stInfo = structNew();
-			var oService = createModelObject("components.service").init();
+			var loader = getServiceLoader();
 			
-			stInfo.isRunning = oService.isRunning();
+			stInfo.isRunning = loader.isRunning();
 			stInfo.startedOn = "";
 			
 			if(stInfo.isRunning) {
-				stInfo.startedOn = oService.getService().getStartedOn();
+				stInfo.startedOn = loader.getService().getStartedOn();
 			}
 			
 			return stInfo;
@@ -58,15 +82,15 @@
 	
 	<cffunction name="startService" access="public" returntype="void">
 		<cfscript>
-			var oService = createModelObject("components.service").init( true );
-			oService.start();
+			var loader = getServiceLoader( true );
+			loader.start();
 		</cfscript>
 	</cffunction>
 
 	<cffunction name="stopService" access="public" returntype="void">
 		<cfscript>
-			var oService = createModelObject("components.service").init();
-			oService.stop();
+			var loader = getServiceLoader();
+			loader.stop();
 		</cfscript>
 	</cffunction>
 
@@ -74,8 +98,8 @@
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="value" type="string" required="false" default="">
 		<cfscript>
-			var oService = createModelObject("components.service").init(true);
-			return oService.getSetting(arguments.name, arguments.value);
+			var loader = getServiceLoader( true );
+			return loader.getSetting(arguments.name, arguments.value);
 		</cfscript>
 	</cffunction>
 
@@ -83,8 +107,8 @@
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="value" type="string" required="false" default="">
 		<cfscript>
-			var oService = createModelObject("components.service").init(true);
-			return oService.setSetting(arguments.name, arguments.value);
+			var loader = getServiceLoader( true );
+			return loader.setSetting(arguments.name, arguments.value);
 		</cfscript>
 	</cffunction>
 	
@@ -336,6 +360,15 @@
 	<cffunction name="getConfigKey" access="public" returntype="string">
 		<cfreturn variables.config.getConfigKey()>
 	</cffunction>	
+
+	<cffunction name="getInstanceName" access="public" returntype="string">
+		<cfreturn variables.instanceName>
+	</cffunction>	
+
+	<cffunction name="getConfig" access="public" returntype="bugLog.components.config">
+		<cfreturn variables.config>
+	</cffunction>	
+
 
 
 	<!----- Extensions ----->	

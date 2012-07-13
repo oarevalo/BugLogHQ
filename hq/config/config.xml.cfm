@@ -18,10 +18,6 @@
 			in case the application encounters an unhandled exception -->
 		<setting name="debugMode" value="true" />
 
-		<!-- main config -->
-		<setting name="configProviderType" value="xml" />
-		<setting name="configPath" value="/bugLog/config/buglog-config.xml.cfm" />
-		
 		<!-- This is used to enable/disable editing of settings via the UI,
 			of disabled all settings change must be done directly on the config file.
 			This can also be a comma-delimited list of config keys (environments)
@@ -32,16 +28,9 @@
 		
 	<!-- This section describes all services that will be loaded into the application -->
 	<services>
-		<!-- General config settings -->
-		<service name="config" class="bugLog.components.config">
-			<init-param name="configProviderType" settingName="configProviderType" />
-			<init-param name="configDoc" settingName="configPath" />
-		</service>
-
 		<!-- Application service (service layer) -->
 		<service name="app" class="bugLog.hq.components.services.appService">
 			<init-param name="path" settingName="bugLogPath" />
-			<init-param name="config" serviceName="config" />
 		</service>
 	
 		<!-- error reporting service -->
@@ -53,7 +42,7 @@
 
 		<!-- JIRA service -->
 		<service name="jira" class="bugLog.hq.components.services.jiraService">
-			<init-param name="config" serviceName="config" />
+			<init-param name="appService" serviceName="app" />
 		</service>
 	</services>
 </config>

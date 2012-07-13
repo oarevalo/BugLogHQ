@@ -11,6 +11,10 @@
 			var versionTag = getSetting("versionTag");
 			var	qs = "";
 			var configKey = "";
+			var instanceName = "";
+			var app = getService("app");
+			var config = app.getConfig();
+
 			
 			try {
 				if(not structKeyExists(session,"userID")) session.userID = 0;
@@ -42,7 +46,7 @@
 				}
 
 				// get status of buglog server
-				stInfo = getService("app").getServiceInfo();
+				stInfo = app.getServiceInfo();
 				
 				// set generally available values on the request context
 				setValue("hostName", hostName);
@@ -50,8 +54,9 @@
 				setValue("stInfo", stInfo);
 				setValue("versionTag", versionTag);
 				setValue("currentUser", session.user);
-				setValue("dateFormatMask", getService("config").getSetting("general.dateFormat"));
-				setValue("configKey", getService("config").getConfigKey());
+				setValue("dateFormatMask",config.getSetting("general.dateFormat"));
+				setValue("configKey", config.getConfigKey());
+				setValue("instanceName", app.getInstanceName());
 
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -334,7 +339,7 @@
 			try {
 				// start service
 				getService("app").startService();
-				getService("config").reload();
+				getService("app").getConfig().reload();
 				setMessage("info","BugLogListener has been started!");
 
 			} catch(any e) {
@@ -356,7 +361,7 @@
 		<cfscript>
 			try {
 				entryID = getValue("entryID",0);
-				sender = getService("config").getSetting("general.adminEmail");
+				sender = getService("app").getConfig().getSetting("general.adminEmail");
 				recipient = getValue("to","");
 				comment = getValue("comment","");
 				

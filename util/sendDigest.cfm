@@ -1,10 +1,13 @@
+<cfparam name="instance" type="string" default="">
 <cfsetting enablecfoutputonly="true">
 
-<cfset oConfig = createObject("component","bugLog.components.config").init(configProviderType = "xml", 
-																			configDoc = "/bugLog/config/buglog-config.xml.cfm")>
+<!--- Handle service initialization if necessary --->
+<cfset oService = createObject("component", "bugLog.components.service").init( instanceName = instance )>
+
+<cfset oConfig = oService.getConfig()>
 
 <cfset oDAOFactory = createObject("component","bugLog.components.DAOFactory").init( oConfig )>
-<cfset oAppService = createObject("component","bugLog.hq.components.services.appService").init("/bugLog", oConfig)>
+<cfset oAppService = createObject("component","bugLog.hq.components.services.appService").init(config = oConfig, instanceName = instance)>
 
 <cfset settings = oAppService.getDigestSettings()>
 

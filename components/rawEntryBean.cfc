@@ -17,20 +17,20 @@
 		variables.instance.HTMLReport = "";
 		variables.instance.sourceName = "";
 		
-		function setDateTime(data) {variables.instance.dateTime = arguments.data;}
-		function setMessage(data) {variables.instance.message = arguments.data;}
-		function setApplicationCode(data) {variables.instance.applicationCode = arguments.data;}
-		function setSourceID(data) {variables.instance.sourceID = arguments.data;}
-		function setSeverityCode(data) {variables.instance.severityCode = arguments.data;}
-		function setHostName(data) {variables.instance.hostName = arguments.data;}
-		function setExceptionMessage(data) {variables.instance.exceptionMessage = arguments.data;}
-		function setExceptionDetails(data) {variables.instance.exceptionDetails = arguments.data;}
-		function setCFID(data) {variables.instance.CFID = arguments.data;}
-		function setCFTOKEN(data) {variables.instance.CFTOKEN = arguments.data;}
-		function setUserAgent(data) {variables.instance.userAgent = arguments.data;}
-		function setTemplatePath(data) {variables.instance.templatePath = arguments.data;}
-		function setHTMLReport(data) {variables.instance.HTMLReport = arguments.data;}
-		function setSourceName(data) {variables.instance.sourceName = arguments.data;}
+		function setDateTime(data) {variables.instance.dateTime = arguments.data; return this;}
+		function setMessage(data) {variables.instance.message = arguments.data; return this;}
+		function setApplicationCode(data) {variables.instance.applicationCode = arguments.data; return this;}
+		function setSourceID(data) {variables.instance.sourceID = arguments.data; return this;}
+		function setSeverityCode(data) {variables.instance.severityCode = arguments.data; return this;}
+		function setHostName(data) {variables.instance.hostName = arguments.data; return this;}
+		function setExceptionMessage(data) {variables.instance.exceptionMessage = arguments.data; return this;}
+		function setExceptionDetails(data) {variables.instance.exceptionDetails = arguments.data; return this;}
+		function setCFID(data) {variables.instance.CFID = arguments.data; return this;}
+		function setCFTOKEN(data) {variables.instance.CFTOKEN = arguments.data; return this;}
+		function setUserAgent(data) {variables.instance.userAgent = arguments.data; return this;}
+		function setTemplatePath(data) {variables.instance.templatePath = arguments.data; return this;}
+		function setHTMLReport(data) {variables.instance.HTMLReport = arguments.data; return this;}
+		function setSourceName(data) {variables.instance.sourceName = arguments.data; return this;}
 		
 		function getDateTime() {return variables.instance.dateTime;}
 		function getMessage() {return variables.instance.message;}

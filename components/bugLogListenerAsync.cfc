@@ -1,4 +1,4 @@
-<cfcomponent extends="bugLogListener" hint="This listener modified the standard listener so that it processes all bug in an asynchronous manner">
+<cfcomponent extends="bugLogListener" hint="This listener modifies the standard listener so that it processes all bug in an asynchronous manner">
 	
 	<cfset variables.queue = arrayNew(1)>
 	<cfset variables.maxQueueSize = 0>
@@ -7,6 +7,7 @@
 	
 	<cffunction name="init" access="public" returntype="bugLogListenerAsync" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
+		<cfargument name="instanceName" type="string" required="true">
 		<cfscript>
 			// initialize variables and read settings
 			variables.queue = arrayNew(1);
@@ -15,7 +16,7 @@
 			variables.schedulerIntervalSecs = arguments.config.getSetting("service.schedulerIntervalSecs");
 
 			// do the normal initialization
-			super.init( arguments.config );
+			super.init( arguments.config, arguments.instanceName );
 
 			// start scheduler
 			startScheduler();
@@ -81,12 +82,12 @@
 	</cffunction>
 
 	<cffunction name="shutDown" access="public" returntype="void" hint="Performs any clean up action required">
-		<cfset logMessage("Stopping BugLogListener service...")>
+		<cfset logMessage("Stopping BugLogListener (#instanceName#) service...")>
 		<cfset logMessage("Stopping ProcessQueue scheduled task...")>
-		<cfschedule action="delete"	task="bugLogProcessQueue" />	
+		<cfschedule action="delete"	task="bugLogProcessQueue_#instanceName#" />	
 		<cfset logMessage("Processing remaining elements in queue...")>
 		<cfset processQueue(variables.key)>
-		<cfset logMessage("BugLogListener service stopped.")>
+		<cfset logMessage("BugLogListener service (#instanceName#) stopped.")>
 	</cffunction>
 	
 	
@@ -101,12 +102,12 @@
 		</cfscript>
 
 		<cfschedule action="update"
-			task="bugLogProcessQueue"
+			task="bugLogProcessQueue_#instanceName#"
 			operation="HTTPRequest"
 			startDate="#createDate(1990,1,1)#"
 			startTime="00:00"
 			endTime="23:59"
-			url="#thisHost#/bugLog/util/processQueue.cfm?key=#variables.KEY#"
+			url="#thisHost#/bugLog/util/processQueue.cfm?key=#variables.KEY#&instance=#instanceName#"
 			interval="#variables.schedulerIntervalSecs#"
 		/>		
 	</cffunction>
