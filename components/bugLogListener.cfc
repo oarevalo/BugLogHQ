@@ -305,15 +305,15 @@
 
 		<cfif variables.purgeHistoryEnabled>
 			<cfschedule action="update"
-				task="bugLogPurgeHistory"
+				task="bugLogPurgeHistory_# variables.instanceName#"
 				operation="HTTPRequest"
 				startDate="#createDate(1990,1,1)#"
 				startTime="03:00"
-				url="#thisHost#/bugLog/util/purgeHistory.cfm"
+				url="#thisHost#/bugLog/util/purgeHistory.cfm?instance=#variables.instanceName#"
 				interval="daily"
 			/>		
 		<cfelse>
-			<cfschedule action="delete"	task="bugLogPurgeHistory" />
+			<cfschedule action="delete"	task="bugLogPurgeHistory_# variables.instanceName#" />
 		</cfif>
 	</cffunction>
 	

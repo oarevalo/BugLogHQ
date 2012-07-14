@@ -1,1 +1,1 @@
-<!--- this page is intentionally blank --->
+<cfinclude template="/bugLog/core/core.cfm">

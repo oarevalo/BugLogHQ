@@ -345,15 +345,15 @@
 
 		<cfif arguments.enabled>
 			<cfschedule action="update"
-				task="bugLogSendDigest"
+				task="bugLogSendDigest_#variables.instanceName#"
 				operation="HTTPRequest"
 				startDate="#createDate(1990,1,1)#"
 				startTime="#arguments.startTime#"
-				url="#thisHost#/bugLog/util/sendDigest.cfm"
+				url="#thisHost#/bugLog/util/sendDigest.cfm?instance=#variables.instanceName#"
 				interval="#arguments.interval*3600#"
 			/>		
 		<cfelse>
-			<cfschedule action="delete"	task="bugLogSendDigest" />
+			<cfschedule action="delete"	task="bugLogSendDigest_#variables.instanceName#" />
 		</cfif>
 	</cffunction>
 
