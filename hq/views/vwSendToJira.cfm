@@ -60,13 +60,13 @@
 	<table width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 		<tr>
 			<td style="border-right:1px solid ##666;">
-				<img alt="" width="16" height="16" src="images/icons/arrow_undo.png" align="absmiddle" />
+				<img alt="" width="16" height="16" src="#rs.assetsPath#images/icons/arrow_undo.png" align="absmiddle" />
 				<a href="index.cfm?event=ehGeneral.dspEntry&entryID=#entryID#">Return To Bug</a>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 			<cfif tmpSeverity neq "">
 				<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
-					<img src="images/severity/#lcase(tmpSeverity)#.png" 
+					<img src="#rs.assetsPath#images/severity/#lcase(tmpSeverity)#.png" 
 							align="bottom"
 							alt="#lcase(tmpSeverity)#" 
 							title="#lcase(tmpSeverity)#">

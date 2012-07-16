@@ -14,6 +14,7 @@
 			var instanceName = "";
 			var app = getService("app");
 			var config = app.getConfig();
+			var assetsPath = "";
 
 			
 			try {
@@ -57,6 +58,7 @@
 				setValue("dateFormatMask",config.getSetting("general.dateFormat"));
 				setValue("configKey", config.getConfigKey());
 				setValue("instanceName", app.getInstanceName());
+				setValue("assetsPath", assetsPath);
 
 			} catch(any e) {
 				setMessage("error",e.message);
