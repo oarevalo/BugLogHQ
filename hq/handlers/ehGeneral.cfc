@@ -14,8 +14,9 @@
 			var instanceName = "";
 			var app = getService("app");
 			var config = app.getConfig();
-			var assetsPath = "";
 
+			// url path used to find html/js/css resources
+			var assetsPath = getPath("html");
 			
 			try {
 				if(not structKeyExists(session,"userID")) session.userID = 0;
