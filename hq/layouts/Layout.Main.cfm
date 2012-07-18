@@ -2,6 +2,7 @@
 <cfset rs = request.requestState>
 <cfparam name="rs.applicationTitle" default="#application.applicationName#">
 <cfparam name="rs.viewTemplatePath" default="">
+<cfparam name="rs.messageTemplatePath" default="">
 <cfparam name="rs.assetsPath" default="">
 <cfoutput>
 	<html>
@@ -15,7 +16,9 @@
 			</div>
 			<div id="mainBody">
 				<div id="content">
-					<cfinclude template="../includes/message.cfm">
+					<cfif rs.messageTemplatePath neq "">
+						<cfinclude template="#rs.messageTemplatePath#">
+					</cfif>
 
 					<table style="width:90%;font-size:11px;" align="center">
 						<tr>	
