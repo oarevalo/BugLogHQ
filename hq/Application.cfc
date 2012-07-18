@@ -21,6 +21,10 @@
 	<cfset this.defaultLayout = "Layout.Main">
 	<cfset this.configDoc = "config/config.xml.cfm">
 
+	<!--- create an application mapping to bugLog location --->
+	<cfset this.rootDir = replace(getDirectoryFromPath(getcurrentTemplatePath()),"hq","")>
+	<cfset this.mappings[ "/bugLog" ] = left(this.rootDir,len(this.rootDir)-1) />
+
 	<cffunction name="onRequestStart">
 		<cfargument name="pageName" type="string" required="false" default="">
 
