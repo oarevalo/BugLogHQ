@@ -53,6 +53,14 @@ to leverage this information.
 -----------------------------------------------------------------------
 2. Release Notes
 -----------------------------------------------------------------------
+ > New in 1.6 (7/2012)
+-----------------------------------------------------------------------
+* Support for "Named Instance" deployment. A Named Instance means that you can
+have multiple instances of BugLog running on the same server at the same time.
+Each instance have their own configuration and point to their own databases.
+* BugLog can now run out-of-the-box on any directory, even the web root! Just unpack and go.
+
+-----------------------------------------------------------------------
  > New in 1.5 (2/2011)
 -----------------------------------------------------------------------
 * Extensions are now stored on a database instead of an XML file
@@ -89,6 +97,7 @@ BugLogHQ as well as perform user management.
 * Multiple bug fixes.
 * Deprecated support for storing data in XML files (it really really didn't make any sense)
 * UPDATE: Added custom web interface for iPhone/iPod Touch. See /bugLog/iphone
+
 
 -----------------------------------------------------------------------
  > New in 1.3
@@ -179,7 +188,8 @@ data in different ways.
 5. Installation and Usage Notes:
 --------------------------------------------------------------------------------------
 * To install BugLog just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be
-installed on a directory or mapping named /bugLog.
+installed on a directory or mapping named /bugLog, but you can actually put BugLog anywhere you want, even
+on the web root.
 
 * Run the corresponding SQL script for your database. The script can be found in the /install directory. This 
 will create the necessary tables.
@@ -187,7 +197,7 @@ will create the necessary tables.
 * By default bugLogHQ uses a datasource named "bugLog" with no password, to change this go to: 
 	/bugLog/config/buglog-config.xml.cfm
 
-	Change the <setting /> tags for:
+	Change the `<setting />` tags for:
 	 db.dsn :	datasource name as defined in the CF administrator (by default is bugLog)
 	 db.dbtype : database type. Can be either mysql or mssql. The default is mysql
 	 db.username : username for the datasource (if needed)
@@ -217,7 +227,7 @@ will create the necessary tables.
 	environment, BugLog will look for a file named "severkey.txt" on your /bugLog/config directory. This file should
 	only contain a single word that is used to name the environment. For example: "dev" or "prod-server-1" or something like that.
 	
-	Then on your buglog-config.xml.cfm add an <envSettings /> section like the following example:
+	Then on your buglog-config.xml.cfm add an `<envSettings />` section like the following example:
 
     <envSettings name="dev">
         <setting name="db.dsn">bugLog_dev</setting>
@@ -225,10 +235,10 @@ will create the necessary tables.
     </envSettings>
 
 	Where the "name" attribute of the envSettings tag must match what you provide on your serverkey.txt file. Inside you
-	can place any number of <settings/> tags you want. These will override the settings of the same name defined on
+	can place any number of `<settings/>` tags you want. These will override the settings of the same name defined on
 	the general part of the config.
 	
-	You can have as many <envSettings/> sections as you want. However only one will be used (the one that matches your serverkey.txt).
+	You can have as many `<envSettings/>` sections as you want. However only one will be used (the one that matches your serverkey.txt).
 	If none matches the serverkey, then BugLog will use the default settings.	
 	
 	An alternative way of providing the "serverkey" value is by using a Context Parameter. The advantage is that this
@@ -243,6 +253,17 @@ will create the necessary tables.
         <Parameter name="serverkey" value="dev" override="false" />
         ...
     </Context>
+
+* INSTALLING A NAMED INSTANCE
+	To create a new instance, just create a new directory under the webroot with the name 
+	you want for your neq instance (i.e. "/buglogdev").
+	On the new directory copy the contents of /bugLog/install/named-instance-template.
+	NOTE: don't copy the directory itself, only its contents.
+	Change the new Application.cfc to properly name your application, and modify the
+	config/buglog-config.xml.cfm on your new instance to set its appropriate configuration
+	(datasource, etc).
+	After that you can just go to /buglogdev (in this case) to access your new instance. 
+	To submit bugs to this instance, just point your buglog client to /buglogdev/listener.cfm
 	
 
 
@@ -276,7 +297,9 @@ your bug reports might get truncated.
 There is now a Google Groups for the BugLogHQ project. Use them to ask any questions, 
 ask for help if you get stuck, or if you have any contributions that you would like
 to share.
+
 Google Groups Page:  http://groups.google.com/group/bugloghq
+GitHub Project Page: https://github.com/oarevalo/BugLogHQ
 
 
 -----------------------------------------------------------------------
