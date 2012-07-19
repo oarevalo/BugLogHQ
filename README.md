@@ -2,7 +2,7 @@ BugLogHQ (v1.6)
 ===============
 https://github.com/oarevalo/BugLogHQ
 
-BugLogHQ is a tool to centralize the handling of automated bug reports from multiple applications. BugLogHQ provides a unified view of error messages sent from any number of applications, allowing the developer to search, graph, forward, and explore the bug reports submitted by the applications.
+**BugLogHQ** is a tool to centralize the handling of automated bug reports from multiple applications. BugLogHQ provides a unified view of error messages sent from any number of applications, allowing the developer to search, graph, forward, and explore the bug reports submitted by the applications.
 
 
 > Copyright 2009 - Oscar Arevalo (http://www.oscararevalo.com)
@@ -42,13 +42,13 @@ graph, forward, and explore the bug reports submitted by the applications. All b
 
 
 2. Release Notes
- > New in 1.6 (7/2012)
 -----------------------------------------------------------------------
+
+### New in 1.6 (7/2012)
 * Support for "Named Instance" deployment. A Named Instance means that you can have multiple instances of BugLog running on the same server at the same time. Each instance have their own configuration and point to their own databases.
 * BugLog can now run out-of-the-box on any directory, even the web root! Just unpack and go.
 
- > New in 1.5 (2/2011)
------------------------------------------------------------------------
+### New in 1.5 (2/2011)
 * Extensions are now stored on a database instead of an XML file
 * Creating a rule instance is now much more user friendly because application, host and severity codes can be selected via dropdowns; or can also be prepopulated from an existing bug report.
 * Added support for defining settings for multiple environments (dev,qa,prod1,prod2,etc). Once the environment is detected buglog can override any setting with custom values.
@@ -57,8 +57,7 @@ graph, forward, and explore the bug reports submitted by the applications. All b
 * Rewrote the "iphone" UI to be for mobiles in general (now its accessible at /bugLog/mobile), also there is an improved platform detection when going to /bugLog. If you go with any mobile browser you should get redirected to the new UI, otherwise you go to the regular desktop UI
 * Multiple bug fixes 
 
- > New in 1.4 (11/2009)
------------------------------------------------------------------------
+### New in 1.4 (11/2009)
 * Bug reports and rules are now processed asynchronously and not at the time they arrive. This largely increases the response and scalability of the system. The default interval for execution is 2 minutes but this can be configured easily.
 * Reduced the number of configuration files (only 2) and moved them to a single location.
 * Added a "settings" screen to the main interface to allow administrators to configure multiple aspects of BugLogHQ as well as perform user management.
@@ -73,8 +72,7 @@ graph, forward, and explore the bug reports submitted by the applications. All b
 * Deprecated support for storing data in XML files (it really really didn't make any sense)
 * UPDATE: Added custom web interface for iPhone/iPod Touch. See /bugLog/iphone
 
- > New in 1.3
------------------------------------------------------------------------
+### New in 1.3
 * This is a release of mostly internal changes. The entire data access layer has been refactored to use an improved mechanism that makes it easier to work with different backend data storages.
 See: 
 http://www.oscararevalo.com/index.cfm/2007/11/28/Using-Polymorphism-and-Inheritance-to-Build-a-Switchable-Data-Access-Layer
@@ -87,8 +85,7 @@ http://www.oscararevalo.com/index.cfm/2007/11/28/Using-Polymorphism-and-Inherita
 * bl_source table no longer needs to be populated with pre-defined values. The listener will insert these as needed.
 * Added bugLogProxy.cfm for integration with BugLogMini ( http://buglogmini.riaforge.org/ )
 
- > New in 1.2
------------------------------------------------------------------------
+### New in 1.2
 * Support for a configurable and extensible rules system. Rules are processes that are applied to each bug report as it is received. Rules can be defined for tasks such as sending notifications when a bug of given conditions is received; when the amount of bugs received in a given timeframe is greater than a defined threshold, etc. The rules system is extensible in the sense that each rule is implemented as a CFC with a common interface.
 For more info on rules see:
 http://www.oscararevalo.com/index.cfm/2007/10/2/BugLogHQ-New-Rules-feature
@@ -102,31 +99,29 @@ Applications can send bug reports to BugLogHQ via three different ways:
 * http post
 * direct CFC call
 
-BugLogHQ provides a CFC that can be used to send the bug reports. This CFC is located in /bugLog/client/bugLogService.cfc. This is the only file that needs to be distributed with any application that wants to submit reports to BugLogHQ.
+BugLogHQ provides a CFC that can be used to send the bug reports. This CFC is located in `/bugLog/client/bugLogService.cfc`. This is the only file that needs to be distributed with any application that wants to submit reports to BugLogHQ.
 
-You may instantiate and keep the instance of this CFC in some a scope such as Application and then just call the "notifyService" method in it whenever the application needs to submit a bug report.
+You may instantiate and keep the instance of this CFC in some a scope such as Application and then just call the `notifyService()` method in it whenever the application needs to submit a bug report.
 
 To initialize the bugLogService, call the Init method. This method takes three parameters:
-* bugLogListener:	The location of the listener where to send the bug reports
-* bugEmailRecipients:  A comma-delimited list of email addresses to which send the 
-						bug reports in case there is an error submitting the report
-						to the bugLog listener.
-* bugEmailSender:	The sender address to use when sending the emails mentioned above.
+* _bugLogListener:_	The location of the listener where to send the bug reports
+* _bugEmailRecipients:_  A comma-delimited list of email addresses to which send the bug reports in case there is an error submitting the report to the bugLog listener.
+* _bugEmailSender:_	The sender address to use when sending the emails mentioned above.
 
 The bugLogListener parameter can be any of:
-* WSDL pointing to /bugLog/listeners/bugLogListenerWS.cfc (to submit the report using a webservice), 
-* Full URL pointing to /bugLog/listeners/bugLogListenerREST.cfm (to submit as an http post)
-* path to /bugLog/listeners/bugLogListenerWS.cfc in dot notation (i.e. bugLog.listeners.bugLogListenerWS)
+* WSDL pointing to `/bugLog/listeners/bugLogListenerWS.cfc` (to submit the report using a webservice), 
+* Full URL pointing to `/bugLog/listeners/bugLogListenerREST.cfm` (to submit as an http post)
+* path to `/bugLog/listeners/bugLogListenerWS.cfc` in dot notation (i.e. bugLog.listeners.bugLogListenerWS)
 
-If an error occurs while submitting the report to the listener, then bugLogService will automatically send the same information as an email to the addresses provided in the Init() method.
+If an error occurs while submitting the report to the listener, then bugLogService will automatically send the same information as an email to the addresses provided in the `init()` method.
 
-**TIP:** Check the file /bugLog/test/client.cfm for an example of how to use the bugLog client CFC
+**TIP:** Check the file `/bugLog/test/client.cfm` for an example of how to use the bugLog client CFC
 
 
 
 4. BugLogHQ Interface
 -----------------------------------------------------------------------
-To access the BugLogHQ interface, go to /bugLog/ on your bugLog server; the interface is password protected. The default username and password is: admin / admin. From here you can have an overview of every bug report that has been received. Everything is pretty self-explanatory, and there are lots of things you can click to visualize the data in different ways.
+To access the BugLogHQ interface, go to `/bugLog/` on your bugLog server; the interface is password protected. The default username and password is: admin / admin. From here you can have an overview of every bug report that has been received. Everything is pretty self-explanatory, and there are lots of things you can click to visualize the data in different ways.
 
 
 
@@ -134,59 +129,58 @@ To access the BugLogHQ interface, go to /bugLog/ on your bugLog server; the inte
 --------------------------------------------------------------------------------------
 * To install BugLog just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be installed on a directory or mapping named /bugLog, but you can actually put BugLog anywhere you want, even on the web root.
 
-* Run the corresponding SQL script for your database. The script can be found in the /install directory. This will create the necessary tables.
+* Run the corresponding SQL script for your database. The script can be found in the `/install` directory. This will create the necessary tables.
 
 * By default bugLogHQ uses a datasource named "bugLog" with no password, to change this go to: 
 
 	/bugLog/config/buglog-config.xml.cfm
 
-	Change the `<setting />` tags for:
+Change the `<setting />` tags for:
 
-	db.dsn :	datasource name as defined in the CF administrator (by default is bugLog)
-	db.dbtype : database type. Can be either mysql or mssql. The default is mysql
-	db.username : username for the datasource (if needed)
-	db.password : password for the datasource (if needed)
+	_db.dsn:_	datasource name as defined in the CF administrator (by default is bugLog)
+	_db.dbtype:_ database type. Can be either mysql or mssql. The default is mysql
+	_db.username:_ username for the datasource (if needed)
+	_db.password:_ password for the datasource (if needed)
 	
 * To access the bugLogHQ interface, go to /bugLog. The default username/password is:
 	
-	username: admin
-	password: admin
+	_username:_ admin
+	_password:_ admin
 	
-	**IMPORTANT:** To change the admin password or to create additional users click on the "Settings" link on
-		the upper right corner of the screen.
+**IMPORTANT:** To change the admin password or to create additional users click on the "Settings" link on 	the upper right corner of the screen.
 
 ### TESTING AND VERIFICATION:
-	After installation use your browser to go to /bugLog/test and follow the links to test both the client and server side of buglog.
+After installation use your browser to go to /bugLog/test and follow the links to test both the client and server side of buglog.
 
 ### FOR DEBUGGING ONLY (OPTIONAL):
-	If you wish to receive email notices when the application itself has a problem, setup proper email at the following locations: 
+If you wish to receive email notices when the application itself has a problem, setup proper email at the following locations: 
 	
 	/bugLog/hq/Application.cfc (lines 14-15)
 	/bugLog/hq/config/config.xml.cfm (lines 10-11)
 	
-	Also, on /bugLog/hq/Application.cfc, line 19, change it to:
+Also, on `/bugLog/hq/Application.cfc`, line 19, change it to:
 
 	this.emailErrors = true
 
 ### CONFIGURING MULTIPLE ENVIRONMENTS
-	You can override any setting on the main config on a per-environment basis. To determine which is the current environment, BugLog will look for a file named "severkey.txt" on your /bugLog/config directory. This file should only contain a single word that is used to name the environment. For example: "dev" or "prod-server-1" or something like that.
+You can override any setting on the main config on a per-environment basis. To determine which is the current environment, BugLog will look for a file named `severkey.txt` on your `/bugLog/config` directory. This file should only contain a single word that is used to name the environment. For example: "dev" or "prod-server-1" or something like that.
 	
-	Then on your buglog-config.xml.cfm add an `<envSettings />` section like the following example:
+Then on your buglog-config.xml.cfm add an `<envSettings />` section like the following example:
 
 	<envSettings name="dev">
 	  <setting name="db.dsn">bugLog_dev</setting>
 	  <setting name="general.adminEmail">devteam@somedomain.org</setting>
 	</envSettings>
 
-	Where the "name" attribute of the envSettings tag must match what you provide on your serverkey.txt file. Inside you can place any number of `<settings/>` tags you want. These will override the settings of the same name defined on the general part of the config.
+Where the "name" attribute of the envSettings tag must match what you provide on your serverkey.txt file. Inside you can place any number of `<settings/>` tags you want. These will override the settings of the same name defined on the general part of the config.
 	
-	You can have as many `<envSettings/>` sections as you want. However only one will be used (the one that matches your serverkey.txt).
+You can have as many `<envSettings/>` sections as you want. However only one will be used (the one that matches your serverkey.txt).
 
-	If none matches the serverkey, then BugLog will use the default settings.	
+If none matches the serverkey, then BugLog will use the default settings.	
 	
-	An alternative way of providing the "serverkey" value is by using a Context Parameter. The advantage is that this method does not require you to add any new files to your BugLog installation. Of course, this only works if you have access to the config files of your application server.
+An alternative way of providing the "serverkey" value is by using a Context Parameter. The advantage is that this method does not require you to add any new files to your BugLog installation. Of course, this only works if you have access to the config files of your application server.
 	
-	For example in Tomcat, to set your serverkey as "dev", you would set a context parameter by editing "{Tomcat Path}/conf/context.xml" like this:
+For example in Tomcat, to set your serverkey as "dev", you would set a context parameter by editing `"{Tomcat Path}/conf/context.xml"` like this:
 	
 	<Context>
 	  ...
@@ -195,12 +189,17 @@ To access the BugLogHQ interface, go to /bugLog/ on your bugLog server; the inte
 	</Context>
 
 ### INSTALLING A NAMED INSTANCE
-	To create a new instance, just create a new directory under the webroot with the name you want for your neq instance (i.e. "/buglogdev").
-	On the new directory copy the contents of /bugLog/install/named-instance-template.
-	**NOTE:** don't copy the directory itself, only its contents.
-	Change the new Application.cfc to properly name your application, and modify the config/buglog-config.xml.cfm on your new instance to set its appropriate configuration (datasource, etc).
-	After that you can just go to /buglogdev (in this case) to access your new instance. 
-	To submit bugs to this instance, just point your buglog client to /buglogdev/listener.cfm
+To create a new instance, just create a new directory under the webroot with the name you want for your neq instance (i.e. "/buglogdev").
+
+On the new directory copy the contents of /bugLog/install/named-instance-template.
+
+**NOTE:** don't copy the directory itself, only its contents.
+
+Change the new Application.cfc to properly name your application, and modify the `config/buglog-config.xml.cfm` on your new instance to set its appropriate configuration (datasource, etc).
+
+After that you can just go to /buglogdev (in this case) to access your new instance. 
+
+To submit bugs to this instance, just point your buglog client to /buglogdev/listener.cfm
 	
 
 
@@ -229,8 +228,8 @@ Currently BugLogHQ supports the following databases:
 ---------------------------------------------------------------------------
 There is now a Google Groups for the BugLogHQ project. Use them to ask any questions, ask for help if you get stuck, or if you have any contributions that you would like to share.
 
-Google Groups Page:  http://groups.google.com/group/bugloghq
-GitHub Project Page: https://github.com/oarevalo/BugLogHQ
+_Google Groups Page:_  http://groups.google.com/group/bugloghq
+_GitHub Project Page:_ https://github.com/oarevalo/BugLogHQ
 
 
 9. Using BugLog with Non ColdFusion Applications
