@@ -57,7 +57,7 @@
 					ruleName = getMetaData(thisRule).name;
 								
 					// process rule					
-					rtn = _invoke(thisRule, arguments.method, args);
+					rtn = invokeRule(thisRule, arguments.method, args);
 
 					// if rule returns false, then that means that no more rules will be processed, so we exit
 					if(not rtn) break;
@@ -71,7 +71,7 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="_invoke" access="private" returntype="boolean">
+	<cffunction name="invokeRule" access="private" returntype="boolean">
 		<cfargument name="instance" type="any" required="true">
 		<cfargument name="method" type="string" required="true">
 		<cfargument name="args" type="struct" required="true">
