@@ -137,30 +137,20 @@ To access the BugLogHQ interface, go to `/bugLog/` on your bugLog server; the in
 
 Change the `<setting />` tags for:
 
-	_db.dsn:_	datasource name as defined in the CF administrator (by default is bugLog)
-	_db.dbtype:_ database type. Can be either mysql or mssql. The default is mysql
-	_db.username:_ username for the datasource (if needed)
-	_db.password:_ password for the datasource (if needed)
+	db.dsn:	datasource name as defined in the CF administrator (by default is bugLog)
+	db.dbtype: database type. Can be either mysql or mssql. The default is mysql
+	db.username: username for the datasource (if needed)
+	db.password: password for the datasource (if needed)
 	
 * To access the bugLogHQ interface, go to /bugLog. The default username/password is:
 	
-	_username:_ admin
-	_password:_ admin
+	username: admin
+	password: admin
 	
 **IMPORTANT:** To change the admin password or to create additional users click on the "Settings" link on 	the upper right corner of the screen.
 
 ### TESTING AND VERIFICATION:
-After installation use your browser to go to /bugLog/test and follow the links to test both the client and server side of buglog.
-
-### FOR DEBUGGING ONLY (OPTIONAL):
-If you wish to receive email notices when the application itself has a problem, setup proper email at the following locations: 
-	
-	/bugLog/hq/Application.cfc (lines 14-15)
-	/bugLog/hq/config/config.xml.cfm (lines 10-11)
-	
-Also, on `/bugLog/hq/Application.cfc`, line 19, change it to:
-
-	this.emailErrors = true
+After installation use your browser to go to `/bugLog/test` and follow the links to test both the client and server side of buglog.
 
 ### CONFIGURING MULTIPLE ENVIRONMENTS
 You can override any setting on the main config on a per-environment basis. To determine which is the current environment, BugLog will look for a file named `severkey.txt` on your `/bugLog/config` directory. This file should only contain a single word that is used to name the environment. For example: "dev" or "prod-server-1" or something like that.
@@ -228,8 +218,8 @@ Currently BugLogHQ supports the following databases:
 ---------------------------------------------------------------------------
 There is now a Google Groups for the BugLogHQ project. Use them to ask any questions, ask for help if you get stuck, or if you have any contributions that you would like to share.
 
-_Google Groups Page:_  http://groups.google.com/group/bugloghq
-_GitHub Project Page:_ https://github.com/oarevalo/BugLogHQ
+* _Google Groups Page:_  http://groups.google.com/group/bugloghq
+* _GitHub Project Page:_ https://github.com/oarevalo/BugLogHQ
 
 
 9. Using BugLog with Non ColdFusion Applications
