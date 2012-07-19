@@ -353,7 +353,16 @@
 				interval="#arguments.interval*3600#"
 			/>		
 		<cfelse>
-			<cfschedule action="delete"	task="bugLogSendDigest_#variables.instanceName#" />
+			<cftry>
+				<cfschedule action="delete" task="bugLogSendDigest_#variables.instanceName#" />
+				<cfcatch type="any">
+					<cfif findNoCase("coldfusion.scheduling.SchedulingNoSuchTaskException",cfcatch.stackTrace)>
+						<!--- it's ok, nothing to do here --->
+					<cfelse>
+						<cfrethrow>
+					</cfif>
+				</cfcatch>		
+			</cftry>
 		</cfif>
 	</cffunction>
 
