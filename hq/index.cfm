@@ -9,6 +9,7 @@
 <!--- Framework Settings --->
 <cfset app.paths.app = "/bugLog/hq">
 <cfset app.paths.core = "/bugLog/core">
+<cfset app.paths.coreImages = "../core/images">
 <cfset app.paths.html = "">
 
 <cfset app.dirs.handlers = "handlers">
