@@ -129,7 +129,7 @@ To access the BugLogHQ interface, go to `/bugLog/` on your bugLog server; the in
 --------------------------------------------------------------------------------------
 * To install BugLog just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be installed on a directory named /bugLog. If you want, you can also put BugLog directly on the web root.
 
-**NOTE:** If you want to install bugLog directly on the web root, make sure to update the setting `general.externalURL` to the value "\" so that BugLog knows how to find itself.
+**NOTE:** If you want to install bugLog directly on the web root, make sure to update the setting `general.externalURL` to the value "/" so that BugLog knows how to find itself.
 
 * Run the corresponding SQL script for your database. The script can be found in the `/install` directory. This will create the necessary tables.
 
