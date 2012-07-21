@@ -1,9 +1,8 @@
 <cfcomponent>
 	
-	<cfset variables.DEFAULT_BUGLOG_PATH = "/bugLog/">
+	<cfset variables.DEFAULT_BUGLOG_CFC_PATH = "bugLog">
 	<cfset variables.DEFAULT_BUGLOG_INSTANCE = "default">
 	
-	<cfset variables.path = "">
 	<cfset variables.cfcPath = "">
 	<cfset variables.extensionsPath = "">
 	<cfset variables.OSPathSeparator = createObject("java","java.lang.System").getProperty("file.separator")>
@@ -11,29 +10,22 @@
 	<cfset variables.instanceName = "">
 
 	<cffunction name="init" access="public" returntype="appService">
-		<cfargument name="buglogpath" type="string" required="false" default="#variables.DEFAULT_BUGLOG_PATH#">
 		<cfargument name="instanceName" type="string" required="false" default="">
 
 		<!--- get the path in dot notation --->
-		<cfset variables.path = arguments.path>
-		<cfset variables.cfcPath = replace(variables.path, variables.OSPathSeparator, ".", "ALL")>
-		<cfif left(variables.cfcPath,1) eq ".">
-			<cfset variables.cfcPath = right(variables.cfcPath, len(variables.cfcPath)-1)>
-		</cfif>
-		<cfif right(variables.cfcPath,1) eq ".">
-			<cfset variables.cfcPath = left(variables.cfcPath, len(variables.cfcPath)-1)>
-		</cfif>
+		<cfset variables.cfcPath = variables.DEFAULT_BUGLOG_CFC_PATH>
 
 		<!--- set instance --->
 		<cfif arguments.instanceName eq "">
 			<!--- allow setting the buglog instance using a global request-level variable --->
 			<cfif structKeyExists(request,"bugLogInstance") and request.bugLogInstance neq "">
-				<cfset instanceName = request.bugLogInstance>
+				<cfset variables.instanceName = request.bugLogInstance>
 			<cfelse>
-				<cfset instanceName = variables.DEFAULT_BUGLOG_INSTANCE>
+				<cfset variables.instanceName = variables.DEFAULT_BUGLOG_INSTANCE>
 			</cfif>
+		<cfelse>
+			<cfset variables.instanceName = arguments.instanceName>
 		</cfif>
-		<cfset variables.instanceName = arguments.instanceName>
 		<cfdump var="BuglogHQ Init. Using instance: #variables.instanceName# #chr(10)#" output="console">
 
 		<!--- load the config object --->
@@ -196,13 +188,8 @@
 		<cfscript>
 			var oEntry = getEntry(arguments.entryID);
 			var thisHost = "";
-			var bugURL = "";
-
-			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
-			thisHost = thisHost & cgi.server_name;
-			if(cgi.server_port neq 80 and cgi.server_port neq 443) thisHost = thisHost & ":" & cgi.server_port;
-			
-			bugURL = "#thisHost#/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#arguments.entryID#";
+			var bugURL = getBugEntryHREF(arguments.EntryID);
+			var buglogHref = getBaseBugLogHREF();
 		</cfscript>
 		
 		<cfmail from="#arguments.sender#" 
@@ -246,7 +233,7 @@
 			<a href="#bugURL#">#bugURL#</a>
 			<br><br><br>
 			** This email has been sent from the BugLog server at 
-			<a href="#thisHost#/bugLog">#thisHost#/bugLog</a>
+			<a href="#arguments#">#arguments#</a>
 		</cfmail>
 		
 	</cffunction>
@@ -326,6 +313,8 @@
 		<cfargument name="severity" type="string" required="true">
 		<cfargument name="application" type="string" required="true">
 		<cfargument name="host" type="string" required="true">
+
+		<cfset var scheduler = createObject("component","bugLog.components.schedulerService").init(config,instanceName)>
 		
 		<cfset variables.config.setSetting("digest.enabled", arguments.enabled)>
 		<cfset variables.config.setSetting("digest.recipients", arguments.recipients)>
@@ -336,33 +325,13 @@
 		<cfset variables.config.setSetting("digest.application", arguments.application)>
 		<cfset variables.config.setSetting("digest.host", arguments.host)>
 
-		<cfscript>
-			var thisHost = "";
-			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
-			thisHost = thisHost & cgi.server_name;
-			if(cgi.server_port neq 80 and cgi.server_port neq 443) thisHost = thisHost & ":" & cgi.server_port;
-		</cfscript>
-
 		<cfif arguments.enabled>
-			<cfschedule action="update"
-				task="bugLogSendDigest_#variables.instanceName#"
-				operation="HTTPRequest"
-				startDate="#createDate(1990,1,1)#"
-				startTime="#arguments.startTime#"
-				url="#thisHost#/bugLog/util/sendDigest.cfm?instance=#variables.instanceName#"
-				interval="#arguments.interval*3600#"
-			/>		
+			<cfset scheduler.setupTask("bugLogSendDigest", 
+										"util/sendDigest.cfm",
+										arguments.startTime,
+										arguments.interval*3600) />		
 		<cfelse>
-			<cftry>
-				<cfschedule action="delete" task="bugLogSendDigest_#variables.instanceName#" />
-				<cfcatch type="any">
-					<cfif findNoCase("coldfusion.scheduling.SchedulingNoSuchTaskException",cfcatch.stackTrace)>
-						<!--- it's ok, nothing to do here --->
-					<cfelse>
-						<cfrethrow>
-					</cfif>
-				</cfcatch>		
-			</cftry>
+			<cfset scheduler.removeTask("bugLogSendDigest") />
 		</cfif>
 	</cffunction>
 
@@ -525,6 +494,19 @@
 
 			return st;
 		</cfscript>
+	</cffunction>
+
+	<cffunction name="getBugEntryHREF" access="public" returntype="string" hint="Returns the URL to a given bug report">
+		<cfargument name="entryID" type="numeric" required="true" hint="the id of the bug report">
+		<cfset var utils = createObject("component","bugLog.components.util").init() />
+		<cfset var href = utils.getBugEntryHREF(arguments.entryID, variables.config, variables.instanceName) />
+		<cfreturn href />
+	</cffunction>
+
+	<cffunction name="getBaseBugLogHREF" access="public" returntype="string" hint="Returns a web accessible URL to buglog">
+		<cfset var utils = createObject("component","bugLog.components.util").init() />
+		<cfset var href = utils.getBaseBugLogHREF(variables.config, variables.instanceName) />
+		<cfreturn href />
 	</cffunction>
 
 </cfcomponent>

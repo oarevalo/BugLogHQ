@@ -10,10 +10,7 @@
 		<setting name="bugEmailRecipients" value="" />
 		<setting name="bugEmailSender" value="" />
 		<setting name="bugLogListener" value="bugLog.listeners.bugLogListenerWS" />
-		
-		<!-- This is the directory/mapping where the application is located -->
-		<setting name="bugLogPath" value="/bugLog/" />
-		
+				
 		<!-- This flag controls wether detailed error information is displayed
 			in case the application encounters an unhandled exception -->
 		<setting name="debugMode" value="true" />
@@ -30,7 +27,6 @@
 	<services>
 		<!-- Application service (service layer) -->
 		<service name="app" class="bugLog.hq.components.services.appService">
-			<init-param name="path" settingName="bugLogPath" />
 		</service>
 	
 		<!-- error reporting service -->

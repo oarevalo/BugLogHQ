@@ -46,7 +46,7 @@ graph, forward, and explore the bug reports submitted by the applications. All b
 
 ### New in 1.6 (7/2012)
 * Support for "Named Instance" deployment. A Named Instance means that you can have multiple instances of BugLog running on the same server at the same time. Each instance have their own configuration and point to their own databases.
-* BugLog can now run out-of-the-box on any directory, even the web root! Just unpack and go.
+* BugLog can now (optionally) run out-of-the-box on the web root! Just unpack and go.
 
 ### New in 1.5 (2/2011)
 * Extensions are now stored on a database instead of an XML file
@@ -127,7 +127,9 @@ To access the BugLogHQ interface, go to `/bugLog/` on your bugLog server; the in
 
 5. Installation and Usage Notes:
 --------------------------------------------------------------------------------------
-* To install BugLog just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be installed on a directory or mapping named /bugLog, but you can actually put BugLog anywhere you want, even on the web root.
+* To install BugLog just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be installed on a directory named /bugLog. If you want, you can also put BugLog directly on the web root.
+
+**NOTE:** If you want to install bugLog directly on the web root, make sure to update the setting `general.externalURL` to the value "\" so that BugLog knows how to find itself.
 
 * Run the corresponding SQL script for your database. The script can be found in the `/install` directory. This will create the necessary tables.
 
@@ -148,6 +150,8 @@ Change the `<setting />` tags for:
 	password: admin
 	
 **IMPORTANT:** To change the admin password or to create additional users click on the "Settings" link on 	the upper right corner of the screen.
+
+**TIP:** Changing the setting `general.externalURL` in the main config you can tell BugLog the URL to use when referring to itself. By default buglog will try to guess it from the CGI scope, but in some cases you may want to override this. For example if you have a clustered deployment.
 
 ### TESTING AND VERIFICATION:
 After installation use your browser to go to `/bugLog/test` and follow the links to test both the client and server side of buglog.

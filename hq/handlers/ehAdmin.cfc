@@ -71,6 +71,10 @@
 						setValue("host", digestConfig.host);			
 						setValue("severity", digestConfig.severity);			
 						break;
+						
+					case "listeners":
+						setValue("bugLogHREF", app.getBaseBugLogHREF());	
+						break;
 				}
 
 				setValue("panel", panel);

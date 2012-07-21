@@ -84,16 +84,7 @@
 	<cffunction name="shutDown" access="public" returntype="void" hint="Performs any clean up action required">
 		<cfset logMessage("Stopping BugLogListener (#instanceName#) service...")>
 		<cfset logMessage("Stopping ProcessQueue scheduled task...")>
-		<cftry>
-			<cfschedule action="delete"	task="bugLogProcessQueue_#instanceName#" />	
-			<cfcatch type="any">
-				<cfif findNoCase("coldfusion.scheduling.SchedulingNoSuchTaskException",cfcatch.stackTrace)>
-					<!--- it's ok, nothing to do here --->
-				<cfelse>
-					<cfrethrow>
-				</cfif>
-			</cfcatch>			
-		</cftry>
+		<cfset scheduler.removeTask("bugLogProcessQueue") />
 		<cfset logMessage("Processing remaining elements in queue...")>
 		<cfset processQueue(variables.key)>
 		<cfset logMessage("BugLogListener service (#instanceName#) stopped.")>
@@ -103,22 +94,11 @@
 	<!--- Private methods --->
 		
 	<cffunction name="startScheduler" access="private" output="false" returntype="void">
-		<cfscript>
-			var thisHost = "";
-			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
-			thisHost = thisHost & cgi.server_name;
-			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
-		</cfscript>
-
-		<cfschedule action="update"
-			task="bugLogProcessQueue_#instanceName#"
-			operation="HTTPRequest"
-			startDate="#createDate(1990,1,1)#"
-			startTime="00:00"
-			endTime="23:59"
-			url="#thisHost#/bugLog/util/processQueue.cfm?key=#variables.KEY#&instance=#instanceName#"
-			interval="#variables.schedulerIntervalSecs#"
-		/>		
+		<cfset scheduler.setupTask("bugLogProcessQueue", 
+									"util/processQueue.cfm",
+									"00:00",
+									variables.schedulerIntervalSecs,
+									[{name="key",value=variables.KEY}]) />
 	</cffunction>
 	
 	

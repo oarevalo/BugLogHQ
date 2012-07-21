@@ -47,16 +47,12 @@
 		<cfargument name="comment" type="string" required="false" default="">
 		<cfscript>
 			var stEntry = {};
-			var thisHost = "";
+			var buglogHref = getBaseBugLogHREF();
 
 			if(structKeyExists(arguments,"rawEntryBean")) {
 				stEntry = arguments.rawEntryBean.getMemento();
 			}
-
-			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
-			thisHost = thisHost & cgi.server_name;
-			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
-
+			 
 			if(arguments.sender eq "") {writeToCFLog("Missing 'sender' email address. Cannot send alert email!"); return;}
 			if(arguments.recipient eq "") {writeToCFLog("Missing 'recipient' email address. Cannot send alert email!"); return;}
 		</cfscript>
@@ -119,7 +115,7 @@
 
 			<div style="font-family:arial;font-size:11px;margin-top:15px;">
 				** This email has been sent automatically from the BugLog server at 
-				<a href="#thisHost#/bugLog/hq">#thisHost#/bugLog/hq</a><br />
+				<a href="#buglogHref#">#buglogHref#</a><br />
 				<em>To disable automatic notifications log into the bugLog server and disable the corresponding rule.</em>
 			</div>
 		</cfmail>
@@ -137,6 +133,19 @@
 	<cffunction name="setListener" access="public" returntype="void" hint="Adds a reference to the bugLogListener instance">
 		<cfargument name="listener" type="any" required="true">
 		<cfset variables.listener = arguments.listener>
+	</cffunction>
+
+	<cffunction name="getBugEntryHREF" access="public" returntype="string" hint="Returns the URL to a given bug report">
+		<cfargument name="entryID" type="numeric" required="true" hint="the id of the bug report">
+		<cfset var utils = createObject("component","bugLog.components.util").init() />
+		<cfset var href = utils.getBugEntryHREF(arguments.entryID, listener.getConfig(), listener.getInstanceName()) />
+		<cfreturn href />
+	</cffunction>
+
+	<cffunction name="getBaseBugLogHREF" access="public" returntype="string" hint="Returns a web accessible URL to buglog">
+		<cfset var utils = createObject("component","bugLog.components.util").init() />
+		<cfset var href = utils.getBaseBugLogHREF(listener.getConfig(), listener.getInstanceName()) />
+		<cfreturn href />
 	</cffunction>
 
 </cfcomponent>
