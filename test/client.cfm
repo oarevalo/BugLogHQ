@@ -9,17 +9,36 @@
 		reset: unloads the buglog client from memory after the test
 --->
 
-<cfset bugLogListener = structNew()>
-<cfset bugLogListener.soap = "http://#cgi.HTTP_HOST#/bugLog/listeners/bugLogListenerWS.cfc?wsdl">
-<cfset bugLogListener.rest = "http://#cgi.HTTP_HOST#/bugLog/listeners/bugLogListenerREST.cfm">
-<cfset bugLogListener.cfc = "bugLog.listeners.bugLogListenerWS">
-
 <cfparam name="protocol" default="cfc">
 <cfparam name="pathToService" default="bugLog.client.bugLogService">
 <cfparam name="severity" default="FATAL">
 <cfparam name="reset" default="true">
 <cfparam name="apikey" default="">
+<cfparam name="instance" default="">
+<cfparam name="bugLogHREF" default="">
+<cfparam name="returnTo" default="">
 
+<cfif bugLogHREF neq "">
+	<cfset path = bugLogHREF>
+<cfelse>
+	<cfset path = "http://#cgi.HTTP_HOST#/bugLog/">
+</cfif>
+
+
+<cfset bugLogListener = structNew()>
+
+<cfif instance neq "default" and instance neq "">
+	<cfset bugLogListener.soap = "#path#listener.cfc?wsdl">
+	<cfset bugLogListener.rest = "#path#listener.cfm">
+	<cfset adminPath = "">
+<cfelse>
+	<cfset bugLogListener.soap = "#path#listeners/bugLogListenerWS.cfc?wsdl">
+	<cfset bugLogListener.rest = "#path#listeners/bugLogListenerREST.cfm">
+	<cfset adminPath = "hq/">
+</cfif>
+<cfset bugLogListener.cfc = "bugLog.listeners.bugLogListenerWS">
+
+<cfoutput>
 <html>
 	<head>
 		<style type="text/css">
@@ -40,13 +59,11 @@
 			<cflock name="buglogservice" timeout="5" type="exclusive">
 				<cfif not IsDefined("application.oBugLogService") or reset>
 					BugLog client not loaded. Creating instance and loading into Application scope now... <br>
-					<cfoutput>
-						... Listener type is: <b>#protocol#</b><br />
-						... Listener is: <a href="#bugLogListener[protocol]#">#bugLogListener[protocol]#</a><br />
-						<cfif apikey neq "">
-						... Listener API Key is: <b>#apikey#</b><br />
-						</cfif>
-					</cfoutput>
+					... Listener type is: <b>#protocol#</b><br />
+					... Listener is: <a href="#bugLogListener[protocol]#">#bugLogListener[protocol]#</a><br />
+					<cfif apikey neq "">
+					... Listener API Key is: <b>#apikey#</b><br />
+					</cfif>
 					<cfset application.oBugLogService = createObject("component",pathToService).init(bugLogListener = bugLogListener[protocol],
 																									 apiKey = apiKey)>
 				</cfif>
@@ -62,7 +79,7 @@
 			
 			<cfcatch type="any">
 				<!--- notify bugLog of error --->
-				<cfoutput>Notify service via  <strong>[#protocol#]</strong> using severity <strong>[#severity#]</strong>....</cfoutput> <br>
+				Notify service via  <strong>[#protocol#]</strong> using severity <strong>[#severity#]</strong>....<br>
 				<cfset application.oBugLogService.notifyService(cfcatch.message, cfcatch, "", severity)>
 			</cfcatch>
 		</cftry>
@@ -79,16 +96,18 @@
 		<br /><br />
 		
 		<strong>Send test bug report via:</strong> 
-		<cfoutput>
-			<cfloop collection="#bugLogListener#" item="key">
-				<a href="client.cfm?protocol=#key#">#key#</a>
-				&nbsp;|&nbsp;
-			</cfloop>
-		</cfoutput>
+		<cfloop collection="#bugLogListener#" item="key">
+			<a href="client.cfm?protocol=#key#&instance=#instance#&bugloghref=#bugloghref#&returnTo=#returnTo#">#key#</a>
+			&nbsp;|&nbsp;
+		</cfloop>
 
 		<br /><br />
-
-		<a href="index.cfm">Return</a>
+	
+		<cfif returnTo eq "admin">
+			<a href="#path##adminPath#index.cfm?event=ehAdmin.dspMain&panel=listeners">Return</a>
+		<cfelse>
+			<a href="index.cfm">Return</a>
+		</cfif>
 	</body>
 </html>
-
+</cfoutput>
