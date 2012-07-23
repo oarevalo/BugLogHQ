@@ -8,8 +8,8 @@
 		<cfargument name="entryID" type="numeric" required="true" hint="the id of the bug report">
 		<cfargument name="config" type="any" required="true" hint="the main config object">
 		<cfargument name="instanceName" type="string" required="false" default="default" hint="the current buglog instance name">
-		<cfset var buglogHref = utils.getBaseBugLogHREF(config, instanceName) />
-		<cfset var href = buglogHref & "hq/index.cfm?event=ehGeneral.dspEntry&entryID=#arguments.entryID#" />
+		<cfset var buglogHref = getBugLogHQAppHREF(config, instanceName) />
+		<cfset var href = buglogHref & "index.cfm?event=ehGeneral.dspEntry&entryID=#arguments.entryID#" />
 		<cfreturn href />
 	</cffunction>
 
@@ -34,7 +34,7 @@
 				// there is no external url defined, so we use
 				// the current host and assume the application is located
 				// at either the buglog dir or a named instance dir
-				if(instanceName eq "default")
+				if(instanceName eq "default" or instanceName eq "")
 					buglogPath = getCurrentHost() & "/bugLog";
 				else
 					buglogPath = getCurrentHost() & "/" & instanceName;
@@ -46,6 +46,22 @@
 				
 			return buglogPath;
 		</cfscript>
+	</cffunction>
+
+	<cffunction name="getBugLogHQAssetsHREF" access="public" returntype="string" hint="Returns a web accessible URL to use to obtain buglog HQ assets (images,html,js,etc)">
+		<cfargument name="config" type="any" required="true" hint="the main config object">
+		<cfset var buglogHref = getBaseBugLogHREF(config) & "hq/" />
+		<cfreturn buglogHref>
+	</cffunction>
+
+	<cffunction name="getBugLogHQAppHREF" access="public" returntype="string" hint="Returns a web accessible URL to buglog HQ app (only for linking into the app code itself, not assets)">
+		<cfargument name="config" type="any" required="true" hint="the main config object">
+		<cfargument name="instanceName" type="string" required="false" default="default" hint="the current buglog instance name">
+		<cfset var buglogHref = getBaseBugLogHREF(config, instanceName) />
+		<cfif instanceName eq "default" or instanceName eq "">
+			<cfset buglogHref = buglogHref & "hq/">
+		</cfif>
+		<cfreturn buglogHref>
 	</cffunction>
 
 	<cffunction name="getCurrentHost" access="public" returntype="string" hint="gets the current host based on the CGI scope">

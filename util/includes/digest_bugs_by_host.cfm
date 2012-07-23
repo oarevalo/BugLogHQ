@@ -25,20 +25,20 @@
 				<td style="padding:3px;border:1px dotted silver;">&nbsp;</td>
 			<cfelse>
 				<td style="padding:3px;border:1px dotted silver;">
-					<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?applicationID=#ApplicationID#">
+					<cfset tmpURL = thisHost & "hq/index.cfm?applicationID=#ApplicationID#">
 					<a href="#tmpURL#">#ApplicationCode#</a>
 				</td>
 			</cfif>
 			<td style="padding:3px;border:1px dotted silver;" align="center">
-				<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?applicationID=#ApplicationID#&hostID=#hostID#">
+				<cfset tmpURL = thisHost & "hq/index.cfm?applicationID=#ApplicationID#&hostID=#hostID#">
 				<a href="#tmpURL#">#hostName#</a>
 			</td>
 			<td style="padding:3px;border:1px dotted silver;padding-right:10px;" align="right">
-				<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspLog&msgFromEntryID=#EntryID#&applicationID=#ApplicationID#&hostID=#hostID#">
+				<cfset tmpURL = thisHost & "hq/index.cfm?event=ehGeneral.dspLog&msgFromEntryID=#EntryID#&applicationID=#ApplicationID#&hostID=#hostID#">
 				<a href="#tmpURL#">#bugCount#</a>
 			</td>
 			<td style="padding:3px;border:1px dotted silver;" align="center">
-				<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#EntryID#">
+				<cfset tmpURL = thisHost & "hq/index.cfm?event=ehGeneral.dspEntry&entryID=#EntryID#">
 				<a href="#tmpURL#">#dateFormat(createdOn,dateMask)# #lsTimeFormat(createdOn)#</a>
 			</td>
 		</tr>
