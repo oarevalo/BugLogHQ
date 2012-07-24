@@ -3,7 +3,7 @@
 
 <!--- Handle service initialization if necessary --->
 <cfset oService = createObject("component", "bugLog.components.service").init( instanceName = instance )>
-<cfset oAppService = createObject("component","bugLog.hq.components.services.appService").init(instanceName = instance)>
+<cfset oAppService = createObject("component","bugLog.components.hq.appService").init(instanceName = instance)>
 
 <cfset oConfig = oService.getConfig()>
 <cfset settings = oAppService.getDigestSettings()>

@@ -14,7 +14,7 @@
 <cfset oConfig = oService.getConfig()>
 
 <cfset oDAOFactory = createObject("component","bugLog.components.DAOFactory").init( oConfig )>
-<cfset oAppService = createObject("component","bugLog.hq.components.services.appService").init(instanceName = instance)>
+<cfset oAppService = createObject("component","bugLog.components.hq.appService").init(instanceName = instance)>
 <cfset oUtils = createObject("component","bugLog.components.util").init()>
 
 <cfset settings = oAppService.getDigestSettings()>

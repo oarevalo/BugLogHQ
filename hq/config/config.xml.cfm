@@ -3,7 +3,7 @@
 	<settings>
 		<!-- Application Title -->
 		<setting name="applicationTitle" value="BugLogHQ"/>
-		<setting name="versionTag" value="1.6.204" />
+		<setting name="versionTag" value="1.6.0" />
 		
 		<!-- These two settings are used for reporting internal
 			errors of the HQ application -->
@@ -26,7 +26,7 @@
 	<!-- This section describes all services that will be loaded into the application -->
 	<services>
 		<!-- Application service (service layer) -->
-		<service name="app" class="bugLog.hq.components.services.appService">
+		<service name="app" class="bugLog.components.hq.appService">
 		</service>
 	
 		<!-- error reporting service -->
@@ -37,12 +37,12 @@
 		</service>
 
 		<!-- JIRA service -->
-		<service name="jira" class="bugLog.hq.components.services.jiraService">
+		<service name="jira" class="bugLog.components.hq.jiraService">
 			<init-param name="appService" serviceName="app" />
 		</service>
 
 		<!-- RSS service -->
-		<service name="rss" class="bugLog.hq.components.rss">
+		<service name="rss" class="bugLog.components.lib.rss">
 		</service>
 	</services>
 </config>

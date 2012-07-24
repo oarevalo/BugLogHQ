@@ -9,6 +9,6 @@
 
 <cfif isBoolean(enabled) and enabled>
 	<cfdump var="Purging buglog history for records older than #days# days" output="console" />
-	<cfset oAppService = createObject("component","bugLog.hq.components.services.appService").init(config = oConfig, instanceName = instance)>
+	<cfset oAppService = createObject("component","bugLog.components.hq.appService").init(config = oConfig, instanceName = instance)>
 	<cfset oAppService.purgeHistory(days) />
 </cfif>

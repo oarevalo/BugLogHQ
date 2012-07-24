@@ -1,13 +1,12 @@
 <cfparam name="action" default="">
 
-<cfset bugLogPath = "/bugLog">
 <cfset results = "">
 <cfset error = false>
 <cfset errorMessage = "">
 
 <cftry>
-	<cfset oConfig = createObject("component","bugLog.components.config").init(configProviderType = "xml", configDoc = "/bugLog/config/buglog-config.xml.cfm")>
-	<cfset oAppService = createObject("component","bugLog.hq.components.services.appService").init(bugLogPath,oConfig)>
+	<cfset oAppService = createObject("component","bugLog.components.hq.appService").init()>
+	<cfset oConfig = oAppService.getConfig()>
 	
 	<cfset dateFormatMask = oConfig.getSetting("general.dateFormat")>
 	
