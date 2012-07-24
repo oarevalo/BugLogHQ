@@ -136,7 +136,7 @@
 	</cffunction>
 	
 	<cffunction name="getConfig" returnType="any" access="public" hint="returns the config settings">
-		<cfreturn variables.config>
+		<cfreturn variables.oConfig>
 	</cffunction>
 
 	<cffunction name="getInstanceName" returnType="any" access="public" hint="returns the current instance name">
