@@ -53,10 +53,10 @@
 	</cfquery>
 </cfif>
 <cfif sortDir eq "ASC">
-	<cfset imgSortDir = "images/icons/16-arrow-up.png">
+	<cfset imgSortDir = "#rs.assetsPath#images/icons/16-arrow-up.png">
 	<cfset opSortDir = "DESC">
 <cfelse>
-	<cfset imgSortDir = "images/icons/16-arrow-down.png">
+	<cfset imgSortDir = "#rs.assetsPath#images/icons/16-arrow-down.png">
 	<cfset opSortDir = "ASC">
 </cfif>
 
@@ -184,7 +184,7 @@
 						<cfset tmpImgName = "images/severity/#lcase(qryEntries.SeverityCode)#.png">
 					</cfif>
 				</cfif>
-				<img src="#tmpImgName#" 
+				<img src="#rs.assetsPath##tmpImgName#" 
 						align="absmiddle"
 						alt="#lcase(qryEntries.SeverityCode)#" 
 						title="#lcase(qryEntries.SeverityCode)#">
@@ -200,7 +200,7 @@
 				style="cursor:pointer;">#HtmlEditFormat(qryEntries.message)#</td>
 			<td class="cell_details" align="center">
 				<a href="?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">
-					<img alt="View details" width="16" height="16" src="images/icons/zoom.png" align="absmiddle" border="0" /></a>
+					<img alt="View details" width="16" height="16" src="#rs.assetsPath#images/icons/zoom.png" align="absmiddle" border="0" /></a>
 			</td>
 		</tr>
 	</cfloop>

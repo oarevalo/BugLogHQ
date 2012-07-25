@@ -1,14 +1,12 @@
 /************* Connect View ***********/
 function initConnectView() {
 	serverInfo = doGetServerInfo();
-	$("#server").val(serverInfo.server);
 	$("#username").val(serverInfo.username);
 	$("#password").val(serverInfo.password);
 	$("#rememberMe").attr("checked",serverInfo.rememberMe);
 	$("#btnConnect").click(function(){
 		frm = this.form;
-		doConnect(frm.server.value,
-						frm.username.value,
+		doConnect(frm.username.value,
 						frm.password.value,
 						frm.rememberMe.checked);
 	});
@@ -78,7 +76,7 @@ function doGoBack() {
 function createSummaryCapsuleHTML(entry) {
 	var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "' applicationID='" + entry.ApplicationID + "'>";
 		tmpHTML += "<div class='entryCapsuleBugCount'>"
-		tmpHTML += "<img src='/bugLog/hq/images/severity/" + jQuery.trim(entry.SeverityCode).toLowerCase() + ".png'><br>"
+		tmpHTML += "<img src='../hq/images/severity/" + jQuery.trim(entry.SeverityCode).toLowerCase() + ".png'><br>"
 		tmpHTML += entry.bugCount 
 		tmpHTML += "</div>";
 		tmpHTML += "<div class='entryCapsuleApplication'>" + entry.ApplicationCode + "</div>";
@@ -91,7 +89,7 @@ function createListingCapsuleHTML(entry) {
 	var tmpHTML = "<div class='entryCapsule' entryID='" + entry.EntryID + "'>";
 		tmpHTML += "<div class='entryCapsuleHost' style='float:right;'>" + entry.HostName + "</div>";
 		tmpHTML += "<div class='entryCapsuleDate'>";
-		tmpHTML += "<img src='/bugLog/hq/images/severity/" + jQuery.trim(entry.SeverityCode).toLowerCase() + ".png' align='absmiddle'>&nbsp;"
+		tmpHTML += "<img src='../hq/images/severity/" + jQuery.trim(entry.SeverityCode).toLowerCase() + ".png' align='absmiddle'>&nbsp;"
 		tmpHTML += entry.createdOn + "</div>"
 		tmpHTML += "</div>";
 	return tmpHTML;				
@@ -99,7 +97,7 @@ function createListingCapsuleHTML(entry) {
 function createEntryHTML(entry) {
 	var tmpHTML = "<table class='entryDetailTable'>";
 	tmpHTML += "<tr><td colspan='2' class='entryDetailTitle'>" 
-	tmpHTML += "<img src='/bugLog/hq/images/severity/" + jQuery.trim(entry.SeverityCode).toLowerCase()  + ".png' align='absmiddle' style='float:left;margin-right:3px;margin-top:5px;'>"
+	tmpHTML += "<img src='../hq/images/severity/" + jQuery.trim(entry.SeverityCode).toLowerCase()  + ".png' align='absmiddle' style='float:left;margin-right:3px;margin-top:5px;'>"
 	tmpHTML += entry.Message + "</td></tr>";
 	tmpHTML += "<tr><th>Application:</th><td>" + entry["ApplicationCode"] + "</td></tr>";
 	tmpHTML += "<tr><th>Host:</th><td>" + entry.HostName+ "</td></tr>";
@@ -169,10 +167,10 @@ function doPopulateSeverities(items) {
 	
 	var tmpHTML = "";
 	for(var i=0;i < items.length;i++) {
-		tmpHTML += "<input type='checkbox' name='severityID' value='"+items[i].severityID +"'";
+		tmpHTML += "<label><input type='checkbox' name='severityID' value='"+items[i].severityID +"'";
 		if(severities.indexOf(items[i].severityID)!=-1) tmpHTML += " checked";
-		tmpHTML += "><img src='/bugLog/hq/images/severity/" + jQuery.trim(items[i].code).toLowerCase()  + ".png' align='absmiddle'> ";
-		tmpHTML += items[i].name + "<br/>";
+		tmpHTML += "><img src='../hq/images/severity/" + jQuery.trim(items[i].code).toLowerCase()  + ".png' align='absmiddle'> ";
+		tmpHTML += items[i].name + "</label><br/>";
 	}
 	$("#severitiesContainer").html(tmpHTML);
 }

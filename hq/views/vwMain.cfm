@@ -16,6 +16,7 @@
 <cfparam name="request.requestState.qrySeverities" default="#queryNew('')#">
 <cfparam name="request.requestState.severityID" default="_ALL_">
 <cfparam name="request.requestState.searchHTMLReport" default="false">
+<cfparam name="request.requestState.assetsPath" default="">
 
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
@@ -39,6 +40,7 @@
 <cfset severityID = request.requestState.severityID>
 <cfset searchHTMLReport = request.requestState.searchHTMLReport>
 <cfset dateFormatMask = request.requestState.dateFormatMask>
+<cfset assetsPath = request.requestState.assetsPath>
 
 <!--- base URL for reloading --->
 <cfset pageURL = "index.cfm?event=ehGeneral.dspMain&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#urlEncodedFormat(searchTerm)#&groupByApp=#groupByApp#&groupByHost=#groupByHost#&numDays=#numDays#&severityID=#severityID#&searchHTMLReport=#searchHTMLReport#">
@@ -61,10 +63,10 @@
 	</cfquery>
 </cfif>
 <cfif sortDir eq "ASC">
-	<cfset imgSortDir = "images/icons/16-arrow-up.png">
+	<cfset imgSortDir = "#rs.assetsPath#images/icons/16-arrow-up.png">
 	<cfset opSortDir = "DESC">
 <cfelse>
-	<cfset imgSortDir = "images/icons/16-arrow-down.png">
+	<cfset imgSortDir = "#rs.assetsPath#images/icons/16-arrow-down.png">
 	<cfset opSortDir = "ASC">
 </cfif>
 
@@ -106,7 +108,7 @@
 				<cfif stInfo.isRunning>
 					<span style="color:green;font-weight:bold;">Running</span>
 					<span style="font-size:12px;">(<a href="index.cfm?event=ehGeneral.doStop">Stop</a>)</span>
-					<a href="index.cfm?event=ehServiceMonitor.dspMain"><img src="images/icons/server_connect.png" border="0" align="absmiddle"></a>
+					<a href="index.cfm?event=ehServiceMonitor.dspMain"><img src="#rs.assetsPath#images/icons/server_connect.png" border="0" align="absmiddle"></a>
 					<div style="font-size:9px;">
 						<strong>Last Start:</strong> 
 						#lsdateformat(stInfo.startedOn)# #lstimeformat(stInfo.startedOn)#
@@ -192,8 +194,8 @@
 					<span <cfif severityID neq "_ALL_">style="color:red;"</cfif>>Severity:</span> &nbsp;&nbsp;
 					<cfset tmp = severityID>
 					<cfloop query="qrySeverities">
-						<cfset tmpImgName = "images/severity/#lcase(qrySeverities.name)#.png">
-						<cfset tmpDefImgName = "images/severity/default.png">
+						<cfset tmpImgName = "#rs.assetsPath#images/severity/#lcase(qrySeverities.name)#.png">
+						<cfset tmpDefImgName = "#rs.assetsPath#images/severity/default.png">
 
 						<input type="checkbox" 
 								onclick="doSearch()"
@@ -304,7 +306,7 @@
 				</cfif>
 				<a href="index.cfm?event=ehGeneral.dspLog&severityID=#qryEntries.SeverityCode#" 
 					title="Click to view all #qryEntries.SeverityCode# bugs"><img 
-						src="#tmpImgName#" 
+						src="#rs.assetsPath##tmpImgName#" 
 						align="absmiddle"
 						alt="#lcase(qryEntries.SeverityCode)#" 
 						title="#lcase(qryEntries.SeverityCode)#"
@@ -331,7 +333,7 @@
 			</td>
 			<td class="cell_details" align="center">
 				<a href="#zoomURL#" title="Click for more detail">
-					<img alt="View details" width="16" height="16" src="images/icons/zoom.png" align="absmiddle" border="0" /></a>
+					<img alt="View details" width="16" height="16" src="#rs.assetsPath#images/icons/zoom.png" align="absmiddle" border="0" /></a>
 			</td>
 		</tr>
 	</cfloop>

@@ -2,24 +2,24 @@
 	
 	<cffunction name="dspRSS" access="public">
 		<cfscript>
-			applicationID = getValue("applicationID",0);
-			hostID = getValue("hostID",0);
-			maxEntries = 15;
+			var applicationID = getValue("applicationID",0);
+			var hostID = getValue("hostID",0);
+			var maxEntries = 15;
 
 			// get data
-			qryEntries = getService("app").searchEntries("", applicationID, hostID);
+			var qryEntries = getService("app").searchEntries("", applicationID, hostID);
 
 			// sort data to put newest entries first
 			qryEntries = sortQuery(qryEntries, "mydatetime", "DESC");
 
 			// build rss feed
-			meta = structNew();
+			var meta = structNew();
 			meta.title = "BugLog";
 			meta.link = "http://#cgi.HTTP_HOST##cgi.script_name#";
 			meta.description = "Recently received bugs";
 			
-			data = queryNew("title,body,link,subject,date");
-			for(i=1;i lte min(maxEntries, qryEntries.recordCount);i=i+1) {
+			var data = queryNew("title,body,link,subject,date");
+			for(var i=1;i lte min(maxEntries, qryEntries.recordCount);i=i+1) {
 				queryAddRow(data,1);
 				querySetCell(data,"title","Bug ###qryEntries.entryID[i]#: " & qryEntries.message[i]);
 				querySetCell(data,"body",composeMessage(qryEntries.mydateTime[i], qryEntries.applicationCode[i], qryEntries.hostName[i], qryEntries.templatePath[i], qryEntries.severityCode[i], qryEntries.exceptionMessage[i], qryEntries.exceptionDetails[i] ));
@@ -27,8 +27,8 @@
 				querySetCell(data,"subject","Subject");
 				querySetCell(data,"date",now());
 			}
-			rss = createObject("component","bugLog.hq.components.rss");
-			rssXML = rss.generateRSS("rss1",data,meta);
+			var rss = getService("rss");
+			var rssXML = rss.generateRSS("rss1",data,meta);
 
 			setValue("rssXML", rssXML);
 			setView("vwFeed");

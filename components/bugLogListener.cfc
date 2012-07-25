@@ -17,15 +17,18 @@
 	<cfset variables.msgLog = arrayNew(1)>
 	<cfset variables.maxLogSize = 10>
 	<cfset variables.purgeHistoryEnabled = false>
+	<cfset variables.instanceName = "">
 
 	<cffunction name="init" access="public" returntype="bugLogListener" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
+		<cfargument name="instanceName" type="string" required="true">
 		<cfscript>
 			var cacheTTL = 300;		// timeout in minutes for cache entries
 			
 			variables.oConfig = arguments.config;		// global configuration
-
-			logMessage("Starting BugLogListener service...");
+			variables.instanceName = arguments.instanceName;
+			
+			logMessage("Starting BugLogListener (#instanceName#) service...");
 	
 			// load settings
 			variables.maxLogSize = arguments.config.getSetting("service.maxLogSize");
@@ -52,13 +55,16 @@
 			variables.oSeverityCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);
 			variables.oSourceCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);		
 						
+			// load scheduler
+			variables.scheduler = createObject("component","bugLog.components.schedulerService").init( variables.oConfig, variables.instanceName );			
+						
 			// configure history purging
 			configureHistoryPurging();
 
 			// record the date at which the service started 
 			variables.startedOn = Now();
 
-			logMessage("BugLogListener Service Started");
+			logMessage("BugLogListener Service (#instanceName#) Started");
 		</cfscript>
 	
 		<cfreturn this>
@@ -128,6 +134,15 @@
 			<cfset arrayPrepend(variables.msgLog,txt)>
 		</cflock>
 	</cffunction>
+	
+	<cffunction name="getConfig" returnType="any" access="public" hint="returns the config settings">
+		<cfreturn variables.oConfig>
+	</cffunction>
+
+	<cffunction name="getInstanceName" returnType="any" access="public" hint="returns the current instance name">
+		<cfreturn variables.instanceName>
+	</cffunction>
+
 	
 	
 	<!---- Private Methods ---->
@@ -272,6 +287,7 @@
 			var aRules = arrayNew(1);
 			var i = 0;
 			var dao = 0;
+			var thisRule = 0;
 			
 			// get the rule definitions from the extensions service
 			dao = variables.oDAOFactory.getDAO("extension");
@@ -280,9 +296,10 @@
 			
 			// create rule objects and load them into the rule processor
 			for(i=1; i lte arrayLen(aRules);i=i+1) {
+				thisRule = aRules[i];
 				
-				if(aRules[i].enabled) {
-					oRule = createObject("component", aRules[i].component ).init( argumentCollection = aRules[i].config );
+				if(thisRule.enabled) {
+					oRule = createObject("component", thisRule.component ).init( argumentCollection = thisRule.config );
 					oRule.setListener(this);
 	
 					// add rule to processor
@@ -293,33 +310,13 @@
 	</cffunction>
 
 	<cffunction name="configureHistoryPurging" access="private" output="false" returntype="void">
-		<cfscript>
-			var thisHost = "";
-			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
-			thisHost = thisHost & cgi.server_name;
-			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
-		</cfscript>
-
 		<cfif variables.purgeHistoryEnabled>
-			<cfschedule action="update"
-				task="bugLogPurgeHistory"
-				operation="HTTPRequest"
-				startDate="#createDate(1990,1,1)#"
-				startTime="03:00"
-				url="#thisHost#/bugLog/util/purgeHistory.cfm"
-				interval="daily"
-			/>		
+			<cfset scheduler.setupTask("bugLogPurgeHistory", 
+										"util/purgeHistory.cfm",
+										"03:00",
+										"daily") />
 		<cfelse>
-			<cftry>
-				<cfschedule action="delete" task="bugLogPurgeHistory" />
-				<cfcatch type="any">
-					<cfif findNoCase("coldfusion.scheduling.SchedulingNoSuchTaskException",cfcatch.stackTrace)>
-						<!--- it's ok, nothing to do here --->
-					<cfelse>
-						<cfrethrow>
-					</cfif>
-				</cfcatch>				
-			</cftry>
+			<cfset scheduler.removeTask("bugLogPurgeHistory") />
 		</cfif>
 	</cffunction>
 	

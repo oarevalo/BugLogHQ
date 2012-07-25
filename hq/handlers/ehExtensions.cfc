@@ -40,7 +40,7 @@
 				if(getValue("currentUser").getEmail() neq "")
 					setValue("defaultEmail", getValue("currentUser").getEmail());
 				else
-					setValue("defaultEmail", getService("config").getSetting("general.adminEmail",""));
+					setValue("defaultEmail", app.getConfig().getSetting("general.adminEmail",""));
 
 				setValue("stRule", stRule);
 				setValue("index", index);

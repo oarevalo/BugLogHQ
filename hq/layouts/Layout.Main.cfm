@@ -1,11 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<cfparam name="request.requestState.applicationTitle" default="#application.applicationName#">
-<cfparam name="request.requestState.viewTemplatePath" default="">
+<cfset rs = request.requestState>
+<cfparam name="rs.applicationTitle" default="#application.applicationName#">
+<cfparam name="rs.viewTemplatePath" default="">
+<cfparam name="rs.messageTemplatePath" default="">
+<cfparam name="rs.assetsPath" default="">
 <cfoutput>
 	<html>
 		<head>
-			<title>#request.requestState.applicationTitle#</title>
-			<link href="style.css" rel="stylesheet" type="text/css">
+			<title>#rs.applicationTitle#</title>
+			<link href="#rs.assetsPath#style.css" rel="stylesheet" type="text/css">
 		</head>
 		<body>
 			<div id="header">
@@ -13,13 +16,15 @@
 			</div>
 			<div id="mainBody">
 				<div id="content">
-					<cfinclude template="../includes/message.cfm">
+					<cfif rs.messageTemplatePath neq "">
+						<cfinclude template="#rs.messageTemplatePath#">
+					</cfif>
 
 					<table style="width:90%;font-size:11px;" align="center">
 						<tr>	
 							<td>
-								<cfif request.requestState.viewTemplatePath neq "">
-									<cfinclude template="#request.requestState.viewTemplatePath#">
+								<cfif rs.viewTemplatePath neq "">
+									<cfinclude template="#rs.viewTemplatePath#">
 								</cfif>
 							</td>
 						</tr>
@@ -30,8 +35,3 @@
 		</body>
 	</html>
 </cfoutput>
-
-
-
-
-

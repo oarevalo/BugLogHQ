@@ -4,14 +4,16 @@
 		<title>BugLogMini</title>
 		<meta name="viewport" content="height=device-height,width=device-width" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<link rel="apple-touch-icon" href="/bugLog/mobile/images/bug_48.png"/>
-		<link rel="apple-touch-startup-image" href="/bugLog/mobile/images/startup.png">
+		<cfoutput>
+		<link rel="apple-touch-icon" href="#request.fullBugLogHQPath#../mobile/images/bug_48.png"/>
+		<link rel="apple-touch-icon-precomposed" href="#request.fullBugLogHQPath#../mobile/images/bug_48.png"/>
+		<link rel="apple-touch-startup-image" href="#request.fullBugLogHQPath#../mobile/images/startup.png">
+		</cfoutput>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
 		<script type="text/javascript" src="main.js"></script>
 		<script type="text/javascript" src="views.js"></script>
 		<script type="text/javascript">
-			<cfoutput>serverInfo.server = "#cgi.SERVER_NAME#<cfif cgi.server_port neq 80>:#cgi.server_port#</cfif>";</cfoutput>
 			$(document).ready(function() {
 				initApp();
 			});

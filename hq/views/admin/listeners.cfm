@@ -1,5 +1,16 @@
-<cfset bugLogListener.soap = "http://#cgi.HTTP_HOST#/bugLog/listeners/bugLogListenerWS.cfc?wsdl">
-<cfset bugLogListener.rest = "http://#cgi.HTTP_HOST#/bugLog/listeners/bugLogListenerREST.cfm">
+<cfif rs.instanceName neq "default">
+	<cfset bugLogListener.soap = "#rs.bugLogHREF#listener.cfc?wsdl">
+	<cfset bugLogListener.rest = "#rs.bugLogHREF#listener.cfm">
+	<cfset testhref.soap = "/bugLog/test/client.cfm?protocol=soap&instance=#rs.instanceName#&bugloghref=#rs.bugLogHREF#&returnTo=admin">
+	<cfset testhref.rest = "/bugLog/test/client.cfm?protocol=rest&instance=#rs.instanceName#&bugloghref=#rs.bugLogHREF#&returnTo=admin">
+	<cfset testhref.cfc = "/bugLog/test/client.cfm?protocol=cfc&instance=#rs.instanceName#&bugloghref=#rs.bugLogHREF#&returnTo=admin">
+<cfelse>
+	<cfset bugLogListener.soap = "#rs.bugLogHREF#listeners/bugLogListenerWS.cfc?wsdl">
+	<cfset bugLogListener.rest = "#rs.bugLogHREF#listeners/bugLogListenerREST.cfm">
+	<cfset testhref.soap = rs.bugLogHREF & "test/client.cfm?protocol=soap&bugloghref=#rs.bugLogHREF#&returnTo=admin">
+	<cfset testhref.rest = rs.bugLogHREF & "test/client.cfm?protocol=rest&bugloghref=#rs.bugLogHREF#&returnTo=admin">
+	<cfset testhref.cfc = rs.bugLogHREF & "test/client.cfm?protocol=cfc&bugloghref=#rs.bugLogHREF#&returnTo=admin">
+</cfif>
 <cfset bugLogListener.cfc = "bugLog.listeners.bugLogListenerWS">
 
 <cfoutput>
@@ -7,13 +18,13 @@
 	<div style="margin-left:30px;line-height:24px;">
 		You can use the following BugLog listeners for this server:<br /><br />
 		
-		<b>SOAP / Webservice:</b> ( <a href="/bugLog/test/client.cfm?protocol=soap">Test</a> )<br />
+		<b>SOAP / Webservice:</b> ( <a href="#testhref.soap#">Test</a> )<br />
 		<a href="#bugLogListener.soap#">#bugLogListener.soap#</a><br /><br />
 		
-		<b>HTTP POST / REST:</b> ( <a href="/bugLog/test/client.cfm?protocol=rest">Test</a> )<br />
+		<b>HTTP POST / REST:</b> ( <a href="#testhref.rest#">Test</a> )<br />
 		<a href="#bugLogListener.rest#">#bugLogListener.rest#</a><br /><br />
 
-		<b>CFC:</b> ( <a href="/bugLog/test/client.cfm?protocol=cfc">Test</a> )<br />
-		<a href="#bugLogListener.cfc#">#bugLogListener.cfc#</a>
+		<b>CFC:</b> ( <a href="#testhref.cfc#">Test</a> )<br />
+		<a href="##">#bugLogListener.cfc#</a>
 	</div>
 </cfoutput>

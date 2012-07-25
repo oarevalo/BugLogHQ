@@ -86,6 +86,7 @@
 		<cfset var q = arguments.data>
 		<cfset var numHours = int(variables.config.timespan / 60)>
 		<cfset var numMinutes = variables.config.timespan mod 60>
+		<cfset var bugReportURL = getBugEntryHREF(q.EntryID) />
 
 		<cfsavecontent variable="intro">
 			<cfoutput>
@@ -105,8 +106,7 @@
 					<cfif numMinutes gt 0> #numMinutes# minute<cfif numMinutes gt 1>s</cfif></cfif>
 				</b>
 				<br /><br />
-				<cfset tmpURL = "http://#cgi.HTTP_HOST#/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#q.EntryID#">
-				Bug Report URL: <a href="#tmpURL#">#tmpURL#</a>
+				Bug Report URL: <a href="#bugReportURL#">#bugReportURL#</a>
 				<br />
 			</cfoutput>
 		</cfsavecontent>			

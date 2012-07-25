@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config>
+	<!-- This section describes application-specific settings -->
+	<settings>
+		<!-- This is a sample setting, settings are available to event handlers using the getSetting() method 
+
+		<setting name="some_name" value="some value" />
+		-->
+	</settings>
+
+
+	<!-- This section describes all services that will be loaded into the application -->
+	<services>
+		<!-- This is a sample service, settings are available to event handlers using the getService() method.
+			The init method is called automatically. Init arguments can be values, other settings or other services
+		
+		<service name="some_name" class="path.to.component">
+			<init-param name="some_argument_name" settingName="name_of_a_setting" />
+			<init-param name="some_other_name" serviceName="name_of_another_service" />
+			<init-param name="yet_another_one">some_value</init-param />
+		</service>
+		-->
+	</services>
+</config>
+

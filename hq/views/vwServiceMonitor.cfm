@@ -74,7 +74,7 @@
 										<cfset tmpImgName = "images/severity/#lcase(st.SeverityCode)#.png">
 									</cfif>
 								</cfif>
-								<img src="#tmpImgName#" 
+								<img src="#rs.assetsPath##tmpImgName#" 
 										align="absmiddle"
 										alt="#lcase(st.SeverityCode)#" 
 										title="#lcase(st.SeverityCode)#"

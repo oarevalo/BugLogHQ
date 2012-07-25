@@ -1,4 +1,4 @@
-<cfcomponent extends="bugLogListener" hint="This listener modified the standard listener so that it processes all bug in an asynchronous manner">
+<cfcomponent extends="bugLogListener" hint="This listener modifies the standard listener so that it processes all bug in an asynchronous manner">
 	
 	<cfset variables.queue = arrayNew(1)>
 	<cfset variables.maxQueueSize = 0>
@@ -7,6 +7,7 @@
 	
 	<cffunction name="init" access="public" returntype="bugLogListenerAsync" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
+		<cfargument name="instanceName" type="string" required="true">
 		<cfscript>
 			// initialize variables and read settings
 			variables.queue = arrayNew(1);
@@ -15,7 +16,7 @@
 			variables.schedulerIntervalSecs = arguments.config.getSetting("service.schedulerIntervalSecs");
 
 			// do the normal initialization
-			super.init( arguments.config );
+			super.init( arguments.config, arguments.instanceName );
 
 			// start scheduler
 			startScheduler();
@@ -81,44 +82,23 @@
 	</cffunction>
 
 	<cffunction name="shutDown" access="public" returntype="void" hint="Performs any clean up action required">
-		<cfset logMessage("Stopping BugLogListener service...")>
+		<cfset logMessage("Stopping BugLogListener (#instanceName#) service...")>
 		<cfset logMessage("Stopping ProcessQueue scheduled task...")>
-		<cftry>
-			<cfschedule action="delete" task="bugLogProcessQueue" />
-			<cfcatch type="any">
-				<cfif findNoCase("coldfusion.scheduling.SchedulingNoSuchTaskException",cfcatch.stackTrace)>
-					<!--- it's ok, nothing to do here --->
-					<cfset logMessage("Scheduled task was not running.")>
-				<cfelse>
-					<cfrethrow>
-				</cfif>
-			</cfcatch>				
-		</cftry>
+		<cfset scheduler.removeTask("bugLogProcessQueue") />
 		<cfset logMessage("Processing remaining elements in queue...")>
 		<cfset processQueue(variables.key)>
-		<cfset logMessage("BugLogListener service stopped.")>
+		<cfset logMessage("BugLogListener service (#instanceName#) stopped.")>
 	</cffunction>
 	
 	
 	<!--- Private methods --->
 		
 	<cffunction name="startScheduler" access="private" output="false" returntype="void">
-		<cfscript>
-			var thisHost = "";
-			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
-			thisHost = thisHost & cgi.server_name;
-			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
-		</cfscript>
-
-		<cfschedule action="update"
-			task="bugLogProcessQueue"
-			operation="HTTPRequest"
-			startDate="#createDate(1990,1,1)#"
-			startTime="00:00"
-			endTime="23:59"
-			url="#thisHost#/bugLog/util/processQueue.cfm?key=#variables.KEY#"
-			interval="#variables.schedulerIntervalSecs#"
-		/>		
+		<cfset scheduler.setupTask("bugLogProcessQueue", 
+									"util/processQueue.cfm",
+									"00:00",
+									variables.schedulerIntervalSecs,
+									[{name="key",value=variables.KEY}]) />
 	</cffunction>
 	
 	

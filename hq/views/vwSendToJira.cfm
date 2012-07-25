@@ -2,13 +2,11 @@
 <cfparam name="request.requestState.oEntry">
 <cfparam name="request.requestState.projects">
 <cfparam name="request.requestState.issueTypes">
-<cfparam name="request.requestState.thisHost">
 
 <cfset entryID = request.requestState.entryID>
 <cfset oEntry = request.requestState.oEntry>
 <cfset projects = request.requestState.projects>
 <cfset issueTypes = request.requestState.issueTypes>
-<cfset thisHost = request.requestState.thisHost>
 
 <cfset oApp = oEntry.getApplication()>
 <cfset oHost = oEntry.getHost()>
@@ -19,7 +17,7 @@
 
 <cfsavecontent variable="defaultDescription">
 <cfoutput>
-[Bug ###entryID#|#thisHost#/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#oEntry.getEntryID()#]
+[Bug ###entryID#|#bugLogEntryHREF#]
 
 * *Date/Time:* #lsDateFormat(oEntry.getDateTime())# - #lsTimeFormat(oEntry.getDateTime())#
 * *Application:* #oApp.getCode()#
@@ -60,13 +58,13 @@
 	<table width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 		<tr>
 			<td style="border-right:1px solid ##666;">
-				<img alt="" width="16" height="16" src="images/icons/arrow_undo.png" align="absmiddle" />
+				<img alt="" width="16" height="16" src="#rs.assetsPath#images/icons/arrow_undo.png" align="absmiddle" />
 				<a href="index.cfm?event=ehGeneral.dspEntry&entryID=#entryID#">Return To Bug</a>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 			<cfif tmpSeverity neq "">
 				<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
-					<img src="images/severity/#lcase(tmpSeverity)#.png" 
+					<img src="#rs.assetsPath#images/severity/#lcase(tmpSeverity)#.png" 
 							align="bottom"
 							alt="#lcase(tmpSeverity)#" 
 							title="#lcase(tmpSeverity)#">

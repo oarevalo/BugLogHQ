@@ -100,13 +100,8 @@
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
 		<cfargument name="sender" type="string" required="true" hint="the sender of the email">
 		<cfset var qryEntries = 0>
-		<cfset var thisHost = "">
-
-		<cfscript>
-			if(cgi.server_port_secure) thisHost = "https://"; else thisHost = "http://";
-			thisHost = thisHost & cgi.server_name;
-			if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
-		</cfscript>
+		<cfset var bugReportURL = "">
+		<cfset var buglogHref = getBaseBugLogHREF()>
 		
 		<cfquery name="qryEntries" dbtype="query">
 			SELECT ApplicationCode, ApplicationID, 
@@ -141,12 +136,12 @@
 				on the last <strong>#variables.config.timespan#</strong> minutes.
 				<br /><br />
 				<cfloop query="qryEntries">
-					<cfset tmpURL = thisHost & "/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=#qryEntries.EntryID#">
-					&bull; <a href="#tmpURL#">[#qryEntries.severityCode#][#qryEntries.applicationCode#][#qryEntries.hostName#] #qryEntries.message# <cfif !variables.sameMessage>(#qryEntries.bugCount#)</cfif></a><br />
+					<cfset bugReportURL = getBugEntryHREF(qryEntries.EntryID) />
+					&bull; <a href="#bugReportURL#">[#qryEntries.severityCode#][#qryEntries.applicationCode#][#qryEntries.hostName#] #qryEntries.message# <cfif !variables.sameMessage>(#qryEntries.bugCount#)</cfif></a><br />
 				</cfloop>
 				<br /><br /><br />
 				** This email has been sent from the BugLog server at 
-				<a href="#thisHost#/bugLog/hq">#thisHost#/bugLog/hq</a>
+				<a href="#buglogHref#">#buglogHref#</a>
 			</cfmail>
 		</cfif>
 
