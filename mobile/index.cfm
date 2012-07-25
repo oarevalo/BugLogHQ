@@ -4,8 +4,11 @@
 		<title>BugLogMini</title>
 		<meta name="viewport" content="height=device-height,width=device-width" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<link rel="apple-touch-icon" href="images/bug_48.png"/>
-		<link rel="apple-touch-startup-image" href="images/startup.png">
+		<cfoutput>
+		<link rel="apple-touch-icon" href="#request.fullBugLogHQPath#../mobile/images/bug_48.png"/>
+		<link rel="apple-touch-icon-precomposed" href="#request.fullBugLogHQPath#../mobile/images/bug_48.png"/>
+		<link rel="apple-touch-startup-image" href="#request.fullBugLogHQPath#../mobile/images/startup.png">
+		</cfoutput>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
 		<script type="text/javascript" src="main.js"></script>

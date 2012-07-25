@@ -1,14 +1,14 @@
 <cfparam name="action" default="">
+<cfparam name="resetApp" default="false">
 
 <cfset results = "">
 <cfset error = false>
 <cfset errorMessage = "">
 
 <cftry>
-	<cfset oAppService = createObject("component","bugLog.components.hq.appService").init()>
-	<cfset oConfig = oAppService.getConfig()>
+	<cfset oAppService = application.appService>
 	
-	<cfset dateFormatMask = oConfig.getSetting("general.dateFormat")>
+	<cfset dateFormatMask = oAppService.getConfig().getSetting("general.dateFormat")>
 	
 	<cfswitch expression="#action#">
 		

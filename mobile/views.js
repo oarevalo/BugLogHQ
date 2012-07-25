@@ -167,10 +167,10 @@ function doPopulateSeverities(items) {
 	
 	var tmpHTML = "";
 	for(var i=0;i < items.length;i++) {
-		tmpHTML += "<input type='checkbox' name='severityID' value='"+items[i].severityID +"'";
+		tmpHTML += "<label><input type='checkbox' name='severityID' value='"+items[i].severityID +"'";
 		if(severities.indexOf(items[i].severityID)!=-1) tmpHTML += " checked";
 		tmpHTML += "><img src='../hq/images/severity/" + jQuery.trim(items[i].code).toLowerCase()  + ".png' align='absmiddle'> ";
-		tmpHTML += items[i].name + "<br/>";
+		tmpHTML += items[i].name + "</label><br/>";
 	}
 	$("#severitiesContainer").html(tmpHTML);
 }
