@@ -1,8 +1,4 @@
-var bugLogMiniPath = "/bugLog/mobile/"
-var bugLogHQPath = "/bugLog/hq/"
-var bugLogProxyPath = "/bugLog/bugLogProxy.cfm"
-var bugLogProtocol = "http"
-var bugLogURL = "";
+var bugLogEndpoint = "proxy.cfm";
 
 var serverInfo = {
 	username: "",
@@ -29,10 +25,9 @@ function initApp() {
 
 	// load any stored login credentials
 	loadServerInfo();
-	bugLogURL = bugLogProtocol + "://" + serverInfo.server + bugLogProxyPath;
 
 	if(serverInfo.rememberMe)
-		doConnect(serverInfo.server,serverInfo.username,serverInfo.password,serverInfo.rememberMe);
+		doConnect(serverInfo.username,serverInfo.password,serverInfo.rememberMe);
 	else {
 		// display connect page
 		setView("connect");
@@ -41,7 +36,7 @@ function initApp() {
 
 function setView(vw) {
 	clearInterval(listingRefreshTimer);
-	var loc = bugLogMiniPath + "views/" + vw + ".html";
+	var loc = "views/" + vw + ".html";
 	if(vw=="main")
 		callback=initMainView;
 	else if(vw=="connect")
@@ -70,12 +65,11 @@ function doConfig() {
 		setView("connect");
 }
 
-function doConnect(srv,usr,pwd,rem) {
-	if(srv==null || srv=='') {alert("Server cannot be empty"); return;}
+function doConnect(usr,pwd,rem) {
 	if(usr==null || usr=='') {alert("Username cannot be empty"); return;}
 	if(pwd==null || pwd=='') {alert("Password cannot be empty"); return;}
 	
-	var url = bugLogProtocol + "://" + srv + bugLogProxyPath;
+	var url = bugLogEndpoint;
 		url += "?action=checkLogin";
 		url += "&username="+usr;
 		url += "&password="+pwd;
@@ -95,7 +89,6 @@ function doConnect(srv,usr,pwd,rem) {
 			
 			serverInfo.username = usr;
 			serverInfo.password = pwd;
-			serverInfo.server = srv;
 			serverInfo.token = resultsNode[0].firstChild.nodeValue;
 			serverInfo.rememberMe = rem;
 	
@@ -149,7 +142,7 @@ function doGetSeverities(callback) {
 
 
 function doGetData(action,qs,func) {
-	var url = bugLogURL;
+	var url = bugLogEndpoint;
 		url += "?action="+action;
 		url += "&" + qs;
 		url += "&token="+serverInfo.token;
