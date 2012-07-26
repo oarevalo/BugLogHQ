@@ -84,7 +84,7 @@
 			var severity = getValue("severity");
 			var host = getValue("host");
 			var app = getValue("app");
-			var refreshSeconds = 15;
+			var refreshSeconds = 60;
 			var appService = getService("app"); 
 
 			var criteria = structNew();
