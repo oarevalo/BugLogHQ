@@ -5,11 +5,11 @@
 
 <cfoutput>
 <div style="font-size:12px;">
+	[ <a href="index.cfm?event=ehGeneral.dspDashboard" <cfif event eq "ehGeneral.dspDashboard">style="font-weight:bold;"</cfif>>Dashboard</a> ]
+	&nbsp;&nbsp;&nbsp;
 	[ <a href="index.cfm?event=ehGeneral.dspMain" <cfif event eq "ehGeneral.dspMain">style="font-weight:bold;"</cfif>>Summary</a> ] 
 	&nbsp;&nbsp;&nbsp;
 	[ <a href="index.cfm?event=ehGeneral.dspLog" <cfif event eq "ehGeneral.dspLog">style="font-weight:bold;"</cfif>>Detail</a> ] 
-	&nbsp;&nbsp;&nbsp;
-	[ <a href="index.cfm?event=ehStats.dspMain" <cfif eventPkg eq "ehStats">style="font-weight:bold;"</cfif>>Stats</a> ]
 	&nbsp;&nbsp;&nbsp;
 	[ <a href="index.cfm?event=ehExtensions.dspMain" <cfif eventPkg eq "ehExtensions">style="font-weight:bold;"</cfif>>Rules</a> ]
 	&nbsp;&nbsp;&nbsp;

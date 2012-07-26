@@ -17,7 +17,7 @@
 <cfset app.dirs.views = "views">
 
 <cfset app.mainHandler = "ehGeneral">
-<cfset app.defaultEvent = "dspMain">
+<cfset app.defaultEvent = "dspDashboard">
 <cfset app.defaultLayout = "Layout.Main">
 <cfset app.configDoc = "config/config.xml.cfm">
 

@@ -78,6 +78,81 @@
 		<cfset setLayout("Layout.Clean")>
 	</cffunction>
 
+	<cffunction name="dspDashboard" access="public" returntype="void">
+		<cfscript>
+			var hours = val(getValue("hours",72));
+			var severity = getValue("severity");
+			var host = getValue("host");
+			var app = getValue("app");
+			var refreshSeconds = 15;
+			var appService = getService("app"); 
+
+			var criteria = structNew();
+			var resetCriteria = getValue("resetCriteria", false);
+
+			if(resetCriteria) {
+				structDelete(cookie,"criteria");
+				writeCookie("criteria","","now");
+			}
+			
+			if(structKeyExists(cookie,"criteria") and isJSON(cookie.criteria)) {
+				criteria = deserializeJSON(cookie.criteria);
+			}
+			
+			// make sure we have a complete criteria struct w/ default values
+			if(not isStruct(criteria)) criteria = structNew();
+			if(not structKeyExists(criteria,"numdays")) criteria.numDays = 1;
+			if(not structKeyExists(criteria,"applicationID")) criteria.applicationID = 0;
+			if(not structKeyExists(criteria,"hostID")) criteria.hostID = 0;
+			if(not structKeyExists(criteria,"severityID")) criteria.severityID = "_ALL_";
+			
+			// page params
+			numDays = getValue("numDays", criteria.numDays);
+			applicationID = getValue("applicationID", criteria.applicationID);
+			hostID = getValue("hostID", criteria.hostID);
+			severityID = getValue("severityID", criteria.severityID);
+
+			criteria = structNew();
+			criteria.numDays = numDays;
+			criteria.applicationID = applicationID;
+			criteria.hostID = hostID;
+			criteria.severityID = severityID;
+			writeCookie("criteria",serializeJSON(criteria),30);
+
+			try {
+				startDate = dateAdd("d", val(numDays) * -1, now());
+				qryApplications = appService.getApplications();
+				qryHosts = appService.getHosts();
+				qrySeverities = appService.getSeverities();
+						
+				searchArgs = {
+					searchTerm = "", 
+					startDate = startDate,
+					applicationID = criteria.applicationID,
+					hostID = criteria.hostID,
+					severityID = criteria.severityID
+				};
+				
+				qryData = appService.searchEntries(argumentCollection = searchArgs);
+
+				setValue("qryData",qryData);
+				setValue("refreshSeconds",refreshSeconds);
+				setValue("numDays", numDays);
+				setValue("applicationID", applicationID);
+				setValue("hostID", hostID);
+				setValue("severityID", severityID);
+				setValue("qryApplications", qryApplications);
+				setValue("qryHosts", qryHosts);
+				setValue("qrySeverities", qrySeverities);
+				setView("vwDashboard");
+
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+			}
+		</cfscript>
+	</cffunction>
+
 	<cffunction name="dspMain" access="public" returntype="void">
 		<cfscript>
 			var criteria = structNew();
