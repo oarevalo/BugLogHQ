@@ -9,7 +9,7 @@
 	<div style="margin-left:30px;line-height:24px;">
 		<cfif !allowConfigEditing><div style="color:##990000;line-height:18px;font-weight:bold;margin-bottom:10px;">#editingSettingsNotAllowedMsg#</div></cfif>
 		<form name="settings" action="index.cfm" method="post">
-			<input type="hidden" name="event" value="ehAdmin.doSaveGeneralSettings">
+			<input type="hidden" name="event" value="admin.doSaveGeneralSettings">
 			<table>
 				<tr valign="top">
 					<td>Admin Email:</td>

@@ -49,15 +49,15 @@
 				<b>BugLogListener Service is: </b>
 				<cfif rs.stInfo.isRunning>
 					<span style="color:green;font-weight:bold;">Running</span>
-					<span style="font-size:12px;">(<a href="index.cfm?event=ehGeneral.doStop">Stop</a>)</span>
-					<a href="index.cfm?event=ehServiceMonitor.dspMain"><img src="#rs.assetsPath#images/icons/server_connect.png" border="0" align="absmiddle"></a>
+					<span style="font-size:12px;">(<a href="index.cfm?event=doStop">Stop</a>)</span>
+					<a href="index.cfm?event=serviceMonitor.main"><img src="#rs.assetsPath#images/icons/server_connect.png" border="0" align="absmiddle"></a>
 					<div style="font-size:9px;">
 						<strong>Last Start:</strong> 
 						#lsdateformat(rs.stInfo.startedOn)# #lstimeformat(rs.stInfo.startedOn)#
 					</div>
 				<cfelse>
 					<span style="color:red;font-weight:bold;">Stopped</span>
-					<span style="font-size:12px;">(<a href="index.cfm?event=ehGeneral.doStart">Start</a>)</span>
+					<span style="font-size:12px;">(<a href="index.cfm?event=doStart">Start</a>)</span>
 				</cfif>
 			</td>
 		</tr>
@@ -65,7 +65,7 @@
 	
 	<!--- Search Criteria / Filters --->			
 	<form name="frmSearch" action="index.cfm" method="get" style="margin:0px;padding-top:10px;">
-		<input type="hidden" name="event" value="ehGeneral.dspDashboard">
+		<input type="hidden" name="event" value="dashboard">
 		
 		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 			<tr align="center">

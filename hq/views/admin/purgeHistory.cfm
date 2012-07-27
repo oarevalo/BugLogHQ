@@ -7,7 +7,7 @@
 	<h3>Purge History:</h3>
 	<div style="margin-left:30px;line-height:24px;">
 		<form name="frmPurge" action="index.cfm" method="post">
-			<input type="hidden" name="event" value="ehAdmin.doPurgeHistory">
+			<input type="hidden" name="event" value="admin.doPurgeHistory">
 			
 			Delete all bug reports older than
 			<input type="text" name="purgeHistoryDays" value="#purgeHistoryDays#" class="formField" style="width:40px;">

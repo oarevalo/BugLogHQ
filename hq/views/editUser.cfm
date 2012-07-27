@@ -10,7 +10,7 @@
 	<cfinclude template="../includes/menu.cfm">
 	
 	<form name="frmDelete" action="index.cfm" method="post">
-		<input type="hidden" name="event" value="ehAdmin.doSaveUser">
+		<input type="hidden" name="event" value="admin.doSaveUser">
 		<input type="hidden" name="userID" value="#userID#">
 		
 		<h2>Add/Edit User</h2>
@@ -41,7 +41,7 @@
 		<br /><br />
 		<input type="submit" name="btngo" value="Apply Changes">
 		&nbsp;&nbsp;
-		<a href="index.cfm?event=ehAdmin.dspMain&panel=userManagement">Go Back</a>
+		<a href="index.cfm?event=admin.main&panel=userManagement">Go Back</a>
 	
 	</form>
 </cfoutput>

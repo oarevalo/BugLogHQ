@@ -13,17 +13,17 @@
 			<cfloop query="qryUsers">
 				<tr>
 					<td width="15" align="right">#qryUsers.currentRow#.</td>
-					<td><a href="index.cfm?event=ehAdmin.dspUser&userID=#qryUsers.userID#">#qryUsers.username#</a></td>
+					<td><a href="index.cfm?event=admin.user&userID=#qryUsers.userID#">#qryUsers.username#</a></td>
 					<td align="center" style="width:90px;">#yesNoFormat(qryUsers.isAdmin)#</td>
 					<td align="center" style="width:110px;">
-						<a href="index.cfm?event=ehAdmin.dspUser&userID=#qryUsers.userID#">[ Edit ]</a>
+						<a href="index.cfm?event=admin.user&userID=#qryUsers.userID#">[ Edit ]</a>
 						&nbsp;
-						<a href="index.cfm?event=ehAdmin.dspDeleteUser&userID=#qryUsers.userID#">[ Delete ]</a> 
+						<a href="index.cfm?event=admin.deleteUser&userID=#qryUsers.userID#">[ Delete ]</a> 
 					</td>
 				</tr>
 			</cfloop>
 		</table>
-		<br /><a href="index.cfm?event=ehAdmin.dspUser">[ Create New User ]</a>
+		<br /><a href="index.cfm?event=admin.user">[ Create New User ]</a>
 		<br /><br />
 	</div>
 </cfoutput>

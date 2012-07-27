@@ -37,7 +37,7 @@
 
 <cfoutput>
 	<form name="frmSearch" action="index.cfm" method="get">
-		<input type="hidden" name="event" value="ehStats.dspMain">
+		<input type="hidden" name="event" value="stats.main">
 		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 			<tr align="center">
 				<td>
@@ -98,7 +98,7 @@
 	<cfchart chartwidth="290" title="Top #maxRows# HostNames" show3d="yes" xaxistitle="Host">
 		<cfchartseries query="qryHostSummary" type="bar" itemcolumn="hostname" valuecolumn="numcount" paintstyle="raise">
 	</cfchart>
-	<cfchart chartwidth="290" title="Top #maxRows# Messages" show3d="yes" xaxistitle="Message" url="index.cfm?event=ehGeneral.dspMain&searchTerm=$ITEMLABEL$">
+	<cfchart chartwidth="290" title="Top #maxRows# Messages" show3d="yes" xaxistitle="Message" url="index.cfm?event=main&searchTerm=$ITEMLABEL$">
 		<cfchartseries query="qryMsgSummary" type="bar" itemcolumn="message" valuecolumn="numcount" paintstyle="raise">
 	</cfchart>
 	<br>

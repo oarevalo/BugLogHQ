@@ -1,4 +1,4 @@
-<cfcomponent name="ehGeneral" extends="eventHandler">
+<cfcomponent name="general" extends="eventHandler">
 
 	<cffunction name="onApplicationStart" access="public" returntype="void">
 	</cffunction>
@@ -28,7 +28,7 @@
 				}
 
 				// check login
-				if(not listFindNoCase("ehGeneral.doLogin,ehGeneral.dspLogin,ehRSS.dspRSS",event) and 
+				if(not listFindNoCase("doLogin,login,rss.rss",event) and 
 					(session.userID eq 0)) {
 					setMessage("Warning","Please enter your username and password");
 					for(key in url) {
@@ -37,14 +37,14 @@
 						else
 							qs = qs & key & "=" & url[key] & "&";
 					}
-					setNextEvent("ehGeneral.dspLogin",qs);
+					setNextEvent("login",qs);
 				}
 
 				// check if user needs to change password
 				if(structKeyExists(session,"requirePasswordChange")
-					and not listFindNoCase("ehGeneral.dspUpdatePassword,ehGeneral.doUpdatePassword",event)) {
+					and not listFindNoCase("updatePassword,doUpdatePassword",event)) {
 					setMessage("warning","Please update your password");
-					setNextEvent("ehGeneral.dspUpdatePassword");
+					setNextEvent("updatePassword");
 				}
 
 				// get status of buglog server
@@ -73,12 +73,12 @@
 		<!--- code to execute at the end of each request --->
 	</cffunction>
 
-	<cffunction name="dspLogin" access="public" returntype="void">
-		<cfset setView("vwLogin")>
-		<cfset setLayout("Layout.Clean")>
+	<cffunction name="login" access="public" returntype="void">
+		<cfset setView("login")>
+		<cfset setLayout("clean")>
 	</cffunction>
 
-	<cffunction name="dspDashboard" access="public" returntype="void">
+	<cffunction name="dashboard" access="public" returntype="void">
 		<cfscript>
 			var hours = val(getValue("hours",72));
 			var severity = getValue("severity");
@@ -144,7 +144,7 @@
 				setValue("qryApplications", qryApplications);
 				setValue("qryHosts", qryHosts);
 				setValue("qrySeverities", qrySeverities);
-				setView("vwDashboard");
+				setView("dashboard");
 
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -153,7 +153,7 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="dspMain" access="public" returntype="void">
+	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
 			var criteria = structNew();
 			var resetCriteria = getValue("resetCriteria", false);
@@ -298,10 +298,10 @@
 		<cfset setValue("qryApplications", qryApplications)>	
 		<cfset setValue("qryHosts", qryHosts)>	
 		<cfset setValue("qrySeverities", qrySeverities)>	
-		<cfset setView("vwMain")>
+		<cfset setView("main")>
 	</cffunction>
 	
-	<cffunction name="dspLog" access="public" returntype="void">
+	<cffunction name="log" access="public" returntype="void">
 		<cfscript>
 			// page params
 			searchTerm = getValue("searchTerm","");
@@ -354,17 +354,17 @@
 		</cfquery>
 		<cfset setValue("qryHosts", qryHosts)>	
 			
-		<cfset setView("vwLog")>	
+		<cfset setView("log")>	
 	</cffunction>
 
-	<cffunction name="dspEntry" access="public" returntype="void">
+	<cffunction name="entry" access="public" returntype="void">
 		<cfscript>
 			try {
 				entryID = getValue("entryID");
 
 				if(val(entryID) eq 0) {
 					setMessage("warning","Please select an entry to view");
-					setNextEvent("ehGeneral.dspMain");
+					setNextEvent("main");
 				}		
 				
 				oEntry = getService("app").getEntry(entryID);
@@ -378,17 +378,17 @@
 				setValue("ruleTypes", getService("app").getRules());
 				setValue("jiraEnabled", getService("jira").getSetting("enabled"));
 				setValue("oEntry", oEntry);
-				setView("vwEntry");
+				setView("entry");
 
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehGeneral.dspMain");
+				setNextEvent("main");
 			}
 		</cfscript>
 	</cffunction>	
 	
-	<cffunction name="dspRSS" access="public" returntype="void">
+	<cffunction name="rss" access="public" returntype="void">
 		<cfscript>
 			try {
 				qryApplications = getService("app").getApplications();
@@ -398,17 +398,17 @@
 				setValue("qryApplications", qryApplications);
 				setValue("qryHosts", qryHosts);
 				
-				setView("vwRSS");
+				setView("rss");
 
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehGeneral.dspMain");
+				setNextEvent("main");
 			}
 		</cfscript>	
 	</cffunction>
 
-	<cffunction name="dspUpdatePassword" access="public" returntype="void">
+	<cffunction name="updatePassword" access="public" returntype="void">
 		<cfset setView("vwUpdatePassword")>
 	</cffunction>
 	
@@ -425,21 +425,21 @@
 				getService("bugTracker").notifyService(e.message, e);
 			}
 
-			setNextEvent("ehGeneral.dspMain");
+			setNextEvent("main");
 		</cfscript>	
 	</cffunction>
 	
 	<cffunction name="doStop" access="public" returnType="void">
 		<cfset getService("app").stopService()>
 		<cfset setMessage("info","BugLogListener has been stopped!")>
-		<cfset setNextEvent("ehGeneral.dspMain")>
+		<cfset setNextEvent("main")>
 	</cffunction>
 
 	<cffunction name="doSend" access="public" returnType="void">
 		<cfscript>
 			try {
 				entryID = getValue("entryID",0);
-				sender = getService("app").getConfig().getSetting("general.adminEmail");
+				sender = getService("app").getConfig().getSetting("adminEmail");
 				recipient = getValue("to","");
 				comment = getValue("comment","");
 				
@@ -459,7 +459,7 @@
 				getService("bugTracker").notifyService(e.message, e);
 			}
 
-			setNextEvent("ehGeneral.dspEntry","entryID=#entryID#");
+			setNextEvent("entry","entryID=#entryID#");
 		</cfscript>		
 	</cffunction>
 	
@@ -469,7 +469,7 @@
 			var password = "";
 			var userID = 0;
 			var nextEvent = getValue("nextEvent");
-			var qs = replaceNoCase(cgi.QUERY_STRING,"event=ehGeneral.doLogin","");
+			var qs = replaceNoCase(cgi.QUERY_STRING,"event=doLogin","");
 
 			try {
 				username = getValue("username","");
@@ -477,7 +477,7 @@
 				
 				if(username eq "") throw("Please enter your username");		
 				if(password eq "") throw("Please enter your password");
-				if(nextEvent eq "") nextEvent = "ehGeneral.dspMain";
+				if(nextEvent eq "") nextEvent = "main";
 				
 				userID = getService("app").checkLogin(username, password);
 				if(userID eq 0) throw("Invalid username/password combination");
@@ -487,19 +487,19 @@
 				if(userID lt 0) {
 					session.requirePasswordChange = true;
 					setMessage("warning","Please update your password");
-					setNextEvent("ehGeneral.dspUpdatePassword");
+					setNextEvent("updatePassword");
 				}
 
 				setNextEvent(nextEvent,qs);
 				
 			} catch(custom e) {
 				setMessage("warning",e.message);
-				setNextEvent("ehGeneral.dspLogin");
+				setNextEvent("login");
 
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehGeneral.dspLogin");
+				setNextEvent("login");
 			}
 
 		</cfscript>		
@@ -512,28 +512,27 @@
 			var user = session.user;
 			
 			try {
-				if(!structKeyExists(session,"requirePasswordChange")) setNextEvent("ehGeneral.dspMain");
-				if(newPassword eq "") {setMessage("warning","Your password cannot be empty"); setNextEvent("ehGeneral.dspUpdatePassword");}
-				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("ehGeneral.dspUpdatePassword");}
+				if(!structKeyExists(session,"requirePasswordChange")) setNextEvent("main");
+				if(newPassword eq "") {setMessage("warning","Your password cannot be empty"); setNextEvent("updatePassword");}
+				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("updatePassword");}
 				getService("app").setUserPassword(user, newPassword);
 				structDelete(session,"requirePasswordChange");
 				setMessage("info","Your password has been updated");
-				setNextEvent("ehGeneral.dspMain");
+				setNextEvent("main");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain","panel=changePassword");				
+				setNextEvent("admin.main","panel=changePassword");				
 			}
 		</cfscript>
 	</cffunction>
 
-	
 	<cffunction name="doLogoff" access="public" returnType="void">
 		<cfset structDelete(session,"userID")>
 		<cfset structDelete(session,"user")>
 		<cfset setMessage("information","Thank you for using BugLogHQ")>
-		<cfset setNextEvent("ehGeneral.dspLogin")>
+		<cfset setNextEvent("login")>
 	</cffunction>
 				
 	<cffunction name="writeCookie" access="private">

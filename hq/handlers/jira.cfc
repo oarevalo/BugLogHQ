@@ -1,6 +1,6 @@
 <cfcomponent extends="eventHandler">
 	
-	<cffunction name="dspSendToJira" access="public" returntype="void">
+	<cffunction name="sendToJira" access="public" returntype="void">
 		<cfscript>
 			var oJIRA = getService("jira");
 			var entryID = getValue("entryID");
@@ -17,12 +17,12 @@
 				setValue("projects", projects);
 				setValue("issueTypes", issueTypes);
 				setValue("bugLogEntryHREF", getService("app").getBugEntryHREF(entryID));
-				setView("vwSendToJira");
+				setView("sendToJira");
 
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehGeneral.dspEntry","entryID=#entryID#");
+				setNextEvent("entry","entryID=#entryID#");
 			}
 		</cfscript>				
 	</cffunction>
@@ -52,7 +52,7 @@
 				getService("bugTracker").notifyService(e.message, e);
 			}
 
-			setNextEvent("ehGeneral.dspEntry","entryID=#entryID#");
+			setNextEvent("entry","entryID=#entryID#");
 			
 		</cfscript>
 	</cffunction>

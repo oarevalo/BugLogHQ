@@ -2,7 +2,7 @@
 
 	<cfset variables.extensionsXMLPath = "/bugLog/config/extensions-config.xml.cfm">
 
-	<cffunction name="dspMain" access="public" returntype="void">
+	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
 			try {
 				aRules = getService("app").getRules();
@@ -12,17 +12,17 @@
 				setValue("aRules", aRules);
 				setValue("aActiveRules", aActiveRules);
 	
-				setView("vwExtensions");
+				setView("extensions");
 
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehGeneral.dspMain");
+				setNextEvent("main");
 			}
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="dspRule" access="public" returntype="void">
+	<cffunction name="rule" access="public" returntype="void">
 		<cfscript>
 			var index = getValue("index",0);
 			var ruleName = getValue("ruleName","");
@@ -40,7 +40,7 @@
 				if(getValue("currentUser").getEmail() neq "")
 					setValue("defaultEmail", getValue("currentUser").getEmail());
 				else
-					setValue("defaultEmail", app.getConfig().getSetting("general.adminEmail",""));
+					setValue("defaultEmail", app.getConfig().getSetting("adminEmail",""));
 
 				setValue("stRule", stRule);
 				setValue("index", index);
@@ -51,21 +51,21 @@
 					setValue("aActiveRule", aActiveRules[index]);
 				}
 
-				setView("vwRule");
+				setView("rule");
 
 			} catch(validation e) {
 				setMessage("warning",e.message);
-				setNextEvent("ehExtensions.dspMain");
+				setNextEvent("extensions.main");
 
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehExtensions.dspMain");
+				setNextEvent("extensions.main");
 			}
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="dspRulesLog" access="public" returntype="void">
+	<cffunction name="rulesLog" access="public" returntype="void">
 		<cfscript>
 			var logcontents = "";
 			var logsdir = getValue("logsdir");
@@ -91,7 +91,7 @@
 
 			setValue("logcontents", logcontents);
 			setValue("logsdir", logsdir);
-			setView("vwRulesLog");
+			setView("rulesLog");
 		</cfscript>
 	</cffunction>
 		
@@ -102,7 +102,7 @@
 			var lstIgnoreFields = "event,fieldnames,btnSave";
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to create or modify a rule"); setNextEvent("ehExtensions.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to create or modify a rule"); setNextEvent("extensions.main");}
 				for(fld in form) {
 					if(!listFindNoCase(lstIgnoreFields,fld)) {
 						if(structKeyExists(form,fld & "_other")) {
@@ -125,7 +125,7 @@
 				getService("bugTracker").notifyService(e.message, e);
 			}
 
-			setNextEvent("ehExtensions.dspMain");
+			setNextEvent("extensions.main");
 		</cfscript>
 	</cffunction>
 
@@ -134,7 +134,7 @@
 			var user = getValue("currentUser");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to delete a rule"); setNextEvent("ehExtensions.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to delete a rule"); setNextEvent("extensions.main");}
 				getService("app").deleteRule(index);
 				setMessage("info","Rule has been removed. Changes will be effective the next time the listener service is started.");
 			
@@ -143,7 +143,7 @@
 				getService("bugTracker").notifyService(e.message, e);
 			}
 
-			setNextEvent("ehExtensions.dspMain");
+			setNextEvent("extensions.main");
 		</cfscript>
 	</cffunction>
 
@@ -152,7 +152,7 @@
 			var user = getValue("currentUser");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to enable or disable a rule"); setNextEvent("ehExtensions.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to enable or disable a rule"); setNextEvent("extensions.main");}
 				getService("app").disableRule(index);
 				setMessage("info","Rule has been disabled. Changes will be effective the next time the listener service is started.");
 			
@@ -161,7 +161,7 @@
 				getService("bugTracker").notifyService(e.message, e);
 			}
 
-			setNextEvent("ehExtensions.dspMain");
+			setNextEvent("extensions.main");
 		</cfscript>
 	</cffunction>
 
@@ -170,7 +170,7 @@
 			var user = getValue("currentUser");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to enable or disable a rule"); setNextEvent("ehExtensions.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to enable or disable a rule"); setNextEvent("extensions.main");}
 				getService("app").enableRule(index);
 				setMessage("info","Rule has been enabled. Changes will be effective the next time the listener service is started.");
 			
@@ -179,7 +179,7 @@
 				getService("bugTracker").notifyService(e.message, e);
 			}
 
-			setNextEvent("ehExtensions.dspMain");
+			setNextEvent("extensions.main");
 		</cfscript>
 	</cffunction>	
 
@@ -188,10 +188,10 @@
 			var user = getValue("currentUser");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to do this"); setNextEvent("ehExtensions.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to do this"); setNextEvent("extensions.main");}
 				if(!fileExists(expandPath(variables.extensionsXMLPath))) {
 					setMessage("warning","The file '#variables.extensionsXMLPath#' could not be found.");
-					setNextEvent("ehExtensions.dspMain");
+					setNextEvent("extensions.main");
 				}
 	
 				// read file
@@ -233,7 +233,7 @@
 				getService("bugTracker").notifyService(e.message, e);
 			}
 
-			setNextEvent("ehExtensions.dspMain");
+			setNextEvent("extensions.main");
 		</cfscript>
 	</cffunction>
 
@@ -242,7 +242,7 @@
 			var user = getValue("currentUser");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to do this"); setNextEvent("ehExtensions.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to do this"); setNextEvent("extensions.main");}
 				if(fileExists(expandPath(variables.extensionsXMLPath))) {
 					fileDelete(expandPath(variables.extensionsXMLPath));
 				}
@@ -253,7 +253,7 @@
 				getService("bugTracker").notifyService(e.message, e);
 			}
 
-			setNextEvent("ehExtensions.dspMain");
+			setNextEvent("extensions.main");
 		</cfscript>
 	</cffunction>
 

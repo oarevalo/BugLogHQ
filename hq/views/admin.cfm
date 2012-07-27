@@ -29,7 +29,7 @@
 			<td style="width:120px;padding-top:10px;border-right:1px solid silver;">
 				<cfloop from="1" to="#arrayLen(aPanels)#" index="i">
 					<cfif aPanels[i].display>
-						<a href="index.cfm?event=ehAdmin.dspMain&panel=#aPanels[i].id#"
+						<a href="index.cfm?event=admin.main&panel=#aPanels[i].id#"
 							<cfif panel eq aPanels[i].id>style="font-weight:bold;"</cfif>
 							><cfif panel eq aPanels[i].id>&raquo;</cfif> #aPanels[i].label#</a><br />
 						<cfset lstPanelIDs = listAppend(lstPanelIDs,aPanels[i].id)>

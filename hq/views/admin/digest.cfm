@@ -19,7 +19,7 @@
 		often you want to receive the report.</p>
 
 		<form name="settings" action="index.cfm" method="post">
-			<input type="hidden" name="event" value="ehAdmin.doSaveDigestSettings">
+			<input type="hidden" name="event" value="admin.doSaveDigestSettings">
 			<table>
 				<tr valign="top">
 					<td>Enabled?:</td>

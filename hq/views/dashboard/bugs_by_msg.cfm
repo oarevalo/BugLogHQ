@@ -24,7 +24,7 @@
 		<th style="background-color:##90A4B5;line-height: 14px;color: ##FFFFFF;font-size:13px;padding:3px;">Most Recent</th>
 	</tr>
 	<cfloop query="qryListing" endrow="#maxRows#">
-		<cfset tmpURL = "index.cfm?event=ehGeneral.dspEntry&entryID=#qryListing.EntryID#">
+		<cfset tmpURL = "index.cfm?event=entry&entryID=#qryListing.EntryID#">
 		<cfset tmpImgURL = getSeverityIconURL(severityCode)>
 		<tr style="line-height:12px;color:##333;font-size:12px;<cfif qryListing.currentRow mod 2>background-color:##F6F6F6;</cfif>">
 			<td align="center" style="padding:3px;border-bottom:1px dotted silver;">

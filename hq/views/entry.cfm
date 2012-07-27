@@ -10,7 +10,7 @@
 <cfset jiraEnabled = request.requestState.jiraEnabled>
 <cfset ruleTypes = request.requestState.ruleTypes>
 
-<cfset tmpCreateRuleURL = "?event=ehExtensions.dspRule&application=#oApp.getCode()#&host=#oHost.getHostName()#&severity=#oSeverity.getCode()#">
+<cfset tmpCreateRuleURL = "?event=extensions.rule&application=#oApp.getCode()#&host=#oHost.getHostName()#&severity=#oSeverity.getCode()#">
 
 <script type="text/javascript">
 	function toggle(sec) {
@@ -38,7 +38,7 @@
 				<cfif isBoolean(jiraEnabled) and jiraEnabled>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 					<img width="16" height="16" src="#rs.assetsPath#images/icons/jira.png" align="absmiddle" />
-					<a href="index.cfm?event=ehJira.dspSendToJira&entryID=#entryID#">Send to JIRA</a>
+					<a href="index.cfm?event=jira.sendToJira&entryID=#entryID#">Send to JIRA</a>
 				</cfif>
 
 				&nbsp;&nbsp;&nbsp;&nbsp;
@@ -64,10 +64,10 @@
 				</td>
 			</cfif>
 			<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
-				<a href="index.cfm?event=ehGeneral.dspMain&applicationID=#oApp.getApplicationID()#">#oApp.getCode()#</a>
+				<a href="index.cfm?event=main&applicationID=#oApp.getApplicationID()#">#oApp.getCode()#</a>
 			</td>
 			<td align="center" width="150" style="border-left:1px solid ##fff;">
-				<a href="index.cfm?event=ehGeneral.dspMain&hostID=#oHost.getHostID()#">#oHost.getHostname()#</a>
+				<a href="index.cfm?event=main&hostID=#oHost.getHostID()#">#oHost.getHostname()#</a>
 			</td>
 		</tr>
 	</table>
@@ -77,7 +77,7 @@
 <div id="dSendForm" style="display:none;background-color:##f9f9f9;" class="criteriaTable">
 	<div style="margin:10px;padding-top:10px;">
 	<form name="frmSend" action="index.cfm" method="post" style="padding:0px;margin:0px;">
-		<input type="hidden" name="event" value="ehGeneral.doSend">
+		<input type="hidden" name="event" value="doSend">
 		<input type="hidden" name="entryID" value="#oEntry.getEntryID()#">
 		<strong>Recipient(s):</strong><br />
 		<input type="text" name="to" value="" style="width:90%;">

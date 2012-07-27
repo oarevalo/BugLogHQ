@@ -41,7 +41,7 @@
 <script type="text/javascript"> 
 	function confirmDeleteRule(index) {
 		if(confirm("Are you sure you wish to remove the rule")) {
-			document.location='index.cfm?event=ehExtensions.doDeleteRule&index='+index;
+			document.location='index.cfm?event=extensions.doDeleteRule&index='+index;
 		}
 	}
 </script>
@@ -71,9 +71,9 @@
 		supported and rules are now stored on the database. BugLog can migrate these rules automatically if you want, 
 		or alternatively it can delete this file and you can
 		the rules manually.<br /><br />
-		<input type="button" name="btn" value="Yes, migrate my rules" onclick="document.location='?event=ehExtensions.doMigrateExtensionsXML'">
+		<input type="button" name="btn" value="Yes, migrate my rules" onclick="document.location='?event=extensions.doMigrateExtensionsXML'">
 		&nbsp;
-		<input type="button" name="btn" value="No, just delete the file" onclick="if(confirm('Are you sure?')) document.location='?event=ehExtensions.doDeleteExtensionsXML'">
+		<input type="button" name="btn" value="No, just delete the file" onclick="if(confirm('Are you sure?')) document.location='?event=extensions.doDeleteExtensionsXML'">
 	</div>
 </cfif>
 
@@ -81,7 +81,7 @@
 
 <cfif currentUser.getIsAdmin()>
 	<form name="frm" method="get" action="index.cfm" style="margin:15px;margin-left:0px;margin-bottom:25px;">
-		<input type="hidden" name="event" value="ehExtensions.dspRule">
+		<input type="hidden" name="event" value="extensions.rule">
 
 		<strong style="font-size:12px;">&raquo; Create a new rule of type: </strong>
 		<select name="ruleName">
@@ -93,7 +93,7 @@
 		<input type="submit" value="GO">
 		
 		&nbsp;|&nbsp;
-		<a href="index.cfm?event=ehExtensions.dspRulesLog"><b>View Rule Processor Log</b></a>
+		<a href="index.cfm?event=extensions.rulesLog"><b>View Rule Processor Log</b></a>
 	</form>
 </cfif>	
 
@@ -114,14 +114,14 @@
 		<b>#ruleName#</b>
 		<cfif currentUser.getIsAdmin()>
 			&nbsp;&nbsp;
-			<a href="index.cfm?event=ehExtensions.dspRule&index=#i#&ruleName=#ruleName#" style="font-size:10px;">Modify</a>
+			<a href="index.cfm?event=extensions.rule&index=#i#&ruleName=#ruleName#" style="font-size:10px;">Modify</a>
 			&nbsp;
 			<a href="##" onclick="confirmDeleteRule(#i#)" style="font-size:10px;">Remove</a>
 			&nbsp;
 			<cfif item.enabled>
-				<a href="index.cfm?event=ehExtensions.doDisableRule&index=#i#&ruleName=#ruleName#" style="font-size:10px;">Disable</a>
+				<a href="index.cfm?event=extensions.doDisableRule&index=#i#&ruleName=#ruleName#" style="font-size:10px;">Disable</a>
 			<cfelse>
-				<a href="index.cfm?event=ehExtensions.doEnableRule&index=#i#&ruleName=#ruleName#" style="font-size:10px;">Enable</a>
+				<a href="index.cfm?event=extensions.doEnableRule&index=#i#&ruleName=#ruleName#" style="font-size:10px;">Enable</a>
 			</cfif>
 		</cfif>
 		

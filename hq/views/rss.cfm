@@ -16,7 +16,7 @@
 	thisHost = thisHost & cgi.server_name;
 	if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
 </cfscript>
-<cfset rssFeedURL = "#thisHost##cgi.script_name#?event=ehRSS.dspRSS">
+<cfset rssFeedURL = "#thisHost##cgi.script_name#?event=rss.rss">
 
 <cfquery name="qryApplications" dbtype="query">
 	SELECT *, upper(code) as u_code

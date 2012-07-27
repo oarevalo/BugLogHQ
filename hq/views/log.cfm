@@ -32,7 +32,7 @@
 <cfset dateFormatMask = request.requestState.dateFormatMask>
 
 <!--- base URL for reloading --->
-<cfset pageURL = "index.cfm?event=ehGeneral.dspLog&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#urlEncodedFormat(searchTerm)#&msgFromEntryID=#msgFromEntryID#">
+<cfset pageURL = "index.cfm?event=log&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#urlEncodedFormat(searchTerm)#&msgFromEntryID=#msgFromEntryID#">
 
 <!--- setup variables for paging records --->
 <cfset numPages = ceiling(qryEntries.recordCount / rowsPerPage)>
@@ -72,7 +72,7 @@
 		
 		<script type="text/javascript">
 			function search(term, appID, hostID) {
-				location.replace('index.cfm?event=ehGeneral.dspLog&applicationID='+appID+'&hostID='+hostID+'&searchTerm='+escape(term)+'&msgFromEntryID=#msgFromEntryID#');
+				location.replace('index.cfm?event=log&applicationID='+appID+'&hostID='+hostID+'&searchTerm='+escape(term)+'&msgFromEntryID=#msgFromEntryID#');
 			}
 		</script>	
 	</cfoutput>
@@ -88,7 +88,7 @@
 				
 	<!--- Search Criteria / Filters --->			
 	<form name="frmSearch" action="index.cfm" method="post" style="margin:0px;padding-top:10px;">
-		<input type="hidden" name="event" value="ehGeneral.dspLog">
+		<input type="hidden" name="event" value="log">
 		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 			<tr align="center">
 				<td>
@@ -190,16 +190,16 @@
 						title="#lcase(qryEntries.SeverityCode)#">
 			</td>
 			<td class="cell_entry" width="15">
-				<a href="?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#qryEntries.entryID#</a>
+				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#qryEntries.entryID#</a>
 			</td>
 			<td class="cell_datetime" align="center" width="110">#DateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</td>
-			<td class="cell_application" width="120"><a href="index.cfm?event=ehGeneral.dspLog&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a></td>
-			<td class="cell_hostname" width="120"><a href="index.cfm?event=ehGeneral.dspLog&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a></td>
-			<td class="cell_message" onclick="document.location='?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#'" 
+			<td class="cell_application" width="120"><a href="index.cfm?event=log&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a></td>
+			<td class="cell_hostname" width="120"><a href="index.cfm?event=log&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a></td>
+			<td class="cell_message" onclick="document.location='?event=entry&entryID=#qryEntries.entryID#'" 
 				title="Click to view full details of bug"
 				style="cursor:pointer;">#HtmlEditFormat(qryEntries.message)#</td>
 			<td class="cell_details" align="center">
-				<a href="?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">
+				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">
 					<img alt="View details" width="16" height="16" src="#rs.assetsPath#images/icons/zoom.png" align="absmiddle" border="0" /></a>
 			</td>
 		</tr>

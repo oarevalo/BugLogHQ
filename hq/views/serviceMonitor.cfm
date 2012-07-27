@@ -23,14 +23,14 @@
 	<b>BugLogListener Service is: </b>
 	<cfif stInfo.isRunning>
 		<span style="color:green;font-weight:bold;">Running</span>
-		<span style="font-size:12px;">(<a href="index.cfm?event=ehGeneral.doStop">Stop</a>)</span>
+		<span style="font-size:12px;">(<a href="index.cfm?event=doStop">Stop</a>)</span>
 		<div style="font-size:9px;">
 			<strong>Last Start:</strong> 
 			#lsdateformat(stInfo.startedOn)# #lstimeformat(stInfo.startedOn)#
 		</div>
 	<cfelse>
 		<span style="color:red;font-weight:bold;">Stopped</span>
-		<span style="font-size:12px;">(<a href="index.cfm?event=ehGeneral.doStart">Start</a>)</span>
+		<span style="font-size:12px;">(<a href="index.cfm?event=doStart">Start</a>)</span>
 	</cfif>
 	<br />
 	
@@ -53,7 +53,7 @@
 							Entries in Queue (#arrayLen(aQueue)#)
 							&nbsp;
 							<span style="font-size:10px;color:##43505a;">
-								( <a href="index.cfm?event=ehServiceMonitor.doProcessQueue" style="color:##43505a;">Process</a> )
+								( <a href="index.cfm?event=serviceMonitor.doProcessQueue" style="color:##43505a;">Process</a> )
 							</span>
 						</th>
 					</tr>

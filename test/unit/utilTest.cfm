@@ -19,7 +19,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = target.getCurrentHost() & "/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = target.getCurrentHost() & "/bugLog/hq/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -48,7 +48,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = target.getCurrentHost() & "/myinstance/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = target.getCurrentHost() & "/myinstance/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -78,7 +78,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = target.getCurrentHost() & "/hq/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = target.getCurrentHost() & "/hq/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -109,7 +109,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = target.getCurrentHost() & "/myinstance/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = target.getCurrentHost() & "/myinstance/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -140,7 +140,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = target.getCurrentHost() & "/mybuglog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = target.getCurrentHost() & "/mybuglog/hq/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -172,7 +172,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = target.getCurrentHost() & "/mybuglog/myinstance/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = target.getCurrentHost() & "/mybuglog/myinstance/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -202,7 +202,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = "https://buglog.somedomain.org/hq/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = "https://buglog.somedomain.org/hq/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -232,7 +232,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = "https://buglog.somedomain.org/myinstance/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = "https://buglog.somedomain.org/myinstance/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -261,7 +261,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = "https://buglog.somedomain.org/bugLog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = "https://buglog.somedomain.org/bugLog/hq/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -291,7 +291,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = "https://buglog.somedomain.org/bugLog/myinstance/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = "https://buglog.somedomain.org/bugLog/myinstance/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -320,7 +320,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = "https://buglog.somedomain.org/mybuglog/hq/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = "https://buglog.somedomain.org/mybuglog/hq/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),
@@ -350,7 +350,7 @@
 	tests = [{
 		name = "getBugEntryHREF()",
 		actual = target.getBugEntryHREF(123,config,instance),
-		expected = "https://buglog.somedomain.org/mybuglog/myinstance/index.cfm?event=ehGeneral.dspEntry&entryID=123"
+		expected = "https://buglog.somedomain.org/mybuglog/myinstance/index.cfm?event=entry&entryID=123"
 	},{
 		name = "getBaseBugLogHREF()",
 		actual = target.getBaseBugLogHREF(config,instance),

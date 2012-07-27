@@ -1,6 +1,6 @@
-<cfcomponent name="ehGeneral" extends="eventHandler">
+<cfcomponent name="general" extends="eventHandler">
 
-	<cffunction name="dspMain" access="public" returntype="void">
+	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
 			try {
 				oService = createObject("component","bugLog.components.service").init();
@@ -11,12 +11,12 @@
 				setValue("aMsgLog", aMsgLog);
 				setValue("aQueue", aQueue);
 				
-				setView("vwServiceMonitor");
+				setView("serviceMonitor");
 
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehGeneral.dspMain");
+				setNextEvent("main");
 			}
 		</cfscript>	
 	</cffunction>
@@ -32,12 +32,12 @@
 				oListener = oService.getService();
 				rtn = oListener.processQueue( oListener.getKey() );
 				setMessage("info","Queue processed (#rtn#)");
-				setNextEvent("ehServiceMonitor.dspMain");
+				setNextEvent("serviceMonitor.main");
 
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehServiceMonitor.dspMain");
+				setNextEvent("serviceMonitor.main");
 			}
 		</cfscript>	
 	</cffunction>

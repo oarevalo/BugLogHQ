@@ -35,11 +35,11 @@
 				<a href="#tmpURL#"><img src="#tmpImgURL#" align="absmiddle" alt="#severityCode#" title="Click to see all bugs flagged as '#severityCode#'"></a>
 			</td>
 			<td style="padding:3px;border:1px dotted silver;padding-right:10px;" align="right">
-				<cfset tmpURL = thisHostHQ & "index.cfm?event=ehGeneral.dspLog&msgFromEntryID=#EntryID#&applicationID=#ApplicationID#&severityID=#severityID#">
+				<cfset tmpURL = thisHostHQ & "index.cfm?event=log&msgFromEntryID=#EntryID#&applicationID=#ApplicationID#&severityID=#severityID#">
 				<a href="#tmpURL#">#bugCount#</a>
 			</td>
 			<td style="padding:3px;border:1px dotted silver;" align="center">
-				<cfset tmpURL = thisHostHQ & "index.cfm?event=ehGeneral.dspEntry&entryID=#EntryID#">
+				<cfset tmpURL = thisHostHQ & "index.cfm?event=entry&entryID=#EntryID#">
 				<a href="#tmpURL#">#dateFormat(createdOn,dateMask)# #lsTimeFormat(createdOn)#</a>
 			</td>
 		</tr>

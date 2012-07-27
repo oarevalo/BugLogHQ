@@ -9,7 +9,7 @@
 		<cfargument name="config" type="any" required="true" hint="the main config object">
 		<cfargument name="instanceName" type="string" required="false" default="default" hint="the current buglog instance name">
 		<cfset var buglogHref = getBugLogHQAppHREF(config, instanceName) />
-		<cfset var href = buglogHref & "index.cfm?event=ehGeneral.dspEntry&entryID=#arguments.entryID#" />
+		<cfset var href = buglogHref & "index.cfm?event=entry&entryID=#arguments.entryID#" />
 		<cfreturn href />
 	</cffunction>
 

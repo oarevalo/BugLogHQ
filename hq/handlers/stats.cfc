@@ -1,6 +1,6 @@
-<cfcomponent name="ehStats" extends="eventHandler">
+<cfcomponent name="stats" extends="eventHandler">
 
-	<cffunction name="dspMain">
+	<cffunction name="main">
 		<cftry>
 			<cfscript>
 				criteria = structNew();
@@ -89,13 +89,13 @@
 				setValue("qryMsgSummary", qryMsgSummary);
 				setValue("qryTimeline", qryTimeline);
 
-				setView("vwStats");
+				setView("stats");
 			</cfscript>
 			
 			<cfcatch type="any">
 				<cfset setMessage("error",cfcatch.message)>
 				<cfset getService("bugTracker").notifyService(cfcatch.message, cfcatch)>
-				<cfset setNextEvent("ehGeneral.dspMain")>
+				<cfset setNextEvent("main")>
 			</cfcatch>
 		</cftry>
 	</cffunction>

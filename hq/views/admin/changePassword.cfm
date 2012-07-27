@@ -2,7 +2,7 @@
 	<h3>Change Password:</h3>
 	<div style="margin-left:30px;line-height:24px;">
 		<form name="frmChangePassword" action="index.cfm" method="post">
-			<input type="hidden" name="event" value="ehAdmin.doChangePassword">
+			<input type="hidden" name="event" value="admin.doChangePassword">
 			
 			<table>
 				<tr>

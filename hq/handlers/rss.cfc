@@ -1,6 +1,6 @@
-<cfcomponent name="ehGeneral" extends="eventHandler">
+<cfcomponent extends="eventHandler">
 	
-	<cffunction name="dspRSS" access="public">
+	<cffunction name="rss" access="public">
 		<cfscript>
 			var applicationID = getValue("applicationID",0);
 			var hostID = getValue("hostID",0);
@@ -23,7 +23,7 @@
 				queryAddRow(data,1);
 				querySetCell(data,"title","Bug ###qryEntries.entryID[i]#: " & qryEntries.message[i]);
 				querySetCell(data,"body",composeMessage(qryEntries.mydateTime[i], qryEntries.applicationCode[i], qryEntries.hostName[i], qryEntries.templatePath[i], qryEntries.severityCode[i], qryEntries.exceptionMessage[i], qryEntries.exceptionDetails[i] ));
-				querySetCell(data,"link","http://#cgi.HTTP_HOST##cgi.script_name#?event=ehGeneral.dspEntry&entryID=" & qryEntries.entryID[i]);
+				querySetCell(data,"link","http://#cgi.HTTP_HOST##cgi.script_name#?event=entry&entryID=" & qryEntries.entryID[i]);
 				querySetCell(data,"subject","Subject");
 				querySetCell(data,"date",now());
 			}
@@ -31,8 +31,8 @@
 			var rssXML = rss.generateRSS("rss1",data,meta);
 
 			setValue("rssXML", rssXML);
-			setView("vwFeed");
-			setLayout("Layout.XML");
+			setView("feed");
+			setLayout("xml");
 		</cfscript>
 	</cffunction>
 	

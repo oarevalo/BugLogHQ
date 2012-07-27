@@ -31,7 +31,7 @@
 	<em>#rs.stRule.description#</em><br /><br /><br />
 
 	<form name="frm" method="post" action="index.cfm">
-		<input type="hidden" name="event" value="ehExtensions.doSaveRule">
+		<input type="hidden" name="event" value="extensions.doSaveRule">
 		<input type="hidden" name="ruleName" value="#ruleName#">
 		<input type="hidden" name="index" value="#rs.index#">
 	
@@ -146,7 +146,7 @@
 		</table>
 		<br />
 		<input type="submit" value="Save" name="btnSave">&nbsp;&nbsp;
-		<input type="button" value="Cancel" name="btnCancel" onclick="document.location='index.cfm?event=ehExtensions.dspMain'">
+		<input type="button" value="Cancel" name="btnCancel" onclick="document.location='index.cfm?event=extensions.main'">
 	</form>
 
 </cfoutput>

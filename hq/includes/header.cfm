@@ -1,4 +1,5 @@
 <cfparam name="request.requestState.hostName" default="">
+<cfparam name="request.requestState.configKey" default="">
 <cfparam name="request.requestState.applicationTitle" default="#application.applicationName#">
 
 <cfoutput>
@@ -22,10 +23,10 @@
 				</cfif>
 				<cfif structKeyExists(request.requestState,"currentUser")>
 					&nbsp;&nbsp;|&nbsp;&nbsp;
-					<a href="?event=ehAdmin.dspMain">Settings</a>
+					<a href="?event=admin.main">Settings</a>
 					&nbsp;&nbsp;|&nbsp;&nbsp;
 					#request.requestState.currentUser.getUsername()#
-					( <a href="?event=ehGeneral.doLogoff">Log off</a> )
+					( <a href="?event=doLogoff">Log off</a> )
 				</cfif>
 			</span>
 		</td>

@@ -6,7 +6,7 @@
 	<div style="margin-left:30px;line-height:24px;">
 		<cfif !allowConfigEditing><div style="color:##990000;line-height:18px;font-weight:bold;margin-bottom:10px;">#editingSettingsNotAllowedMsg#</div></cfif>
 		<form name="jira" action="index.cfm" method="post">
-			<input type="hidden" name="event" value="ehAdmin.doSaveJiraSettings">
+			<input type="hidden" name="event" value="admin.doSaveJiraSettings">
 			<table>
 				<tr>
 					<td>Enabled:</td>

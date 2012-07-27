@@ -104,7 +104,7 @@
 		<br /><br />
 	
 		<cfif returnTo eq "admin">
-			<a href="#path##adminPath#index.cfm?event=ehAdmin.dspMain&panel=listeners">Return</a>
+			<a href="#path##adminPath#index.cfm?event=admin.main&panel=listeners">Return</a>
 		<cfelse>
 			<a href="index.cfm">Return</a>
 		</cfif>

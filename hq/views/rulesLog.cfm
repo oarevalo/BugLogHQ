@@ -10,7 +10,7 @@
 <cfoutput>
 	<br />
 	<form name="frm" method="get" action="index.cfm">
-		<input type="hidden" name="event" value="ehExtensions.dspRulesLog">
+		<input type="hidden" name="event" value="extensions.rulesLog">
 		<b>Logs Directory:</b>
 		<input type="text" name="logsDir" value="#rs.logsDir#" size="100">
 		<input type="submit" value="Reload">

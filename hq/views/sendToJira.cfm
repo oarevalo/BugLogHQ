@@ -59,7 +59,7 @@
 		<tr>
 			<td style="border-right:1px solid ##666;">
 				<img alt="" width="16" height="16" src="#rs.assetsPath#images/icons/arrow_undo.png" align="absmiddle" />
-				<a href="index.cfm?event=ehGeneral.dspEntry&entryID=#entryID#">Return To Bug</a>
+				<a href="index.cfm?event=entry&entryID=#entryID#">Return To Bug</a>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 			<cfif tmpSeverity neq "">
@@ -72,10 +72,10 @@
 				</td>
 			</cfif>
 			<td align="center" style="border-left:1px solid ##fff;border-right:1px solid ##666;" width="150">
-				<a href="index.cfm?event=ehGeneral.dspMain&applicationID=#oApp.getApplicationID()#">#oApp.getCode()#</a>
+				<a href="index.cfm?event=main&applicationID=#oApp.getApplicationID()#">#oApp.getCode()#</a>
 			</td>
 			<td align="center" width="150" style="border-left:1px solid ##fff;">
-				<a href="index.cfm?event=ehGeneral.dspMain&hostID=#oHost.getHostID()#">#oHost.getHostname()#</a>
+				<a href="index.cfm?event=main&hostID=#oHost.getHostID()#">#oHost.getHostname()#</a>
 			</td>
 		</tr>
 	</table>
@@ -84,7 +84,7 @@
 <div style="background-color:##f9f9f9;" class="criteriaTable">
 <div style="margin:10px;padding-top:10px;">
 	<form name="frmSend" action="index.cfm" method="post" style="padding:0px;margin:0px;">
-		<input type="hidden" name="event" value="ehJira.doSendToJira">
+		<input type="hidden" name="event" value="jira.doSendToJira">
 		<input type="hidden" name="entryID" value="#oEntry.getEntryID()#">
 		<table width="100%">
 			<tr>

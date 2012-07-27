@@ -43,7 +43,7 @@
 <cfset assetsPath = request.requestState.assetsPath>
 
 <!--- base URL for reloading --->
-<cfset pageURL = "index.cfm?event=ehGeneral.dspMain&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#urlEncodedFormat(searchTerm)#&groupByApp=#groupByApp#&groupByHost=#groupByHost#&numDays=#numDays#&severityID=#severityID#&searchHTMLReport=#searchHTMLReport#">
+<cfset pageURL = "index.cfm?event=main&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#urlEncodedFormat(searchTerm)#&groupByApp=#groupByApp#&groupByHost=#groupByHost#&numDays=#numDays#&severityID=#severityID#&searchHTMLReport=#searchHTMLReport#">
 
 <!--- setup variables for paging records --->
 <cfset numPages = ceiling(qryEntries.recordCount / rowsPerPage)>
@@ -107,15 +107,15 @@
 				<b>BugLogListener Service is: </b>
 				<cfif stInfo.isRunning>
 					<span style="color:green;font-weight:bold;">Running</span>
-					<span style="font-size:12px;">(<a href="index.cfm?event=ehGeneral.doStop">Stop</a>)</span>
-					<a href="index.cfm?event=ehServiceMonitor.dspMain"><img src="#rs.assetsPath#images/icons/server_connect.png" border="0" align="absmiddle"></a>
+					<span style="font-size:12px;">(<a href="index.cfm?event=doStop">Stop</a>)</span>
+					<a href="index.cfm?event=serviceMonitor.main"><img src="#rs.assetsPath#images/icons/server_connect.png" border="0" align="absmiddle"></a>
 					<div style="font-size:9px;">
 						<strong>Last Start:</strong> 
 						#lsdateformat(stInfo.startedOn)# #lstimeformat(stInfo.startedOn)#
 					</div>
 				<cfelse>
 					<span style="color:red;font-weight:bold;">Stopped</span>
-					<span style="font-size:12px;">(<a href="index.cfm?event=ehGeneral.doStart">Start</a>)</span>
+					<span style="font-size:12px;">(<a href="index.cfm?event=doStart">Start</a>)</span>
 				</cfif>
 			</td>
 		</tr>
@@ -127,6 +127,7 @@
 		<input type="hidden" name="groupByApp" value="#groupByApp#">
 		<input type="hidden" name="groupByHost" value="#groupByHost#">
 		<input type="hidden" name="searchHTMLReport" value="#searchHTMLReport#">
+		<input type="hidden" name="event" value="main">
 		
 		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 			<tr align="center">
@@ -276,7 +277,7 @@
 	<cfloop query="qryEntries" startrow="#startRow#" endrow="#startRow+rowsPerPage-1#">
 		<cfset isNew = qryEntries.entryID gt lastbugread>
 		<cfif bugCount gt 1>
-			<cfset zoomURL = "index.cfm?event=ehGeneral.dspLog&msgFromEntryID=#qryEntries.entryID#">
+			<cfset zoomURL = "index.cfm?event=log&msgFromEntryID=#qryEntries.entryID#">
 			<cfif groupByApp>
 				<Cfset zoomURL = zoomURL & "&ApplicationID=#qryEntries.applicationID#">
 			</cfif>		
@@ -284,7 +285,7 @@
 				<Cfset zoomURL = zoomURL & "&HostID=#qryEntries.HostID#">
 			</cfif>		
 		<cfelse>
-			<cfset zoomURL = "?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#">
+			<cfset zoomURL = "?event=entry&entryID=#qryEntries.entryID#">
 		</cfif>
 
 		<cfset tmpRowClass = "">		
@@ -304,7 +305,7 @@
 						<cfset tmpImgName = "images/severity/#lcase(qryEntries.SeverityCode)#.png">
 					</cfif>
 				</cfif>
-				<a href="index.cfm?event=ehGeneral.dspLog&severityID=#qryEntries.SeverityCode#" 
+				<a href="index.cfm?event=log&severityID=#qryEntries.SeverityCode#" 
 					title="Click to view all #qryEntries.SeverityCode# bugs"><img 
 						src="#rs.assetsPath##tmpImgName#" 
 						align="absmiddle"
@@ -314,12 +315,12 @@
 			</td>
 			<td class="cell_application" width="120">
 				<cfif groupByApp>
-					<a href="index.cfm?event=ehGeneral.dspLog&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a>
+					<a href="index.cfm?event=log&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a>
 				</cfif>
 			</td>
 			<td class="cell_hostname" width="120">
 				<cfif groupByHost>
-					<a href="index.cfm?event=ehGeneral.dspLog&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a>
+					<a href="index.cfm?event=log&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a>
 				</cfif>	
 			</td>
 			<td class="cell_message" onclick="document.location='#zoomURL#'"
@@ -329,7 +330,7 @@
 				#qryEntries.bugCount#
 			</td>
 			<td class="cell_mostrecent" align="center" width="140">
-				<a href="?event=ehGeneral.dspEntry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#DateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</a>)
+				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#DateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</a>)
 			</td>
 			<td class="cell_details" align="center">
 				<a href="#zoomURL#" title="Click for more detail">

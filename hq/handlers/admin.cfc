@@ -6,7 +6,7 @@
 				editingSettingsNotAllowed = "Editing of settings is currently not allowed. All configuration changes must be done directly in the config file. To allow editing settings through the UI you must enable it in your BugLogHQ config file."
 			}>
 	
-	<cffunction name="dspMain" access="public" returntype="void">
+	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
 			var app = getService("app");
@@ -26,7 +26,7 @@
 				switch(panel) {
 					case "general":
 						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
-						setValue("adminEmail", cfg.getSetting("general.adminEmail",""));
+						setValue("adminEmail", cfg.getSetting("adminEmail",""));
 						setValue("autoStart", app.getServiceSetting("autoStart",true));
 						break;
 
@@ -79,21 +79,21 @@
 
 				setValue("panel", panel);
 				setValue("allowConfigEditing", isConfigEditingAllowed());
-				setView("vwAdmin");
+				setView("admin");
 				
 			} catch(validation e) {
 				setMessage("warning",e.message);
-				setNextEvent("ehGeneral.dspMain");				
+				setNextEvent("main");				
 
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehGeneral.dspMain");				
+				setNextEvent("main");				
 			}
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="dspUser" access="public" returntype="void">
+	<cffunction name="user" access="public" returntype="void">
 		<cfscript>
 			var userID = getValue("userID");
 			var oUser = 0;
@@ -105,29 +105,29 @@
 					oUser = getService("app").getBlankUser();
 				
 				setValue("oUser",oUser);				
-				setView("vwEditUser");
+				setView("editUser");
 				
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain");				
+				setNextEvent("admin.main");				
 			}
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="dspDeleteUser" access="public" returntype="void">
+	<cffunction name="deleteUser" access="public" returntype="void">
 		<cfscript>
 			var userID = getValue("userID");
 			
 			try {
-				if(userID eq 0) setNextEvent("ehAdmin.dspMain");
+				if(userID eq 0) setNextEvent("admin.main");
 				setValue("userID",userID);				
-				setView("vwDeleteUser");
+				setView("deleteUser");
 				
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain");				
+				setNextEvent("admin.main");				
 			}
 		</cfscript>
 	</cffunction>
@@ -140,17 +140,17 @@
 			var user = getValue("currentUser");
 			
 			try {
-				if(getService("app").checkLogin(user.getUsername(), currentPassword) eq 0) {setMessage("warning","The current password is invalid"); setNextEvent("ehAdmin.dspMain","panel=changePassword");}
-				if(newPassword eq "") {setMessage("warning","Password cannot be empty"); setNextEvent("ehAdmin.dspMain","panel=changePassword");}
-				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("ehAdmin.dspMain","panel=changePassword");}
+				if(getService("app").checkLogin(user.getUsername(), currentPassword) eq 0) {setMessage("warning","The current password is invalid"); setNextEvent("admin.main","panel=changePassword");}
+				if(newPassword eq "") {setMessage("warning","Password cannot be empty"); setNextEvent("admin.main","panel=changePassword");}
+				if(newPassword neq newPassword2) {setMessage("warning","The new passwords do not match"); setNextEvent("admin.main","panel=changePassword");}
 				getService("app").setUserPassword(user, newPassword);
 				setMessage("info","Password has been changed");
-				setNextEvent("ehAdmin.dspMain","panel=changePassword");
+				setNextEvent("admin.main","panel=changePassword");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain","panel=changePassword");				
+				setNextEvent("admin.main","panel=changePassword");				
 			}
 		</cfscript>
 	</cffunction>
@@ -164,7 +164,7 @@
 			var config = getService("app").getConfig();
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=purgeHistory");}
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main","panel=purgeHistory");}
 				config.setSetting("purging.numberOfDays", purgeHistoryDays);
 				config.setSetting("purging.enabled", enabled);
 				if(runnow) {
@@ -173,12 +173,12 @@
 				} else {
 					setMessage("info","Purge History settings saved. The BugLog service must be restarted for changes to take effect.");
 				}
-				setNextEvent("ehAdmin.dspMain","panel=purgeHistory");
+				setNextEvent("admin.main","panel=purgeHistory");
 			
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain","panel=purgeHistory");				
+				setNextEvent("admin.main","panel=purgeHistory");				
 			}
 		</cfscript>
 	</cffunction>
@@ -208,15 +208,15 @@
 
 				getService("app").saveUser(oUser);
 				setMessage("info","User information has been saved");
-				setNextEvent("ehAdmin.dspMain","panel=userManagement");
+				setNextEvent("admin.main","panel=userManagement");
 							
 			} catch(validation e) {
 				setMessage("warning",e.message);
-				setNextEvent("ehAdmin.dspUser","userID=#userID#&username=#username#&isAdmin=#isAdmin#");
+				setNextEvent("admin.user","userID=#userID#&username=#username#&isAdmin=#isAdmin#");
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspUser","userID=#userID#&username=#username#&isAdmin=#isAdmin#");
+				setNextEvent("admin.user","userID=#userID#&username=#username#&isAdmin=#isAdmin#");
 			}
 		</cfscript>
 	</cffunction>
@@ -227,15 +227,15 @@
 			var userID = getValue("userID");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=userManagement");}
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main","panel=userManagement");}
 				getService("app").deleteUser(userID);
 				setMessage("info","User has been deleted");
-				setNextEvent("ehAdmin.dspMain","panel=userManagement");
+				setNextEvent("admin.main","panel=userManagement");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain","panel=userManagement");
+				setNextEvent("admin.main","panel=userManagement");
 			}
 		</cfscript>
 	</cffunction>
@@ -248,18 +248,18 @@
 			var generateNewKey = getValue("generateNewKey");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=APISecurity");}
-				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("ehAdmin.dspMain","panel=APISecurity");}
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main","panel=APISecurity");}
+				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("admin.main","panel=APISecurity");}
 				if(generateNewKey neq "") APIKey = createUUID();
 				getService("app").setServiceSetting("requireAPIKey", requireAPIKey);
 				getService("app").setServiceSetting("APIKey", APIKey);
 				setMessage("info","API security settings updated. You must restart the BugLogListener service for changes to take effect.");
-				setNextEvent("ehAdmin.dspMain","panel=APISecurity");
+				setNextEvent("admin.main","panel=APISecurity");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain","panel=APISecurity");
+				setNextEvent("admin.main","panel=APISecurity");
 			}
 		</cfscript>	
 	</cffunction>	
@@ -273,8 +273,8 @@
 			var password = getValue("password");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=jira");}
-				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("ehAdmin.dspMain","panel=jira");}
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main","panel=jira");}
+				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("admin.main","panel=jira");}
 				getService("jira").setSetting("enabled", enabled)
 									.setSetting("wsdl", wsdl)
 									.setSetting("username", username)
@@ -282,12 +282,12 @@
 									.reinit();
 
 				setMessage("info","JIRA integration settings updated.");
-				setNextEvent("ehAdmin.dspMain","panel=jira");
+				setNextEvent("admin.main","panel=jira");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain","panel=jira");
+				setNextEvent("admin.main","panel=jira");
 			}
 		</cfscript>	
 	</cffunction>	
@@ -300,19 +300,19 @@
 			var config = getService("app").getConfig();
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain");}
-				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("ehAdmin.dspMain");}
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main");}
+				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("admin.main");}
 				getService("app").setServiceSetting("autoStart", autoStart);
 				config.reload();
-				config.setSetting("general.adminEmail", adminEmail);
+				config.setSetting("adminEmail", adminEmail);
 
 				setMessage("info","General settings updated.");
-				setNextEvent("ehAdmin.dspMain","panel=general");
+				setNextEvent("admin.main","panel=general");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain","panel=general");
+				setNextEvent("admin.main","panel=general");
 			}
 		</cfscript>	
 	</cffunction>		
@@ -330,18 +330,18 @@
 			var severity = getValue("severity");
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("ehAdmin.dspMain","panel=digest");}
-				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("ehAdmin.dspMain","panel=digest");}
-				if(interval eq "") {setMessage("warning","Please set the digest interval"); setNextEvent("ehAdmin.dspMain","panel=digest");};
-				if(startTime eq "") {setMessage("warning","Please enter the start time"); setNextEvent("ehAdmin.dspMain","panel=digest");};
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main","panel=digest");}
+				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("admin.main","panel=digest");}
+				if(interval eq "") {setMessage("warning","Please set the digest interval"); setNextEvent("admin.main","panel=digest");};
+				if(startTime eq "") {setMessage("warning","Please enter the start time"); setNextEvent("admin.main","panel=digest");};
 				getService("app").setDigestSettings(enabled, recipients, interval, startTime, sendIfEmpty, severity, app, host);
 				setMessage("info","Digest settings updated.");
-				setNextEvent("ehAdmin.dspMain","panel=digest");
+				setNextEvent("admin.main","panel=digest");
 							
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("ehAdmin.dspMain","panel=digest");
+				setNextEvent("admin.main","panel=digest");
 			}
 		</cfscript>	
 	</cffunction>	
