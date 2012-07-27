@@ -19,31 +19,54 @@
 		<cfscript>
 			var buglogPath = "";
 			var externalURL = config.getSetting("general.externalURL");
+			var host = getCurrentHost();
+			var innerpath = externalURL;
+			var external_is_url = false;
 
-			// if there is an external url defined and it looks like a full URL, 
-			// then use that one as the buglog path
-			if(externalURL neq "") {
-				if(left(externalURL,4) eq "http") {
-					buglogPath = externalURL;	
-				} else {
-					// if the external url is a relative path,
-					// then get the host from the current request
-					buglogPath = getCurrentHost() & "/" & externalPath;
-				}		
+			// normalize instance name
+			if(instanceName eq "" or instanceName eq "default")
+				instanceName = "bugLog";
+
+			// check if the externalURL setting points to a full URL
+			// if this is the case, then that will be assumed to be the location
+			// where the bugLog application is installed 
+			if(left(externalURL,4) eq "http") {
+				external_is_url = true;
+				host = externalURL;
+				innerpath = "";
+			}
+			
+			// make sure we have a backslash at the end
+			if(right(host,1) neq "/")
+				host = host & "/";
+
+			// build the path
+			if((innerpath eq "/" or (innerpath eq "" and external_is_url)) and instanceName eq "bugLog") {
+				buglogPath = host;
 			} else {
-				// there is no external url defined, so we use
-				// the current host and assume the application is located
-				// at either the buglog dir or a named instance dir
-				if(instanceName eq "default" or instanceName eq "")
-					buglogPath = getCurrentHost() & "/bugLog";
-				else
-					buglogPath = getCurrentHost() & "/" & instanceName;
+				if(innerpath eq "/") {
+					buglogPath = host & instanceName;
+				} else {
+					if(left(innerpath,1) eq "/")
+						innerpath = right(innerpath,len(innerpath)-1);
+
+					if(innerpath neq "") {
+						if(right(innerpath,1) neq "/")
+							innerpath = innerpath & "/";
+						if(instanceName eq "bugLog")					
+							buglogPath = host & innerpath;
+						else
+							buglogPath = host & innerpath & instanceName;
+					} else {
+						buglogPath = host & instanceName;
+					}
+				}
 			}
 			
 			// make sure we have a backslash at the end
 			if(right(buglogPath,1) neq "/")
 				buglogPath = buglogPath & "/";
-				
+
 			return buglogPath;
 		</cfscript>
 	</cffunction>
