@@ -53,6 +53,12 @@
 	<body>
 		<h1><span style="color:red;">BugLog</span>HQ: Test Client</h1>
 
+		<cfif returnTo eq "">
+			<p><b style="color:red;">IMPORTANT:</b> <b>This test assumes that your bugLog instance is located on a directory named <u>/bugLog</u>. If
+			you have deployed bugLog to a different directory you need to use the bugloghref URL parameter to indicate the full URL to
+			the BugLog app.</b></p>
+		</cfif>
+
 		<!--- Load bugLog client into application scope (if needed) --->
 		Checking if buglog client is in memory...<br>
 		<cfif not IsDefined("application.oBugLogService") or reset>
