@@ -14,11 +14,12 @@
 		<!--- see if this is a request for a named instance.
 			A "named instance" is a separate deployment of buglog under a different directory other than /buglog or web root.
 			A single server can host multiple named instances at the same time.
+			
+			Note: Named instances must have an application name different than bugLogHQ.
+ 				  The name of the named instance is given by its containing folder.
 		 --->
-		<cfset var current_path_dir = replace(getDirectoryFromPath(cgi.script_name), "/", "", "ALL")>
-		<cfif current_path_dir neq "hq" and current_path_dir neq "bugLoghq">
-			<!--- custom buglog instance name (same as url of containing folder, but without slashes) --->
-			<cfset request.bugLogInstance = current_path_dir>
+		<cfif this.name neq "bugLogHQ">
+			<cfset request.bugLogInstance = replace(getDirectoryFromPath(cgi.script_name), "/", "", "ALL")>
 		</cfif>
 	</cffunction>
 	
