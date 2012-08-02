@@ -366,4 +366,36 @@
 	}];
 	writeOutput(testDriver.evaluateScenario(scenario,tests).html);
 	
+	
+	
+	// Scenario: get path for bugLog mapping
+	scenario = "get path for buglog mapping";
+	target = createObject("component","bugLog.components.util").init();
+	tests = [{
+		name = "Linux path to default location",
+		actual = target.getParentPath("/opt/tomcat/webapps/ROOT/bugLog/hq/Application.cfc"),
+		expected = "/opt/tomcat/webapps/ROOT/bugLog"
+	},{
+		name = "Linux path to web root location",
+		actual = target.getParentPath("/opt/tomcat/webapps/ROOT/hq/Application.cfc"),
+		expected = "/opt/tomcat/webapps/ROOT"
+	},{
+		name = "Linux path to custom location",
+		actual = target.getParentPath("/opt/tomcat/webapps/ROOT/bugabuga/hq/Application.cfc"),
+		expected = "/opt/tomcat/webapps/ROOT/bugabuga"
+	},{
+		name = "Windows path to default location",
+		actual = target.getParentPath("C:\servers\tomcat\webapps\ROOT\bugLog\hq\Application.cfc"),
+		expected = "C:\servers\tomcat\webapps\ROOT\bugLog"
+	},{
+		name = "Windows path to web root location",
+		actual = target.getParentPath("C:\servers\tomcat\webapps\ROOT\hq\Application.cfc"),
+		expected = "C:\servers\tomcat\webapps\ROOT"
+	},{
+		name = "Windows path to custom location",
+		actual = target.getParentPath("C:\servers\tomcat\webapps\ROOT\bugabuga\hq\Application.cfc"),
+		expected = "C:\servers\tomcat\webapps\ROOT\bugabuga"
+	}];
+	writeOutput(testDriver.evaluateScenario(scenario,tests).html);
+	
 </cfscript>

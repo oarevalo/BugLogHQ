@@ -97,4 +97,13 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="getParentPath" access="public" returntype="string" hint="returns the path to the parent folder of a given template">
+		<cfargument name="templatePath" type="string" required="true">
+		<cfset var path = GetDirectoryFromPath(GetDirectoryFromPath(arguments.templatePath).ReplaceFirst( "[\\\/]{1}$", "" ))>
+		<cfif path.endsWith("/") or path.endsWith("\")>
+			<cfset path = left(path,len(path)-1)>
+		</cfif>
+		<cfreturn path>
+	</cffunction>
+
 </cfcomponent>
