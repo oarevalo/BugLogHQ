@@ -16,7 +16,7 @@
 			var config = app.getConfig();
 
 			// url path used to find html/js/css resources
-			var assetsPath = getPath("html");
+			var assetsPath = app.getLocalAssetsPath();
 			
 			try {
 				if(not structKeyExists(session,"userID")) session.userID = 0;
