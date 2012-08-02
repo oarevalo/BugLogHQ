@@ -510,12 +510,22 @@
 	</cffunction>
 
 	<cffunction name="getLocalAssetsPath" access="public" returntype="string" hint="Returns the path to use locally within the HQ app to find html assets (js,images,css)">
-		<cfset var path = "" />
-		<cfset var externalURL = variables.config.getSetting("general.externalURL") />
-		<cfif externalURL neq "" and externalURL neq "/bugLog/">
-			<cfset path = externalURL & "hq/" />
-		</cfif>
-		<cfreturn path />
+		<cfscript>
+			var path = "";
+			var externalURL = variables.config.getSetting("general.externalURL");
+			switch(externalURL) {
+				case "":
+				case "/bugLog/":
+					path = "/bugLog/hq/";
+					break;
+				case "/":
+					path = "/hq/";
+					break;
+				default:
+					path = externalURL & "hq/";
+			}
+			return path;
+		</cfscript>
 	</cffunction>
 	
 </cfcomponent>
