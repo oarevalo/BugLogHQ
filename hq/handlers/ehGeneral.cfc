@@ -17,6 +17,7 @@
 
 			// url path used to find html/js/css resources
 			var assetsPath = app.getLocalAssetsPath();
+			setValue("_coreImagesPath",assetsPath & "../core/images");
 			
 			try {
 				if(not structKeyExists(session,"userID")) session.userID = 0;
