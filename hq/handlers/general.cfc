@@ -81,70 +81,20 @@
 
 	<cffunction name="dashboard" access="public" returntype="void">
 		<cfscript>
-			var hours = val(getValue("hours",72));
-			var severity = getValue("severity");
-			var host = getValue("host");
-			var app = getValue("app");
 			var refreshSeconds = 60;
 			var appService = getService("app"); 
 
-			var criteria = structNew();
-			var resetCriteria = getValue("resetCriteria", false);
-
-			if(resetCriteria) {
-				structDelete(cookie,"criteria");
-				writeCookie("criteria","","now");
-			}
-			
-			if(structKeyExists(cookie,"criteria") and isJSON(cookie.criteria)) {
-				criteria = deserializeJSON(cookie.criteria);
-			}
-			
-			// make sure we have a complete criteria struct w/ default values
-			if(not isStruct(criteria)) criteria = structNew();
-			if(not structKeyExists(criteria,"numdays")) criteria.numDays = 1;
-			if(not structKeyExists(criteria,"applicationID")) criteria.applicationID = 0;
-			if(not structKeyExists(criteria,"hostID")) criteria.hostID = 0;
-			if(not structKeyExists(criteria,"severityID")) criteria.severityID = "_ALL_";
-			
-			// page params
-			numDays = getValue("numDays", criteria.numDays);
-			applicationID = getValue("applicationID", criteria.applicationID);
-			hostID = getValue("hostID", criteria.hostID);
-			severityID = getValue("severityID", criteria.severityID);
-
-			criteria = structNew();
-			criteria.numDays = numDays;
-			criteria.applicationID = applicationID;
-			criteria.hostID = hostID;
-			criteria.severityID = severityID;
-			writeCookie("criteria",serializeJSON(criteria),30);
-
 			try {
-				startDate = dateAdd("d", val(numDays) * -1, now());
-				qryApplications = appService.getApplications();
-				qryHosts = appService.getHosts();
-				qrySeverities = appService.getSeverities();
-						
-				searchArgs = {
-					searchTerm = "", 
-					startDate = startDate,
-					applicationID = criteria.applicationID,
-					hostID = criteria.hostID,
-					severityID = criteria.severityID
-				};
+				// prepare filters panel
+				prepareFilter();
 				
-				qryData = appService.searchEntries(argumentCollection = searchArgs);
+				// get current filters selected
+				criteria = getValue("criteria");
+				
+				qryData = appService.searchEntries(argumentCollection = criteria);
 
 				setValue("qryData",qryData);
 				setValue("refreshSeconds",refreshSeconds);
-				setValue("numDays", numDays);
-				setValue("applicationID", applicationID);
-				setValue("hostID", hostID);
-				setValue("severityID", severityID);
-				setValue("qryApplications", qryApplications);
-				setValue("qryHosts", qryHosts);
-				setValue("qrySeverities", qrySeverities);
 				setValue("pageTitle", "Dashboard");
 				setView("dashboard");
 
@@ -157,151 +107,46 @@
 
 	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
-			var criteria = structNew();
-			var resetCriteria = getValue("resetCriteria", false);
+			var refreshSeconds = 60;
+			var rowsPerPage = 20;
+			var appService = getService("app"); 
 
-			if(resetCriteria) {
-				structDelete(cookie,"criteria");
-				writeCookie("criteria","","now");
+			try {
+				// prepare filters panel
+				prepareFilter();
+				
+				// get current filters selected
+				var criteria = getValue("criteria");
+				
+				// perform search				
+				var qryEntries = appService.searchEntries(argumentCollection = criteria);
+	
+				// save the last entryID on a cookie, this allows to detect unread entries
+				var lastEntryID = arrayMax( listToArray( valueList(qryEntries.entryID) ) );
+				if(not structKeyExists(cookie,"lastbugread")) {
+					writeCookie("lastbugread",lastEntryID,30);
+				}
+				setValue("lastbugread", cookie.lastbugread);
+	
+				// set the page title to reflect any recenly received messages
+				if(lastEntryID gt cookie.lastbugread) 
+					setValue("pageTitle", "Summary (#lastEntryID-cookie.lastbugread#)");
+				else
+					setValue("pageTitle", "Summary");
+					
+				// perform grouping for summary display
+				qryEntries = appService.applyGroupings(qryEntries, criteria.groupByApp, criteria.groupByHost);
+	
+				setValue("qryEntries", qryEntries);
+				setValue("refreshSeconds",refreshSeconds);
+				setValue("rowsPerPage",rowsPerPage);
+				setView("main");
+
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
 			}
-			
-			if(structKeyExists(cookie,"criteria") and isJSON(cookie.criteria)) {
-				criteria = deserializeJSON(cookie.criteria);
-			}
-			
-			// make sure we have a complete criteria struct w/ default values
-			if(not isStruct(criteria)) criteria = structNew();
-			if(not structKeyExists(criteria,"numdays")) criteria.numDays = 1;
-			if(not structKeyExists(criteria,"searchTerm")) criteria.searchTerm = "";
-			if(not structKeyExists(criteria,"applicationID")) criteria.applicationID = 0;
-			if(not structKeyExists(criteria,"hostID")) criteria.hostID = 0;
-			if(not structKeyExists(criteria,"severityID")) criteria.severityID = "_ALL_";
-			if(not structKeyExists(criteria,"search_cfid")) criteria.search_cfid = "";
-			if(not structKeyExists(criteria,"search_cftoken")) criteria.search_cftoken = "";
-			if(not structKeyExists(criteria,"enddate")) criteria.enddate = "1/1/3000";
-			if(not structKeyExists(criteria,"groupByApp")) criteria.groupByApp = true;
-			if(not structKeyExists(criteria,"groupByHost")) criteria.groupByHost = true;
-			if(not structKeyExists(criteria,"searchHTMLReport")) criteria.searchHTMLReport = false;
-			
-			
-			// page params
-			numDays = getValue("numDays", criteria.numDays);
-			searchTerm = getValue("searchTerm", criteria.searchTerm);
-			applicationID = getValue("applicationID", criteria.applicationID);
-			hostID = getValue("hostID", criteria.hostID);
-			severityID = getValue("severityID", criteria.severityID);
-			search_cfid = getValue("search_cfid", criteria.search_cfid);
-			search_cftoken = getValue("search_cftoken", criteria.search_cftoken);
-			endDate = getValue("endDate", criteria.enddate);
-			searchHTMLReport = getValue("searchHTMLReport", criteria.searchHTMLReport);
-
-			groupByApp = getValue("groupByApp", criteria.groupByApp);
-			groupByHost = getValue("groupByHost", criteria.groupByHost);
-
-			// calculate how far back to query the data
-			startDate = dateAdd("d", val(numDays) * -1, now());
-							
-			// perform search				
-			qryEntries = getService("app").searchEntries(searchTerm, applicationID, hostID, severityID, startDate, endDate, search_cfid, search_cftoken, searchHTMLReport);
-
-			// set some default values			
-			if(applicationID neq "" and Not isNumeric(applicationID)) setValue("applicationID", qryEntries.applicationID);
-			if(hostID neq "" and Not isNumeric(hostID)) setValue("hostID", qryEntries.hostID);
-			
-			// save the last entryID on a cookie, this allows to detect unread entries
-			lastEntryID = arrayMax( listToArray( valueList(qryEntries.entryID) ) );
-			if(not structKeyExists(cookie,"lastbugread")) {
-				writeCookie("lastbugread",lastEntryID,30);
-			}
-			setValue("lastbugread", cookie.lastbugread);
-
-			// set the page title to reflect any recenly received messages
-			if(lastEntryID gt cookie.lastbugread) {
-				setValue("applicationTitle", getValue("applicationTitle") & " (#lastEntryID-cookie.lastbugread#)");
-			}
-			
-			criteria = structNew();
-			criteria.numDays = numDays;
-			criteria.searchTerm = searchTerm;
-			criteria.applicationID = applicationID;
-			criteria.hostID = hostID;
-			criteria.severityID = severityID;
-			criteria.search_cfid = search_cfid;
-			criteria.search_cftoken = search_cftoken;
-			criteria.enddate = enddate;
-			criteria.groupByApp = groupByApp;
-			criteria.groupByHost = groupByHost;
-			criteria.searchHTMLReport = searchHTMLReport;
-			writeCookie("criteria",serializeJSON(criteria),30);
-		</cfscript>
-			
-		<!--- perform grouping for summary display --->	
-		<cfquery name="qryEntries" dbtype="query">
-			SELECT <cfif groupByApp>
-						ApplicationCode, ApplicationID, 
-					</cfif>
-					<cfif groupByHost>
-						HostName, HostID, 
-					</cfif>
-					Message, COUNT(*) AS bugCount, MAX(createdOn) as createdOn, MAX(entryID) AS EntryID, MAX(severityCode) AS SeverityCode
-				FROM qryEntries
-				GROUP BY 
-					<cfif groupByApp>
-						ApplicationCode, ApplicationID, 
-					</cfif>
-					<cfif groupByHost>
-						HostName, HostID, 
-					</cfif>
-					Message
-				ORDER BY createdOn DESC
-		</cfquery>
-		<cfset setValue("qryEntries", qryEntries)>	
-			
-		<!--- get the data for the filter dropdowns --->
-        <cfif groupByApp>
-            <cfquery name="qryApplications" dbtype="query">
-                SELECT DISTINCT applicationID, applicationCode FROM qryEntries ORDER BY applicationCode
-            </cfquery>
-        <cfelse>
-        	<cfset qryApplications = getService("app").getApplications()>
-            <cfquery name="qryApplications" dbtype="query">
-                SELECT applicationID, code as applicationCode, name FROM qryApplications ORDER BY code
-            </cfquery>
-        </cfif>
-
-		<cfif groupByHost>
-            <cfquery name="qryHosts" dbtype="query">
-                SELECT DISTINCT hostID, hostName FROM qryEntries ORDER BY hostName
-            </cfquery>
-        <cfelse>
-        	<cfset qryHosts = getService("app").getHosts()>
-            <cfquery name="qryHosts" dbtype="query">
-                SELECT hostID, hostName FROM qryHosts ORDER BY hostName
-            </cfquery>
-        </cfif>
-		
-		<cfset qrySeverities = getService("app").getSeverities()>
-		<cfquery name="qrySeverities" dbtype="query">
-			SELECT severityID, name FROM qrySeverities ORDER BY name
-		</cfquery>
-
-
-		<cfset setValue("numDays", numDays)>	
-		<cfset setValue("searchTerm", searchTerm)>	
-		<cfset setValue("applicationID", applicationID)>	
-		<cfset setValue("hostID", hostID)>	
-		<cfset setValue("severityID", severityID)>	
-		<cfset setValue("search_cfid", search_cfid)>	
-		<cfset setValue("search_cftoken", search_cftoken)>	
-		<cfset setValue("endDate", endDate)>	
-		<cfset setValue("searchHTMLReport", searchHTMLReport)>	
-		<cfset setValue("groupByApp", groupByApp)>	
-		<cfset setValue("groupByHost", groupByHost)>	
-		<cfset setValue("qryApplications", qryApplications)>	
-		<cfset setValue("qryHosts", qryHosts)>	
-		<cfset setValue("qrySeverities", qrySeverities)>	
-		<cfset setValue("pageTitle", "Summary")>
-		<cfset setView("main")>
+		</cfscript>				
 	</cffunction>
 	
 	<cffunction name="log" access="public" returntype="void">
@@ -558,6 +403,86 @@
 		<cfargument name="value" type="string">
 		<cfargument name="expires" type="string">
 		<cfcookie name="#arguments.name#" value="#arguments.value#" expires="#arguments.expires#">
+	</cffunction>
+	
+	<cffunction name="prepareFilter" access="private">
+		<cfscript>
+			var criteria = structNew();
+			var resetCriteria = getValue("resetCriteria", false);
+			var appService = getService("app"); 
+
+			if(resetCriteria) {
+				structDelete(cookie,"criteria");
+				writeCookie("criteria","","now");
+			}
+			
+			if(structKeyExists(cookie,"criteria") and isJSON(cookie.criteria)) {
+				criteria = deserializeJSON(cookie.criteria);
+			}
+			
+			// make sure we have a complete criteria struct w/ default values
+			if(not isStruct(criteria)) criteria = structNew();
+			if(not structKeyExists(criteria,"numdays")) criteria.numDays = 1;
+			if(not structKeyExists(criteria,"searchTerm")) criteria.searchTerm = "";
+			if(not structKeyExists(criteria,"applicationID")) criteria.applicationID = 0;
+			if(not structKeyExists(criteria,"hostID")) criteria.hostID = 0;
+			if(not structKeyExists(criteria,"severityID")) criteria.severityID = "_ALL_";
+			if(not structKeyExists(criteria,"search_cfid")) criteria.search_cfid = "";
+			if(not structKeyExists(criteria,"search_cftoken")) criteria.search_cftoken = "";
+			if(not structKeyExists(criteria,"enddate")) criteria.enddate = "1/1/3000";
+			if(not structKeyExists(criteria,"groupByApp")) criteria.groupByApp = true;
+			if(not structKeyExists(criteria,"groupByHost")) criteria.groupByHost = true;
+			if(not structKeyExists(criteria,"searchHTMLReport")) criteria.searchHTMLReport = false;
+			
+			criteria = {
+				numDays = getValue("numDays", criteria.numDays),
+				searchTerm = getValue("searchTerm", criteria.searchTerm),
+				applicationID = getValue("applicationID", criteria.applicationID),
+				hostID = getValue("hostID", criteria.hostID),
+				severityID = getValue("severityID", criteria.severityID),
+				search_cfid = getValue("search_cfid", criteria.search_cfid),
+				search_cftoken = getValue("search_cftoken", criteria.search_cftoken),
+				enddate = getValue("endDate", criteria.enddate),
+				groupByApp = getValue("groupByApp", criteria.groupByApp),
+				groupByHost = getValue("groupByHost", criteria.groupByHost),
+				searchHTMLReport = getValue("searchHTMLReport", criteria.searchHTMLReport)
+			};
+
+			// calculate how far back to query the data
+			criteria.startDate = dateAdd("d", val(criteria.numDays) * -1, now());
+
+			// write cookie back
+			writeCookie("criteria",serializeJSON(criteria),30);
+
+			qryApplications = appService.getApplications();
+			qryHosts = appService.getHosts();
+			qrySeverities = appService.getSeverities();
+
+			// validate the application code
+			if(criteria.applicationID eq "") criteria.applicationID = 0;
+			if(criteria.applicationID neq 0 and criteria.applicationID neq "") {
+				if(not listfindnocase(valuelist(qryApplications.applicationID), criteria.applicationID)
+					and not listfindnocase(valuelist(qryApplications.code), criteria.applicationID)) {
+					setMessage("warning","The given application does not exist.");
+					criteria.applicationID = 0;
+				}
+			}
+
+			// validate the host code
+			if(criteria.hostID eq "") criteria.hostID = 0;
+			if(criteria.hostID neq 0 and criteria.hostID neq "") {
+				if(not listfindnocase(valuelist(qryHosts.hostID), criteria.hostID)
+					and not listfindnocase(valuelist(qryHosts.hostName), criteria.hostID)) {
+					setMessage("warning","The given host does not exist.");
+					criteria.hostID = 0;
+				}
+			}
+
+			setValue("criteria", criteria);
+			setValue("qryApplications", qryApplications);
+			setValue("qryHosts", qryHosts);
+			setValue("qrySeverities", qrySeverities);
+		</cfscript>
 	</cffunction>
 	
 </cfcomponent>

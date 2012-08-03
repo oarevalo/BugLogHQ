@@ -349,6 +349,36 @@
 		<cfreturn variables.config>
 	</cffunction>	
 
+	<cffunction name="applyGroupings" access="public" returntype="query" hint="perform grouping for summary display">
+		<cfargument name="qryEntries" required="true" type="query">
+		<cfargument name="groupByApp" required="true" type="boolean">
+		<cfargument name="groupByHost" required="true" type="boolean">
+		<cfset var qry = 0>
+		<cfquery name="qry" dbtype="query">
+			SELECT <cfif arguments.groupByApp>
+						ApplicationCode, ApplicationID, 
+					</cfif>
+					<cfif arguments.groupByHost>
+						HostName, HostID, 
+					</cfif>
+					Message, 
+					COUNT(entryID) AS bugCount, 
+					MAX(createdOn) as createdOn, 
+					MAX(entryID) AS EntryID, 
+					MAX(severityCode) AS SeverityCode
+				FROM arguments.qryEntries
+				GROUP BY 
+					<cfif arguments.groupByApp>
+						ApplicationCode, ApplicationID, 
+					</cfif>
+					<cfif arguments.groupByHost>
+						HostName, HostID, 
+					</cfif>
+					Message
+				ORDER BY createdOn DESC
+		</cfquery>
+		<cfreturn qry>
+	</cffunction>
 
 
 	<!----- Extensions ----->	

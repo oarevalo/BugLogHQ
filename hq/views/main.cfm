@@ -1,47 +1,22 @@
 <!--- vwHome.cfm --->
 
-<!--- values sent from the event handler --->
-<cfparam name="request.requestState.qryEntries" default="#queryNew('')#">
-<cfparam name="request.requestState.refreshSeconds" default="60">
-<cfparam name="request.requestState.rowsPerPage" default="20">
-<cfparam name="request.requestState.searchTerm" default="">
-<cfparam name="request.requestState.applicationID" default="0">
-<cfparam name="request.requestState.hostID" default="0">
-<cfparam name="request.requestState.numDays" default="1">
-<cfparam name="request.requestState.groupByApp" default="true">
-<cfparam name="request.requestState.groupByHost" default="true">
-<cfparam name="request.requestState.qryApplications" default="#queryNew('')#">
-<cfparam name="request.requestState.qryHosts" default="#queryNew('')#">
-<cfparam name="request.requestState.qrySeverities" default="#queryNew('')#">
-<cfparam name="request.requestState.severityID" default="_ALL_">
-<cfparam name="request.requestState.searchHTMLReport" default="false">
-<cfparam name="request.requestState.assetsPath" default="">
-
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
 <cfparam name="sortBy" default="">
 <cfparam name="sortDir" default="ASC">
 
-<cfset qryEntries = request.requestState.qryEntries>
-<cfset rowsPerPage = request.requestState.rowsPerPage>
-<cfset refreshSeconds = request.requestState.refreshSeconds>
-<cfset lastbugread = request.requestState.lastbugread>
-<cfset searchTerm = request.requestState.searchTerm>
-<cfset applicationID = request.requestState.applicationID>
-<cfset hostID = request.requestState.hostID>
-<cfset numDays = request.requestState.numDays>
-<cfset groupByApp = request.requestState.groupByApp>
-<cfset groupByHost = request.requestState.groupByHost>
-<cfset qryApplications = request.requestState.qryApplications>
-<cfset qryHosts = request.requestState.qryHosts>
-<cfset qrySeverities = request.requestState.qrySeverities>
-<cfset severityID = request.requestState.severityID>
-<cfset searchHTMLReport = request.requestState.searchHTMLReport>
-<cfset dateFormatMask = request.requestState.dateFormatMask>
-<cfset assetsPath = request.requestState.assetsPath>
+<cfset qryEntries = rs.qryEntries>
+<cfset rowsPerPage = rs.rowsPerPage>
+<cfset refreshSeconds = rs.refreshSeconds>
+<cfset lastbugread = rs.lastbugread>
+<cfset dateFormatMask = rs.dateFormatMask>
+<cfset assetsPath = rs.assetsPath>
+
+<cfset groupByApp = rs.criteria.groupByApp>
+<cfset groupByHost = rs.criteria.groupByHost>
 
 <!--- base URL for reloading --->
-<cfset pageURL = "index.cfm?event=main&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#urlEncodedFormat(searchTerm)#&groupByApp=#groupByApp#&groupByHost=#groupByHost#&numDays=#numDays#&severityID=#severityID#&searchHTMLReport=#searchHTMLReport#">
+<cfset pageURL = "index.cfm?event=main">
 
 <!--- setup variables for paging records --->
 <cfset numPages = ceiling(qryEntries.recordCount / rowsPerPage)>
@@ -99,104 +74,7 @@
 				
 				
 	<!--- Search Criteria / Filters --->			
-	<form name="frmSearch" action="index.cfm" method="get" style="margin:0px;padding-top:10px;">
-		<input type="hidden" name="groupByApp" value="#groupByApp#">
-		<input type="hidden" name="groupByHost" value="#groupByHost#">
-		<input type="hidden" name="searchHTMLReport" value="#searchHTMLReport#">
-		<input type="hidden" name="event" value="main">
-		
-		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
-			<tr align="center">
-				<td>
-					Show for last: &nbsp;&nbsp;
-					<select name="numDays" style="width:100px;" onchange="doSearch()">
-						<option value="1" <cfif numDays eq 1>selected</cfif>>24 hours</option>
-						<option value="7" <cfif numDays eq 7>selected</cfif>>7 days</option>
-						<option value="30" <cfif numDays eq 30>selected</cfif>>30 days</option>
-						<option value="60" <cfif numDays eq 60>selected</cfif>>60 days</option>
-						<option value="120" <cfif numDays eq 120>selected</cfif>>120 days</option>
-						<option value="360" <cfif numDays eq 360>selected</cfif>>360 days</option>
-					</select>				
-				</td>
-				<td>
-					<span <cfif searchTerm neq "">style="color:red;"</cfif>>Search:</span> &nbsp;&nbsp;
-					<input type="text" name="searchTerm" value="#searchTerm#" style="width:200px;" onchange="doSearch()">
-					<div style="font-size:10p;">
-						<input type="checkbox" 
-								name="searchHTMLReportChk" 
-								id="searchHTMLReportChk" 
-								value="true"
-								onclick="doSearch()" 
-								<cfif searchHTMLReport>checked</cfif>>
-						Search HTML Report content
-					</div>
-				</td>
-				<td>
-					<span <cfif applicationID gt 0>style="color:red;"</cfif>>Application:</span> &nbsp;&nbsp;
-					<select name="applicationID" style="width:200px;" onchange="doSearch()">
-						<option value="0">All</option>
-						<cfset tmp = applicationID>
-						<cfset found = false>
-						<cfloop query="qryApplications">
-							<option value="#qryApplications.applicationID#" <cfif qryApplications.applicationID eq tmp>selected</cfif>>#qryApplications.applicationCode#</option>
-							<cfif qryApplications.applicationID eq tmp>
-								<cfset found = true>
-							</cfif>
-						</cfloop>
-						<cfif applicationID gt 0 and not found>
-							<option value="0" selected>No Match Found</option>
-						</cfif>
-					</select>
-				</td>
-				<td>
-					<span <cfif hostID gt 0>style="color:red;"</cfif>>Host:</span> &nbsp;&nbsp;
-					<select name="hostID" style="width:200px;" onchange="doSearch()">
-						<option value="0">All</option>
-						<cfset tmp = hostID>
-						<cfset found = false>
-						<cfloop query="qryHosts">
-							<option value="#qryHosts.hostID#" <cfif qryHosts.hostID eq tmp>selected</cfif>>#qryHosts.hostName#</option>
-							<cfif qryHosts.hostID eq tmp>
-								<cfset found = true>
-							</cfif>
-						</cfloop>
-						<cfif hostID gt 0 and not found>
-							<option value="0" selected>No Match Found</option>
-						</cfif>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="4" align="center">
-					<span <cfif severityID neq "_ALL_">style="color:red;"</cfif>>Severity:</span> &nbsp;&nbsp;
-					<cfset tmp = severityID>
-					<cfloop query="qrySeverities">
-						<cfset tmpImgName = "#rs.assetsPath#images/severity/#lcase(qrySeverities.name)#.png">
-						<cfset tmpDefImgName = "#rs.assetsPath#images/severity/default.png">
-
-						<input type="checkbox" 
-								onclick="doSearch()"
-								name="severityID" 
-								value="#qrySeverities.severityID#"
-								<cfif tmp eq "_ALL_" or listFind(tmp,qrySeverities.severityID)>checked</cfif>
-								>
-						<cfif fileExists(expandPath(tmpImgName))>
-							<img src="#tmpImgName#" 
-									alt="#lcase(qrySeverities.name)#" 
-									title="#lcase(qrySeverities.name)#">
-						<cfelse>
-							<img src="#tmpDefImgName#" 
-									alt="#lcase(qrySeverities.name)#" 
-									title="#lcase(qrySeverities.name)#">
-						</cfif>
-						 #lcase(qrySeverities.name)#
-						&nbsp;&nbsp;&nbsp;
-					</cfloop>
-				</td>
-			</tr>
-		</table>
-	</form>
-
+	<cfinclude template="../includes/filters.cfm">
 
 
 	<!--- Data table --->
