@@ -151,60 +151,53 @@
 	
 	<cffunction name="log" access="public" returntype="void">
 		<cfscript>
-			// page params
-			searchTerm = getValue("searchTerm","");
-			msgFromEntryID = getValue("msgFromEntryID",0);
-			applicationID = getValue("applicationID",0);
-			hostID = getValue("hostID",0);
-			severityID = getValue("severityID",0);
-			startDate = getValue("startDate","1/1/1800");
-			endDate = getValue("endDate","1/1/3000");
-			search_cfid = getValue("search_cfid","");
-			search_cftoken = getValue("search_cftoken","");
-							
-			// if we are passing an entryID, then get the message from there
-			if(searchTerm eq "" and val(msgFromEntryID) gt 0) {
-				oEntry = getService("app").getEntry( msgFromEntryID );
-				searchTerm = oEntry.getMessage();
-				setValue("searchTerm", searchTerm);
-			} else {
-				setValue("msgFromEntryID", "");
-			}
-							
-			// perform search				
-			qryEntries = getService("app").searchEntries(searchTerm, applicationID, hostID, severityID, startDate, endDate, search_cfid, search_cftoken);
-			setValue("qryEntries", qryEntries);
-			
-			if(applicationID neq "" and Not isNumeric(applicationID)) setValue("applicationID", qryEntries.applicationID);
-			if(hostID neq "" and Not isNumeric(hostID)) setValue("hostID", qryEntries.hostID);
-			
-			// save the last entryID on a cookie, this allows to detect unread entries
-			lastEntryID = arrayMax( listToArray( valueList(qryEntries.entryID) ) );
-			if(not structKeyExists(cookie,"lastbugread")) {
-				cookie.lastbugread = lastEntryID;
-			}
-			setValue("lastbugread", cookie.lastbugread);
+			var refreshSeconds = 60;
+			var rowsPerPage = 20;
+			var appService = getService("app"); 
 
-			// set the page title to reflect any recenly received messages
-			if(lastEntryID gt cookie.lastbugread) {
-				setValue("applicationTitle", getValue("applicationTitle") & " (#lastEntryID-cookie.lastbugread#)");
+			try {
+				// prepare filters panel
+				prepareFilter();
+				
+				// get current filters selected
+				var criteria = getValue("criteria");
+
+				// if we are passing an entryID, then get the message from there
+				msgFromEntryID = getValue("msgFromEntryID",0);
+				if(criteria.searchTerm eq "" and val(msgFromEntryID) gt 0) {
+					oEntry = getService("app").getEntry( msgFromEntryID );
+					criteria.searchTerm = oEntry.getMessage();
+					setValue("criteria", criteria);
+				} else {
+					setValue("msgFromEntryID", "");
+				}
+				
+				// perform search				
+				var qryEntries = appService.searchEntries(argumentCollection = criteria);
+	
+				// save the last entryID on a cookie, this allows to detect unread entries
+				var lastEntryID = arrayMax( listToArray( valueList(qryEntries.entryID) ) );
+				if(not structKeyExists(cookie,"lastbugread")) {
+					writeCookie("lastbugread",lastEntryID,30);
+				}
+				setValue("lastbugread", cookie.lastbugread);
+	
+				// set the page title to reflect any recenly received messages
+				if(lastEntryID gt cookie.lastbugread) 
+					setValue("pageTitle", "Details View (#lastEntryID-cookie.lastbugread#)");
+				else
+					setValue("pageTitle", "Details View");
+					
+				setValue("qryEntries", qryEntries);
+				setValue("refreshSeconds",refreshSeconds);
+				setValue("rowsPerPage",rowsPerPage);
+				setView("log");
+
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
 			}
 		</cfscript>
-			
-		<!--- get the data for the filter dropdowns --->
-		<cfquery name="qryApplications" dbtype="query">
-			SELECT DISTINCT applicationID, applicationCode FROM qryEntries ORDER BY applicationCode
-		</cfquery>
-		<cfset setValue("qryApplications", qryApplications)>	
-
-		<cfquery name="qryHosts" dbtype="query">
-			SELECT DISTINCT hostID, hostName FROM qryEntries ORDER BY hostName
-		</cfquery>
-		<cfset setValue("qryHosts", qryHosts)>	
-
-		<cfset setValue("pageTitle", "Details View")>
-			
-		<cfset setView("log")>	
 	</cffunction>
 
 	<cffunction name="entry" access="public" returntype="void">

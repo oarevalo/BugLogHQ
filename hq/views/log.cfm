@@ -1,38 +1,18 @@
 <!--- vwLog.cfm --->
 
-<!--- values sent from the event handler --->
-<cfparam name="request.requestState.stInfo" default="structNew()">
-<cfparam name="request.requestState.qryEntries" default="#queryNew('')#">
-<cfparam name="request.requestState.refreshSeconds" default="60">
-<cfparam name="request.requestState.rowsPerPage" default="20">
-<cfparam name="request.requestState.searchTerm" default="">
-<cfparam name="request.requestState.applicationID" default="0">
-<cfparam name="request.requestState.hostID" default="0">
-<cfparam name="request.requestState.qryApplications" default="#queryNew('')#">
-<cfparam name="request.requestState.qryHosts" default="#queryNew('')#">
-<cfparam name="request.requestState.msgFromEntryID" default="">
-
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
 <cfparam name="sortBy" default="mydatetime">
 <cfparam name="sortDir" default="DESC">
 
-
-<cfset stInfo = request.requestState.stInfo>
-<cfset qryEntries = request.requestState.qryEntries>
-<cfset rowsPerPage = request.requestState.rowsPerPage>
-<cfset refreshSeconds = request.requestState.refreshSeconds>
-<cfset lastbugread = request.requestState.lastbugread>
-<cfset searchTerm = request.requestState.searchTerm>
-<cfset applicationID = request.requestState.applicationID>
-<cfset hostID = request.requestState.hostID>
-<cfset qryApplications = request.requestState.qryApplications>
-<cfset qryHosts = request.requestState.qryHosts>
-<cfset msgFromEntryID = request.requestState.msgFromEntryID>
-<cfset dateFormatMask = request.requestState.dateFormatMask>
+<cfset qryEntries = rs.qryEntries>
+<cfset rowsPerPage = rs.rowsPerPage>
+<cfset refreshSeconds = rs.refreshSeconds>
+<cfset lastbugread = rs.lastbugread>
+<cfset dateFormatMask = rs.dateFormatMask>
 
 <!--- base URL for reloading --->
-<cfset pageURL = "index.cfm?event=log&applicationID=#applicationID#&hostID=#hostID#&searchTerm=#urlEncodedFormat(searchTerm)#&msgFromEntryID=#msgFromEntryID#">
+<cfset pageURL = "index.cfm?event=log&msgFromEntryID=#rs.msgFromEntryID#">
 
 <!--- setup variables for paging records --->
 <cfset numPages = ceiling(qryEntries.recordCount / rowsPerPage)>
@@ -71,8 +51,14 @@
 		</cfif>
 		
 		<script type="text/javascript">
-			function search(term, appID, hostID) {
-				location.replace('index.cfm?event=log&applicationID='+appID+'&hostID='+hostID+'&searchTerm='+escape(term)+'&msgFromEntryID=#msgFromEntryID#');
+			function doSearch() {
+				var frm = document.frmSearch;
+				
+				frm.groupByApp.value = "#rs.criteria.groupByApp#";
+				frm.groupByHost.value = "#rs.criteria.groupByHost#";
+				frm.searchHTMLReport.value = document.getElementById("searchHTMLReportChk").checked;
+				
+				frm.submit();
 			}
 		</script>	
 	</cfoutput>
@@ -86,38 +72,7 @@
 	<cfinclude template="../includes/menu.cfm">
 				
 	<!--- Search Criteria / Filters --->			
-	<form name="frmSearch" action="index.cfm" method="post" style="margin:0px;padding-top:10px;">
-		<input type="hidden" name="event" value="log">
-		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
-			<tr align="center">
-				<td>
-					<span <cfif searchTerm neq "">style="color:red;"</cfif>>Search:</span> &nbsp;&nbsp;
-					<input type="text" name="searchTerm" value="#htmlEditFormat(searchTerm)#" style="width:200px;" onchange="search(this.value,#applicationID#,#hostID#)">
-				</td>
-				<td>
-					<span <cfif applicationID gt 0>style="color:red;"</cfif>>Application:</span> &nbsp;&nbsp;
-					<select name="applicationID" style="width:200px;" onchange="search('#jsStringFormat(searchTerm)#',this.value,#hostID#)">
-						<option value="0">All</option>
-						<cfset tmp = applicationID>
-						<cfloop query="qryApplications">
-							<option value="#qryApplications.applicationID#" <cfif qryApplications.applicationID eq tmp>selected</cfif>>#qryApplications.applicationCode#</option>
-						</cfloop>
-					</select>
-				</td>
-				<td>
-					<span <cfif hostID gt 0>style="color:red;"</cfif>>Host:</span> &nbsp;&nbsp;
-					<select name="hostID" style="width:200px;" onchange="search('#jsStringFormat(searchTerm)#',#applicationID#,this.value)">
-						<option value="0">All</option>
-						<cfset tmp = hostID>
-						<cfloop query="qryHosts">
-							<option value="#qryHosts.hostID#" <cfif qryHosts.hostID eq tmp>selected</cfif>>#qryHosts.hostName#</option>
-						</cfloop>
-					</select>
-				</td>
-			</tr>
-		</table>
-	</form>
-
+	<cfinclude template="../includes/filters.cfm">
 
 
 	<!--- Data table --->
@@ -213,6 +168,10 @@
 	<!--- Table Footer (paging controls) --->
 	<div style="font-size:10px;line-height:20px;margin-top:10px;font-weight:bold;">
 		<cfset pageURL = pageURL & "&sortBy=#sortBy#&sortDir=#sortDir#">
+		
+		<div style="float:right;width:150px;text-align:right;">
+			<a href="index.cfm?event=#rs.event#&resetCriteria=1">Reset Filters</a>
+		</div>
 		
 		Page #currPage# of #numPages#
 		&nbsp;&nbsp;&middot;&nbsp;&nbsp;

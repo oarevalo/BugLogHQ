@@ -130,6 +130,9 @@
 		</tr>
 	<cfloop query="qryEntries" startrow="#startRow#" endrow="#startRow+rowsPerPage-1#">
 		<cfset isNew = qryEntries.entryID gt lastbugread>
+		<cfif !structKeyExists(qryEntries,"bugCount")>
+			<cfset bugCount = 1>
+		</cfif>
 		<cfif bugCount gt 1>
 			<cfset zoomURL = "index.cfm?event=log&msgFromEntryID=#qryEntries.entryID#">
 			<cfif groupByApp>
@@ -181,7 +184,7 @@
 				title="Click for more details"
 				style="cursor:pointer;">#HtmlEditFormat(qryEntries.message)#</td>
 			<td class="cell_count" width="60" align="right">
-				#qryEntries.bugCount#
+				#bugCount#
 			</td>
 			<td class="cell_mostrecent" align="center" width="140">
 				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#DateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</a>)
@@ -201,7 +204,7 @@
 		<cfset pageURL = pageURL & "&sortBy=#sortBy#&sortDir=#sortDir#">
 		
 		<div style="float:right;width:150px;text-align:right;">
-			<a href="index.cfm?resetCriteria=1">Reset Filters</a>
+			<a href="index.cfm?event=#rs.event#&resetCriteria=1">Reset Filters</a>
 		</div>
 		
 		Page #currPage# of #numPages#
