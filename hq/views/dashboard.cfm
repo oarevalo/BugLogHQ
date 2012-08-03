@@ -148,20 +148,6 @@
 	
 	<!--- Dashboard --->
 	<br />
-	<cfinclude template="dashboard/bugs_by_severity.cfm">
-	<br />
-	<table width="100%" border="0">
-		<tr valign="top">
-			<td width="49%" align="center">
-				<cfinclude template="dashboard/bugs_by_app_severity.cfm">
-			</td>
-			<td>&nbsp;</td>
-			<td width="49%" align="center">
-				<cfinclude template="dashboard/bugs_by_host.cfm">
-			</td>
-		</tr>
-	</table>
-	<br /><br />
 	<cfinclude template="dashboard/bugs_by_msg.cfm">	
 	
 	<cfif rs.refreshSeconds gt 0>

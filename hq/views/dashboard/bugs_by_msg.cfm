@@ -17,11 +17,9 @@
 </div>
 <table style="border-bottom:1px solid ##333;width:95%;font-family: arial,sans-serif;" cellpadding="0" cellspacing="2" align="center">
 	<tr>
-		<th style="background-color:##90A4B5;line-height: 14px;color: ##FFFFFF;font-size:13px;padding:3px;">Severity</th>
-		<th style="background-color:##90A4B5;line-height: 14px;color: ##FFFFFF;font-size:13px;padding:3px;">Application</th>
-		<th style="background-color:##90A4B5;line-height: 14px;color: ##FFFFFF;font-size:13px;padding:3px;">Message (#min(qryListing.recordCount,maxRows)#)</th>
+		<th style="background-color:##90A4B5;line-height: 14px;color: ##FFFFFF;font-size:13px;padding:3px;">&nbsp;</th>
 		<th style="background-color:##90A4B5;line-height: 14px;color: ##FFFFFF;font-size:13px;padding:3px;">Count</th>
-		<th style="background-color:##90A4B5;line-height: 14px;color: ##FFFFFF;font-size:13px;padding:3px;">Most Recent</th>
+		<th style="background-color:##90A4B5;line-height: 14px;color: ##FFFFFF;font-size:13px;padding:3px;">Message (#min(qryListing.recordCount,maxRows)#)</th>
 	</tr>
 	<cfloop query="qryListing" endrow="#maxRows#">
 		<cfset tmpURL = "index.cfm?event=entry&entryID=#qryListing.EntryID#">
@@ -30,10 +28,17 @@
 			<td align="center" style="padding:3px;border-bottom:1px dotted silver;">
 				<img src="#tmpImgURL#" align="absmiddle" alt="#severityCode#" title="Click to see all bugs flagged as '#severityCode#'">
 			</td>
-			<td style="padding:3px;border-bottom:1px dotted silver;">#qryListing.applicationCode#</td>
-			<td style="padding:3px;border-bottom:1px dotted silver;">#qryListing.Message#</td>
-			<td align="right" style="padding:3px;border-bottom:1px dotted silver;">#qryListing.bugCount#</td>
-			<td align="center" style="padding:3px;border-bottom:1px dotted silver;"><a href="#tmpURL#">#dateFormat(qryListing.createdOn,dateMask)# #lsTimeFormat(qryListing.createdOn)#</a></td>
+			<td align="center" style="padding:3px;border-bottom:1px dotted silver;font-weight:bold;font-size:18px;">#qryListing.bugCount#</td>
+			<td style="padding:3px;border-bottom:1px dotted silver;">
+				<div style="font-weight:bold;margin-bottom:4px;">
+					#qryListing.Message#
+				</div>
+				<div style="font-size:11px;">
+					on #qryListing.applicationCode#
+					last received on
+					<a href="#tmpURL#">#dateFormat(qryListing.createdOn,dateMask)# #lsTimeFormat(qryListing.createdOn)#</a>
+				</div>
+			</td>
 		</tr>
 	</cfloop>
 	<cfif qryListing.recordCount eq 0>
