@@ -284,6 +284,8 @@
 						createdOn < NOW() - INTERVAL #purgeHistoryDays# DAY
 					<cfelseif dbType contains "mssql" or dbType eq "access">
 						DATEDIFF(day, createdOn, GETDATE()) > #purgeHistoryDays#
+					<cfelseif dbType EQ "pgsql">
+						createdOn < CURRENT_TIMESTAMP - INTERVAL '#purgeHistoryDays# days'
 					</cfif>
 			</cfoutput>
 		</cfsavecontent>

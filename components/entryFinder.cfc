@@ -102,6 +102,13 @@
 							datePart(hour, e.mydateTime) as entry_hour, 
 							datePart(minute, e.mydateTime) as entry_minute
 						</cfcase>
+						<cfcase value="pgsql">
+							date_part('year', e.mydateTime) as entry_year, 
+							date_part('month', e.mydateTime) as entry_month,
+							date_part('day', e.mydateTime) as entry_day,
+							date_part('hour', e.mydateTime) as entry_hour, 
+							date_part('minute', e.mydateTime) as entry_minute
+						</cfcase>
 						<cfdefaultcase>
 							year(e.mydateTime) as entry_year, 
 							month(e.mydateTime) as entry_month, 
