@@ -3,6 +3,10 @@
 	<cfset this.name = "bugLogMobile">
 	<cfset this.sessionManagement = true> 
 
+	<!--- create an application mapping to the main bugLog directory (parent dir of this template) --->
+	<cfset this.rootDir = GetDirectoryFromPath(GetDirectoryFromPath(GetCurrentTemplatePath()).ReplaceFirst( "[\\\/]{1}$", "" ))>
+	<cfset this.mappings[ "/bugLog" ] = left(this.rootDir,len(this.rootDir)-1)>
+
 	<cffunction name="onRequestStart" output="false">
 		<cfargument name="pageName" type="string" required="false" default="">
 		

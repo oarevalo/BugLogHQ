@@ -46,7 +46,8 @@ graph, forward, and explore the bug reports submitted by the applications. All b
 
 ### New in 1.6 (7/2012)
 * Support for "Named Instance" deployment. A Named Instance means that you can have multiple instances of BugLog running on the same server at the same time. Each instance have their own configuration and point to their own databases.
-* BugLog can now (optionally) run out-of-the-box on the web root! Just unpack and go.
+* BugLog can now (optionally) run out-of-the-box on any directory (even the webroot).
+* Added support for PostgreSQL (contributed by morgdenn)
 
 ### New in 1.5 (2/2011)
 * Extensions are now stored on a database instead of an XML file
@@ -127,9 +128,9 @@ To access the BugLogHQ interface, go to `/bugLog/` on your bugLog server; the in
 
 5. Installation and Usage Notes:
 --------------------------------------------------------------------------------------
-* To install BugLog just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be installed on a directory named /bugLog. If you want, you can also put BugLog directly on the web root.
+* To install BugLog just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be installed on a directory named /bugLog. If you want, you can also put BugLog directly on the web root or any other directory.
 
-**NOTE:** If you want to install bugLog directly on the web root, make sure to update the setting `general.externalURL` to the value "/" so that BugLog knows how to find itself.
+**NOTE:** If you want to install bugLog on a location other than the default (/bugLog/), you will need to update the setting `general.externalURL` with the path to where you installed BugLog. The path must always end with a "/". Examples: "/", "/mybuglog/", "/bugtrackingthingy/", etc.
 
 * Run the corresponding SQL script for your database. The script can be found in the `/install` directory. This will create the necessary tables.
 
@@ -140,7 +141,7 @@ To access the BugLogHQ interface, go to `/bugLog/` on your bugLog server; the in
 Change the `<setting />` tags for:
 
 	db.dsn:	datasource name as defined in the CF administrator (by default is bugLog)
-	db.dbtype: database type. Can be either mysql or mssql. The default is mysql
+	db.dbtype: database type. Can be mysql, mssql (for Microsot SQL Server) or pgsql (for PostgreSQL). The default is mysql
 	db.username: username for the datasource (if needed)
 	db.password: password for the datasource (if needed)
 	
@@ -149,9 +150,9 @@ Change the `<setting />` tags for:
 	username: admin
 	password: admin
 	
-**IMPORTANT:** To change the admin password or to create additional users click on the "Settings" link on 	the upper right corner of the screen.
+**IMPORTANT:** To change the admin password or to create additional users click on the "Settings" link on the upper right corner of the screen.
 
-**TIP:** Changing the setting `general.externalURL` in the main config you can tell BugLog the URL to use when referring to itself. By default buglog will try to guess it from the CGI scope, but in some cases you may want to override this. For example if you have a clustered deployment.
+**TIP:** Changing the setting `general.externalURL` in the main config you can tell BugLog the URL to use when referring to itself. By default buglog will try to guess it from the CGI scope, but in some cases you may want to override this. For example if you have a clustered deployment. This value can be either a relative path starting with "/", or a full URL (i.e. "http://www.someserver.com/bugLog/")
 
 ### TESTING AND VERIFICATION:
 After installation use your browser to go to `/bugLog/test` and follow the links to test both the client and server side of buglog.
@@ -204,6 +205,7 @@ Currently BugLogHQ supports the following databases:
 * Microsoft SQL Server 2000
 * Microsoft SQL Server 2005
 * Microsoft Access
+* PostgreSQL
 
 **IMPORTANT:** Make sure you enable CLOB/BLOB support on the CF datasource settings in the ColdFusion Administrator, otherwise your bug reports might get truncated.
 
@@ -215,6 +217,7 @@ Currently BugLogHQ supports the following databases:
 * Thanks to Tom DeManincor for creating the SQL script for MSSQL
 * Thanks to Chuck Weidler for updating and providing the SQL scripts for Access, MS SQL Server 2000, MSSQL Server 2005
 * Thanks to WST crew at Mentor Graphics for the great suggestions and ideas to improve BugLog
+* Thanks to Morgan Dennitor for adding support for PostgreSQL
 * Thanks to everyone that contributes code and patches to the project!
 
 

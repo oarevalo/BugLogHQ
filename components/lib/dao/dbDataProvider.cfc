@@ -172,6 +172,8 @@
 					)
 				<cfif dbtype eq "mssql">
 					SELECT SCOPE_IDENTITY() AS lastID	
+				<cfelseif dbtype eq "pgsql">
+					;SELECT lastval() AS lastID;
 				</cfif>
 			</cfquery>		
 
@@ -185,7 +187,7 @@
 				</cfquery>		
 			</cfif>
 			
-			<cfif not listFindnocase("mssql,mysql,msaccess", dbtype)>
+			<cfif not listFindnocase("mssql,mysql,msaccess,pgsql", dbtype)>
 				<cfthrow message="database type not supported for INSERT" type="dao.dbDataProvider.dbNotSupported">
 			</cfif>
 	

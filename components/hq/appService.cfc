@@ -284,6 +284,8 @@
 						createdOn < NOW() - INTERVAL #purgeHistoryDays# DAY
 					<cfelseif dbType contains "mssql" or dbType eq "access">
 						DATEDIFF(day, createdOn, GETDATE()) > #purgeHistoryDays#
+					<cfelseif dbType EQ "pgsql">
+						createdOn < CURRENT_TIMESTAMP - INTERVAL '#purgeHistoryDays# days'
 					</cfif>
 			</cfoutput>
 		</cfsavecontent>
@@ -509,4 +511,23 @@
 		<cfreturn href />
 	</cffunction>
 
+	<cffunction name="getLocalAssetsPath" access="public" returntype="string" hint="Returns the path to use locally within the HQ app to find html assets (js,images,css)">
+		<cfscript>
+			var path = "";
+			var externalURL = variables.config.getSetting("general.externalURL");
+			switch(externalURL) {
+				case "":
+				case "/bugLog/":
+					path = "/bugLog/hq/";
+					break;
+				case "/":
+					path = "/hq/";
+					break;
+				default:
+					path = externalURL & "hq/";
+			}
+			return path;
+		</cfscript>
+	</cffunction>
+	
 </cfcomponent>

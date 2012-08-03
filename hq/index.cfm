@@ -10,7 +10,6 @@
 <cfset app.paths.app = "/bugLog/hq">
 <cfset app.paths.core = "/bugLog/core">
 <cfset app.paths.coreImages = "../core/images">
-<cfset app.paths.html = "">
 
 <cfset app.dirs.handlers = "handlers">
 <cfset app.dirs.layouts = "layouts">
@@ -20,12 +19,6 @@
 <cfset app.defaultEvent = "dashboard">
 <cfset app.defaultLayout = "main">
 <cfset app.configDoc = "config/config.xml.cfm">
-
-
-<!--- For named instances, we must tell them where the html assets are located --->
-<cfif structKeyExists(request, "bugLogInstance")>
-	<cfset app.paths.html = "/bugLog/hq/">
-</cfif>
 
 
 <!--- Invoke controller --->
