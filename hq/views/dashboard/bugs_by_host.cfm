@@ -11,33 +11,33 @@
 </cfquery>
 
 <b>Breakdown By Host:</b>
-<table style="border-bottom:1px solid #333;font-family: arial,sans-serif;" cellpadding="0" cellspacing="2" border="1">
+<table class="browseTable" style="width:100%">	
 	<tr>
-		<th style="background-color:#90A4B5;line-height: 14px;color: #FFFFFF;font-size:13px;padding:3px;">Application</th>
-		<th style="background-color:#90A4B5;line-height: 14px;color: #FFFFFF;font-size:13px;padding:3px;">Host</th>
-		<th style="width:50px;background-color:#90A4B5;line-height: 14px;color: #FFFFFF;font-size:13px;padding:3px;">Count</th>
-		<th style="background-color:#90A4B5;line-height: 14px;color: #FFFFFF;font-size:13px;padding:3px;">Most Recent</th>
+		<th>Application</th>
+		<th>Host</th>
+		<th style="width:50px;">Count</th>
+		<th>Most Recent</th>
 	</tr>
 	<cfset prevAppCode = "">
 	<cfoutput query="qrySummary">
-		<tr valign="top" style="line-height:12px;color:##333;font-size:12px;<cfif currentRow mod 2>background-color:##F6F6F6;</cfif>">
+		<tr <cfif qrySummary.currentRow mod 2>class="altRow"</cfif>>
 			<cfif applicationCode eq prevAppCode>
-				<td style="padding:3px;border:1px dotted silver;">&nbsp;</td>
+				<td>&nbsp;</td>
 			<cfelse>
-				<td style="padding:3px;border:1px dotted silver;">
-					<cfset tmpURL = "index.cfm?applicationID=#ApplicationID#">
+				<td>
+					<cfset tmpURL = "index.cfm?event=main&applicationID=#ApplicationID#">
 					<a href="#tmpURL#">#ApplicationCode#</a>
 				</td>
 			</cfif>
-			<td style="padding:3px;border:1px dotted silver;" align="center">
-				<cfset tmpURL = "index.cfm?applicationID=#ApplicationID#&hostID=#hostID#">
+			<td align="center">
+				<cfset tmpURL = "index.cfm?event=main&applicationID=#ApplicationID#&hostID=#hostID#">
 				<a href="#tmpURL#">#hostName#</a>
 			</td>
-			<td style="padding:3px;border:1px dotted silver;padding-right:10px;" align="right">
+			<td align="right">
 				<cfset tmpURL = "index.cfm?event=log&msgFromEntryID=#EntryID#&applicationID=#ApplicationID#&hostID=#hostID#">
 				<a href="#tmpURL#">#bugCount#</a>
 			</td>
-			<td style="padding:3px;border:1px dotted silver;" align="center">
+			<td align="center">
 				<cfset tmpURL = "index.cfm?event=entry&entryID=#EntryID#">
 				<a href="#tmpURL#">#dateFormat(createdOn,dateMask)# #lsTimeFormat(createdOn)#</a>
 			</td>

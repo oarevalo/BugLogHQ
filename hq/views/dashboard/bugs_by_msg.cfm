@@ -1,4 +1,4 @@
-<cfset maxRows = 50>
+<cfset maxRows = 10>
 <cfset sortField = "bugCount">
 <cfquery name="qryListing" dbtype="query">
 	SELECT ApplicationCode, ApplicationID, 
@@ -19,12 +19,12 @@
 <table class="browseTable" style="width:100%">	
 	<tr>
 		<th style="width:15px;">&nbsp;</th>
-		<th style="width:40px;">Count</th>
+		<th style="width:35px;">Count</th>
 		<th>Message (#min(qryListing.recordCount,maxRows)#)</th>
 	</tr>
 	<cfloop query="qryListing" endrow="#maxRows#">
 		<cfset tmpEntryURL = "index.cfm?event=entry&entryID=#qryListing.EntryID#">
-		<cfset tmpAppURL = "index.cfm?event=log&applicationID=#qryListing.applicationID#">
+		<cfset tmpAppURL = "index.cfm?event=main&applicationID=#qryListing.applicationID#">
 		<cfset tmpMsgURL = "index.cfm?event=log&applicationID=#qryListing.applicationID#&msgFromEntryID=#qryListing.EntryID#">
 		<cfset tmpImgURL = getSeverityIconURL(severityCode)>
 		<tr <cfif qryListing.currentRow mod 2>class="altRow"</cfif>>
@@ -36,7 +36,7 @@
 				<div style="font-weight:bold;font-size:14px;">
 					#qryListing.Message#
 				</div>
-				<div style="font-size:11px;">
+				<div style="font-size:12px;margin-top:3px;">
 					on <a href="#tmpAppURL#">#qryListing.applicationCode#</a>
 					last received on
 					<a href="#tmpEntryURL#">#dateFormat(qryListing.createdOn,dateMask)# #lsTimeFormat(qryListing.createdOn)#</a>

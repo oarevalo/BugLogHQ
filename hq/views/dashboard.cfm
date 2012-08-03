@@ -27,7 +27,21 @@
 	
 	<!--- Dashboard --->
 	<br />
-	<cfinclude template="dashboard/bugs_by_msg.cfm">	
+	<table width="100%">
+		<tr valign="top">
+			<td width="50%">
+				<cfinclude template="dashboard/bugs_by_msg.cfm">	
+			</td>
+			<td style="width:20px;">&nbsp;</td>
+			<td align="center">
+				<cfinclude template="dashboard/bugs_by_severity.cfm">
+				<br /><br />
+				<cfinclude template="dashboard/bugs_by_host.cfm">
+				<br /><br />
+				<cfinclude template="dashboard/bugs_by_app_severity.cfm">	
+			</td>
+		</tr>
+	</table>
 
 	<div style="font-size:10px;margin-top:10px">
 		<div style="float:right;width:150px;text-align:right;">
