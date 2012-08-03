@@ -1,31 +1,61 @@
 
+
+SET CONSTRAINTS ALL DEFERRED;
+
+--
+-- Definition of table bl_Application
+--
+
+
+DROP TABLE IF EXISTS bl_Application;
 CREATE TABLE bl_Application (
   ApplicationID SERIAL,
   Code varchar(100) NOT NULL,
   Name varchar(250) NOT NULL,
   CONSTRAINT bl_Application_pkey PRIMARY KEY (ApplicationID),
   CONSTRAINT bl_Application_Code_unique UNIQUE (Code)
-)
+) ;
 
+--
+-- Definition of table bl_Host
+--
+
+DROP TABLE IF EXISTS bl_Host;
 CREATE TABLE bl_Host (
   HostID SERIAL,
   HostName varchar(255) NOT NULL,
   CONSTRAINT bl_Host_pkey PRIMARY KEY (HostID)
-)
+) ;
 
+--
+-- Definition of table bl_Severity
+--
+
+DROP TABLE IF EXISTS bl_Severity;
 CREATE TABLE  bl_Severity (
   SeverityID SERIAL,
   Name varchar(250) NOT NULL,
   Code varchar(10) NOT NULL,
   CONSTRAINT bl_Severity_pkey PRIMARY KEY (SeverityID)
-)
+) ;
 
+
+--
+-- Definition of table bl_Source
+--
+
+DROP TABLE IF EXISTS bl_Source;
 CREATE TABLE  bl_Source (
   sourceID SERIAL,
   Name varchar(255) NOT NULL,
-  CONSTRAINT bl_Source_pkey PRIMARY KEY (sourceID)
-)
+  CONSTRAINT bl_Source_pkey PRIMARY KEY ( sourceID )
+) ;
 
+--
+-- Definition of table bl_Entry
+--
+
+DROP TABLE IF EXISTS bl_Entry;
 CREATE TABLE bl_Entry (
   EntryID SERIAL,
   myDateTime TIMESTAMP NOT NULL,
@@ -43,8 +73,13 @@ CREATE TABLE bl_Entry (
   HTMLReport TEXT,
   createdOn TIMESTAMP NOT NULL DEFAULT now(),
   CONSTRAINT bl_Entry_pkey PRIMARY KEY (EntryID)
-) 
+);
 
+--
+-- Table structure for table bl_User
+--
+
+DROP TABLE IF EXISTS bl_User;
 CREATE TABLE bl_User (
   UserID SERIAL,
   Username varchar(255) NOT NULL,
@@ -52,11 +87,21 @@ CREATE TABLE bl_User (
   IsAdmin INTEGER NOT NULL default 0,
   Email varchar(255) NULL,
   CONSTRAINT bl_User_pkey PRIMARY KEY (UserID)
-) 
+) ;
 
-INSERT INTO bl_User (UserID,Username,Password,IsAdmin) VALUES (1,'admin','admin',1);
+--
+-- Insert data for table bl_User
+--
+
+INSERT INTO bl_User (Username,Password,IsAdmin) VALUES ('admin','admin',1);
 
 
+--
+-- Table structure for table bl_Extension
+--
+
+
+DROP TABLE IF EXISTS bl_Extension;
 CREATE TABLE bl_Extension (
   ExtensionID SERIAL,
   name varchar(255) NOT NULL,
@@ -67,4 +112,7 @@ CREATE TABLE bl_Extension (
   createdBy INTEGER NULL,
   createdOn TIMESTAMP NOT NULL DEFAULT now(),
   CONSTRAINT bl_Extension_pkey PRIMARY KEY (ExtensionID)
-)
+) ;
+
+
+
