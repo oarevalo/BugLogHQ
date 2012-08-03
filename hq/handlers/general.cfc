@@ -470,7 +470,7 @@
 			var password = "";
 			var userID = 0;
 			var nextEvent = getValue("nextEvent");
-			var qs = replaceNoCase(cgi.QUERY_STRING,"event=doLogin","");
+			var qs = "";
 
 			try {
 				username = getValue("username","");
@@ -478,7 +478,7 @@
 				
 				if(username eq "") throw("Please enter your username");		
 				if(password eq "") throw("Please enter your password");
-				if(nextEvent eq "") nextEvent = "main";
+				if(nextEvent eq "") nextEvent = "";
 				
 				userID = getService("app").checkLogin(username, password);
 				if(userID eq 0) throw("Invalid username/password combination");
@@ -489,6 +489,17 @@
 					session.requirePasswordChange = true;
 					setMessage("warning","Please update your password");
 					setNextEvent("updatePassword");
+				}
+
+				// build new query string
+				var parts = listToArray(cgi.QUERY_STRING,"&");
+				var paramName = "";
+				var paramValue = "";
+				for(var i=1;i lte arrayLen(parts);i++) {
+					paramName = listFirst(parts[i],"=");
+					paramValue = listLast(parts[i],"=");
+					if(paramName neq "event" and paramName neq "resetapp" and paramName neq "nextevent")
+						qs = listAppend(qs, paramName & "=" & paramValue, "&");
 				}
 
 				setNextEvent(nextEvent,qs);
