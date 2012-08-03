@@ -33,13 +33,15 @@
 					<span <cfif rs.criteria.searchTerm neq "">style="color:red;"</cfif>>Search:</span> &nbsp;&nbsp;
 					<input type="text" name="searchTerm" value="#rs.criteria.searchTerm#" style="width:200px;" onchange="doSearch()">
 					<div style="font-size:10p;">
-						<input type="checkbox" 
-								name="searchHTMLReportChk" 
-								id="searchHTMLReportChk" 
-								value="true"
-								onclick="doSearch()" 
-								<cfif rs.criteria.searchHTMLReport>checked</cfif>>
-						Search HTML Report content
+						<label>
+							<input type="checkbox" 
+									name="searchHTMLReportChk" 
+									id="searchHTMLReportChk" 
+									value="true"
+									onclick="doSearch()" 
+									<cfif rs.criteria.searchHTMLReport>checked</cfif>>
+							Search HTML Report content
+						</label>
 					</div>
 				</td>
 				<td>
@@ -84,22 +86,24 @@
 						<cfset tmpImgName = "#rs.assetsPath#images/severity/#lcase(rs.qrySeverities.name)#.png">
 						<cfset tmpDefImgName = "#rs.assetsPath#images/severity/default.png">
 
-						<input type="checkbox" 
-								onclick="doSearch()"
-								name="severityID" 
-								value="#rs.qrySeverities.severityID#"
-								<cfif rs.criteria.severityID eq "_ALL_" or listFind(rs.criteria.severityID, rs.qrySeverities.severityID)>checked</cfif>
-								>
-						<cfif fileExists(expandPath(tmpImgName))>
-							<img src="#tmpImgName#" 
-									alt="#lcase(rs.qrySeverities.name)#" 
-									title="#lcase(rs.qrySeverities.name)#">
-						<cfelse>
-							<img src="#tmpDefImgName#" 
-									alt="#lcase(rs.qrySeverities.name)#" 
-									title="#lcase(rs.qrySeverities.name)#">
-						</cfif>
-						 #lcase(rs.qrySeverities.name)#
+						<label>
+							<input type="checkbox" 
+									onclick="doSearch()"
+									name="severityID" 
+									value="#rs.qrySeverities.severityID#"
+									<cfif rs.criteria.severityID eq "_ALL_" or listFind(rs.criteria.severityID, rs.qrySeverities.severityID)>checked</cfif>
+									>
+							<cfif fileExists(expandPath(tmpImgName))>
+								<img src="#tmpImgName#" 
+										alt="#lcase(rs.qrySeverities.name)#" 
+										title="#lcase(rs.qrySeverities.name)#">
+							<cfelse>
+								<img src="#tmpDefImgName#" 
+										alt="#lcase(rs.qrySeverities.name)#" 
+										title="#lcase(rs.qrySeverities.name)#">
+							</cfif>
+							 #lcase(rs.qrySeverities.name)#
+						</label>
 						&nbsp;&nbsp;&nbsp;
 					</cfloop>
 				</td>
