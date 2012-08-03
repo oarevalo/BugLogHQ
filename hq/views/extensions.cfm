@@ -48,7 +48,6 @@
 
 
 <cfoutput>
-<h2 style="margin-bottom:3px;">BugLog Rules</h2>
 <cfinclude template="../includes/menu.cfm">
 
 <p>

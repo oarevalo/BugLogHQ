@@ -11,6 +11,7 @@
 				setValue("hasExtensionsXMLFile", fileExists(expandPath(variables.extensionsXMLPath)));
 				setValue("aRules", aRules);
 				setValue("aActiveRules", aActiveRules);
+				setValue("pageTitle", "Rules");
 	
 				setView("extensions");
 
@@ -50,7 +51,8 @@
 					aActiveRules = app.getActiveRules();
 					setValue("aActiveRule", aActiveRules[index]);
 				}
-
+	
+				setValue("pageTitle", "Rules > Add/Edit Rule");
 				setView("rule");
 
 			} catch(validation e) {
@@ -91,6 +93,7 @@
 
 			setValue("logcontents", logcontents);
 			setValue("logsdir", logsdir);
+			setValue("pageTitle", "Rules > View Log");
 			setView("rulesLog");
 		</cfscript>
 	</cffunction>

@@ -31,7 +31,6 @@
 </cfquery>
 
 <cfoutput>
-	<h2 style="margin-bottom:3px;">BugLog RSS Feeds</h2>
 	<cfinclude template="../includes/menu.cfm">
 
 	<br><br>
@@ -48,7 +47,7 @@
 			<cfloop query="qryApplications">
 			<tr <cfif currentRow mod 2>class="altRow"</cfif>>
 				<td style="width:100px;"><strong>#code#</strong></td>
-				<td><a href="#rssFeedURL#&applicationID=#applicationID#">#rssFeedURL#&applicationID=#applicationID#</a></td>
+				<td><a href="#rssFeedURL#&applicationID=#applicationID#" target="_blank">#rssFeedURL#&applicationID=#applicationID#</a></td>
 			</tr>
 			</cfloop>
 			<tr><td colspan="2">&nbsp;</td></tr>
@@ -56,7 +55,7 @@
 			<cfloop query="qryHosts">
 			<tr <cfif currentRow mod 2>class="altRow"</cfif>>
 				<td style="width:100px;"><strong>#HostName#</strong></td>
-				<td><a href="#rssFeedURL#&hostID=#hostID#">#rssFeedURL#&hostID=#hostID#</a></td>
+				<td><a href="#rssFeedURL#&hostID=#hostID#" target="_blank">#rssFeedURL#&hostID=#hostID#</a></td>
 			</tr>
 			</cfloop>
 		</table>

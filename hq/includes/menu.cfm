@@ -1,18 +1,41 @@
-
-<cfparam name="request.requestState.event" default="">
-<cfset event = request.requestState.event>
-<cfset eventPkg = listFirst(event,".")>
+<cfparam name="rs.event">
+<cfparam name="rs.stInfo">
+<cfparam name="rs.pageTitle" default="">
+<cfset eventPkg = listFirst(rs.event,".")>
 
 <cfoutput>
-<div style="font-size:12px;">
-	[ <a href="index.cfm?event=dashboard" <cfif event eq "dashboard" or event eq "dashboard">style="font-weight:bold;"</cfif>>Dashboard</a> ]
-	&nbsp;&nbsp;&nbsp;
-	[ <a href="index.cfm?event=main" <cfif event eq "main" or event eq "main">style="font-weight:bold;"</cfif>>Summary</a> ] 
-	&nbsp;&nbsp;&nbsp;
-	[ <a href="index.cfm?event=log" <cfif event eq "log" or event eq "log">style="font-weight:bold;"</cfif>>Detail</a> ] 
-	&nbsp;&nbsp;&nbsp;
-	[ <a href="index.cfm?event=extensions.main" <cfif eventPkg eq "extensions">style="font-weight:bold;"</cfif>>Rules</a> ]
-	&nbsp;&nbsp;&nbsp;
-	[ <img alt="RSS" width="16" height="16" src="#rs.assetsPath#images/icons/feed-icon16x16.gif" border="0" align="absmiddle"/> <a href="index.cfm?event=rss" <cfif event eq "rss">style="font-weight:bold;"</cfif>>RSS</a> ]
-</div>
+	<table width="100%">
+		<tr>	
+			<td>
+				<h2 style="margin-bottom:3px;">#rs.pageTitle#</h2>
+				<div style="font-size:12px;">
+					[ <a href="index.cfm?event=dashboard" <cfif rs.event eq "dashboard" or rs.event eq "dashboard">style="font-weight:bold;"</cfif>>Dashboard</a> ]
+					&nbsp;&nbsp;&nbsp;
+					[ <a href="index.cfm?event=main" <cfif rs.event eq "main" or rs.event eq "main">style="font-weight:bold;"</cfif>>Summary</a> ] 
+					&nbsp;&nbsp;&nbsp;
+					[ <a href="index.cfm?event=log" <cfif rs.event eq "log" or rs.event eq "log">style="font-weight:bold;"</cfif>>Detail</a> ] 
+					&nbsp;&nbsp;&nbsp;
+					[ <a href="index.cfm?event=extensions.main" <cfif eventPkg eq "extensions">style="font-weight:bold;"</cfif>>Rules</a> ]
+					&nbsp;&nbsp;&nbsp;
+					[ <img alt="RSS" width="16" height="16" src="#rs.assetsPath#images/icons/feed-icon16x16.gif" border="0" align="absmiddle"/> <a href="index.cfm?event=rss" <cfif rs.event eq "rss">style="font-weight:bold;"</cfif>>RSS</a> ]
+				</div>
+			</td>
+			<td align="right" width="300" style="font-size:13px;">
+				<b>BugLogListener Service is: </b>
+				<cfif rs.stInfo.isRunning>
+					<span style="color:green;font-weight:bold;">Running</span>
+					<span style="font-size:12px;">(<a href="index.cfm?event=doStop">Stop</a>)</span>
+					<a href="index.cfm?event=serviceMonitor.main"><img src="#rs.assetsPath#images/icons/server_connect.png" border="0" align="absmiddle"></a>
+					<div style="font-size:9px;">
+						<strong>Last Start:</strong> 
+						#lsdateformat(rs.stInfo.startedOn)# #lstimeformat(rs.stInfo.startedOn)#
+					</div>
+				<cfelse>
+					<span style="color:red;font-weight:bold;">Stopped</span>
+					<span style="font-size:12px;">(<a href="index.cfm?event=doStart">Start</a>)</span>
+				</cfif>
+			</td>
+		</tr>
+	</table>	
+
 </cfoutput>

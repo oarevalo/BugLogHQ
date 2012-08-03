@@ -18,7 +18,6 @@
 			]>
 <cfset lstPanelIDs = "">
 			
-<h2 style="margin-bottom:3px;">BugLog Settings & Management</h2>
 <cfinclude template="../includes/menu.cfm">
 
 <br />

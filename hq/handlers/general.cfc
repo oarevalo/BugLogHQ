@@ -145,6 +145,7 @@
 				setValue("qryApplications", qryApplications);
 				setValue("qryHosts", qryHosts);
 				setValue("qrySeverities", qrySeverities);
+				setValue("pageTitle", "Dashboard");
 				setView("dashboard");
 
 			} catch(any e) {
@@ -299,6 +300,7 @@
 		<cfset setValue("qryApplications", qryApplications)>	
 		<cfset setValue("qryHosts", qryHosts)>	
 		<cfset setValue("qrySeverities", qrySeverities)>	
+		<cfset setValue("pageTitle", "Summary")>
 		<cfset setView("main")>
 	</cffunction>
 	
@@ -354,6 +356,8 @@
 			SELECT DISTINCT hostID, hostName FROM qryEntries ORDER BY hostName
 		</cfquery>
 		<cfset setValue("qryHosts", qryHosts)>	
+
+		<cfset setValue("pageTitle", "Details View")>
 			
 		<cfset setView("log")>	
 	</cffunction>
@@ -379,6 +383,7 @@
 				setValue("ruleTypes", getService("app").getRules());
 				setValue("jiraEnabled", getService("jira").getSetting("enabled"));
 				setValue("oEntry", oEntry);
+				setValue("pageTitle", oEntry.getMessage());
 				setView("entry");
 
 			} catch(any e) {
@@ -398,6 +403,7 @@
 				// set values
 				setValue("qryApplications", qryApplications);
 				setValue("qryHosts", qryHosts);
+				setValue("pageTitle", "RSS Feeds");
 				
 				setView("rss");
 

@@ -6,15 +6,12 @@
 <cfset email = oUser.getEmail()>
 
 <cfoutput>
-	<h2 style="margin-bottom:3px;">BugLog Settings & Management</h2>
 	<cfinclude template="../includes/menu.cfm">
 	
 	<form name="frmDelete" action="index.cfm" method="post">
 		<input type="hidden" name="event" value="admin.doSaveUser">
 		<input type="hidden" name="userID" value="#userID#">
-		
-		<h2>Add/Edit User</h2>
-	
+		<br />
 		<table>
 			<tr>
 				<td><b>Username:</b></td>

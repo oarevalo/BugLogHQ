@@ -10,6 +10,7 @@
 				// set values
 				setValue("aMsgLog", aMsgLog);
 				setValue("aQueue", aQueue);
+				setValue("pageTitle", "Service Monitor");
 				
 				setView("serviceMonitor");
 

@@ -79,6 +79,7 @@
 
 				setValue("panel", panel);
 				setValue("allowConfigEditing", isConfigEditingAllowed());
+				setValue("pageTitle", "BugLog Settings & Management");
 				setView("admin");
 				
 			} catch(validation e) {
@@ -104,7 +105,8 @@
 				else
 					oUser = getService("app").getBlankUser();
 				
-				setValue("oUser",oUser);				
+				setValue("oUser",oUser);			
+				setValue("pageTitle", "BugLog Settings & Management > Add/Edit User");	
 				setView("editUser");
 				
 			} catch(any e) {
@@ -122,6 +124,7 @@
 			try {
 				if(userID eq 0) setNextEvent("admin.main");
 				setValue("userID",userID);				
+				setValue("pageTitle", "BugLog Settings & Management > Delete User");	
 				setView("deleteUser");
 				
 			} catch(any e) {

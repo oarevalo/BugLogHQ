@@ -16,7 +16,6 @@
 
 <cfoutput>
 	<!--- Page headers --->			
-	<h2 style="margin-bottom:3px;">Service Monitor</h2>
 	<cfinclude template="../includes/menu.cfm">
 	<br />
 

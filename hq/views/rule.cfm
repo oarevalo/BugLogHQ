@@ -24,7 +24,6 @@
 </script>
 
 <cfoutput>
-	<h2 style="margin-bottom:3px;">BugLog Add/Edit Rule</h2>
 	<cfinclude template="../includes/menu.cfm">
 
 	<h3>#ruleLabel#</h3>

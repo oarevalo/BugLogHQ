@@ -39,29 +39,7 @@
 
 <cfoutput>
 	<!--- Page headers --->			
-	<table width="100%">
-		<tr>	
-			<td>
-				<h2 style="margin-bottom:3px;">Dashboard</h2>
-				<cfinclude template="../includes/menu.cfm">
-			</td>
-			<td align="right" width="300" style="font-size:13px;">
-				<b>BugLogListener Service is: </b>
-				<cfif rs.stInfo.isRunning>
-					<span style="color:green;font-weight:bold;">Running</span>
-					<span style="font-size:12px;">(<a href="index.cfm?event=doStop">Stop</a>)</span>
-					<a href="index.cfm?event=serviceMonitor.main"><img src="#rs.assetsPath#images/icons/server_connect.png" border="0" align="absmiddle"></a>
-					<div style="font-size:9px;">
-						<strong>Last Start:</strong> 
-						#lsdateformat(rs.stInfo.startedOn)# #lstimeformat(rs.stInfo.startedOn)#
-					</div>
-				<cfelse>
-					<span style="color:red;font-weight:bold;">Stopped</span>
-					<span style="font-size:12px;">(<a href="index.cfm?event=doStart">Start</a>)</span>
-				</cfif>
-			</td>
-		</tr>
-	</table>	
+	<cfinclude template="../includes/menu.cfm">
 	
 	<!--- Search Criteria / Filters --->			
 	<form name="frmSearch" action="index.cfm" method="get" style="margin:0px;padding-top:10px;">

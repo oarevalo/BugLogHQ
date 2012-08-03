@@ -4,7 +4,6 @@
 <cfset startIndex = arrayLen(lines)>
 <cfset endIndex = max(arrayLen(lines)-100,2)>
 
-<h2 style="margin-bottom:3px;">BugLog Rules > View Log</h2>
 <cfinclude template="../includes/menu.cfm">
 
 <cfoutput>

@@ -31,7 +31,6 @@
 		ORDER BY u_code
 </cfquery>
 
-<h2 style="margin-bottom:3px;">BugLog Stats</h2>
 <cfinclude template="../includes/menu.cfm">
 <br>
 

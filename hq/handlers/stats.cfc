@@ -88,6 +88,8 @@
 				setValue("qryHostSummary", qryHostSummary);
 				setValue("qryMsgSummary", qryMsgSummary);
 				setValue("qryTimeline", qryTimeline);
+				
+				setValue("pageTitle", "Stats");
 
 				setView("stats");
 			</cfscript>
