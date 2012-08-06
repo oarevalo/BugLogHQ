@@ -43,7 +43,7 @@
 							and entry_day = #day(theDate)#
 							and entry_month = #month(theDate)#
 							and entry_year = #year(theDate)#
-							<cfset datePartValue = timeFormat(theDate,"hh:00")>
+							<cfset datePartValue = timeFormat(theDate,"hh:00 tt")>
 							<cfset theDate = dateAdd("h",1,theDate)>
 						</cfcase>
 						<cfcase value="day">
@@ -67,8 +67,10 @@
 	</cfloop>
 
 	<cfoutput>
-		<cfchart chartwidth="600" markersize="5" xaxistitle="#datePartName#"  yaxistitle="Bug count" title="Timeline">
-			<cfchartseries query="qryChart" type="bar"
+		<cfchart chartwidth="600" markersize="5" xaxistitle="#datePartName#"  yaxistitle="Count" title="Timeline" sortXAxis="no">
+			<cfchartseries query="qryChart" type="curve"
+							paintStyle="plain"
+							markerStyle="circle"
 							itemcolumn="DatePartValue" 
 							valuecolumn="numcount">
 		</cfchart>
