@@ -34,7 +34,7 @@
 			</td>
 			<td style="width:20px;">&nbsp;</td>
 			<td align="center">
-				<cfinclude template="dashboard/bugs_by_host.cfm">
+				<cfinclude template="dashboard/bugs_by_time.cfm">
 				<br /><br />
 				<cfinclude template="dashboard/bugs_by_app_severity.cfm">	
 				<br /><br />
