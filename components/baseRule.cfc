@@ -36,7 +36,6 @@
 
 	<cffunction name="sendToEmail" access="public" returntype="void">
 		<cfargument name="rawEntryBean" type="bugLog.components.rawEntryBean" required="false">
-		<cfargument name="sender" type="string" required="true">
 		<cfargument name="recipient" type="string" required="true">
 		<cfargument name="subject" type="string" required="false" default="BugLog: bug received">
 		<cfargument name="comment" type="string" required="false" default="">
