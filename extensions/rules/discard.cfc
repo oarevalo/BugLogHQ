@@ -21,8 +21,6 @@
 
 	<cffunction name="processQueueStart" access="public" returntype="boolean" hint="This method gets called BEFORE each processing of the queue (only invoked when using the asynch listener)">
 		<cfargument name="queue" type="array" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
 		<cfscript>
 			for(var i=1;i lte arrayLen(queue);i++) {
 				if(matches(queue[i])) {

@@ -109,7 +109,7 @@
 			oEntry.save();
 		
 			// process rules
-			variables.oRuleProcessor.processRules(bean, oDF.getDataProvider(), variables.oConfig );
+			variables.oRuleProcessor.processRules(bean, oEntry);
 		
 		</cfscript>
 	</cffunction>
@@ -299,8 +299,10 @@
 				thisRule = aRules[i];
 				
 				if(thisRule.enabled) {
-					oRule = createObject("component", thisRule.component ).init( argumentCollection = thisRule.config );
-					oRule.setListener(this);
+					oRule = createObject("component", thisRule.component )
+								.init( argumentCollection = thisRule.config )
+								.setListener(this)
+								.setDAOFactory( variables.oDAOFactory );
 	
 					// add rule to processor
 					variables.oRuleProcessor.addRule(oRule);

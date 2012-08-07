@@ -41,29 +41,27 @@
 	
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		<cfscript>
 			var qry = 0;
 			var oEntryFinder = 0;
 			var oEntryDAO = 0;
 			var args = structNew();
-			var sender = arguments.configObj.getSetting("general.adminEmail");
 			
 			// only evaluate this rule if the amount of timespan minutes has passed after the last email was sent
 			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan ) {
 			
-				oEntryDAO = createObject("component","bugLog.components.db.entryDAO").init(arguments.dataProvider);
+				oEntryDAO = getDAOFactory().getDAO("entry");
 				oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
 	
 				if(variables.config.application neq "" and (variables.applicationID eq ID_NOT_SET or variables.applicationID eq ID_NOT_FOUND)) {
-					variables.applicationID = getApplicationID(arguments.dataProvider);
+					variables.applicationID = getApplicationID();
 				}
 				if(variables.config.host neq "" and (variables.hostID eq ID_NOT_SET or variables.hostID eq ID_NOT_FOUND)) {
-					variables.hostID = getHostID(arguments.dataProvider);
+					variables.hostID = getHostID();
 				}
 				if(variables.config.severity neq "" and (variables.severityID eq ID_NOT_SET or variables.severityID eq ID_NOT_FOUND)) {
-					variables.severityID = getSeverityID(arguments.dataProvider);
+					variables.severityID = getSeverityID();
 				}
 				
 				args = structNew();
@@ -81,13 +79,13 @@
 						qry = groupMessages(qry, variables.config.count);
 						
 						if(qry.recordCount gt 0) {
-							sendEmail(qry, sender);
-							sendAlert(qry, sender);
+							sendEmail(qry);
+							sendAlert(qry);
 						}
 			
 					} else if(qry.recordCount gt variables.config.count) {
-						sendEmail(qry, sender);
-						sendAlert(qry, sender);
+						sendEmail(qry);
+						sendAlert(qry);
 					}
 				}
 			
@@ -98,10 +96,10 @@
 
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
-		<cfargument name="sender" type="string" required="true" hint="the sender of the email">
 		<cfset var qryEntries = 0>
 		<cfset var bugReportURL = "">
 		<cfset var buglogHref = getBaseBugLogHREF()>
+		<cfset var sender = getListener().getConfig().getSetting("general.adminEmail")>
 		
 		<cfquery name="qryEntries" dbtype="query">
 			SELECT ApplicationCode, ApplicationID, 
@@ -115,8 +113,8 @@
 				ORDER BY createdOn DESC
 		</cfquery>
 		
-		<cfif variables.config.recipientEmail neq "" and arguments.sender neq "">
-			<cfmail from="#arguments.sender#" 
+		<cfif variables.config.recipientEmail neq "">
+			<cfmail from="#sender#" 
 					to="#variables.config.recipientEmail#"
 					subject="BugLog: bug frequency alert!" 
 					type="text/html">
@@ -151,8 +149,7 @@
 	</cffunction>
 
 	<cffunction name="getApplicationID" access="private" returntype="numeric">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfset var oDAO = createObject("component","bugLog.components.db.applicationDAO").init(arguments.dataProvider)>
+		<cfset var oDAO = getDAOFactory().getDAO("application")>
 		<cfset var oFinder = createObject("component","bugLog.components.appFinder").init(oDAO)>
 		<cfset var o = 0>
 		<cftry>
@@ -165,8 +162,7 @@
 	</cffunction>
 
 	<cffunction name="getHostID" access="private" returntype="numeric">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfset var oDAO = createObject("component","bugLog.components.db.hostDAO").init(arguments.dataProvider)>
+		<cfset var oDAO = getDAOFactory().getDAO("host")>
 		<cfset var oFinder = createObject("component","bugLog.components.hostFinder").init(oDAO)>
 		<cfset var o = 0>
 		<cftry>
@@ -179,8 +175,7 @@
 	</cffunction>
 
 	<cffunction name="getSeverityID" access="private" returntype="numeric">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfset var oDAO = createObject("component","bugLog.components.db.severityDAO").init(arguments.dataProvider)>
+		<cfset var oDAO = getDAOFactory().getDAO("severity")>
 		<cfset var oFinder = createObject("component","bugLog.components.severityFinder").init(oDAO)>
 		<cfset var o = 0>
 		<cftry>
@@ -225,9 +220,9 @@
 
 	<cffunction name="sendAlert" access="private" returntype="void" output="true">
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
-		<cfargument name="sender" type="string" required="true" hint="the sender of the email">
 		<cfset var qryEntries = 0>
 		<cfset var msg = "">
+		<cfset var sender = getListener().getConfig().getSetting("general.adminEmail")>
 		
 		<cfif variables.config.oneTimeAlertRecipient neq "" 
 				and dateDiff("n", variables.lastOneTimeEmailTimestamp, now()) gt 60*24>
@@ -244,7 +239,7 @@
 			</cfif>
 			<cfset msg = msg & "on the last #variables.config.timespan# minutes.">
 		
-			<cfmail from="#arguments.sender#" 
+			<cfmail from="#sender#" 
 					to="#variables.config.oneTimeAlertRecipient#"
 					subject="BugLog: Frequency alert" 
 					type="text">#msg#</cfmail>

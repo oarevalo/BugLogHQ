@@ -20,8 +20,7 @@
 	
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		<cfscript>
 			var stEntry = arguments.rawEntry.getMemento();
 			var evalCond1 = true;
@@ -44,7 +43,6 @@
 			// if all conditions are met, then send the alert
 			if(evalCond1 and evalCond2 and evalCond3) {
 				sendToEmail(rawEntryBean = arguments.rawEntry, 
-							sender = arguments.configObj.getSetting("general.adminEmail"),
 							recipient = variables.config.recipientEmail,
 							subject = "BugLog: #arguments.rawEntry.getMessage()#",
 							comment = "This message has been sent because the following bug report matched the given criteria. To review or modify the criteria please log into the bugLog server and go into the Rules section.");

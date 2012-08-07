@@ -11,10 +11,8 @@
 	
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		<cfset sendToEmail(rawEntryBean = arguments.rawEntry, 
-							sender = arguments.configObj.getSetting("general.adminEmail"),
 							recipient = variables.config.recipientEmail,
 							subject = "BugLog: #arguments.rawEntry.getMessage()#")>
 		<cfset writeToCFLog("'mailRelay' rule fired. Email sent. Msg: '#arguments.rawEntry.getMessage()#'")>

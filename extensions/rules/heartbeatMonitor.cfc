@@ -31,31 +31,28 @@
 	
 	<cffunction name="processQueueEnd" access="public" returntype="boolean" hint="This method gets called AFTER each processing of the queue (only invoked when using the asynch listener)">
 		<cfargument name="queue" type="array" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
 		<cfscript>
 			var qry = 0;
 			var oEntryFinder = 0;
 			var oEntryDAO = 0;
 			var args = structNew();
-			var sender = arguments.configObj.getSetting("general.adminEmail");
 	
 			// only evaluate this rule if 'alertInterval' minutes has passed after the last email was sent
 			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.alertInterval ) {
 
 				// get necessary IDs
 				if(variables.config.application neq "" and variables.applicationID eq -1) {
-					variables.applicationID = getApplicationID(arguments.dataProvider);
+					variables.applicationID = getApplicationID();
 				}
 				if(variables.config.host neq "" and variables.hostID eq -1) {
-					variables.hostID = getHostID(arguments.dataProvider);
+					variables.hostID = getHostID();
 				}
 				if(variables.config.severity neq "" and variables.severityID eq -1) {
-					variables.severityID = getSeverityID(arguments.dataProvider);
+					variables.severityID = getSeverityID();
 				}
 	
 				
-				oEntryDAO = createObject("component","bugLog.components.db.entryDAO").init(arguments.dataProvider);
+				oEntryDAO = getDAOFactory().getDAO("entry");
 				oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
 	
 				
@@ -70,7 +67,7 @@
 				qry = oEntryFinder.search(argumentCollection = args);
 				
 				if(qry.recordCount eq 0) {
-					sendEmail(sender);
+					sendEmail();
 					variables.lastEmailTimestamp = now();
 				}
 				
@@ -81,11 +78,10 @@
 	</cffunction>
 
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
-		<cfargument name="sender" type="string" required="true" hint="the sender of the email">
 		
 		<cfset var numHours = int(variables.config.timespan / 60)>
 		<cfset var numMinutes = variables.config.timespan mod 60>
-
+		
 		<cfsavecontent variable="intro">
 			<cfoutput>
 				BugLog has <b>NOT</b> received a report 
@@ -109,8 +105,7 @@
 			</cfoutput>
 		</cfsavecontent>			
 		
-		<cfset sendToEmail(sender = arguments.sender,
-							recipient = variables.config.recipientEmail,
+		<cfset sendToEmail(recipient = variables.config.recipientEmail,
 							subject= "BugLog: [Heartbeat Monitor Alert][#variables.config.application#][#variables.config.host#]", 
 							comment = intro)>
 		
@@ -118,8 +113,7 @@
 	</cffunction>
 
 	<cffunction name="getApplicationID" access="private" returntype="numeric">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfset var oDAO = createObject("component","bugLog.components.db.applicationDAO").init(arguments.dataProvider)>
+		<cfset var oDAO = getDAOFactory().getDAO("application")>
 		<cfset var oFinder = createObject("component","bugLog.components.appFinder").init(oDAO)>
 		<cfset var o = 0>
 		<cftry>
@@ -132,8 +126,7 @@
 	</cffunction>
 
 	<cffunction name="getHostID" access="private" returntype="numeric">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfset var oDAO = createObject("component","bugLog.components.db.hostDAO").init(arguments.dataProvider)>
+		<cfset var oDAO = getDAOFactory().getDAO("host")>
 		<cfset var oFinder = createObject("component","bugLog.components.hostFinder").init(oDAO)>
 		<cfset var o = 0>
 		<cftry>
@@ -146,8 +139,7 @@
 	</cffunction>
 
 	<cffunction name="getSeverityID" access="private" returntype="numeric">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfset var oDAO = createObject("component","bugLog.components.db.severityDAO").init(arguments.dataProvider)>
+		<cfset var oDAO = getDAOFactory().getDAO("severity")>
 		<cfset var oFinder = createObject("component","bugLog.components.severityFinder").init(oDAO)>
 		<cfset var o = 0>
 		<cftry>

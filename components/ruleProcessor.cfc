@@ -2,10 +2,11 @@
 
 	<cfset variables.aRules = arrayNew(1)>
 	<cfset variables.buglogClient = 0>
+	<cfset variables.bugLogListenerEndpoint = "bugLog.listeners.bugLogListenerWS">
 
 	<cffunction name="init" access="public" returntype="ruleProcessor">
 		<cfset variables.aRules = arrayNew(1)>
-		<cfset variables.buglogClient = createObject("component","bugLog.client.bugLogService").init("bugLog.listeners.bugLogListenerWS")>
+		<cfset variables.buglogClient = createObject("component","bugLog.client.bugLogService").init(variables.bugLogListenerEndpoint)>
 		<cfreturn this>
 	</cffunction>
 	
@@ -16,22 +17,17 @@
 	
 	<cffunction name="processRules" access="public" returnType="void" hint="Process all rules with a given raw entry bean">
 		<cfargument name="rawEntry" type="rawEntryBean" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
+		<cfargument name="entry" type="entry" required="true">
 		<cfset _processRules("processRule", arguments)>
 	</cffunction>
 	
 	<cffunction name="processQueueStart" access="public" returntype="void" hint="This method gets called BEFORE each processing of the queue (only invoked when using the asynch listener)">
 		<cfargument name="queue" type="array" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
 		<cfset _processRules("processQueueStart", arguments)>
 	</cffunction>
 
 	<cffunction name="processQueueEnd" access="public" returntype="void" hint="This method gets called AFTER each processing of the queue (only invoked when using the asynch listener)">
 		<cfargument name="queue" type="array" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
 		<cfset _processRules("processQueueEnd", arguments)>
 	</cffunction>
 

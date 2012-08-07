@@ -17,24 +17,19 @@
 						The method returns a boolean value that can be used by the caller to determine if additional rules
 						need to be evaluated.">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		<!--- this method must be implemented by rules that extend the base rule --->
 		<cfreturn true>
 	</cffunction>
 
 	<cffunction name="processQueueStart" access="public" returntype="boolean" hint="This method gets called BEFORE each processing of the queue (only invoked when using the asynch listener)">
 		<cfargument name="queue" type="array" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
 		<!--- this method must be implemented by rules that extend the base rule --->
 		<cfreturn true>
 	</cffunction>
 
 	<cffunction name="processQueueEnd" access="public" returntype="boolean" hint="This method gets called AFTER each processing of the queue (only invoked when using the asynch listener)">
 		<cfargument name="queue" type="array" required="true">
-		<cfargument name="dataProvider" type="bugLog.components.lib.dao.dataProvider" required="true">
-		<cfargument name="configObj" type="bugLog.components.config" required="true">
 		<!--- this method must be implemented by rules that extend the base rule --->
 		<cfreturn true>
 	</cffunction>
@@ -48,16 +43,17 @@
 		<cfscript>
 			var stEntry = {};
 			var buglogHref = getBaseBugLogHREF();
+			var sender = getListener().getConfig().getSetting("general.adminEmail");
+
 
 			if(structKeyExists(arguments,"rawEntryBean")) {
 				stEntry = arguments.rawEntryBean.getMemento();
 			}
 			 
-			if(arguments.sender eq "") {writeToCFLog("Missing 'sender' email address. Cannot send alert email!"); return;}
 			if(arguments.recipient eq "") {writeToCFLog("Missing 'recipient' email address. Cannot send alert email!"); return;}
 		</cfscript>
 
-		<cfmail from="#arguments.sender#" 
+		<cfmail from="#sender#" 
 				to="#arguments.recipient#" 
 				type="html" 
 				subject="#arguments.subject#">
@@ -130,9 +126,24 @@
 		</cfif>
 	</cffunction>
 	
-	<cffunction name="setListener" access="public" returntype="void" hint="Adds a reference to the bugLogListener instance">
+	<cffunction name="setListener" access="public" returntype="baseRule" hint="Adds a reference to the bugLogListener instance">
 		<cfargument name="listener" type="any" required="true">
 		<cfset variables.listener = arguments.listener>
+		<cfreturn this />
+	</cffunction>
+
+	<cffunction name="getListener" access="public" returntype="bugLog.components.bugLogListener" hint="Returns a reference to the bugLogListener instance">
+		<cfreturn variables.listener />
+	</cffunction>
+
+	<cffunction name="setDAOFactory" access="public" returntype="baseRule" hint="Adds a reference to the current DAOFactory instance">
+		<cfargument name="daoFactory" type="any" required="true">
+		<cfset variables.daoFactory = arguments.daoFactory>
+		<cfreturn this />
+	</cffunction>
+
+	<cffunction name="getDAOFactory" access="public" returntype="bugLog.components.lib.dao.DAOFactory" hint="Returns a reference to the current DAOFactory instance">
+		<cfreturn variables.daoFactory />
 	</cffunction>
 
 	<cffunction name="getBugEntryHREF" access="public" returntype="string" hint="Returns the URL to a given bug report">
@@ -146,6 +157,10 @@
 		<cfset var utils = createObject("component","bugLog.components.util").init() />
 		<cfset var href = utils.getBaseBugLogHREF(listener.getConfig(), listener.getInstanceName()) />
 		<cfreturn href />
+	</cffunction>
+	
+	<cffunction name="logTrigger" access="public" returntype="void" hint="logs a firing of a rule">
+		<cfargument name="entryID" type="numeric" required="true" hint="the id of the bug report">
 	</cffunction>
 
 </cfcomponent>
