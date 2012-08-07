@@ -302,7 +302,8 @@
 					oRule = createObject("component", thisRule.component )
 								.init( argumentCollection = thisRule.config )
 								.setListener(this)
-								.setDAOFactory( variables.oDAOFactory );
+								.setDAOFactory( variables.oDAOFactory )
+								.setExtensionID( thisRule.id );
 	
 					// add rule to processor
 					variables.oRuleProcessor.addRule(oRule);

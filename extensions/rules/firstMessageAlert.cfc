@@ -68,6 +68,7 @@
 			qry = oEntryFinder.search(argumentCollection = args);
 			
 			if(qry.recordCount eq 1 or (qry.recordCount gt 1 and dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan)) {
+				logTrigger(entry);
 				sendEmail(qry, rawEntry);
 				variables.lastEmailTimestamp = now();
 			}

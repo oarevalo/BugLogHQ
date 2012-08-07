@@ -42,6 +42,7 @@
 
 			// if all conditions are met, then send the alert
 			if(evalCond1 and evalCond2 and evalCond3) {
+				logTrigger(entry);
 				sendToEmail(rawEntryBean = arguments.rawEntry, 
 							recipient = variables.config.recipientEmail,
 							subject = "BugLog: #arguments.rawEntry.getMessage()#",

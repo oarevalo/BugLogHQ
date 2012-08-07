@@ -144,6 +144,16 @@
 	<cffunction name="getDAOFactory" access="public" returntype="bugLog.components.lib.dao.DAOFactory" hint="Returns a reference to the current DAOFactory instance">
 		<cfreturn variables.daoFactory />
 	</cffunction>
+	
+	<cffunction name="setExtensionID" access="public" returntype="baseRule" hint="Sets the ID of this extension instance">
+		<cfargument name="id" type="numeric" required="true">
+		<cfset variables._id_ = arguments.id>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="getExtensionID" access="public" returntype="numeric" hint="Returns the ID of this extension instance">
+		<cfreturn variables._id_ />
+	</cffunction>
 
 	<cffunction name="getBugEntryHREF" access="public" returntype="string" hint="Returns the URL to a given bug report">
 		<cfargument name="entryID" type="numeric" required="true" hint="the id of the bug report">
@@ -159,7 +169,12 @@
 	</cffunction>
 	
 	<cffunction name="logTrigger" access="public" returntype="void" hint="logs a firing of a rule">
-		<cfargument name="entryID" type="numeric" required="true" hint="the id of the bug report">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfscript>
+			var dao = getDAOFactory().getDAO("extensionLog");
+			dao.save(extensionID = getExtensionID(), 
+							entryID = arguments.entry.getEntryID());
+		</cfscript>
 	</cffunction>
 
 </cfcomponent>

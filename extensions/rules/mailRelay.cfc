@@ -12,6 +12,7 @@
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfset logTrigger(entry)>
 		<cfset sendToEmail(rawEntryBean = arguments.rawEntry, 
 							recipient = variables.config.recipientEmail,
 							subject = "BugLog: #arguments.rawEntry.getMessage()#")>

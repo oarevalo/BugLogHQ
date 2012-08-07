@@ -79,11 +79,13 @@
 						qry = groupMessages(qry, variables.config.count);
 						
 						if(qry.recordCount gt 0) {
+							logTrigger(entry);
 							sendEmail(qry);
 							sendAlert(qry);
 						}
 			
 					} else if(qry.recordCount gt variables.config.count) {
+						logTrigger(entry);
 						sendEmail(qry);
 						sendAlert(qry);
 					}
