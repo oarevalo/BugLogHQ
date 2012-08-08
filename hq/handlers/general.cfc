@@ -83,6 +83,7 @@
 		<cfscript>
 			var refreshSeconds = 60;
 			var appService = getService("app"); 
+			var numTriggersToDisplay = 10;
 
 			try {
 				// prepare filters panel
@@ -92,8 +93,10 @@
 				criteria = getValue("criteria");
 				
 				qryData = appService.searchEntries(argumentCollection = criteria);
+				qryTriggers = appService.getRecentTriggers(numTriggersToDisplay);
 
 				setValue("qryData",qryData);
+				setValue("qryTriggers",qryTriggers);
 				setValue("refreshSeconds",refreshSeconds);
 				setValue("pageTitle", "Dashboard");
 				setView("dashboard");

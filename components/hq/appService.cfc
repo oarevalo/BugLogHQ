@@ -380,6 +380,28 @@
 		<cfreturn qry>
 	</cffunction>
 
+	<cffunction name="getRecentTriggers" access="public" returntype="query" hint="get a list of the most recent rule firings">
+		<cfargument name="maxRows" type="numeric" required="false" default="10">
+		<cfset var dsn = variables.config.getSetting("db.dsn")>
+		<cfset var qry = 0>
+		<cfquery name="qry" datasource="#dsn#" maxrows="#arguments.maxRows#">
+			SELECT el.extensionLogID, el.createdOn,
+						ext.extensionID, ext.name, ext.type, ext.description,   
+						e.entryID, e.message, e.mydatetime,
+						a.applicationID, a.code as application_code,
+						h.hostID, h.hostName,
+						s.severityID, s.name as severity_code
+				FROM bl_extensionlog el
+					INNER JOIN bl_Extension ext ON el.extensionID = ext.extensionID
+					INNER JOIN bl_Entry e ON el.entryID = e.entryID 
+					INNER JOIN bl_Application a ON e.applicationID = a.applicationID
+					INNER JOIN bl_Host h ON e.hostID = h.hostID
+					INNER JOIN bl_Severity s ON e.severityID = s.severityID
+				ORDER BY createdOn DESC
+		</cfquery>
+		<cfreturn qry>
+	</cffunction>
+	
 
 	<!----- Extensions ----->	
 	<cffunction name="getRules" access="public" returnType="array" hint="Returns all rules that are available">
