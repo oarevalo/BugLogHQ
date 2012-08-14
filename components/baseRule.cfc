@@ -173,7 +173,8 @@
 		<cfscript>
 			var dao = getDAOFactory().getDAO("extensionLog");
 			dao.save(extensionID = getExtensionID(), 
-							entryID = arguments.entry.getEntryID());
+							entryID = arguments.entry.getEntryID(),
+							createdOn = now());
 		</cfscript>
 	</cffunction>
 
