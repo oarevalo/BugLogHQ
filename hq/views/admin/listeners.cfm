@@ -14,7 +14,7 @@
 <cfset bugLogListener.cfc = "bugLog.listeners.bugLogListenerWS">
 
 <cfoutput>
-	<h3>Change Password:</h3>
+	<h3>BugLog Listeners:</h3>
 	<div style="margin-left:30px;line-height:24px;">
 		You can use the following BugLog listeners for this server:<br /><br />
 		
