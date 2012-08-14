@@ -27,6 +27,12 @@
 		<cfset tmpAppURL = "index.cfm?event=main&applicationID=#qryListing.applicationID#">
 		<cfset tmpMsgURL = "index.cfm?event=log&applicationID=#qryListing.applicationID#&msgFromEntryID=#qryListing.EntryID#">
 		<cfset tmpImgURL = getSeverityIconURL(severityCode)>
+		<cfif qryListing.message eq "">
+			<cfset tmpMessage = "<em>No message</em>">
+		<cfelse>		
+			<cfset tmpMessage = HtmlEditFormat(qryListing.message)>
+		</cfif>
+		
 		<tr <cfif qryListing.currentRow mod 2>class="altRow"</cfif>>
 			<td align="center">
 				<img src="#tmpImgURL#" align="absmiddle" alt="#severityCode#" title="Click to see all bugs flagged as '#severityCode#'">
@@ -34,7 +40,7 @@
 			<td align="center" style="font-size:18px;"><a href="#tmpMsgURL#">#qryListing.bugCount#</a></td>
 			<td>
 				<div style="font-weight:bold;font-size:14px;">
-					#HtmlEditFormat(qryListing.Message)#
+					#tmpMessage#
 				</div>
 				<div style="font-size:12px;margin-top:3px;">
 					on <a href="#tmpAppURL#">#qryListing.applicationCode#</a>

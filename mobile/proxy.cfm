@@ -59,10 +59,15 @@
 			
 			<cfsavecontent variable="results">
 				<cfoutput query="qryEntries">
+					<cfif qryEntries.message eq "">
+						<cfset tmpMessage = "<em>No message</em>">
+					<cfelse>		
+						<cfset tmpMessage = HtmlEditFormat(qryEntries.message)>
+					</cfif>
 					<item>
 						<ApplicationCode>#xmlFormat(qryEntries.ApplicationCode)#</ApplicationCode>
 						<ApplicationID>#ApplicationID#</ApplicationID>
-						<Message>#xmlFormat(htmlEditFormat(qryEntries.message))#</Message>
+						<Message>#xmlFormat(tmpMessage)#</Message>
 						<bugCount>#qryEntries.bugCount#</bugCount>
 						<createdOn>#dateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
 						<EntryID>#qryEntries.entryID#</EntryID>
@@ -107,12 +112,17 @@
 			
 			<cfsavecontent variable="results">
 				<cfoutput query="qryEntries" maxrows="#rowsPerPage#" startrow="#startRow#">
+					<cfif qryEntries.message eq "">
+						<cfset tmpMessage = "<em>No message</em>">
+					<cfelse>		
+						<cfset tmpMessage = HtmlEditFormat(qryEntries.message)>
+					</cfif>
 					<item>
 						<ApplicationCode>#xmlFormat(qryEntries.ApplicationCode)#</ApplicationCode>
 						<ApplicationID>#ApplicationID#</ApplicationID>
 						<HostName>#xmlFormat(qryEntries.hostname)#</HostName>
 						<HostID>#qryEntries.hostid#</HostID>
-						<Message>#xmlFormat(htmlEditFormat(qryEntries.message))#</Message>
+						<Message>#xmlFormat(tmpMessage)#</Message>
 						<createdOn>#dateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
 						<EntryID>#qryEntries.entryID#</EntryID>
 						<SeverityCode>#qryEntries.severityCode#</SeverityCode>
@@ -133,6 +143,12 @@
 			<!--- get listing --->
 			<cfset oEntry = oAppService.getEntry(entryID)>
 
+			<cfif oEntry.getMessage() eq "">
+				<cfset tmpMessage = "<em>No message</em>">
+			<cfelse>		
+				<cfset tmpMessage = HtmlEditFormat(oEntry.getMessage())>
+			</cfif>
+
 			<cfsavecontent variable="results">
 				<cfoutput>
 					<item>
@@ -140,7 +156,7 @@
 						<ApplicationID>#oEntry.getApplicationID()#</ApplicationID>
 						<HostName>#xmlFormat(oEntry.getHost().getHostname())#</HostName>
 						<HostID>#oEntry.getHostID()#</HostID>
-						<Message>#xmlFormat(htmlEditFormat(oEntry.getMessage()))#</Message>
+						<Message>#xmlFormat(tmpMessage)#</Message>
 						<createdOn>#dateFormat(oEntry.getDateTime(),dateFormatMask)# - #lsTimeFormat(oEntry.getDateTime())#</createdOn>
 						<EntryID>#oEntry.getEntryID()#</EntryID>
 						<SeverityCode>#oEntry.getSeverity().getCode()#</SeverityCode>

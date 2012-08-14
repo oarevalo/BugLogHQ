@@ -14,6 +14,12 @@
 		<cfset tmpHostURL = "index.cfm?event=main&applicationID=#qryTriggers.applicationID#&hostID=#qryTriggers.hostID#">
 		<cfset tmpMsgURL = "index.cfm?event=log&applicationID=#qryTriggers.applicationID#&msgFromEntryID=#qryTriggers.EntryID#">
 		<cfset tmpImgURL = getSeverityIconURL(qryTriggers.severity_code)>
+		<cfif qryTriggers.message eq "">
+			<cfset tmpMessage = "<em>No message</em>">
+		<cfelse>		
+			<cfset tmpMessage = HtmlEditFormat(qryTriggers.message)>
+		</cfif>
+
 		<tr <cfif qryTriggers.currentRow mod 2>class="altRow"</cfif>>
 			<td align="center">
 				<img src="#tmpImgURL#" align="absmiddle" alt="#severity_code#" title="Click to see all bugs flagged as '#severity_code#'">
@@ -23,7 +29,7 @@
 					#qryTriggers.name#
 				</div>
 				<div style="font-size:12px;margin-top:3px;">
-					by <em>#HtmlEditFormat(qryTriggers.message)#</em><br />
+					by <em>#tmpMessage#</em><br />
 					on <a href="#tmpAppURL#">#qryTriggers.application_Code#</a> 
 					(<a href="#tmpHostURL#">#qryTriggers.hostname#</a>)
 					received on

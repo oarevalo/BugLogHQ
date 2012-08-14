@@ -154,6 +154,12 @@
 		</cfif>
 		<cfset tmpRowClass = tmpRowClass & "row_sev_" & replace(qryEntries.SeverityCode," ","","ALL")>
 		
+		<cfif qryEntries.message eq "">
+			<cfset tmpMessage = "<em>No message</em>">
+		<cfelse>		
+			<cfset tmpMessage = HtmlEditFormat(qryEntries.message)>
+		</cfif>
+		
 		<tr class="#LCase(tmpRowClass)#<cfif qryEntries.currentRow mod 2> altRow</cfif>" <cfif isNew>style="font-weight:bold;"</cfif>>
 			<td class="cell_severity" width="15" align="center" style="padding:0px;">
 				<cfset tmpImgName = "images/severity/default.png">
@@ -182,7 +188,7 @@
 			</td>
 			<td class="cell_message" onclick="document.location='#zoomURL#'"
 				title="Click for more details"
-				style="cursor:pointer;">#HtmlEditFormat(qryEntries.message)#</td>
+				style="cursor:pointer;">#tmpMessage#</td>
 			<td class="cell_count" width="60" align="right">
 				#bugCount#
 			</td>

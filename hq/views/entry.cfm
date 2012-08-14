@@ -21,9 +21,14 @@
 
 <cfset tmpSeverity = oSeverity.getCode()>
 <cfset htmlReport = oEntry.getHTMLReport()>
+<cfif oEntry.getMessage() eq "">
+	<cfset tmpMessage = "<em>No message</em>">
+<cfelse>		
+	<cfset tmpMessage = HtmlEditFormat(oEntry.getMessage())>
+</cfif>
 
 <cfoutput>
-<h2>Bug ###oEntry.getEntryID()# : <span style="color:##cc0000;">#HtmlEditFormat(oEntry.getMessage())#</span></h2>
+<h2>Bug ###oEntry.getEntryID()# : <span style="color:##cc0000;">#tmpMessage#</span></h2>
 
 <p>
 	<table width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">

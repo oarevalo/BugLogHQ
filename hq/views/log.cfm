@@ -129,6 +129,11 @@
 		<cfset tmpRowClass = "row_app_" & replace(qryEntries.applicationCode," ","","ALL") & " "
 							 & "row_host_" & replace(qryEntries.hostName," ","","ALL") & " "
 						 	 & "row_sev_" & replace(qryEntries.SeverityCode," ","","ALL")>
+		<cfif qryEntries.message eq "">
+			<cfset tmpMessage = "<em>No message</em>">
+		<cfelse>		
+			<cfset tmpMessage = HtmlEditFormat(qryEntries.message)>
+		</cfif>
 
 		<tr class="#LCase(tmpRowClass)#<cfif qryEntries.currentRow mod 2> altRow</cfif>" <cfif isNew>style="font-weight:bold;"</cfif>>
 			<td class="cell_severity" width="15" align="center" style="padding:0px;">
@@ -151,7 +156,7 @@
 			<td class="cell_hostname" width="120"><a href="index.cfm?event=log&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a></td>
 			<td class="cell_message" onclick="document.location='?event=entry&entryID=#qryEntries.entryID#'" 
 				title="Click to view full details of bug"
-				style="cursor:pointer;">#HtmlEditFormat(qryEntries.message)#</td>
+				style="cursor:pointer;">#tmpMessage#</td>
 			<td class="cell_details" align="center">
 				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">
 					<img alt="View details" width="16" height="16" src="#rs.assetsPath#images/icons/zoom.png" align="absmiddle" border="0" /></a>
