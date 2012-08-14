@@ -62,7 +62,7 @@
 					<item>
 						<ApplicationCode>#xmlFormat(qryEntries.ApplicationCode)#</ApplicationCode>
 						<ApplicationID>#ApplicationID#</ApplicationID>
-						<Message>#xmlFormat(qryEntries.message)#</Message>
+						<Message>#xmlFormat(htmlEditFormat(qryEntries.message))#</Message>
 						<bugCount>#qryEntries.bugCount#</bugCount>
 						<createdOn>#dateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
 						<EntryID>#qryEntries.entryID#</EntryID>
@@ -112,7 +112,7 @@
 						<ApplicationID>#ApplicationID#</ApplicationID>
 						<HostName>#xmlFormat(qryEntries.hostname)#</HostName>
 						<HostID>#qryEntries.hostid#</HostID>
-						<Message>#xmlFormat(qryEntries.message)#</Message>
+						<Message>#xmlFormat(htmlEditFormat(qryEntries.message))#</Message>
 						<createdOn>#dateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</createdOn>
 						<EntryID>#qryEntries.entryID#</EntryID>
 						<SeverityCode>#qryEntries.severityCode#</SeverityCode>
@@ -140,12 +140,12 @@
 						<ApplicationID>#oEntry.getApplicationID()#</ApplicationID>
 						<HostName>#xmlFormat(oEntry.getHost().getHostname())#</HostName>
 						<HostID>#oEntry.getHostID()#</HostID>
-						<Message>#xmlFormat(oEntry.getMessage())#</Message>
+						<Message>#xmlFormat(htmlEditFormat(oEntry.getMessage()))#</Message>
 						<createdOn>#dateFormat(oEntry.getDateTime(),dateFormatMask)# - #lsTimeFormat(oEntry.getDateTime())#</createdOn>
 						<EntryID>#oEntry.getEntryID()#</EntryID>
 						<SeverityCode>#oEntry.getSeverity().getCode()#</SeverityCode>
-						<ExceptionMessage>#xmlFormat(oEntry.getExceptionMessage())#</ExceptionMessage>
-						<ExceptionDetails>#xmlFormat(oEntry.getExceptionDetails())#</ExceptionDetails>
+						<ExceptionMessage>#xmlFormat(htmlEditFormat(oEntry.getExceptionMessage()))#</ExceptionMessage>
+						<ExceptionDetails>#xmlFormat(htmlCodeFormat(oEntry.getExceptionDetails()))#</ExceptionDetails>
 						<BugCFID>#xmlFormat(oEntry.getCFID())#</BugCFID>
 						<BugCFTOKEN>#xmlFormat(oEntry.getCFTOKEN())#</BugCFTOKEN>
 						<UserAgent>#xmlFormat(oEntry.getUserAgent())#</UserAgent>

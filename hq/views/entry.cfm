@@ -23,7 +23,7 @@
 <cfset htmlReport = oEntry.getHTMLReport()>
 
 <cfoutput>
-<h2>Bug ###oEntry.getEntryID()# : <span style="color:##cc0000;">#oEntry.getMessage()#</span></h2>
+<h2>Bug ###oEntry.getEntryID()# : <span style="color:##cc0000;">#HtmlEditFormat(oEntry.getMessage())#</span></h2>
 
 <p>
 	<table width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
@@ -110,11 +110,11 @@
 	</tr>
 	<tr>
 		<td><b>Exception Message:</b></td>
-		<td>#oEntry.getExceptionMessage()#</td>
+		<td>#HtmlEditFormat(oEntry.getExceptionMessage())#</td>
 	</tr>
 	<tr>
 		<td><b>Exception Detail:</b></td>
-		<td>#oEntry.getExceptionDetails()#</td>
+		<td>#HtmlCodeFormat(oEntry.getExceptionDetails())#</td>
 	</tr>
 	<tr>
 		<td><b>CFID / CFTOKEN:</b></td>

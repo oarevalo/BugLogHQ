@@ -40,7 +40,7 @@
 					<tr><th>Message Log</th></tr>
 					<cfloop from="1" to="#arrayLen(aMsgLog)#" index="i">
 						<tr <cfif i mod 2>class="altRow"</cfif>>
-							<td>#aMsgLog[i]#</td>
+							<td>#HtmlEditFormat(aMsgLog[i])#</td>
 						</tr>
 					</cfloop>
 				</table>
@@ -82,7 +82,7 @@
 							<td align="center" style="width:100px;">#dateFormat(st.dateTime,dateFormatMask)# #timeFormat(st.dateTime, 'HH:mm:ss')#</td>
 							<td align="center" style="width:120px;">#st.applicationCode#</td>
 							<td align="center" style="width:100px;">#st.hostName#</td>
-							<td>#st.message#</td>
+							<td>#HtmlEditFormat(st.message)#</td>
 						</tr>
 					</cfloop>
 					<cfif arrayLen(aQueue) eq 0>

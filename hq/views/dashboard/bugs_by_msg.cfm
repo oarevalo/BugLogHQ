@@ -34,7 +34,7 @@
 			<td align="center" style="font-size:18px;"><a href="#tmpMsgURL#">#qryListing.bugCount#</a></td>
 			<td>
 				<div style="font-weight:bold;font-size:14px;">
-					#qryListing.Message#
+					#HtmlEditFormat(qryListing.Message)#
 				</div>
 				<div style="font-size:12px;margin-top:3px;">
 					on <a href="#tmpAppURL#">#qryListing.applicationCode#</a>

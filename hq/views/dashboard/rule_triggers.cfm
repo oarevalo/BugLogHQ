@@ -23,7 +23,7 @@
 					#qryTriggers.name#
 				</div>
 				<div style="font-size:12px;margin-top:3px;">
-					by <em>#qryTriggers.message#</em><br />
+					by <em>#HtmlEditFormat(qryTriggers.message)#</em><br />
 					on <a href="#tmpAppURL#">#qryTriggers.application_Code#</a> 
 					(<a href="#tmpHostURL#">#qryTriggers.hostname#</a>)
 					received on
@@ -33,7 +33,7 @@
 		</tr>
 	</cfloop>
 	<cfif qryTriggers.recordCount eq 0>
-		<tr><td colspan="2"><em>No bug reports received! Yay!</em></td></tr>
+		<tr><td colspan="2"><em>No alerts triggered! Yay!</em></td></tr>
 	</cfif>
 </table>
 </cfoutput>
