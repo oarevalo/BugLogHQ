@@ -169,7 +169,10 @@
 				msgFromEntryID = getValue("msgFromEntryID",0);
 				if(criteria.searchTerm eq "" and val(msgFromEntryID) gt 0) {
 					oEntry = getService("app").getEntry( msgFromEntryID );
-					criteria.searchTerm = oEntry.getMessage();
+					if(oEntry.getMessage() eq "")
+						criteria.message = "__EMPTY__";
+					else
+						criteria.message = oEntry.getMessage();
 					setValue("criteria", criteria);
 				} else {
 					setValue("msgFromEntryID", "");

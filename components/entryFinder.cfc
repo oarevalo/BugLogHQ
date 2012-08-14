@@ -140,7 +140,11 @@
 						)
 					</cfif>
 					<cfif arguments.message neq "">
-						AND message LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.message#">
+						<cfif arguments.message eq "__EMPTY__">
+							AND NULLIF(message,'') IS NULL
+						<cfelse>
+							AND message LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.message#">
+						</cfif>
 					</cfif>
 					<cfif arguments.applicationID neq "" and arguments.applicationID neq 0 and arguments.applicationID neq "_ALL_">
 						AND e.applicationID <cfif left(arguments.applicationID,1) eq "-"><cfset arguments.applicationID = removechars(arguments.applicationID,1,1)>NOT</cfif> IN 

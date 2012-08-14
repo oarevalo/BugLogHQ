@@ -86,6 +86,7 @@
 			<cfparam name="searchTerm" default="">
 			<cfparam name="startRow" default="1">
 			<cfparam name="rowsPerPage" default="50">
+			<cfparam name="message" default="">
 			
 			<!--- validate token --->
 			<cfif not validateToken(token)>
@@ -95,15 +96,20 @@
 			<!--- get listing --->
 			<cfscript>
 				// if we are passing an entryID, then get the message from there
+				var  = "";
 				if(val(msgFromEntryID) gt 0) {
 					oEntry = oAppService.getEntry( msgFromEntryID );
-					searchTerm = oEntry.getMessage();
+					if(oEntry.getMessage() eq "")
+						message = "__EMPTY__";
+					else
+						message = oEntry.getMessage();
 				}				
 			</cfscript>
 			<cfset qryEntries = oAppService.searchEntries(searchTerm = searchTerm,
 															startDate = dateAdd("d",-1 * val(numDays),now()), 
 															applicationID=applicationID,
-															hostID=hostID)>
+															hostID=hostID,
+															message = message)>
 			<cfquery name="qryEntries" dbtype="query">
 				SELECT *
 					FROM qryEntries
