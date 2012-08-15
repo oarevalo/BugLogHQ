@@ -265,6 +265,7 @@
 	
 	<cffunction name="doStart" access="public" returnType="void">
 		<cfscript>
+			var nextEvent = getValue("nextEvent");
 			try {
 				// start service
 				getService("app").startService();
@@ -276,14 +277,15 @@
 				getService("bugTracker").notifyService(e.message, e);
 			}
 
-			setNextEvent("main");
+			setNextEvent(nextEvent);
 		</cfscript>	
 	</cffunction>
 	
 	<cffunction name="doStop" access="public" returnType="void">
+		<cfset var nextEvent = getValue("nextEvent")>
 		<cfset getService("app").stopService()>
 		<cfset setMessage("info","BugLogListener has been stopped!")>
-		<cfset setNextEvent("main")>
+		<cfset setNextEvent(nextEvent)>
 	</cffunction>
 
 	<cffunction name="doSend" access="public" returnType="void">

@@ -18,20 +18,6 @@
 	<!--- Page headers --->			
 	<cfinclude template="../includes/menu.cfm">
 	<br />
-
-	<b>BugLogListener Service is: </b>
-	<cfif stInfo.isRunning>
-		<span style="color:green;font-weight:bold;">Running</span>
-		<span style="font-size:12px;">(<a href="index.cfm?event=doStop">Stop</a>)</span>
-		<div style="font-size:9px;">
-			<strong>Last Start:</strong> 
-			#lsdateformat(stInfo.startedOn)# #lstimeformat(stInfo.startedOn)#
-		</div>
-	<cfelse>
-		<span style="color:red;font-weight:bold;">Stopped</span>
-		<span style="font-size:12px;">(<a href="index.cfm?event=doStart">Start</a>)</span>
-	</cfif>
-	<br />
 	
 	<table width="100%" cellspacing="1">
 		<tr valign="top">

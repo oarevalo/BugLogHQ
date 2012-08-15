@@ -24,7 +24,7 @@
 				<b>BugLogListener Service is: </b>
 				<cfif rs.stInfo.isRunning>
 					<span style="color:green;font-weight:bold;">Running</span>
-					<span style="font-size:12px;">(<a href="index.cfm?event=doStop">Stop</a>)</span>
+					<span style="font-size:12px;">(<a href="index.cfm?event=doStop&nextEvent=#rs.event#">Stop</a>)</span>
 					<a href="index.cfm?event=serviceMonitor.main"><img src="#rs.assetsPath#images/icons/server_connect.png" border="0" align="absmiddle"></a>
 					<div style="font-size:9px;">
 						<strong>Last Start:</strong> 
@@ -32,7 +32,7 @@
 					</div>
 				<cfelse>
 					<span style="color:red;font-weight:bold;">Stopped</span>
-					<span style="font-size:12px;">(<a href="index.cfm?event=doStart">Start</a>)</span>
+					<span style="font-size:12px;">(<a href="index.cfm?event=doStart&nextEvent=#rs.event#">Start</a>)</span>
 				</cfif>
 			</td>
 		</tr>
