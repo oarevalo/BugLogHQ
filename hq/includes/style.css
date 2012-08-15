@@ -18,6 +18,11 @@ a:visited {
 a:hover {
     text-decoration:none;
 }
+span.badge a:link,
+span.badge a:visited {
+    text-decoration:none;
+	color:#fff;
+}
 
 h2 {
     font-size:16px;

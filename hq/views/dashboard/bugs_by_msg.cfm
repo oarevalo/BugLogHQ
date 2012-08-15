@@ -13,13 +13,10 @@
 </cfquery>
 
 <cfoutput>	
-<div style="text-align:center;">
-	<b>Breakdown By Application & Message <cfif qryListing.recordCount gt maxRows>(Top #maxRows#)</cfif>:</b>
-</div>
 <table class="browseTable" style="width:100%">	
 	<tr>
 		<th style="width:15px;">&nbsp;</th>
-		<th>Message (#min(qryListing.recordCount,maxRows)#)</th>
+		<th>Messages  <cfif qryListing.recordCount gt maxRows>(Top #maxRows#)</cfif></th>
 		<th style="width:35px;">Count</th>
 	</tr>
 	<cfloop query="qryListing" endrow="#maxRows#">
@@ -47,7 +44,7 @@
 					<a href="#tmpEntryURL#">#dateFormat(qryListing.createdOn,dateMask)# #lsTimeFormat(qryListing.createdOn)#</a>
 				</div>
 			</td>
-			<td align="center" style="font-size:18px;"><a href="#tmpMsgURL#"><span class="badge badge-info">#qryListing.bugCount#</span></a></td>
+			<td align="center" style="font-size:18px;"><span class="badge badge-info"><a href="#tmpMsgURL#">#qryListing.bugCount#</a></span></td>
 		</tr>
 	</cfloop>
 	<cfif qryListing.recordCount eq 0>
