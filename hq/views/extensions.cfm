@@ -38,14 +38,6 @@
 	background-color:#FFFFE0;
 }
 </style>
-<script type="text/javascript"> 
-	function confirmDeleteRule(index) {
-		if(confirm("Are you sure you wish to remove the rule")) {
-			document.location='index.cfm?event=extensions.doDeleteRule&index='+index;
-		}
-	}
-</script>
-
 
 <cfoutput>
 <cfinclude template="../includes/menu.cfm">

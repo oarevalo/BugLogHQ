@@ -186,9 +186,7 @@
 					<a href="index.cfm?event=log&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a>
 				</cfif>	
 			</td>
-			<td class="cell_message" onclick="document.location='#zoomURL#'"
-				title="Click for more details"
-				style="cursor:pointer;">#tmpMessage#</td>
+			<td class="cell_message" rel="#zoomURL#" title="Click for more details">#tmpMessage#</td>
 			<td class="cell_count" width="60" align="right">
 				#bugCount#
 			</td>

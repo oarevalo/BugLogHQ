@@ -1,15 +1,20 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <cfset rs = request.requestState>
 <cfparam name="rs.applicationTitle" default="#application.applicationName#">
 <cfparam name="rs.viewTemplatePath" default="">
 <cfparam name="rs.messageTemplatePath" default="">
 <cfparam name="rs.assetsPath" default="">
 <cfoutput>
-	<html xmlns="http://www.w3.org/1999/xhtml">
+	<html lang="en">
 		<head>
-			<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+			<meta charset="utf-8">
+			<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 			<title>#rs.applicationTitle#</title>
-			<link href="#rs.assetsPath#style.css" rel="stylesheet" type="text/css">
+			<link rel="stylesheet" href="#rs.assetsPath#/includes/bootstrap/css/bootstrap.min.css" type="text/css" />
+			<link rel="stylesheet" href="#rs.assetsPath#/includes/bootstrap/css/bootstrap-responsive.min.css" type="text/css" />
+			<link rel="stylesheet" href="#rs.assetsPath#/includes/style.css" type="text/css">
+			<script type="text/javascript" src="#rs.assetsPath#/includes/jquery-1.8.0.min.js"></script>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		</head>
 		
 		<body>
@@ -27,6 +32,8 @@
 					#cfcatch.Detail#
 				</cfcatch>
 			</cftry>
+			<script type="text/javascript" src="#rs.assetsPath#/includes/bootstrap/js/bootstrap.min.js"></script>
+			<script type="text/javascript" src="#rs.assetsPath#/includes/main.js"></script>
 		</body>
 	</html>
 </cfoutput>

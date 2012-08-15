@@ -19,8 +19,8 @@
 <table class="browseTable" style="width:100%">	
 	<tr>
 		<th style="width:15px;">&nbsp;</th>
-		<th style="width:35px;">Count</th>
 		<th>Message (#min(qryListing.recordCount,maxRows)#)</th>
+		<th style="width:35px;">Count</th>
 	</tr>
 	<cfloop query="qryListing" endrow="#maxRows#">
 		<cfset tmpEntryURL = "index.cfm?event=entry&entryID=#qryListing.EntryID#">
@@ -37,7 +37,6 @@
 			<td align="center">
 				<img src="#tmpImgURL#" align="absmiddle" alt="#severityCode#" title="Click to see all bugs flagged as '#severityCode#'">
 			</td>
-			<td align="center" style="font-size:18px;"><a href="#tmpMsgURL#">#qryListing.bugCount#</a></td>
 			<td>
 				<div style="font-weight:bold;font-size:14px;">
 					#tmpMessage#
@@ -48,6 +47,7 @@
 					<a href="#tmpEntryURL#">#dateFormat(qryListing.createdOn,dateMask)# #lsTimeFormat(qryListing.createdOn)#</a>
 				</div>
 			</td>
+			<td align="center" style="font-size:18px;"><a href="#tmpMsgURL#"><span class="badge badge-info">#qryListing.bugCount#</span></a></td>
 		</tr>
 	</cfloop>
 	<cfif qryListing.recordCount eq 0>

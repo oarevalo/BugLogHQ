@@ -12,13 +12,6 @@
 
 <cfset tmpCreateRuleURL = "?event=extensions.rule&application=#oApp.getCode()#&host=#oHost.getHostName()#&severity=#oSeverity.getCode()#">
 
-<script type="text/javascript">
-	function toggle(sec) {
-		var d = document.getElementById(sec);
-		d.style.display = (d.style.display=='block') ? 'none' : 'block';
-	}
-</script>
-
 <cfset tmpSeverity = oSeverity.getCode()>
 <cfset htmlReport = oEntry.getHTMLReport()>
 <cfif oEntry.getMessage() eq "">
@@ -38,7 +31,7 @@
 				<a href="index.cfm">Return To Log</a>
 				&nbsp;&nbsp;&nbsp;&nbsp;
 				<img width="16" height="16" src="#rs.assetsPath#images/icons/email.png" align="absmiddle" />
-				<a href="##" onclick="toggle('dSendForm')">Send to email</a>
+				<a href="##" id="sendToEmailLink">Send to email</a>
 				
 				<cfif isBoolean(jiraEnabled) and jiraEnabled>
 					&nbsp;&nbsp;&nbsp;&nbsp;

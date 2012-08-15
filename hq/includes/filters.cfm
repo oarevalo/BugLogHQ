@@ -13,40 +13,30 @@
 			]>
 
 <cfoutput>
-	<form name="frmSearch" action="index.cfm" method="get" style="margin:0px;padding-top:10px;">
+	<form name="frmSearch" id="frmSearch" action="index.cfm" method="get" style="margin:0px;padding-top:10px;" class="form-inline">
 		<input type="hidden" name="groupByApp" value="#rs.criteria.groupByApp#">
 		<input type="hidden" name="groupByHost" value="#rs.criteria.groupByHost#">
 		<input type="hidden" name="searchHTMLReport" value="#rs.criteria.searchHTMLReport#">
 		<input type="hidden" name="event" value="#rs.event#">
 		
-		<table  width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
+		<table  width="100%" class="well" cellpadding="0" cellspacing="0">
 			<tr align="center">
-				<td>
+				<td style="padding-top:5px;">
 					Show for last: &nbsp;&nbsp;
-					<select name="numDays" style="width:100px;" onchange="doSearch()">
+					<select name="numDays" style="width:100px;" class="searchSelector">
 						<cfloop array="#times#" index="item">
 							<option value="#item.value#" <cfif rs.criteria.numDays eq item.value>selected</cfif>>#item.label#</option>
 						</cfloop>
 					</select>				
 				</td>
-				<td>
+				<td style="padding-top:5px;">
 					<span <cfif rs.criteria.searchTerm neq "">style="color:red;"</cfif>>Search:</span> &nbsp;&nbsp;
-					<input type="text" name="searchTerm" value="#rs.criteria.searchTerm#" style="width:200px;" onchange="doSearch()">
-					<div style="font-size:10p;">
-						<label>
-							<input type="checkbox" 
-									name="searchHTMLReportChk" 
-									id="searchHTMLReportChk" 
-									value="true"
-									onclick="doSearch()" 
-									<cfif rs.criteria.searchHTMLReport>checked</cfif>>
-							Search HTML Report content
-						</label>
-					</div>
+					<input type="text" name="searchTerm" value="#rs.criteria.searchTerm#" style="width:200px;" class="searchSelector">
+
 				</td>
-				<td>
+				<td style="padding-top:5px;">
 					<span <cfif rs.criteria.applicationID gt 0>style="color:red;"</cfif>>Application:</span> &nbsp;&nbsp;
-					<select name="applicationID" style="width:200px;" onchange="doSearch()">
+					<select name="applicationID" style="width:200px;" class="searchSelector">
 						<option value="0">All</option>
 						<cfset found = false>
 						<cfloop query="rs.qryApplications">
@@ -61,9 +51,9 @@
 						</cfif>
 					</select>
 				</td>
-				<td>
+				<td style="padding-top:5px;">
 					<span <cfif rs.criteria.hostID gt 0>style="color:red;"</cfif>>Host:</span> &nbsp;&nbsp;
-					<select name="hostID" style="width:200px;" onchange="doSearch()">
+					<select name="hostID" style="width:200px;" class="searchSelector">
 						<option value="0">All</option>
 						<cfset found = false>
 						<cfloop query="rs.qryHosts">
@@ -80,15 +70,32 @@
 				</td>
 			</tr>
 			<tr>
+				<td>&nbsp;</td>
+				<td style="text-align:center;">
+					<label style="font-size:11px;">
+						<input type="checkbox" 
+								name="searchHTMLReportChk" 
+								id="searchHTMLReportChk" 
+								value="true"
+								class="searchCheckbox" 
+								<cfif rs.criteria.searchHTMLReport>checked</cfif>>
+						Search HTML Report content
+					</label>				
+				</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
 				<td colspan="4" align="center">
+					<div class="control-group">
 					<span <cfif rs.criteria.severityID neq "_ALL_">style="color:red;"</cfif>>Severity:</span> &nbsp;&nbsp;
 					<cfloop query="rs.qrySeverities">
 						<cfset tmpImgName = "#rs.assetsPath#images/severity/#lcase(rs.qrySeverities.name)#.png">
 						<cfset tmpDefImgName = "#rs.assetsPath#images/severity/default.png">
 
-						<label>
+						<label class="inline">
 							<input type="checkbox" 
-									onclick="doSearch()"
+									class="searchCheckbox"
 									name="severityID" 
 									value="#rs.qrySeverities.severityID#"
 									<cfif rs.criteria.severityID eq "_ALL_" or listFind(rs.criteria.severityID, rs.qrySeverities.severityID)>checked</cfif>
@@ -106,6 +113,7 @@
 						</label>
 						&nbsp;&nbsp;&nbsp;
 					</cfloop>
+					</div>
 				</td>
 			</tr>
 		</table>

@@ -26,13 +26,12 @@
 	<cfinclude template="../includes/filters.cfm">
 	
 	<!--- Dashboard --->
+	<cfinclude template="dashboard/bugs_by_severity.cfm">
 	<br />
 	<table width="100%">
 		<tr valign="top">
 			<td width="50%">
 				<cfinclude template="dashboard/bugs_by_msg.cfm">	
-				<br /><br />
-				<cfinclude template="dashboard/bugs_by_severity.cfm">
 			</td>
 			<td style="width:20px;">&nbsp;</td>
 			<td align="center">

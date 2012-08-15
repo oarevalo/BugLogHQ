@@ -1,7 +1,6 @@
 body {
 	margin:0px;
 	padding:0px;
-	//background-color:#F5F5F5;
 	background-color:#FFF;
 	font-family: "trebuchet MS", Arial, Helvetica, "Sans Serif";
 	color:#333;
@@ -14,6 +13,7 @@ a:hover,
 a:active,
 a:visited {
     color:#43505a;
+	text-decoration:underline;
 }
 a:hover {
     text-decoration:none;
@@ -22,6 +22,10 @@ a:hover {
 h2 {
     font-size:16px;
     border-bottom:1px solid black;
+}
+
+label.inline {
+	display:inline;
 }
 
 .formField {
@@ -119,6 +123,9 @@ h2 {
 .criteriaTable textarea {
      font-size:12px;
      border:1px solid silver;
+}
+.cell_message {
+	cursor:pointer;
 }
 
 

@@ -154,9 +154,8 @@
 			<td class="cell_datetime" align="center" width="110">#DateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</td>
 			<td class="cell_application" width="120"><a href="index.cfm?event=log&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a></td>
 			<td class="cell_hostname" width="120"><a href="index.cfm?event=log&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a></td>
-			<td class="cell_message" onclick="document.location='?event=entry&entryID=#qryEntries.entryID#'" 
-				title="Click to view full details of bug"
-				style="cursor:pointer;">#tmpMessage#</td>
+			<td class="cell_message" rel="index.cfm?event=entry&entryID=#qryEntries.entryID#" 
+				title="Click to view full details of bug">#tmpMessage#</td>
 			<td class="cell_details" align="center">
 				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">
 					<img alt="View details" width="16" height="16" src="#rs.assetsPath#images/icons/zoom.png" align="absmiddle" border="0" /></a>
