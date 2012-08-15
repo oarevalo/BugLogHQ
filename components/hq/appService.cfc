@@ -168,15 +168,33 @@
 	</cffunction>
 	
 	<cffunction name="getApplications" access="public" returntype="query">
-		<cfreturn variables.oApplicationDAO.getAll()>
+		<cfset var qry = variables.oApplicationDAO.getAll()>
+		<cfquery name="qry" dbtype="query">
+			SELECT *
+				FROM qry
+				ORDER BY code
+		</cfquery>
+		<cfreturn qry>
 	</cffunction>	
 
 	<cffunction name="getHosts" access="public" returntype="query">
-		<cfreturn variables.oHostDAO.getAll()>
+		<cfset var qry = variables.oHostDAO.getAll()>
+		<cfquery name="qry" dbtype="query">
+			SELECT *
+				FROM qry
+				ORDER BY hostName
+		</cfquery>
+		<cfreturn qry>
 	</cffunction>	
 
 	<cffunction name="getSeverities" access="public" returntype="query">
-		<cfreturn variables.oSeverityDAO.getAll()>
+		<cfset var qry = variables.oSeverityDAO.getAll()>
+		<cfquery name="qry" dbtype="query">
+			SELECT *
+				FROM qry
+				ORDER BY name
+		</cfquery>
+		<cfreturn qry>
 	</cffunction>	
 	
 	<cffunction name="sendEntry" access="public" returntype="void">
