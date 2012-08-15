@@ -3,16 +3,30 @@
 
 <cfsavecontent variable="tmpHead">
 	<cfoutput>
-		<cfif rs.refreshSeconds gt 0>
-			<!-- refresh every X seconds -->
-			<meta http-equiv="refresh" content="#rs.refreshSeconds#">
-		</cfif>
-		
 		<script type="text/javascript">
 			function doSearch() {
 				var frm = document.frmSearch;
 				frm.submit();
 			}
+			
+			// miliseconds
+			var interval,delay = #val(rs.refreshSeconds)*1000#;
+
+			function startInterval(){ // start interval
+				runIntervalAjax();
+				interval = setInterval(function(){
+            		runIntervalAjax();
+				},delay);
+			}
+			
+			function runIntervalAjax(){		
+				$("##dashboardContent").load("index.cfm?event=dashboardContent");
+			}
+
+			$(document).ready(function(){
+				startInterval()
+			});
+			
 		</script>	
 	</cfoutput>
 </cfsavecontent>
@@ -26,21 +40,7 @@
 	<cfinclude template="../includes/filters.cfm">
 	
 	<!--- Dashboard --->
-	<cfinclude template="dashboard/bugs_by_severity.cfm">
-	<br />
-	<table width="100%">
-		<tr valign="top">
-			<td width="50%">
-				<cfinclude template="dashboard/bugs_by_msg.cfm">	
-			</td>
-			<td style="width:20px;">&nbsp;</td>
-			<td align="center">
-				<cfinclude template="dashboard/bugs_by_time.cfm">
-				<br /><br />
-				<cfinclude template="dashboard/rule_triggers.cfm">
-			</td>
-		</tr>
-	</table>
+	<div id="dashboardContent">Loading...</div>
 
 	<div style="font-size:10px;margin-top:10px">
 		<div style="float:right;width:150px;text-align:right;">

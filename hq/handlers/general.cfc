@@ -108,6 +108,33 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="dashboardContent" access="public" returntype="void">
+		<cfscript>
+			var appService = getService("app"); 
+			var numTriggersToDisplay = 10;
+
+			try {
+				// prepare filters panel
+				loadFilter();
+				
+				// get current filters selected
+				criteria = getValue("criteria");
+				
+				qryData = appService.searchEntries(argumentCollection = criteria);
+				qryTriggers = appService.getRecentTriggers(numTriggersToDisplay);
+
+				setValue("qryData",qryData);
+				setValue("qryTriggers",qryTriggers);
+				setLayout("");
+				setView("dashboardContent");
+
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+			}
+		</cfscript>
+	</cffunction>
+	
 	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
 			var refreshSeconds = 60;
@@ -484,6 +511,17 @@
 			setValue("qryHosts", qryHosts);
 			setValue("qrySeverities", qrySeverities);
 		</cfscript>
+	</cffunction>
+	
+	<cffunction name="loadFilter" access="private" returntype="void">
+		<cfscript>
+			if(structKeyExists(cookie,"criteria") and isJSON(cookie.criteria)) {
+				criteria = deserializeJSON(cookie.criteria);
+				setValue("criteria", criteria);
+			} else {
+				prepareFilter();
+			}
+		</cfscript>		
 	</cffunction>
 	
 </cfcomponent>
