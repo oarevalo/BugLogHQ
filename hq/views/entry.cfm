@@ -112,7 +112,7 @@
 	</tr>
 	<tr>
 		<td><b>Exception Detail:</b></td>
-		<td>#HtmlCodeFormat(oEntry.getExceptionDetails())#</td>
+		<td id="exceptiondetail">#HtmlCodeFormat(oEntry.getExceptionDetails())#</td>
 	</tr>
 	<tr>
 		<td><b>CFID / CFTOKEN:</b></td>

@@ -127,7 +127,10 @@ label.inline {
 .cell_message {
 	cursor:pointer;
 }
-
+#exceptiondetail pre {
+	border:none;
+	background-color:#fff;
+}
 
 /****** User Defined Rules **********/
 /*
