@@ -2,14 +2,20 @@
 
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
-<cfparam name="sortBy" default="mydatetime">
-<cfparam name="sortDir" default="DESC">
 
 <cfset qryEntries = rs.qryEntries>
 <cfset rowsPerPage = rs.rowsPerPage>
 <cfset refreshSeconds = rs.refreshSeconds>
 <cfset lastbugread = rs.lastbugread>
 <cfset dateFormatMask = rs.dateFormatMask>
+
+<cfset sortBy = rs.criteria.sortBy>
+<cfset sortDir = rs.criteria.sortDir>
+<cfif sortBy eq "">
+	<cfset sortBy = "mydatetime">
+	<cfset sortDir = "DESC">
+</cfif>
+
 
 <!--- base URL for reloading --->
 <cfset pageURL = "index.cfm?event=log&msgFromEntryID=#rs.msgFromEntryID#">

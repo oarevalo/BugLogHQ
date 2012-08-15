@@ -87,7 +87,7 @@
 
 			try {
 				// prepare filters panel
-				prepareFilter();
+				prepareFilter("dashboard");
 				
 				// get current filters selected
 				criteria = getValue("criteria");
@@ -115,7 +115,7 @@
 
 			try {
 				// prepare filters panel
-				loadFilter();
+				loadFilter("dashboard");
 				
 				// get current filters selected
 				criteria = getValue("criteria");
@@ -143,7 +143,7 @@
 
 			try {
 				// prepare filters panel
-				prepareFilter();
+				prepareFilter("summary");
 				
 				// get current filters selected
 				var criteria = getValue("criteria");
@@ -187,7 +187,7 @@
 
 			try {
 				// prepare filters panel
-				prepareFilter();
+				prepareFilter("log");
 				
 				// get current filters selected
 				var criteria = getValue("criteria");
@@ -434,18 +434,19 @@
 	</cffunction>
 	
 	<cffunction name="prepareFilter" access="private">
+		<cfargument name="criteriaName" type="string" default="criteria">
 		<cfscript>
 			var criteria = structNew();
 			var resetCriteria = getValue("resetCriteria", false);
 			var appService = getService("app"); 
 
 			if(resetCriteria) {
-				structDelete(cookie,"criteria");
-				writeCookie("criteria","","now");
+				structDelete(cookie,criteriaName);
+				writeCookie(criteriaName,"","now");
 			}
 			
-			if(structKeyExists(cookie,"criteria") and isJSON(cookie.criteria)) {
-				criteria = deserializeJSON(cookie.criteria);
+			if(structKeyExists(cookie,criteriaName) and isJSON(cookie[criteriaName])) {
+				criteria = deserializeJSON(cookie[criteriaName]);
 			}
 			
 			// make sure we have a complete criteria struct w/ default values
@@ -461,6 +462,8 @@
 			if(not structKeyExists(criteria,"groupByApp")) criteria.groupByApp = true;
 			if(not structKeyExists(criteria,"groupByHost")) criteria.groupByHost = true;
 			if(not structKeyExists(criteria,"searchHTMLReport")) criteria.searchHTMLReport = false;
+			if(not structKeyExists(criteria,"sortBy")) criteria.sortBy = "";
+			if(not structKeyExists(criteria,"sortDir")) criteria.sortDir = "asc";
 			
 			criteria = {
 				numDays = getValue("numDays", criteria.numDays),
@@ -473,14 +476,16 @@
 				enddate = getValue("endDate", criteria.enddate),
 				groupByApp = getValue("groupByApp", criteria.groupByApp),
 				groupByHost = getValue("groupByHost", criteria.groupByHost),
-				searchHTMLReport = getValue("searchHTMLReport", criteria.searchHTMLReport)
+				searchHTMLReport = getValue("searchHTMLReport", criteria.searchHTMLReport),
+				sortBy = getValue("sortBy", criteria.sortBy),
+				sortDir = getValue("sortDir", criteria.sortDir)
 			};
 
 			// calculate how far back to query the data
 			criteria.startDate = dateAdd("d", val(criteria.numDays) * -1, now());
 
 			// write cookie back
-			writeCookie("criteria",serializeJSON(criteria),30);
+			writeCookie(criteriaName,serializeJSON(criteria),30);
 
 			qryApplications = appService.getApplications();
 			qryHosts = appService.getHosts();
@@ -514,12 +519,13 @@
 	</cffunction>
 	
 	<cffunction name="loadFilter" access="private" returntype="void">
+		<cfargument name="criteriaName" type="string" default="criteria">
 		<cfscript>
-			if(structKeyExists(cookie,"criteria") and isJSON(cookie.criteria)) {
-				criteria = deserializeJSON(cookie.criteria);
+			if(structKeyExists(cookie,criteriaName) and isJSON(cookie[criteriaName])) {
+				criteria = deserializeJSON(cookie[criteriaName]);
 				setValue("criteria", criteria);
 			} else {
-				prepareFilter();
+				prepareFilter(criteriaName);
 			}
 		</cfscript>		
 	</cffunction>

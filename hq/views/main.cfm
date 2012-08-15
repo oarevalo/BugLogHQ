@@ -2,8 +2,6 @@
 
 <!--- page parameters used for paging records --->
 <cfparam name="startRow" default="1">
-<cfparam name="sortBy" default="">
-<cfparam name="sortDir" default="ASC">
 
 <cfset qryEntries = rs.qryEntries>
 <cfset rowsPerPage = rs.rowsPerPage>
@@ -14,6 +12,13 @@
 
 <cfset groupByApp = rs.criteria.groupByApp>
 <cfset groupByHost = rs.criteria.groupByHost>
+<cfset sortBy = rs.criteria.sortBy>
+<cfset sortDir = rs.criteria.sortDir>
+
+<cfif sortBy eq "">
+	<cfset sortBy = "createdOn">
+	<cfset sortDir = "DESC">
+</cfif>
 
 <!--- base URL for reloading --->
 <cfset pageURL = "index.cfm?event=main">

@@ -51,4 +51,9 @@
 		<tr><td colspan="3"><em>No bug reports received! Yay!</em></td></tr>
 	</cfif>
 </table>
+<cfif qryListing.recordCount gt 0>
+	<div style="float:right;">
+		<a href="index.cfm?event=main&sortBy=bugCount&sortDir=desc&applicationID=#rs.criteria.applicationID#&hostID=#rs.criteria.hostID#">More...</a>	
+	</div>
+</cfif>
 </cfoutput>
