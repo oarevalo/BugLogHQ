@@ -43,12 +43,8 @@
 	<div id="dashboardContent">Loading...</div>
 
 	<div style="font-size:10px;margin-top:10px">
-		<div style="float:right;width:150px;text-align:right;">
-			<a href="index.cfm?event=#rs.event#&resetCriteria=1">Reset Filters</a>
-		</div>
-				
 		<cfif rs.refreshSeconds gt 0>
-			<p>* Page will refresh automatically every #rs.refreshSeconds# seconds.</p>
+			<p>* Content will refresh automatically every #rs.refreshSeconds# seconds.</p>
 		</cfif>	
 	</div>
 </cfoutput>

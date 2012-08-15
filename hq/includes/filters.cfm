@@ -87,6 +87,9 @@
 			</tr>
 			<tr>
 				<td colspan="4" align="center">
+					<div style="float:right;margin-right:10px;font-size:10px;">
+						<a href="index.cfm?event=#rs.event#&resetCriteria=1">Reset Filters</a>
+					</div>
 					<div class="control-group">
 					<span <cfif rs.criteria.severityID neq "_ALL_">style="color:red;"</cfif>>Severity:</span> &nbsp;&nbsp;
 					<cfloop query="rs.qrySeverities">

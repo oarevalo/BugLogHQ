@@ -173,10 +173,6 @@
 	<div style="font-size:10px;line-height:20px;margin-top:10px;font-weight:bold;">
 		<cfset pageURL = pageURL & "&sortBy=#sortBy#&sortDir=#sortDir#">
 		
-		<div style="float:right;width:150px;text-align:right;">
-			<a href="index.cfm?event=#rs.event#&resetCriteria=1">Reset Filters</a>
-		</div>
-		
 		Page #currPage# of #numPages#
 		&nbsp;&nbsp;&middot;&nbsp;&nbsp;
 
