@@ -21,8 +21,8 @@
 	</tr>
 	<cfloop query="qryListing" endrow="#maxRows#">
 		<cfset tmpEntryURL = "index.cfm?event=entry&entryID=#qryListing.EntryID#">
-		<cfset tmpAppURL = "index.cfm?event=main&applicationID=#qryListing.applicationID#">
-		<cfset tmpMsgURL = "index.cfm?event=log&applicationID=#qryListing.applicationID#&msgFromEntryID=#qryListing.EntryID#">
+		<cfset tmpAppURL = "index.cfm?event=main&applicationID=#qryListing.applicationID#&hostID=#rs.criteria.hostID#&severityID=#rs.criteria.severityID#&numDays=#rs.criteria.numDays#">
+		<cfset tmpMsgURL = "index.cfm?event=log&applicationID=#qryListing.applicationID#&msgFromEntryID=#qryListing.EntryID#&hostID=#rs.criteria.hostID#&severityID=#rs.criteria.severityID#&numDays=#rs.criteria.numDays#">
 		<cfset tmpImgURL = getSeverityIconURL(severityCode)>
 		<cfif qryListing.message eq "">
 			<cfset tmpMessage = "<em>No message</em>">
@@ -32,16 +32,16 @@
 		
 		<tr <cfif qryListing.currentRow mod 2>class="altRow"</cfif>>
 			<td align="center">
-				<img src="#tmpImgURL#" align="absmiddle" alt="#severityCode#" title="Click to see all bugs flagged as '#severityCode#'">
+				<img src="#tmpImgURL#" align="absmiddle" alt="#severityCode#" title="#severityCode#">
 			</td>
 			<td>
 				<div style="font-weight:bold;font-size:14px;">
 					#tmpMessage#
 				</div>
 				<div style="font-size:12px;margin-top:3px;">
-					on <a href="#tmpAppURL#">#qryListing.applicationCode#</a>
+					on <a href="#tmpAppURL#" title="View all bug reports for this application">#qryListing.applicationCode#</a>
 					last received on
-					<a href="#tmpEntryURL#">#dateFormat(qryListing.createdOn,dateMask)# #lsTimeFormat(qryListing.createdOn)#</a>
+					<a href="#tmpEntryURL#" title="View bug report">#dateFormat(qryListing.createdOn,dateMask)# #lsTimeFormat(qryListing.createdOn)#</a>
 				</div>
 			</td>
 			<td align="center" style="font-size:18px;"><span class="badge badge-info"><a href="#tmpMsgURL#">#qryListing.bugCount#</a></span></td>
