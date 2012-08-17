@@ -11,12 +11,25 @@
 			<cfloop query="qrySummary">
 				<cfset tmpImgURL = getSeverityIconURL(qrySummary.severityCode)>
 				<cfset tmpSeverityURL = "index.cfm?event=main&severityID=#qrySummary.SeverityID#&numDays=#rs.criteria.numDays#&hostID=#rs.criteria.hostID#&applicationID=#rs.criteria.applicationID#">
+				<cfswitch expression="#qrySummary.severityCode#">
+					<cfcase value="fatal">
+						<cfset color_code_label = "important">
+					</cfcase>
+					<cfcase value="error">
+						<cfset color_code_label = "warning">
+					</cfcase>
+					<cfcase value="info">
+						<cfset color_code_label = "info">
+					</cfcase>
+					<cfdefaultcase>
+						<cfset color_code_label = "default">
+					</cfdefaultcase>
+				</cfswitch>
 				<td>
-					<span class="badge badge-info">
-						<a href="#tmpSeverityURL#"><img 
-								src="#tmpImgURL#" align="absmiddle" alt="#qrySummary.severityCode#" 
-								title="Click to see all bugs flagged as '#severityCode#'">
-							<b>#qrySummary.SeverityCode#</b>: #qrySummary.bugCount#
+					<span class="badge badge-#color_code_label#">
+						<a href="#tmpSeverityURL#" title="Click to see all bugs flagged as '#severityCode#'"><img 
+								src="#tmpImgURL#" align="absmiddle" alt="#qrySummary.severityCode#">
+							<b>#lcase(qrySummary.SeverityCode)#</b>: #qrySummary.bugCount#
 						</a>
 					</span>
 				</td>
