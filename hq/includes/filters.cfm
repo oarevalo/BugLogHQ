@@ -4,6 +4,10 @@
 <cfparam name="rs.criteria" default="#structNew()#">
 
 <cfset times = [
+				{value="0.0417", label="1 hour"},
+				{value="0.125", label="3 hours"},
+				{value="0.25", label="6 hours"},
+				{value="0.5", label="12 hours"},
 				{value="1", label="24 hours"},
 				{value="7", label="7 days"},
 				{value="30", label="30 days"},
@@ -12,17 +16,25 @@
 				{value="360", label="360 days"}
 			]>
 
-<cfquery name="qryApplicationsCurrent" dbtype="query">
-	SELECT DISTINCT applicationID, applicationCode as code
-		FROM rs.qryEntries
-		ORDER BY applicationCode
-</cfquery>
+<cfif rs.criteria.groupByApp>
+	<cfquery name="qryApplicationsCurrent" dbtype="query">
+		SELECT DISTINCT applicationID, applicationCode as code
+			FROM rs.qryEntries
+			ORDER BY applicationCode
+	</cfquery>
+<cfelse>
+	<cfset qryApplicationsCurrent = queryNew("")>
+</cfif>
 
-<cfquery name="qryHostsCurrent" dbtype="query">
-	SELECT DISTINCT hostID, hostName
-		FROM rs.qryEntries
-		ORDER BY hostName
-</cfquery>
+<cfif rs.criteria.groupByHost>
+	<cfquery name="qryHostsCurrent" dbtype="query">
+		SELECT DISTINCT hostID, hostName
+			FROM rs.qryEntries
+			ORDER BY hostName
+	</cfquery>
+<cfelse>
+	<cfset qryHostsCurrent = queryNew("")>
+</cfif>
 
 <cfoutput>
 	<form name="frmSearch" id="frmSearch" action="index.cfm" method="get" style="margin:0px;padding-top:10px;" class="form-inline">

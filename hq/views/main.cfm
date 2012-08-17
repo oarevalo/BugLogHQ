@@ -33,6 +33,12 @@
 <cfset delta = 5>
 
 <!--- Handle sorting of data --->
+<cfif sortBy eq "hostName" and not rs.criteria.groupByHost>
+	<cfset sortBy = "createdOn">
+</cfif>
+<cfif sortBy eq "applicationCode" and not rs.criteria.groupByApp>
+	<cfset sortBy = "createdOn">
+</cfif>
 <cfif sortBy neq "">
 	<cfquery name="qryEntries" dbtype="query">
 		SELECT *, UPPER(#sortBy#) AS SortField

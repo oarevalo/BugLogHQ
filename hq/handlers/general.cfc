@@ -470,6 +470,7 @@
 				severityID = getValue("severityID", criteria.severityID),
 				search_cfid = getValue("search_cfid", criteria.search_cfid),
 				search_cftoken = getValue("search_cftoken", criteria.search_cftoken),
+				startdate = now(),
 				enddate = getValue("endDate", criteria.enddate),
 				groupByApp = getValue("groupByApp", criteria.groupByApp),
 				groupByHost = getValue("groupByHost", criteria.groupByHost),
@@ -479,7 +480,12 @@
 			};
 
 			// calculate how far back to query the data
-			criteria.startDate = dateAdd("d", val(criteria.numDays) * -1, now());
+			if(isNumeric(criteria.numdays)) {
+				if(criteria.numdays lt 1) 
+					criteria.startDate = dateAdd("h", criteria.numDays * 24 * -1, now());
+				else
+					criteria.startDate = dateAdd("d", val(criteria.numDays) * -1, now());
+			}
 
 			// write cookie back
 			writeCookie(criteriaName,serializeJSON(criteria),30);
