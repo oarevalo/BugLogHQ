@@ -118,7 +118,7 @@
 				criteria = getValue("criteria");
 				
 				qryEntries = appService.searchEntries(argumentCollection = criteria);
-				qryTriggers = appService.getRecentTriggers(numTriggersToDisplay);
+				qryTriggers = appService.getRecentTriggers(criteria.startDate);
 
 				setValue("qryEntries",qryEntries);
 				setValue("qryTriggers",qryTriggers);
@@ -517,6 +517,6 @@
 				FROM qryEntries
 				ORDER BY entryID DESC
 		</cfquery>
-		<cfreturn qry.entryID>
+		<cfreturn val(qry.entryID)>
 	</cffunction>
 </cfcomponent>

@@ -394,10 +394,10 @@
 	</cffunction>
 
 	<cffunction name="getRecentTriggers" access="public" returntype="query" hint="get a list of the most recent rule firings">
-		<cfargument name="maxRows" type="numeric" required="false" default="10">
+		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfset var dsn = variables.config.getSetting("db.dsn")>
 		<cfset var qry = 0>
-		<cfquery name="qry" datasource="#dsn#" maxrows="#arguments.maxRows#">
+		<cfquery name="qry" datasource="#dsn#">
 			SELECT el.extensionLogID, el.createdOn,
 						ext.extensionID, ext.name, ext.type, ext.description,   
 						e.entryID, e.message, e.mydatetime,
@@ -410,6 +410,9 @@
 					INNER JOIN bl_Application a ON e.applicationID = a.applicationID
 					INNER JOIN bl_Host h ON e.hostID = h.hostID
 					INNER JOIN bl_Severity s ON e.severityID = s.severityID
+				<cfif startDate neq "1/1/1800">
+					WHERE el.createdOn >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.startDate#">
+				</cfif>
 				ORDER BY createdOn DESC
 		</cfquery>
 		<cfreturn qry>
