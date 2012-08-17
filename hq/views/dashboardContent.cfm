@@ -5,19 +5,17 @@
 <cfoutput>
 	<cfinclude template="dashboard/bugs_by_severity.cfm">
 	<br />
-	<table width="100%">
-		<tr valign="top">
-			<td width="50%">
-				<cfinclude template="dashboard/bugs_by_msg.cfm">	
-			</td>
-			<td style="width:20px;">&nbsp;</td>
-			<td align="center">
-				<cfinclude template="dashboard/bugs_by_time.cfm">
-				<br /><br />
-				<cfinclude template="dashboard/rule_triggers.cfm">
-			</td>
-		</tr>
-	</table>
+		
+	<div id="dashboard-content" class="clearfix">
+		<div id="dashboard-left">
+			<cfinclude template="dashboard/bugs_by_msg.cfm">	
+		</div>
+		<div id="dashboard-right">
+			<cfinclude template="dashboard/bugs_by_time.cfm">
+			<br /><br />
+			<cfinclude template="dashboard/rule_triggers.cfm">
+		</div>
+	</div>
 </cfoutput>
 
 

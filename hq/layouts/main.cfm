@@ -31,16 +31,12 @@
 						<cfinclude template="#rs.messageTemplatePath#">
 					</cfif>
 
-					<table style="width:90%;font-size:11px;" align="center">
-						<tr>	
-							<td>
-								<cfif rs.viewTemplatePath neq "">
-									<cfinclude template="#rs.viewTemplatePath#">
-								</cfif>
-							</td>
-						</tr>
-					</table>
+					<cfif rs.viewTemplatePath neq "">
+						<cfinclude template="#rs.viewTemplatePath#">
+					</cfif>
 				</div>
+			</div>
+			<div id="footer">
 				<cfinclude template="../includes/footer.cfm">
 			</div>
 			<script type="text/javascript" src="#rs.assetsPath#/includes/bootstrap/js/bootstrap.min.js"></script>
