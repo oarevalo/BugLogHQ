@@ -22,6 +22,7 @@
 				o.setUserAgent(qry.userAgent);
 				o.setTemplatePath(qry.templatePath);
 				o.setHTMLReport(qry.HTMLReport);
+				o.setCreatedOn(qry.createdOn);
 				return o;
 			} else {
 				throw("ID not found","entryFinderException.IDNotFound");
@@ -40,6 +41,10 @@
 		<cfargument name="search_cftoken" type="string" required="false" default="">
 		<cfargument name="searchHTMLReport" type="boolean" required="false" default="false">
 		<cfargument name="message" type="string" required="false" default="">
+		<cfargument name="applicationCode" type="string" required="false" default="">
+		<cfargument name="hostName" type="string" required="false" default="">
+		<cfargument name="severityCode" type="string" required="false" default="">
+		<cfargument name="userAgent" type="string" required="false" default="">
 		
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var dbType = oDataProvider.getType()>
@@ -78,6 +83,7 @@
 		<cfargument name="applicationCode" type="string" required="false" default="">
 		<cfargument name="hostName" type="string" required="false" default="">
 		<cfargument name="severityCode" type="string" required="false" default="">
+		<cfargument name="userAgent" type="string" required="false" default="">
 
 		<cfset var tmpSQL = "">
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
@@ -181,6 +187,9 @@
 					</cfif>
 					<cfif arguments.search_cftoken neq "">
 						AND cftoken LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.search_cftoken#%"> 
+					</cfif>
+					<cfif arguments.userAgent neq "">
+						AND userAgent LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.userAgent#"> 
 					</cfif>
 				ORDER BY createdOn DESC, entryID DESC
 		</cfquery>

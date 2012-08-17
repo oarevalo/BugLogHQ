@@ -171,6 +171,16 @@ label.inline {
 	background-color:#fff;
 }
 
+#entry-content {
+	width:100%;
+	clear:both;
+}
+#entry-details {
+}
+#entry-stats {
+	width:300px;
+}
+
 /****** User Defined Rules **********/
 /*
 You can define custom CSS rules to apply to rows with specific applicatio/host/severity 

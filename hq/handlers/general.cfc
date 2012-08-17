@@ -233,14 +233,34 @@
 	<cffunction name="entry" access="public" returntype="void">
 		<cfscript>
 			try {
-				entryID = getValue("entryID");
+				var appService = getService("app"); 
+				var entryID = getValue("entryID");
+				var argsSearch = {};
+				var qryEntriesUA = queryNew("");
 
 				if(val(entryID) eq 0) {
 					setMessage("warning","Please select an entry to view");
 					setNextEvent("main");
 				}		
 				
-				oEntry = getService("app").getEntry(entryID);
+				// get requested entry object
+				oEntry = appService.getEntry(entryID);
+				
+				// search for recent ocurrences (last 24 hours)
+				args.message = "__EMPTY__";
+				args.startDate = dateAdd("d", -1, now());
+				args.searchTerm = "";
+				if(oEntry.getMessage() neq "")
+					args.message = oEntry.getMessage();
+				var qryEntriesLast24 = appService.searchEntries(argumentCollection = args);
+				var qryEntriesAll = appService.searchEntries(message = args.message, 
+																					searchTerm = "");
+				if(oEntry.getUserAgent() neq "") {
+					qryEntriesUA = appService.searchEntries(startDate = args.startDate,
+																						userAgent = oEntry.getUserAgent(),
+																						searchTerm = "");
+				}
+				
 				
 				// update lastread setting
 				if(structKeyExists(cookie, "lastbugread") and entryID gte cookie.lastbugread) {
@@ -251,7 +271,10 @@
 				setValue("ruleTypes", getService("app").getRules());
 				setValue("jiraEnabled", getService("jira").getSetting("enabled"));
 				setValue("oEntry", oEntry);
-				setValue("pageTitle", oEntry.getMessage());
+				setValue("qryEntriesLast24", qryEntriesLast24);
+				setValue("qryEntriesAll", qryEntriesAll);
+				setValue("qryEntriesUA", qryEntriesUA);
+				setValue("oEntry", oEntry);
 				setView("entry");
 
 			} catch(any e) {

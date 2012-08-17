@@ -113,6 +113,7 @@
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
 		<cfargument name="search_cfid" type="string" required="false" default="">
 		<cfargument name="search_cftoken" type="string" required="false" default="">
+		<cfargument name="userAgent" type="string" required="false" default="">
 		<cfscript>
 			var oEntryFinder = 0;
 			var qry = 0;
