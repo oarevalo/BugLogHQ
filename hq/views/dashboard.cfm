@@ -26,7 +26,6 @@
 			$(document).ready(function(){
 				startInterval()
 			});
-			
 		</script>	
 	</cfoutput>
 </cfsavecontent>
@@ -42,21 +41,8 @@
 	<!--- Dashboard --->
 	<div id="dashboardContent">Loading...</div>
 
-	<div style="font-size:10px;margin-top:10px">
-		<cfif rs.refreshSeconds gt 0>
-			<p>* Content will refresh automatically every #rs.refreshSeconds# seconds.</p>
-		</cfif>	
-	</div>
+	<p style="font-size:10px;margin-top:10px">
+		* Content will refresh automatically every #rs.refreshSeconds# seconds.
+	</p>
 </cfoutput>
 
-
-<cffunction name="getSeverityIconURL" returntype="string">
-	<cfargument name="severityCode" type="string" required="true">
-	<cfset var tmpURL = "images/severity/#lcase(severityCode)#.png">
-	<cfif not fileExists(expandPath(tmpURL))>
-		<cfset tmpURL = "images/severity/default.png">
-	<cfelse>
-		<cfset tmpURL = "images/severity/#lcase(severityCode)#.png">
-	</cfif>
-	<cfreturn tmpURL>
-</cffunction>

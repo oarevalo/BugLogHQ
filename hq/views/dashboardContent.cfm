@@ -2,6 +2,8 @@
 <cfset qryData = rs.qryEntries>
 <cfset dateMask = rs.dateFormatMask>
 
+<cfinclude template="../includes/udf.cfm">
+
 <cfoutput>
 	<cfinclude template="dashboard/bugs_by_severity.cfm">
 	<br />
@@ -19,13 +21,4 @@
 </cfoutput>
 
 
-<cffunction name="getSeverityIconURL" returntype="string">
-	<cfargument name="severityCode" type="string" required="true">
-	<cfset var tmpURL = "images/severity/#lcase(severityCode)#.png">
-	<cfif not fileExists(expandPath(tmpURL))>
-		<cfset tmpURL = "images/severity/default.png">
-	<cfelse>
-		<cfset tmpURL = "images/severity/#lcase(severityCode)#.png">
-	</cfif>
-	<cfreturn tmpURL>
-</cffunction>
+

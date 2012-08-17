@@ -13,7 +13,7 @@
 </cfquery>
 
 <cfoutput>	
-<table class="browseTable" style="width:100%">	
+<table style="width:100%" class="table table-striped">	
 	<thead>
 		<tr>
 			<th>Messages  <cfif qryListing.recordCount gt maxRows>(Top #maxRows#)</cfif></th>
@@ -32,29 +32,10 @@
 			<cfset tmpMessage = HtmlEditFormat(qryListing.message)>
 		</cfif>
 		
-		<cfset color_code_count = "info">
-		<cfif qryListing.bugCount gt 50>
-			<cfset color_code_count = "important">
-		<cfelseif qryListing.bugCount gt 25>
-			<cfset color_code_count = "warning">
-		</cfif>
-		
-		<cfswitch expression="#qryListing.severityCode#">
-			<cfcase value="fatal">
-				<cfset color_code_severity = "important">
-			</cfcase>
-			<cfcase value="error">
-				<cfset color_code_severity = "warning">
-			</cfcase>
-			<cfcase value="info">
-				<cfset color_code_severity = "info">
-			</cfcase>
-			<cfdefaultcase>
-				<cfset color_code_severity = "default">
-			</cfdefaultcase>
-		</cfswitch>		
-		
-		<tr <cfif qryListing.currentRow mod 2>class="altRow"</cfif>>
+		<cfset color_code_count = getColorCodeByCount(qryListing.bugCount)>
+		<cfset color_code_severity = getColorCodeBySeverity(qryListing.severityCode)>
+
+		<tr>
 			<td>
 				<div style="font-weight:bold;font-size:13px;">
 					<span class="badge badge-#color_code_severity#">
