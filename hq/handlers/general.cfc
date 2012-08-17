@@ -149,7 +149,7 @@
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
 	
 				// save the last entryID on a cookie, this allows to detect unread entries
-				var lastEntryID = arrayMax( listToArray( valueList(qryEntries.entryID) ) );
+				var lastEntryID = getHighestEntryID(qryEntries);
 				if(not structKeyExists(cookie,"lastbugread")) {
 					writeCookie("lastbugread",lastEntryID,30);
 				}
@@ -206,7 +206,7 @@
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
 	
 				// save the last entryID on a cookie, this allows to detect unread entries
-				var lastEntryID = arrayMax( listToArray( valueList(qryEntries.entryID) ) );
+				var lastEntryID = getHighestEntryID(qryEntries);
 				if(not structKeyExists(cookie,"lastbugread")) {
 					writeCookie("lastbugread",lastEntryID,30);
 				}
@@ -509,4 +509,14 @@
 		</cfscript>		
 	</cffunction>
 	
+	<cffunction name="getHighestEntryID" access="private" returntype="numeric">
+		<cfargument name="qryEntries" type="query" required="true">
+		<cfset var qry = 0>
+		<cfquery name="qry" dbtype="query" maxrows="1">
+			SELECT MAX(entryID) as entryID
+				FROM qryEntries
+				ORDER BY entryID DESC
+		</cfquery>
+		<cfreturn qry.entryID>
+	</cffunction>
 </cfcomponent>
