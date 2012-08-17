@@ -75,6 +75,9 @@
 		<cfargument name="search_cftoken" type="string" required="false" default="">
 		<cfargument name="searchHTMLReport" type="boolean" required="false" default="false">
 		<cfargument name="message" type="string" required="false" default="">
+		<cfargument name="applicationCode" type="string" required="false" default="">
+		<cfargument name="hostName" type="string" required="false" default="">
+		<cfargument name="severityCode" type="string" required="false" default="">
 
 		<cfset var tmpSQL = "">
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
@@ -150,13 +153,22 @@
 						AND e.applicationID <cfif left(arguments.applicationID,1) eq "-"><cfset arguments.applicationID = removechars(arguments.applicationID,1,1)>NOT</cfif> IN 
     						(<cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.applicationID#" list="true">)
 					</cfif>
+					<cfif arguments.applicationCode neq "">
+						AND a.code = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.applicationCode#">
+					</cfif>
 					<cfif arguments.hostID neq "" and arguments.hostID neq 0 and arguments.hostID neq "_ALL_">
 						AND e.hostID <cfif left(arguments.hostID,1) eq "-"><cfset arguments.hostID = removechars(arguments.hostID,1,1)>NOT</cfif> IN
                             (<cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.hostID#" list="true">)
 					</cfif>
+					<cfif arguments.hostName neq "">
+						AND h.hostName = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.hostName#">
+					</cfif>
 					<cfif arguments.severityID neq "" and arguments.severityID neq 0 and arguments.severityID neq "_ALL_">
 						AND e.severityID <cfif left(arguments.severityID,1) eq "-"><cfset arguments.severityID = removechars(arguments.severityID,1,1)>NOT</cfif> IN
                             (<cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.severityID#" list="true">)
+					</cfif>
+					<cfif arguments.severityCode neq "">
+						AND s.code = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.severityCode#">
 					</cfif>
 					<cfif arguments.startDate neq "1/1/1800">
 						AND mydateTime >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.startDate#">
