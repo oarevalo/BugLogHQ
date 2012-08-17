@@ -83,7 +83,6 @@
 		<cfscript>
 			var refreshSeconds = 60;
 			var appService = getService("app"); 
-			var numTriggersToDisplay = 10;
 
 			try {
 				// prepare filters panel
@@ -92,9 +91,9 @@
 				// get current filters selected
 				criteria = getValue("criteria");
 				
-				qryData = appService.searchEntries(argumentCollection = criteria);
+				qryEntries = appService.searchEntries(argumentCollection = criteria);
 
-				setValue("qryData",qryData);
+				setValue("qryEntries",qryEntries);
 				setValue("refreshSeconds",refreshSeconds);
 				setValue("pageTitle", "Dashboard");
 				setView("dashboard");
@@ -118,10 +117,10 @@
 				// get current filters selected
 				criteria = getValue("criteria");
 				
-				qryData = appService.searchEntries(argumentCollection = criteria);
+				qryEntries = appService.searchEntries(argumentCollection = criteria);
 				qryTriggers = appService.getRecentTriggers(numTriggersToDisplay);
 
-				setValue("qryData",qryData);
+				setValue("qryEntries",qryEntries);
 				setValue("qryTriggers",qryTriggers);
 				setLayout("");
 				setView("dashboardContent");
@@ -485,33 +484,9 @@
 			// write cookie back
 			writeCookie(criteriaName,serializeJSON(criteria),30);
 
-			qryApplications = appService.getApplications();
-			qryHosts = appService.getHosts();
 			qrySeverities = appService.getSeverities();
-
-			// validate the application code
-			if(criteria.applicationID eq "") criteria.applicationID = 0;
-			if(criteria.applicationID neq 0 and criteria.applicationID neq "") {
-				if(not listfindnocase(valuelist(qryApplications.applicationID), criteria.applicationID)
-					and not listfindnocase(valuelist(qryApplications.code), criteria.applicationID)) {
-					setMessage("warning","The given application does not exist.");
-					criteria.applicationID = 0;
-				}
-			}
-
-			// validate the host code
-			if(criteria.hostID eq "") criteria.hostID = 0;
-			if(criteria.hostID neq 0 and criteria.hostID neq "") {
-				if(not listfindnocase(valuelist(qryHosts.hostID), criteria.hostID)
-					and not listfindnocase(valuelist(qryHosts.hostName), criteria.hostID)) {
-					setMessage("warning","The given host does not exist.");
-					criteria.hostID = 0;
-				}
-			}
-
+			
 			setValue("criteria", criteria);
-			setValue("qryApplications", qryApplications);
-			setValue("qryHosts", qryHosts);
 			setValue("qrySeverities", qrySeverities);
 		</cfscript>
 	</cffunction>

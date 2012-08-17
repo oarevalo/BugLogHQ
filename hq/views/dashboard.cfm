@@ -1,4 +1,4 @@
-<cfset qryData = rs.qryData>
+<cfset qryData = rs.qryEntries>
 <cfset dateMask = rs.dateFormatMask>
 
 <cfsavecontent variable="tmpHead">

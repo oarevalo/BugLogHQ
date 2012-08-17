@@ -12,6 +12,18 @@
 				{value="360", label="360 days"}
 			]>
 
+<cfquery name="qryApplicationsCurrent" dbtype="query">
+	SELECT DISTINCT applicationID, applicationCode as code
+		FROM rs.qryEntries
+		ORDER BY applicationCode
+</cfquery>
+
+<cfquery name="qryHostsCurrent" dbtype="query">
+	SELECT DISTINCT hostID, hostName
+		FROM rs.qryEntries
+		ORDER BY hostName
+</cfquery>
+
 <cfoutput>
 	<form name="frmSearch" id="frmSearch" action="index.cfm" method="get" style="margin:0px;padding-top:10px;" class="form-inline">
 		<input type="hidden" name="groupByApp" value="#rs.criteria.groupByApp#">
@@ -39,9 +51,9 @@
 					<select name="applicationID" style="width:200px;" class="searchSelector">
 						<option value="0">All</option>
 						<cfset found = false>
-						<cfloop query="rs.qryApplications">
-							<cfset isSelected = (rs.qryApplications.applicationID eq rs.criteria.applicationID or rs.qryApplications.code eq rs.criteria.applicationID)>
-							<option value="#rs.qryApplications.applicationID#" <cfif isSelected>selected</cfif>>#rs.qryApplications.code#</option>
+						<cfloop query="qryApplicationsCurrent">
+							<cfset isSelected = (qryApplicationsCurrent.applicationID eq rs.criteria.applicationID or qryApplicationsCurrent.code eq rs.criteria.applicationID)>
+							<option value="#qryApplicationsCurrent.applicationid#"  <cfif isSelected>selected</cfif>>#qryApplicationsCurrent.code#</option>
 							<cfif isSelected>
 								<cfset found = true>
 							</cfif>
@@ -56,9 +68,9 @@
 					<select name="hostID" style="width:200px;" class="searchSelector">
 						<option value="0">All</option>
 						<cfset found = false>
-						<cfloop query="rs.qryHosts">
-							<cfset isSelected = (rs.qryHosts.hostID eq rs.criteria.hostID or rs.qryHosts.hostName eq rs.criteria.hostID)>
-							<option value="#rs.qryHosts.hostID#" <cfif isSelected>selected</cfif>>#rs.qryHosts.hostName#</option>
+						<cfloop query="qryHostsCurrent">
+							<cfset isSelected = (qryHostsCurrent.hostID eq rs.criteria.hostID or qryHostsCurrent.hostName eq rs.criteria.hostID)>
+							<option value="#qryHostsCurrent.hostID#"  <cfif isSelected>selected</cfif>>#qryHostsCurrent.hostName#</option>
 							<cfif isSelected>
 								<cfset found = true>
 							</cfif>
