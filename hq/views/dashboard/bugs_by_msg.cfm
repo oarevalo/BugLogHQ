@@ -12,14 +12,9 @@
 		ORDER BY #sortField# DESC
 </cfquery>
 
-<cfoutput>	
+<cfoutput>
+<b>Recent Messages <cfif qryListing.recordCount gt maxRows>(Top #maxRows#)</cfif></b>	
 <table style="width:100%" class="table table-striped">	
-	<thead>
-		<tr>
-			<th>Messages  <cfif qryListing.recordCount gt maxRows>(Top #maxRows#)</cfif></th>
-			<th>Count</th>
-		</tr>
-	</thead>
 	<tbody>
 	<cfloop query="qryListing" endrow="#maxRows#">
 		<cfset tmpEntryURL = "index.cfm?event=entry&entryID=#qryListing.EntryID#">

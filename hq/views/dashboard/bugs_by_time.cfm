@@ -4,26 +4,32 @@
 		case "120": 
 			units=6;
 			datePartName = "month"; 
+			subtitle = "Last 6 months";
 			break;
 		case "360": 
 			units=12;
 			datePartName = "month"; 
+			subtitle = "Last 12 months";
 			break;
 		case "7": 
 			units=7;
 			datePartName = "day"; 
+			subtitle = "Last 7 days";
 			break;
 		case "30": 
 			units=30;
 			datePartName = "day"; 
+			subtitle = "Last 30 days";
 			break;
 		case "60": 
 			units=60;
 			datePartName = "day"; 
+			subtitle = "Last 60 days";
 			break;
 		case "1": 
 			units=24;
 			datePartName = "hour"; 
+			subtitle = "Last 24 hours";
 			break;
 	}
 </cfscript>
@@ -50,13 +56,13 @@
 							entry_day = #day(theDate)#
 							and entry_month = #month(theDate)#
 							and entry_year = #year(theDate)#
-							<cfset datePartValue = dateFormat(theDate,"Mmm d")>
+							<cfset datePartValue = dateFormat(theDate,"mm/dd")>
 							<cfset theDate = dateAdd("d",1,theDate)>
 						</cfcase>
 						<cfcase value="month">
 							entry_month = #month(theDate)#
 							and entry_year = #year(theDate)#
-							<cfset datePartValue = dateFormat(theDate,"mmm")>
+							<cfset datePartValue = dateFormat(theDate,"Mmm")>
 							<cfset theDate = dateAdd("m",1,theDate)>
 						</cfcase>
 					</cfswitch>
@@ -67,7 +73,8 @@
 	</cfloop>
 
 	<cfoutput>
-		<cfchart chartwidth="600" markersize="5" xaxistitle="#datePartName#"  yaxistitle="Count" title="Timeline" sortXAxis="no">
+		<b>Timeline (#subtitle#)</b><br />
+		<cfchart chartwidth="600" markersize="5" xaxistitle="#datePartName#"  yaxistitle="Count" sortXAxis="no">
 			<cfchartseries query="qryChart" type="bar"
 							paintStyle="plain"
 							markerStyle="circle"
