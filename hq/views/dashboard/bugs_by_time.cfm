@@ -68,7 +68,7 @@
 
 	<cfoutput>
 		<cfchart chartwidth="600" markersize="5" xaxistitle="#datePartName#"  yaxistitle="Count" title="Timeline" sortXAxis="no">
-			<cfchartseries query="qryChart" type="curve"
+			<cfchartseries query="qryChart" type="bar"
 							paintStyle="plain"
 							markerStyle="circle"
 							itemcolumn="DatePartValue" 
