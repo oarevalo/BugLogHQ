@@ -47,7 +47,6 @@ label.inline {
 }
 
 #header {
-	clear:both;
 }
 #header-left {
 	margin-left:10px;
@@ -75,6 +74,7 @@ label.inline {
 	text-align:right;
 	float:right;
 	color:#333;
+	margin-top:5px;
 }
 #mainBody {
     vertical-align:top;
