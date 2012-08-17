@@ -118,34 +118,29 @@
 			var qry = 0;
 			var oFinder = 0;
 			var o = 0;
+			var args = duplicate(arguments);
 
 			// if applicationID is not numeric, assume it is the applicationCode
 			if(Not isNumeric(arguments.applicationID)) {
-				oFinder = createModelObject("components.appFinder").init( variables.oApplicationDAO );
-				o = oFinder.findByCode(arguments.applicationID);
-				arguments.applicationID = o.getApplicationID();
+				args.applicationID = 0;
+				args.applicationCode = trim(arguments.applicationID);
 			}
 
 			// if hostID is not numeric, assume it is the hostname
 			if(Not isNumeric(arguments.hostID)) {
-				oFinder = createModelObject("components.hostFinder").init( variables.oHostDAO );
-				o = oFinder.findByName(arguments.hostID);
-				arguments.hostID = o.getHostID();
+				args.hostID = 0;
+				args.hostName = trim(arguments.hostID);
 			}
 
 			// if severityID is not numeric and is not a list and is not _ALL_, assume it is the severityCode
 			if(Not isNumeric(arguments.severityID) and listlen(arguments.severityID) eq 1 and arguments.severityID neq "_ALL_") {
-				oFinder = createModelObject("components.severityFinder").init( variables.oSeverityDAO );
-				o = oFinder.findByCode(arguments.severityID);
-				arguments.severityID = o.getSeverityID();
+				args.severityID = 0;
+				args.severityCode = trim(arguments.severityID);
 			}
-			
-			arguments.applicationID = val(arguments.applicationID);
-			arguments.hostID = val(arguments.hostID);
-			
+						
 			// get entries
 			oEntryFinder = createModelObject("components.entryFinder").init( variables.oEntryDAO );
-			qry = oEntryFinder.search(argumentCollection = arguments);
+			qry = oEntryFinder.search(argumentCollection = args);
 			
 			return qry;
 		</cfscript>
