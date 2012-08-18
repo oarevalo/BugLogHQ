@@ -55,50 +55,54 @@
 </cfscript>
 	
 <cfif datePartName neq "">
-	<cfset qryChart = queryNew("datePartValue,numCount")>
+	<cfset qryChart = queryNew("datePartValue,numCount,checkDate")>
 	<cfset theDate = rs.criteria.startDate>
-
-	<cfloop from="1" to="#units#" index="i">
+	<cfloop from="0" to="#units#" index="i">
 		<cfquery name="qryTimeline" dbtype="query">
 			SELECT count(*) as numCount
 				FROM qryData
 				WHERE 
 					<cfswitch expression="#datePartName#">
 						<cfcase value="minute">
+							<cfset theDate = dateAdd("n",i,rs.criteria.startDate)>
 							entry_minute=#minute(theDate)#
-							and entry_hour=#hour(theDate)#
+							and entry_hour=#timeFormat(theDate,"H")#
 							and entry_day = #day(theDate)#
 							and entry_month = #month(theDate)#
 							and entry_year = #year(theDate)#
 							<cfset datePartValue = timeFormat(theDate,"mm")>
-							<cfset theDate = dateAdd("n",1,theDate)>
 						</cfcase>
 						<cfcase value="hour">
-							entry_hour=#hour(theDate)#
+							<cfset theDate = dateAdd("h",i,rs.criteria.startDate)>
+							entry_hour=#timeFormat(theDate,"H")#
 							and entry_day = #day(theDate)#
 							and entry_month = #month(theDate)#
 							and entry_year = #year(theDate)#
 							<cfset datePartValue = timeFormat(theDate,"h tt")>
-							<cfset theDate = dateAdd("h",1,theDate)>
 						</cfcase>
 						<cfcase value="day">
+							<cfset theDate = dateAdd("d",i,rs.criteria.startDate)>
 							entry_day = #day(theDate)#
 							and entry_month = #month(theDate)#
 							and entry_year = #year(theDate)#
 							<cfset datePartValue = dateFormat(theDate,"mm/dd")>
-							<cfset theDate = dateAdd("d",1,theDate)>
 						</cfcase>
 						<cfcase value="month">
+							<cfset theDate = dateAdd("m",i,rs.criteria.startDate)>
 							entry_month = #month(theDate)#
 							and entry_year = #year(theDate)#
-							<cfset datePartValue = dateFormat(theDate,"Mmm")>
-							<cfset theDate = dateAdd("m",1,theDate)>
+							<cfif month(theDate) eq 1 or i eq 1>
+								<cfset datePartValue = dateFormat(theDate,"Mmm yy")>
+							<cfelse>
+								<cfset datePartValue = dateFormat(theDate,"Mmm")>
+							</cfif>
 						</cfcase>
 					</cfswitch>
 		</cfquery>
 		<cfset queryAddRow(qryChart)>
 		<cfset querySetCell(qryChart,"datePartValue",datePartValue)>
 		<cfset querySetCell(qryChart,"numCount",val(qryTimeline.numCount))>
+		<cfset querySetCell(qryChart,"checkDate",theDate)>
 	</cfloop>
 
 	<cfoutput>
