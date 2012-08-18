@@ -16,6 +16,7 @@
 		variables.instance.templatePath = "";
 		variables.instance.HTMLReport = "";
 		variables.instance.sourceName = "";
+		variables.instance.receivedOn = now();
 		
 		function setDateTime(data) {variables.instance.dateTime = arguments.data; return this;}
 		function setMessage(data) {variables.instance.message = arguments.data; return this;}
@@ -31,6 +32,7 @@
 		function setTemplatePath(data) {variables.instance.templatePath = arguments.data; return this;}
 		function setHTMLReport(data) {variables.instance.HTMLReport = arguments.data; return this;}
 		function setSourceName(data) {variables.instance.sourceName = arguments.data; return this;}
+		function setReceivedOn(data) {variables.instance.receivedOn = arguments.data; return this;}
 		
 		function getDateTime() {return variables.instance.dateTime;}
 		function getMessage() {return variables.instance.message;}
@@ -46,6 +48,7 @@
 		function getTemplate_Path() {return variables.instance.templatePath;}
 		function getHTMLReport() {return variables.instance.HTMLReport;}
 		function getSourceName() {return variables.instance.sourceName;}
+		function getReceivedOn() {return variables.instance.receivedOn;}
 	</cfscript>
 	
 	<cffunction name="init" access="public" returnType="rawEntryBean">

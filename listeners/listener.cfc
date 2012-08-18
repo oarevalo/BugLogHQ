@@ -51,7 +51,8 @@
 								.setCFTOKEN(arguments.cftoken)
 								.setUserAgent(arguments.userAgent)
 								.setTemplatePath(arguments.templatePath)
-								.setHTMLReport(arguments.HTMLReport);
+								.setHTMLReport(arguments.HTMLReport)
+								.setReceivedOn(now());
 			
 			// log entry
 			oBugLogListener.logEntry(oRawEntry);

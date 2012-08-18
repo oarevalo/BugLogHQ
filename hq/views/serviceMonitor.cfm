@@ -65,7 +65,7 @@
 										title="#lcase(st.SeverityCode)#"
 										border="0">
 							</td>
-							<td align="center" style="width:100px;">#dateFormat(st.dateTime,dateFormatMask)# #timeFormat(st.dateTime, 'HH:mm:ss')#</td>
+							<td align="center" style="width:100px;">#dateFormat(st.receivedOn,dateFormatMask)# #timeFormat(st.receivedOn, 'HH:mm:ss')#</td>
 							<td align="center" style="width:120px;">#st.applicationCode#</td>
 							<td align="center" style="width:100px;">#st.hostName#</td>
 							<td>#HtmlEditFormat(st.message)#</td>

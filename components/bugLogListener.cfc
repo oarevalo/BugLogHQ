@@ -103,7 +103,7 @@
 			oEntry.setUserAgent(bean.getuserAgent());
 			oEntry.setTemplatePath(bean.gettemplate_Path());
 			oEntry.setHTMLReport(bean.getHTMLReport());
-			oEntry.setCreatedOn(now());
+			oEntry.setCreatedOn(bean.getReceivedOn());
 		
 			// save entry
 			oEntry.save();
