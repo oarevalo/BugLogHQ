@@ -30,7 +30,7 @@
 </cfquery>
 <cfquery name="qryHosts" dbtype="query">
 	SELECT hostID, hostName, count(hostID) as numEntries
-		FROM rs.qryEntriesLast24
+		FROM rs.qryEntriesAll
 		GROUP BY hostID, hostName
 </cfquery>
 <cfquery name="qryUAEntries" dbtype="query">
@@ -39,7 +39,6 @@
 		WHERE entryID <> <cfqueryparam cfsqltype="cf_sql_numeric" value="#entryID#">
 		ORDER BY createdOn DESC
 </cfquery>
-
 
 <cfinclude template="../includes/udf.cfm">
 
@@ -163,10 +162,6 @@
 						<td>#oEntry.getCFID()# &nbsp;&nbsp;/&nbsp;&nbsp; #oEntry.getCFTOKEN()#</td>
 					</tr>
 				</cfif>
-				<tr>
-					<td><b>Received via:</b></td>
-					<td>#oSource.getName()#</td>
-				</tr>
 			</tbody>
 		</table>
 	</td>
@@ -177,19 +172,27 @@
 			<ul>
 			<cfif rs.qryEntriesLast24.recordCount gt 1>
 				<li><b>#rs.qryEntriesLast24.recordCount#</b> reports with the 
-				<a href="index.cfm?event=log&numDays=1&msgFromEntryID=#entryID#&applicationID=0&hostID=0&severityID=0"><b>same message</b></a>
+				<a href="index.cfm?event=log&numDays=1&msgFromEntryID=#entryID#&applicationID=#oApp.getApplicationID()#&hostID=0&severityID=0"><b>same message</b></a>
 				have been reported in the last 24 hours.</li>
 			<cfelse>
 				<li>This is the <b>first time</b> this message has ocurred in the last 24 hours.</li>
 			</cfif>
+			<li style="margin-top:4px;">
+				<cfset firstOccurrence = rs.qryEntriesAll.createdOn[rs.qryEntriesAll.recordCount]>
+				<cfset firstOccurrenceID = rs.qryEntriesAll.entryID[rs.qryEntriesAll.recordCount]>
+				This bug has ocurred 
+				<a href="index.cfm?event=log&numDays=360&msgFromEntryID=#entryID#&applicationID=#oApp.getApplicationID()#&hostID=0&severityID=0"><b>#rs.qryEntriesAll.recordCount#</b> time<cfif rs.qryEntriesAll.recordCount gt 1>s</cfif></a>
+				since 
+				<a href="index.cfm?event=entry&entryID=#firstOccurrenceID#"><b>#lsDateFormat(firstOccurrence,"long")# #lsTimeFormat(firstOccurrence)#</b></a>
+			</li>
 			<cfif qryEntriesOthers.recordCount gt 1>
-				<li>
+				<li style="margin-top:4px;">
 					The previous time this bug was reported was on 
 					<a href="index.cfm?event=entry&entryID=#qryEntriesOthers.entryID#"><b>#lsDateFormat(qryEntriesOthers.createdOn,"long")# #lsTimeFormat(qryEntriesOthers.createdOn)#</b></a>
 				</li>
 			</cfif>
 			</ul>
-			<div style="margin-top:5px;">
+			<div style="margin-top:8px;">
 				<b>Host Distribution:</b><br />
 				<table class="table table-condensed">
 					<cfset totalEntries = arraySum(listToArray(valueList(qryHosts.numEntries)))>

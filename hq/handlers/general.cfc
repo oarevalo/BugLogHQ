@@ -250,11 +250,13 @@
 				args.message = "__EMPTY__";
 				args.startDate = dateAdd("d", -1, now());
 				args.searchTerm = "";
+				args.applicationID = oEntry.getApplicationID();
 				if(oEntry.getMessage() neq "")
 					args.message = oEntry.getMessage();
 				var qryEntriesLast24 = appService.searchEntries(argumentCollection = args);
 				var qryEntriesAll = appService.searchEntries(message = args.message, 
-																					searchTerm = "");
+															 searchTerm = "",
+															 applicationID = args.applicationID);
 				if(oEntry.getUserAgent() neq "") {
 					qryEntriesUA = appService.searchEntries(startDate = args.startDate,
 																						userAgent = oEntry.getUserAgent(),
