@@ -126,7 +126,7 @@
 					<td>
 						#oEntry.getUserAgent()#
 						<cfif qryUAEntries.recordCount gt 0>
-							<br /><a href="##" onclick="$('##uaentries').slideToggle()"><b>#rs.qryEntriesUA.recordCount#</b> other reports from the same user agent (last 24hrs)</a>
+							<br /><a href="##" onclick="$('##uaentries').slideToggle()" title="click to expand"><b>#rs.qryEntriesUA.recordCount#</b> other reports from the same user agent (last 24hrs) <i class="icon-circle-arrow-down"></i></a>
 							<ul id="uaentries" style="display:none;margin-top:5px;">
 								<cfloop query="qryUAEntries" startrow="1" endrow="#min(maxPreviewEntries,qryUAEntries.recordCount)#">
 									<li>
@@ -174,7 +174,7 @@
 			<cfif rs.qryEntriesLast24.recordCount gt 1>
 				<li>
 					<b>#rs.qryEntriesLast24.recordCount#</b> reports with the 
-					<a href="##" onclick="$('##last24hentries').slideToggle()"><b>same message</b></a>
+					<a href="##" onclick="$('##last24hentries').slideToggle()" title="click to expand"><b>same message</b> <i class="icon-circle-arrow-down"></i></a>
 					have been reported in the last 24 hours.
 					<ul id="last24hentries" style="display:none;margin-top:5px;">
 						<cfloop query="rs.qryEntriesLast24" startrow="1" endrow="#min(maxPreviewEntries,rs.qryEntriesLast24.recordCount)#">
@@ -197,7 +197,7 @@
 				<cfset firstOccurrence = rs.qryEntriesAll.createdOn[rs.qryEntriesAll.recordCount]>
 				<cfset firstOccurrenceID = rs.qryEntriesAll.entryID[rs.qryEntriesAll.recordCount]>
 				This bug has ocurred 
-				<a href="##" onclick="$('##allentries').slideToggle()"><b>#rs.qryEntriesAll.recordCount#</b> time<cfif rs.qryEntriesAll.recordCount gt 1>s</cfif></a>
+				<a href="##" onclick="$('##allentries').slideToggle()" title="click to expand"><b>#rs.qryEntriesAll.recordCount#</b> time<cfif rs.qryEntriesAll.recordCount gt 1>s</cfif> <i class="icon-circle-arrow-down"></i></a>
 				since 
 				<a href="index.cfm?event=entry&entryID=#firstOccurrenceID#"><b>#lsDateFormat(firstOccurrence,"long")# #lsTimeFormat(firstOccurrence)#</b></a>
 				<ul id="allentries" style="display:none;margin-top:5px;">
