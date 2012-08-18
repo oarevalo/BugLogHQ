@@ -22,6 +22,8 @@
 	<cfset tmpMessage = HtmlEditFormat(oEntry.getMessage())>
 </cfif>
 
+<cfset maxPreviewEntries = 10>
+							
 <cfquery name="qryEntriesOthers" dbtype="query">
 	SELECT *
 		FROM rs.qryEntriesAll
@@ -124,10 +126,9 @@
 					<td>
 						#oEntry.getUserAgent()#
 						<cfif qryUAEntries.recordCount gt 0>
-							<cfset maxUAEntries = 10>
 							<br /><a href="##" onclick="$('##uaentries').slideToggle()"><b>#rs.qryEntriesUA.recordCount#</b> other reports from the same user agent (last 24hrs)</a>
 							<ul id="uaentries" style="display:none;margin-top:5px;">
-								<cfloop query="qryUAEntries" startrow="1" endrow="#min(maxUAEntries,qryUAEntries.recordCount)#">
+								<cfloop query="qryUAEntries" startrow="1" endrow="#min(maxPreviewEntries,qryUAEntries.recordCount)#">
 									<li>
 										<cfif qryUAEntries.entryID eq oEntry.getEntryID()><span class="label label-info">This</span> </cfif>
 										#dateFormat(qryUAEntries.createdOn,"m/d")# #timeFormat(qryUAEntries.createdOn,"hh:mm tt")#: 
@@ -135,8 +136,8 @@
 										<b>#qryUAEntries.hostName#</b> :
 										<a href="index.cfm?event=entry&entryID=#qryUAEntries.entryID#">#htmlEditFormat(qryUAEntries.message)#</a></li>
 								</cfloop>
-								<cfif qryUAEntries.recordCount gt maxUAEntries>
-									<li>... #qryUAEntries.recordCount-maxUAEntries# more (not shown)</li>
+								<cfif qryUAEntries.recordCount gt maxPreviewEntries>
+									<li>... #qryUAEntries.recordCount-maxPreviewEntries# more (not shown)</li>
 								</cfif>
 							</ul>
 						</cfif>
@@ -171,9 +172,24 @@
 			<h3>Stats</h3>
 			<ul>
 			<cfif rs.qryEntriesLast24.recordCount gt 1>
-				<li><b>#rs.qryEntriesLast24.recordCount#</b> reports with the 
-				<a href="index.cfm?event=log&numDays=1&msgFromEntryID=#entryID#&applicationID=#oApp.getApplicationID()#&hostID=0&severityID=0"><b>same message</b></a>
-				have been reported in the last 24 hours.</li>
+				<li>
+					<b>#rs.qryEntriesLast24.recordCount#</b> reports with the 
+					<a href="##" onclick="$('##last24hentries').slideToggle()"><b>same message</b></a>
+					have been reported in the last 24 hours.
+					<ul id="last24hentries" style="display:none;margin-top:5px;">
+						<cfloop query="rs.qryEntriesLast24" startrow="1" endrow="#min(maxPreviewEntries,rs.qryEntriesLast24.recordCount)#">
+							<li>
+								<cfif rs.qryEntriesLast24.entryID eq oEntry.getEntryID()><span class="label label-info">This</span> </cfif>
+								<a href="index.cfm?event=entry&entryID=#rs.qryEntriesLast24.entryID#">#dateFormat(rs.qryEntriesLast24.createdOn,"m/d")# #timeFormat(rs.qryEntriesLast24.createdOn,"hh:mm tt")#</a> 
+								 on
+								<b>#rs.qryEntriesLast24.hostName#</b>
+							</li>
+						</cfloop>
+						<cfif rs.qryEntriesLast24.recordCount gt maxPreviewEntries>
+							<li>... #rs.qryEntriesLast24.recordCount-maxPreviewEntries# more (<a href="index.cfm?event=log&numDays=1&msgFromEntryID=#entryID#&applicationID=#oApp.getApplicationID()#&hostID=0&severityID=0">See all</a>)</li>
+						</cfif>
+					</ul>
+				</li>
 			<cfelse>
 				<li>This is the <b>first time</b> this message has ocurred in the last 24 hours.</li>
 			</cfif>
@@ -181,11 +197,24 @@
 				<cfset firstOccurrence = rs.qryEntriesAll.createdOn[rs.qryEntriesAll.recordCount]>
 				<cfset firstOccurrenceID = rs.qryEntriesAll.entryID[rs.qryEntriesAll.recordCount]>
 				This bug has ocurred 
-				<a href="index.cfm?event=log&numDays=360&msgFromEntryID=#entryID#&applicationID=#oApp.getApplicationID()#&hostID=0&severityID=0"><b>#rs.qryEntriesAll.recordCount#</b> time<cfif rs.qryEntriesAll.recordCount gt 1>s</cfif></a>
+				<a href="##" onclick="$('##allentries').slideToggle()"><b>#rs.qryEntriesAll.recordCount#</b> time<cfif rs.qryEntriesAll.recordCount gt 1>s</cfif></a>
 				since 
 				<a href="index.cfm?event=entry&entryID=#firstOccurrenceID#"><b>#lsDateFormat(firstOccurrence,"long")# #lsTimeFormat(firstOccurrence)#</b></a>
+				<ul id="allentries" style="display:none;margin-top:5px;">
+					<cfloop query="rs.qryEntriesAll" startrow="1" endrow="#min(maxPreviewEntries,rs.qryEntriesAll.recordCount)#">
+						<li>
+							<cfif rs.qryEntriesAll.entryID eq oEntry.getEntryID()><span class="label label-info">This</span> </cfif>
+							<a href="index.cfm?event=entry&entryID=#rs.qryEntriesAll.entryID#">#dateFormat(rs.qryEntriesAll.createdOn,"m/d")# #timeFormat(rs.qryEntriesAll.createdOn,"hh:mm tt")#</a>
+							 on
+							<b>#rs.qryEntriesAll.hostName#</b>
+						</li>
+					</cfloop>
+					<cfif rs.qryEntriesAll.recordCount gt maxPreviewEntries>
+						<li>... #rs.qryEntriesAll.recordCount-maxPreviewEntries# more (<a href="index.cfm?event=log&numDays=360&msgFromEntryID=#entryID#&applicationID=#oApp.getApplicationID()#&hostID=0&severityID=0">See all</a>)</li>
+					</cfif>
+				</ul>
 			</li>
-			<cfif qryEntriesOthers.recordCount gt 1>
+			<cfif qryEntriesOthers.recordCount gt 0>
 				<li style="margin-top:4px;">
 					The previous time this bug was reported was on 
 					<a href="index.cfm?event=entry&entryID=#qryEntriesOthers.entryID#"><b>#lsDateFormat(qryEntriesOthers.createdOn,"long")# #lsTimeFormat(qryEntriesOthers.createdOn)#</b></a>
