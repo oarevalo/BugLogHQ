@@ -118,7 +118,7 @@
 				criteria = getValue("criteria");
 				
 				qryEntries = appService.searchEntries(argumentCollection = criteria);
-				qryTriggers = appService.getRecentTriggers(criteria.startDate);
+				qryTriggers = appService.getExtensionsLog(criteria.startDate);
 
 				setValue("qryEntries",qryEntries);
 				setValue("qryTriggers",qryTriggers);

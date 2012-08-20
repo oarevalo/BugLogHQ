@@ -10,8 +10,18 @@ $(document).ready(function(){
 		document.location = rel;
 	});
 	
-	$('.searchSelector').change(doSearch);
-	$('.searchCheckbox').click(doSearch);
+	$('.searchSelector').change(function(){
+		if(typeof doSearch == 'function') doSearch();
+	});
+	$('.searchCheckbox').click(function(){
+		if(typeof doSearch == 'function') doSearch();
+	});
+	
+	$('#newRuleSelector').change(function(){
+		var rel = $(this).val();
+		$('.ruleDescription').hide();
+		$('#rule_'+rel).show();
+	})
 });
 
 function confirmDeleteRule(index) {

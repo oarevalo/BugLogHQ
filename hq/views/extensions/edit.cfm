@@ -24,10 +24,15 @@
 </script>
 
 <cfoutput>
-	<cfinclude template="../includes/menu.cfm">
-
+	<cfinclude template="../../includes/menu.cfm">
+	
+	<br />
+	
 	<h3>#ruleLabel#</h3>
-	<em>#rs.stRule.description#</em><br /><br /><br />
+	<div>
+		<img src="#rs.assetsPath#images/icons/information.png"> <em>#rs.stRule.description#</em>
+	</div>
+	<hr />
 
 	<form name="frm" method="post" action="index.cfm">
 		<input type="hidden" name="event" value="extensions.doSaveRule">
@@ -39,7 +44,6 @@
 				<td><b>Description:</b></td>
 				<td><textarea name="description" rows="3" class="formField">#trim(rs.aActiveRule.description)#</textarea></td>
 			</tr>
-			<tr><td colspan="2">&nbsp;</td></tr>
 
 			<cfset aProps = rs.stRule.properties>
 			<cfloop from="1" to="#arrayLen(aProps)#" index="i">
@@ -138,12 +142,11 @@
 								<em>#aProps[i].hint#</em>
 							</div>
 						</cfif>
-						<br><br>
+						<br />
 					</td>
 				</tr>
 			</cfloop>
 		</table>
-		<br />
 		<input type="submit" value="Save" name="btnSave">&nbsp;&nbsp;
 		<input type="button" value="Cancel" name="btnCancel" onclick="document.location='index.cfm?event=extensions.main'">
 	</form>

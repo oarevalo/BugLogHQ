@@ -4,14 +4,28 @@
 
 	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
+			var appService = getService("app");
+			
 			try {
-				aRules = getService("app").getRules();
-				aActiveRules = getService("app").getActiveRules();
+				panel = getValue("panel","rules");
+
+				switch(panel) {
+					case "rules":
+						aActiveRules = appService.getActiveRules();
+						setValue("aActiveRules", aActiveRules);
+						break;
+					case "history":
+						qryHistory = appService.getExtensionsLog();
+						setValue("qryHistory", qryHistory);
+						break;
+				}
+
+				aRules = appService.getRules();
 	
 				setValue("hasExtensionsXMLFile", fileExists(expandPath(variables.extensionsXMLPath)));
 				setValue("aRules", aRules);
-				setValue("aActiveRules", aActiveRules);
 				setValue("pageTitle", "Rules");
+				setValue("panel", panel);
 	
 				setView("extensions");
 
@@ -53,7 +67,7 @@
 				}
 	
 				setValue("pageTitle", "Rules > Add/Edit Rule");
-				setView("rule");
+				setView("extensions/edit");
 
 			} catch(validation e) {
 				setMessage("warning",e.message);

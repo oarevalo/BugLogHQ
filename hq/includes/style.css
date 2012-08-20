@@ -181,6 +181,47 @@ label.inline {
 	width:300px;
 }
 
+/***** Extensions & Rules *******/
+#extensions-content {
+	width:100%;
+}
+#extensions-main {
+	margin-right:310px;
+}
+#extensions-side {
+	float:right;
+	width:300px;
+}
+.extensionItem {
+	background-color:#ebebeb;
+	border-bottom:1px solid #666;
+	border-right:1px solid #666;
+	border-top:1px solid silver;
+	border-left:1px solid silver;
+	font-size:14px;
+	margin-bottom:15px;
+	padding:5px;
+}
+.extensionItem:hover {
+	background-color:#f5f5f5;
+}
+.extensionItem table {
+	margin-top:10px;
+	border-collapse:collapse;
+}
+.extensionItem td {
+	padding:5px;
+	font-size:11px;
+	border:1px solid silver;
+}
+.migrationNotice {
+	margin:20px;
+	padding:10px;
+	font-size:14px;
+	border:1px dashed silver;
+	background-color:#FFFFE0;
+}
+
 /****** User Defined Rules **********/
 /*
 You can define custom CSS rules to apply to rows with specific applicatio/host/severity 

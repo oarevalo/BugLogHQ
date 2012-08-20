@@ -26,15 +26,18 @@
 	<cffunction name="loadExtensions" access="private" returntype="void">
 		<cfset var qry = variables.oDAO.getAll()>
 		<cfset var st = {}>
+		<cfset var obj = 0>
+		<cfset var pathToRuleCFC = "">
 
 		<cfset variables.aRules = []>
 
 		<cfloop query="qry">
 			<cfswitch expression="#qry.type#">
 				<cfcase value="rule">
+					<cfset pathToRuleCFC = variables.extensionsPath & "rules." & qry.name>
 					<cfset st = {
 								id = qry.extensionID,
-								component = variables.extensionsPath & "rules." & qry.name,
+								component = pathToRuleCFC,
 								description = qry.description,
 								config = {},
 								enabled = (qry.enabled gt 0),
@@ -44,6 +47,8 @@
 					<cfif isJson(qry.properties)>
 						<cfset st.config = deserializeJSON(qry.properties)>
 					</cfif>
+					<cfset obj = createObject("component",pathToRuleCFC).init(argumentCollection = st.config)>
+					<cfset st.instance = obj>
 					<cfset arrayAppend(variables.aRules, duplicate(st))>
 				</cfcase>
 			</cfswitch>
