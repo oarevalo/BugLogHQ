@@ -20,4 +20,12 @@
 		<cfreturn true>
 	</cffunction>
 
+	<cffunction name="explain" access="public" returntype="string">
+		<cfset var rtn = "Sends an alert ">
+		<cfif variables.config.recipientEmail  neq "">
+			<cfset rtn &= " to <b>#variables.config.recipientEmail#</b>">
+		</cfif>
+		<cfset rtn &= " every time a bug report is received">
+		<cfreturn rtn>
+	</cffunction>
 </cfcomponent>

@@ -55,4 +55,22 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="explain" access="public" returntype="string">
+		<cfset var rtn = "Sends an alert ">
+		<cfif variables.config.recipientEmail  neq "">
+			<cfset rtn &= " to <b>#variables.config.recipientEmail#</b>">
+		</cfif>
+		<cfset rtn &= " when receiving a bug report">
+		<cfif variables.config.application  neq "">
+			<cfset rtn &= " from application <b>#variables.config.application#</b>">
+		</cfif>
+		<cfif variables.config.severityCode  neq "">
+			<cfset rtn &= " with a severity of <b>#variables.config.severityCode#</b>">
+		</cfif>
+		<cfif variables.config.keywords  neq "">
+			<cfset rtn &= " containing any of the following keywords <b>#listQualify(variables.config.keywords,"'")#</b>">
+		</cfif>
+		<cfreturn rtn>
+	</cffunction>	
+	
 </cfcomponent>

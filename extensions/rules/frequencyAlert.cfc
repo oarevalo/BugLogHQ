@@ -251,4 +251,28 @@
 		</cfif>
 	</cffunction>
 	
+	<cffunction name="explain" access="public" returntype="string">
+		<cfset var rtn = "Sends an alert ">
+		<cfif variables.config.recipientEmail  neq "">
+			<cfset rtn &= " to <b>#variables.config.recipientEmail#</b>">
+		</cfif>
+		<cfif variables.config.oneTimeAlertRecipient neq "">
+			<cfset rtn &= " (and once per day to <b>#variables.config.oneTimeAlertRecipient#</b>)">
+		</cfif>
+		<cfset rtn &= " when receiving more than <b>#variables.config.count#</b> report<cfif variables.config.count gt 1>s</cfif>">
+		<cfif variables.config.timespan  neq "">
+			<cfset rtn &= " within the last <b>#variables.config.timespan#</b> minute<cfif variables.config.timespan gt 1>s</cfif>">
+		</cfif>
+		<cfif variables.config.application  neq "">
+			<cfset rtn &= " from application <b>#variables.config.application#</b>">
+		</cfif>
+		<cfif variables.config.severity  neq "">
+			<cfset rtn &= " with a severity of <b>#variables.config.severity#</b>">
+		</cfif>
+		<cfif variables.config.host  neq "">
+			<cfset rtn &= " from host <b>#variables.config.host#</b>">
+		</cfif>
+		<cfreturn rtn>
+	</cffunction>	
+	
 </cfcomponent>

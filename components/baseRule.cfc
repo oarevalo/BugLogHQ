@@ -191,4 +191,8 @@
 		<cfreturn qry>
 	</cffunction>
 
+	<cffunction name="explain" access="public" returntype="string" hint="returns a user friendly description of this rule">
+		<cfreturn "">
+	</cffunction>
+
 </cfcomponent>

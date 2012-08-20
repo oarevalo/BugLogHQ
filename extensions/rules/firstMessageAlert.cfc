@@ -156,4 +156,26 @@
 		</cftry>
 	</cffunction>
 
+	<cffunction name="explain" access="public" returntype="string">
+		<cfset var rtn = "Sends an alert ">
+		<cfif variables.config.recipientEmail  neq "">
+			<cfset rtn &= " to <b>#variables.config.recipientEmail#</b>">
+		</cfif>
+		<cfset rtn &= " on the first ocurrence">
+		<cfif variables.config.timespan  neq "">
+			<cfset rtn &= " in <b>#variables.config.timespan#</b> minutes">
+		</cfif>
+		<cfset rtn &= " of a bug report received">
+		<cfif variables.config.application  neq "">
+			<cfset rtn &= " from application <b>#variables.config.application#</b>">
+		</cfif>
+		<cfif variables.config.severity  neq "">
+			<cfset rtn &= " with a severity of <b>#variables.config.severity#</b>">
+		</cfif>
+		<cfif variables.config.host  neq "">
+			<cfset rtn &= " from host <b>#variables.config.host#</b>">
+		</cfif>
+		<cfreturn rtn>
+	</cffunction>
+
 </cfcomponent>
