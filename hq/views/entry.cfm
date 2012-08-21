@@ -35,12 +35,17 @@
 		FROM rs.qryEntriesAll
 		GROUP BY hostID, hostName
 </cfquery>
-<cfquery name="qryUAEntries" dbtype="query">
-	SELECT *
-		FROM rs.qryEntriesUA
-		WHERE entryID <> <cfqueryparam cfsqltype="cf_sql_numeric" value="#entryID#">
-		ORDER BY createdOn DESC
-</cfquery>
+
+<cfif rs.qryEntriesUA.recordCount gt 0>
+	<cfquery name="qryUAEntries" dbtype="query">
+		SELECT *
+			FROM rs.qryEntriesUA
+			WHERE entryID <> <cfqueryparam cfsqltype="cf_sql_numeric" value="#entryID#">
+			ORDER BY createdOn DESC
+	</cfquery>
+<cfelse>
+	<cfset qryUAEntries = queryNew("")>
+</cfif>
 
 <cfinclude template="../includes/udf.cfm">
 
@@ -62,6 +67,10 @@
 					<img width="16" height="16" src="#rs.assetsPath#images/icons/jira.png" align="absmiddle" />
 					<a href="index.cfm?event=jira.sendToJira&entryID=#entryID#">Send to JIRA</a>
 				</cfif>
+
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<img width="16" height="16" src="#rs.assetsPath#images/icons/cross.png" align="absmiddle" />
+				<a href="##" onclick="$('##dDeleteReport').slideToggle();">Delete</a>
 
 				&nbsp;&nbsp;&nbsp;&nbsp;
 				<select name="ruleName" style="width:100px;" onchange="if(this.value!='') document.location='#tmpCreateRuleURL#&ruleName='+this.value">
@@ -93,6 +102,29 @@
 		</tr>
 	</table>
 </p>
+
+<!--- Delete bug report form --->
+<div id="dDeleteReport" style="display:none;background-color:##f9f9f9;" class="criteriaTable">
+	<div style="margin:10px;padding-top:10px;">
+	<form name="frmDelete" action="index.cfm" method="post" style="padding:0px;margin:0px;">
+		<input type="hidden" name="event" value="doDelete">
+		<input type="hidden" name="entryID" value="#oEntry.getEntryID()#">
+		<div style="margin-bottom:10px;">
+			<span class="label label-important">DELETE BUG REPORT?</span>
+		</div>
+		<label><input type="radio" name="deleteScope" value="this" checked="true"> Delete this bug report only</label>
+		<cfif qryHosts.RecordCount gt 1>
+			<label><input type="radio" name="deleteScope" value="app-host"> Delete all reports with the same message on this application on this host</label>
+			<label><input type="radio" name="deleteScope" value="app"> Delete all reports with the same message on this application on all hosts</label>
+		<cfelse>
+			<label><input type="radio" name="deleteScope" value="app"> Delete all reports with the same message on this application</label>
+		</cfif>
+		<br>
+		<input type="submit" value="Delete" name="btnSubmit">
+	</form>
+	</div>
+</div>
+
 
 <!--- Send to email form --->
 <div id="dSendForm" style="display:none;background-color:##f9f9f9;" class="criteriaTable">
@@ -193,27 +225,29 @@
 			<cfelse>
 				<li>This is the <b>first time</b> this message has ocurred in the last 24 hours.</li>
 			</cfif>
-			<li style="margin-top:4px;">
-				<cfset firstOccurrence = rs.qryEntriesAll.createdOn[rs.qryEntriesAll.recordCount]>
-				<cfset firstOccurrenceID = rs.qryEntriesAll.entryID[rs.qryEntriesAll.recordCount]>
-				This bug has ocurred 
-				<a href="##" onclick="$('##allentries').slideToggle()" title="click to expand"><b>#rs.qryEntriesAll.recordCount#</b> time<cfif rs.qryEntriesAll.recordCount gt 1>s</cfif> <i class="icon-circle-arrow-down"></i></a>
-				since 
-				<a href="index.cfm?event=entry&entryID=#firstOccurrenceID#"><b>#lsDateFormat(firstOccurrence,"long")# #lsTimeFormat(firstOccurrence)#</b></a>
-				<ul id="allentries" style="display:none;margin-top:5px;">
-					<cfloop query="rs.qryEntriesAll" startrow="1" endrow="#min(maxPreviewEntries,rs.qryEntriesAll.recordCount)#">
-						<li>
-							<cfif rs.qryEntriesAll.entryID eq oEntry.getEntryID()><span class="label label-info">This</span> </cfif>
-							<a href="index.cfm?event=entry&entryID=#rs.qryEntriesAll.entryID#">#dateFormat(rs.qryEntriesAll.createdOn,"m/d")# #timeFormat(rs.qryEntriesAll.createdOn,"hh:mm tt")#</a>
-							 on
-							<b>#rs.qryEntriesAll.hostName#</b>
-						</li>
-					</cfloop>
-					<cfif rs.qryEntriesAll.recordCount gt maxPreviewEntries>
-						<li>... #rs.qryEntriesAll.recordCount-maxPreviewEntries# more (<a href="index.cfm?event=log&numDays=360&msgFromEntryID=#entryID#&applicationID=#oApp.getApplicationID()#&hostID=0&severityID=0">See all</a>)</li>
-					</cfif>
-				</ul>
-			</li>
+			<cfif rs.qryEntriesAll.recordCount gt 0>
+				<li style="margin-top:4px;">
+					<cfset firstOccurrence = rs.qryEntriesAll.createdOn[rs.qryEntriesAll.recordCount]>
+					<cfset firstOccurrenceID = rs.qryEntriesAll.entryID[rs.qryEntriesAll.recordCount]>
+					This bug has ocurred 
+					<a href="##" onclick="$('##allentries').slideToggle()" title="click to expand"><b>#rs.qryEntriesAll.recordCount#</b> time<cfif rs.qryEntriesAll.recordCount gt 1>s</cfif> <i class="icon-circle-arrow-down"></i></a>
+					since 
+					<a href="index.cfm?event=entry&entryID=#firstOccurrenceID#"><b>#lsDateFormat(firstOccurrence,"long")# #lsTimeFormat(firstOccurrence)#</b></a>
+					<ul id="allentries" style="display:none;margin-top:5px;">
+						<cfloop query="rs.qryEntriesAll" startrow="1" endrow="#min(maxPreviewEntries,rs.qryEntriesAll.recordCount)#">
+							<li>
+								<cfif rs.qryEntriesAll.entryID eq oEntry.getEntryID()><span class="label label-info">This</span> </cfif>
+								<a href="index.cfm?event=entry&entryID=#rs.qryEntriesAll.entryID#">#dateFormat(rs.qryEntriesAll.createdOn,"m/d")# #timeFormat(rs.qryEntriesAll.createdOn,"hh:mm tt")#</a>
+								 on
+								<b>#rs.qryEntriesAll.hostName#</b>
+							</li>
+						</cfloop>
+						<cfif rs.qryEntriesAll.recordCount gt maxPreviewEntries>
+							<li>... #rs.qryEntriesAll.recordCount-maxPreviewEntries# more (<a href="index.cfm?event=log&numDays=360&msgFromEntryID=#entryID#&applicationID=#oApp.getApplicationID()#&hostID=0&severityID=0">See all</a>)</li>
+						</cfif>
+					</ul>
+				</li>
+			</cfif>
 			<cfif qryEntriesOthers.recordCount gt 0>
 				<li style="margin-top:4px;">
 					The previous time this bug was reported was on 
@@ -221,18 +255,20 @@
 				</li>
 			</cfif>
 			</ul>
-			<div style="margin-top:8px;">
-				<b>Host Distribution:</b><br />
-				<table class="table table-condensed">
-					<cfset totalEntries = arraySum(listToArray(valueList(qryHosts.numEntries)))>
-					<cfloop query="qryHosts">
-						<tr>
-							<td><a href="index.cfm?event=log&numDays=1&msgFromEntryID=#entryID#&applicationID=0&hostID=#hostID#">#hostName#</a></td>
-							<td>#numEntries# (#round(numEntries/totalEntries*100)#%)</td>
-						</tr>
-					</cfloop>
-				</table>
-			</div>
+			<cfif qryHosts.recordCount gt 0>
+				<div style="margin-top:8px;">
+					<b>Host Distribution:</b><br />
+					<table class="table table-condensed">
+						<cfset totalEntries = arraySum(listToArray(valueList(qryHosts.numEntries)))>
+						<cfloop query="qryHosts">
+							<tr>
+								<td><a href="index.cfm?event=log&numDays=1&msgFromEntryID=#entryID#&applicationID=0&hostID=#hostID#">#hostName#</a></td>
+								<td>#numEntries# (#round(numEntries/totalEntries*100)#%)</td>
+							</tr>
+						</cfloop>
+					</table>
+				</div>
+			</cfif>
 		</div>	
 	</td>
 </tr>

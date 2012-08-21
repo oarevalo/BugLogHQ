@@ -252,6 +252,41 @@
 		
 	</cffunction>
 	
+	<cffunction name="deleteEntry" access="public" returntype="numeric" hint="deletes one or more entries from the database">
+		<cfargument name="entryID" type="numeric" required="true">
+		<cfargument name="deleteScope" type="string" required="false" default="this" hint="indicates whether to delete only one entry or all entries that share certain properties">
+		<cfscript>
+			var oEntry = getEntry(arguments.entryID);
+			var qry = 0;
+			var ids = [];
+
+			switch(deleteScope) {
+				case "this":
+					ids = entryID;
+					break;
+				case "app":
+					qry = oEntryDAO.search(message = oEntry.getMessage(),
+											applicationID = oEntry.getApplicationID());
+					ids = valueList(qry.entryID);
+					break;
+				case "app-host":
+					qry = oEntryDAO.search(message = oEntry.getMessage(),
+											hostID = oEntry.getHostID(),
+											applicationID = oEntry.getApplicationID());
+					ids = valueList(qry.entryID);
+					break;
+				default:
+					throw("Unknown deletion scope");
+			}
+
+			if(listLen(entryID) gt 0) {
+				oEntryDAO.delete(ids);
+			}
+			
+			return listLen(ids);
+		</cfscript>
+	</cffunction>
+	
 	<cffunction name="checkLogin" access="public" returntype="numeric" hint="Checks username and password, and returns userID of corresponding user. If not correct, returns 0">
 		<cfargument name="username" type="string" required="true">
 		<cfargument name="password" type="string" required="true">

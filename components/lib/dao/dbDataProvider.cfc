@@ -39,7 +39,7 @@
 	</cffunction>
 
 	<cffunction name="delete" access="public" returntype="void">
-		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="id" type="any" required="true">
 		<cfargument name="_mapTableInfo" type="struct" required="true">
 		<cfargument name="_mapColumns" type="struct" required="true">
 		<cfset var qry = 0>
@@ -52,7 +52,12 @@
 		
 		<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#">
 			DELETE FROM #getSafeTableName(tableName)#
-				WHERE #PKName# = <cfqueryparam cfsqltype="#PKType#" value="#arguments.id#">
+				WHERE 
+					<cfif listLen(arguments.id) gt 1>
+						#PKName# IN (<cfqueryparam cfsqltype="#PKType#" value="#arguments.id#" list="true">)
+					<cfelse>
+						#PKName# = <cfqueryparam cfsqltype="#PKType#" value="#arguments.id#">
+					</cfif>
 		</cfquery>
 	</cffunction>
 				

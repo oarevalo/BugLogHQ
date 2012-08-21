@@ -448,6 +448,31 @@
 		<cfset setNextEvent("login")>
 	</cffunction>
 				
+	<cffunction name="doDelete" access="public" returnType="void">
+		<cfscript>
+			var appService = getService("app");
+			var entryID = val(getValue("entryID"));
+			var deleteScope = getValue("deleteScope");
+			
+			try {
+				if(entryID eq 0)
+					setNextEvent("");
+				var numDeleted = appService.deleteEntry(entryID, deleteScope);
+				setMessage("info","#numDeleted# Report(s) deleted");
+				setNextEvent("");
+			
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				if(entryID gt 0)
+					setNextEvent("entry","entryID=#entryID#");
+				else
+					setNextEvent("");
+			}
+		</cfscript>
+	</cffunction>			
+				
+				
 	<cffunction name="writeCookie" access="private">
 		<cfargument name="name" type="string">
 		<cfargument name="value" type="string">
