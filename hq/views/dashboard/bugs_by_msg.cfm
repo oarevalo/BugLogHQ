@@ -17,7 +17,7 @@
 	<div style="float:right;">
 		<b>1 to #min(maxRows,qryListing.recordCount)#</b>
 		&nbsp;|&nbsp;
-		<a href="index.cfm?event=dashboard&rows=#maxRows+5###msg#maxRows#">More...</a>	
+		<a href="index.cfm?event=dashboard&rows=#maxRows+5#">More...</a>	
 	</div>
 </cfif>
 <b>Recent Messages <cfif  qryListing.recordCount gt 0>(#qryListing.recordCount#)</cfif></b>	
@@ -39,7 +39,6 @@
 
 		<tr>
 			<td>
-				<a name="msg#qryListing.currentRow#" />
 				<div style="font-weight:bold;font-size:13px;">
 					<span class="badge badge-#color_code_severity#">
 						<img src="#tmpImgURL#" align="absmiddle" alt="#qryListing.severityCode#" title="#qryListing.severityCode#">
