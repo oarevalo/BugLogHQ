@@ -1,4 +1,4 @@
-<cfset maxRows = 5>
+<cfset maxRows = rs.criteria.rows>
 <cfset sortField = "bugCount desc,createdOn desc">
 <cfquery name="qryListing" dbtype="query">
 	SELECT ApplicationCode, ApplicationID, 
@@ -13,7 +13,14 @@
 </cfquery>
 
 <cfoutput>
-<b>Recent Messages <cfif qryListing.recordCount gt maxRows>(Top #maxRows#)</cfif></b>	
+<cfif qryListing.recordCount gt maxRows>
+	<div style="float:right;">
+		<b>1 to #min(maxRows,qryListing.recordCount)#</b>
+		&nbsp;|&nbsp;
+		<a href="index.cfm?event=dashboard&rows=#maxRows+5###msg#maxRows#">More...</a>	
+	</div>
+</cfif>
+<b>Recent Messages <cfif  qryListing.recordCount gt 0>(#qryListing.recordCount#)</cfif></b>	
 <table style="width:100%" class="table table-striped">	
 	<tbody>
 	<cfloop query="qryListing" endrow="#maxRows#">
@@ -32,6 +39,7 @@
 
 		<tr>
 			<td>
+				<a name="msg#qryListing.currentRow#" />
 				<div style="font-weight:bold;font-size:13px;">
 					<span class="badge badge-#color_code_severity#">
 						<img src="#tmpImgURL#" align="absmiddle" alt="#qryListing.severityCode#" title="#qryListing.severityCode#">
@@ -60,7 +68,11 @@
 </table>
 <cfif qryListing.recordCount gt 0>
 	<div style="float:right;">
-		<a href="index.cfm?event=main&sortBy=bugCount&sortDir=desc&applicationID=#rs.criteria.applicationID#&hostID=#rs.criteria.hostID#">More...</a>	
+		<cfif maxRows neq 5>
+			<a href="index.cfm?event=dashboard&rows=5">Reset</a>	
+			&nbsp;|&nbsp;
+		</cfif>
+		<a href="index.cfm?event=main&sortBy=bugCount&sortDir=desc&applicationID=#rs.criteria.applicationID#&hostID=#rs.criteria.hostID#">Show All</a>	
 	</div>
 </cfif>
 </cfoutput>

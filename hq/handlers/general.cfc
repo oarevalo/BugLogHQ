@@ -522,6 +522,7 @@
 			if(not structKeyExists(criteria,"searchHTMLReport")) criteria.searchHTMLReport = false;
 			if(not structKeyExists(criteria,"sortBy")) criteria.sortBy = "";
 			if(not structKeyExists(criteria,"sortDir")) criteria.sortDir = "asc";
+			if(not structKeyExists(criteria,"rows")) criteria.rows = 5;
 			
 			criteria = {
 				numDays = getValue("numDays", criteria.numDays),
@@ -537,7 +538,8 @@
 				groupByHost = getValue("groupByHost", criteria.groupByHost),
 				searchHTMLReport = getValue("searchHTMLReport", criteria.searchHTMLReport),
 				sortBy = getValue("sortBy", criteria.sortBy),
-				sortDir = getValue("sortDir", criteria.sortDir)
+				sortDir = getValue("sortDir", criteria.sortDir),
+				rows = getValue("rows", criteria.rows)
 			};
 
 			// calculate how far back to query the data
