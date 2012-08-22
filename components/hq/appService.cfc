@@ -521,7 +521,7 @@
 		<cfquery name="qry" datasource="#dsn#">
 			SELECT el.extensionLogID, el.createdOn,
 						ext.extensionID, ext.name, ext.type, ext.description,   
-						e.entryID, e.message, e.mydatetime,
+						e.entryID, e.message, e.mydatetime, e.createdOn as entry_createdOn,
 						a.applicationID, a.code as application_code,
 						h.hostID, h.hostName,
 						s.severityID, s.name as severity_code
@@ -534,7 +534,7 @@
 				<cfif startDate neq "1/1/1800">
 					WHERE el.createdOn >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.startDate#">
 				</cfif>
-				ORDER BY createdOn DESC
+				ORDER BY el.createdOn DESC
 		</cfquery>
 		<cfreturn qry>
 	</cffunction>

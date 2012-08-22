@@ -12,7 +12,7 @@
 <cfset sortBy = rs.criteria.sortBy>
 <cfset sortDir = rs.criteria.sortDir>
 <cfif sortBy eq "">
-	<cfset sortBy = "mydatetime">
+	<cfset sortBy = "createdOn">
 	<cfset sortDir = "DESC">
 </cfif>
 
@@ -97,11 +97,11 @@
 				</cfif>
 			</th>
 			<th width="110">
-				<cfif sortBy eq "mydateTime">
-					<a href="#pageURL#&sortBy=mydateTime&sortDir=#opSortDir#" title="Click to sort by bug date/time">Date/Time</a>
+				<cfif sortBy eq "createdOn">
+					<a href="#pageURL#&sortBy=createdOn&sortDir=#opSortDir#" title="Click to sort by bug date/time">Date/Time</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
 				<cfelse>
-					<a href="#pageURL#&sortBy=mydateTime" title="Click to sort by bug date/time">Date/Time</a>
+					<a href="#pageURL#&sortBy=createdOn" title="Click to sort by bug date/time">Date/Time</a>
 				</cfif>
 			</th>
 			<th width="120">

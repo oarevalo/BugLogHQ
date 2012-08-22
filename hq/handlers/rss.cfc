@@ -10,7 +10,7 @@
 			var qryEntries = getService("app").searchEntries("", applicationID, hostID);
 
 			// sort data to put newest entries first
-			qryEntries = sortQuery(qryEntries, "mydatetime", "DESC");
+			qryEntries = sortQuery(qryEntries, "createdOn", "DESC");
 
 			// build rss feed
 			var meta = structNew();
@@ -22,7 +22,7 @@
 			for(var i=1;i lte min(maxEntries, qryEntries.recordCount);i=i+1) {
 				queryAddRow(data,1);
 				querySetCell(data,"title","Bug ###qryEntries.entryID[i]#: " & qryEntries.message[i]);
-				querySetCell(data,"body",composeMessage(qryEntries.mydateTime[i], qryEntries.applicationCode[i], qryEntries.hostName[i], qryEntries.templatePath[i], qryEntries.severityCode[i], qryEntries.exceptionMessage[i], qryEntries.exceptionDetails[i] ));
+				querySetCell(data,"body",composeMessage(qryEntries.createdOn[i], qryEntries.applicationCode[i], qryEntries.hostName[i], qryEntries.templatePath[i], qryEntries.severityCode[i], qryEntries.exceptionMessage[i], qryEntries.exceptionDetails[i] ));
 				querySetCell(data,"link","http://#cgi.HTTP_HOST##cgi.script_name#?event=entry&entryID=" & qryEntries.entryID[i]);
 				querySetCell(data,"subject","Subject");
 				querySetCell(data,"date",now());
