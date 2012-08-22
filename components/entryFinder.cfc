@@ -105,25 +105,25 @@
 					src.name AS SourceName, e.applicationID, e.hostID, e.severityID, e.sourceID, e.createdOn,
 					<cfswitch expression="#dbType#">
 						<cfcase value="mssql">
-							datePart(year, e.mydateTime) as entry_year, 
-							datePart(month, e.mydateTime) as entry_month, 
-							datePart(day, e.mydateTime) as entry_day,
-							datePart(hour, e.mydateTime) as entry_hour, 
-							datePart(minute, e.mydateTime) as entry_minute
+							datePart(year, e.createdOn) as entry_year, 
+							datePart(month, e.createdOn) as entry_month, 
+							datePart(day, e.createdOn) as entry_day,
+							datePart(hour, e.createdOn) as entry_hour, 
+							datePart(minute, e.createdOn) as entry_minute
 						</cfcase>
 						<cfcase value="pgsql">
-							date_part('year', e.mydateTime) as entry_year, 
-							date_part('month', e.mydateTime) as entry_month,
-							date_part('day', e.mydateTime) as entry_day,
-							date_part('hour', e.mydateTime) as entry_hour, 
-							date_part('minute', e.mydateTime) as entry_minute
+							date_part('year', e.createdOn) as entry_year, 
+							date_part('month', e.createdOn) as entry_month,
+							date_part('day', e.createdOn) as entry_day,
+							date_part('hour', e.createdOn) as entry_hour, 
+							date_part('minute', e.createdOn) as entry_minute
 						</cfcase>
 						<cfdefaultcase>
-							year(e.mydateTime) as entry_year, 
-							month(e.mydateTime) as entry_month, 
-							day(e.mydateTime) as entry_day,
-							hour(e.mydateTime) as entry_hour, 
-							minute(e.mydateTime) as entry_minute
+							year(e.createdOn) as entry_year, 
+							month(e.createdOn) as entry_month, 
+							day(e.createdOn) as entry_day,
+							hour(e.createdOn) as entry_hour, 
+							minute(e.createdOn) as entry_minute
 						</cfdefaultcase>
 					</cfswitch>
 				FROM bl_Entry e
@@ -177,10 +177,10 @@
 						AND s.code = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.severityCode#">
 					</cfif>
 					<cfif arguments.startDate neq "1/1/1800">
-						AND mydateTime >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.startDate#">
+						AND e.createdOn >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.startDate#">
 					</cfif>
 					<cfif arguments.endDate neq "1/1/3000">
-						AND mydateTime <= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.endDate#">
+						AND e.createdOn <= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.endDate#">
 					</cfif>
 					<cfif arguments.search_cfid neq "">
 						AND cfid LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.search_cfid#%">
@@ -191,7 +191,7 @@
 					<cfif arguments.userAgent neq "">
 						AND userAgent LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.userAgent#"> 
 					</cfif>
-				ORDER BY createdOn DESC, entryID DESC
+				ORDER BY e.createdOn DESC, entryID DESC
 		</cfquery>
 
 		<cfreturn qry>
