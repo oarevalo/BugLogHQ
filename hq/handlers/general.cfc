@@ -14,6 +14,9 @@
 			var instanceName = "";
 			var app = getService("app");
 			var config = app.getConfig();
+			var publicEvents = "doLogin,login,requireLogin,rss.rss";
+			var noLoginRedirectEvents = "dashboardContent";
+			var loginEvent = "login";
 
 			// url path used to find html/js/css resources
 			var assetsPath = app.getLocalAssetsPath();
@@ -29,16 +32,19 @@
 				}
 
 				// check login
-				if(not listFindNoCase("doLogin,login,rss.rss",event) and 
-					(session.userID eq 0)) {
-					setMessage("Warning","Please enter your username and password");
-					for(key in url) {
-						if(key eq "event")
-							qs = qs & "nextevent=" & url.event & "&";
-						else
-							qs = qs & key & "=" & url[key] & "&";
+				if(not listFindNoCase(publicEvents, event) and session.userID eq 0) {
+					if(not listFindNoCase(noLoginRedirectEvents, event)) {
+						setMessage("Warning","Please enter your username and password");
+						for(key in url) {
+							if(key eq "event")
+								qs = qs & "nextevent=" & url.event & "&";
+							else
+								qs = qs & key & "=" & url[key] & "&";
+						}
+					} else {
+						loginEvent = "requireLogin";
 					}
-					setNextEvent("login",qs);
+					setNextEvent(loginEvent,qs);
 				}
 
 				// check if user needs to change password
@@ -76,6 +82,11 @@
 
 	<cffunction name="login" access="public" returntype="void">
 		<cfset setView("login")>
+		<cfset setLayout("clean")>
+	</cffunction>
+
+	<cffunction name="requireLogin" access="public" returntype="void">
+		<cfset setView("requireLogin")>
 		<cfset setLayout("clean")>
 	</cffunction>
 
