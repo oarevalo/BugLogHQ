@@ -1,5 +1,5 @@
 <cfset maxRows = 5>
-<cfset sortField = "bugCount,createdOn">
+<cfset sortField = "bugCount desc,createdOn desc">
 <cfquery name="qryListing" dbtype="query">
 	SELECT ApplicationCode, ApplicationID, 
 			SeverityCode, SeverityID,
@@ -9,7 +9,7 @@
 				ApplicationCode, ApplicationID, 
 				SeverityCode, SeverityID,
 				Message
-		ORDER BY #sortField# DESC
+		ORDER BY #sortField#
 </cfquery>
 
 <cfoutput>
