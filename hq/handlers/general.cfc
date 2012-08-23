@@ -497,7 +497,6 @@
 			var criteria = structNew();
 			var resetCriteria = getValue("resetCriteria", false);
 			var appService = getService("app"); 
-			var thisEvent = getValue("event");
 
 			if(resetCriteria) {
 				structDelete(cookie,criteriaName);
@@ -509,7 +508,36 @@
 			}
 			
 			// make sure we have a complete criteria struct w/ default values
-			if(not isStruct(criteria)) criteria = structNew();
+			criteria = normalizeCriteria(criteria);
+
+			// write cookie back
+			writeCookie(criteriaName,serializeJSON(criteria),30);
+
+			qrySeverities = appService.getSeverities();
+			
+			setValue("criteria", criteria);
+			setValue("qrySeverities", qrySeverities);
+		</cfscript>
+	</cffunction>
+	
+	<cffunction name="loadFilter" access="private" returntype="void">
+		<cfargument name="criteriaName" type="string" default="criteria">
+		<cfscript>
+			if(structKeyExists(cookie,criteriaName) and isJSON(cookie[criteriaName])) {
+				criteria = deserializeJSON(cookie[criteriaName]);
+				setValue("criteria", criteria);
+			} else {
+				prepareFilter(criteriaName);
+			}
+		</cfscript>		
+	</cffunction>
+	
+	<cffunction name="normalizeCriteria" access="private" returntype="struct">
+		<cfargument name="criteria" type="struct" required="true">
+		<cfscript>
+			var thisEvent = getValue("event");
+
+			// make sure we have a complete criteria struct w/ default values
 			if(not structKeyExists(criteria,"numdays")) criteria.numDays = 1;
 			if(not structKeyExists(criteria,"searchTerm")) criteria.searchTerm = "";
 			if(not structKeyExists(criteria,"applicationID")) criteria.applicationID = 0;
@@ -559,27 +587,9 @@
 					href &= "&" & item & "=" & criteria[item];
 			}
 			criteria.url = href;
-
-			// write cookie back
-			writeCookie(criteriaName,serializeJSON(criteria),30);
-
-			qrySeverities = appService.getSeverities();
 			
-			setValue("criteria", criteria);
-			setValue("qrySeverities", qrySeverities);
+			return criteria;
 		</cfscript>
-	</cffunction>
-	
-	<cffunction name="loadFilter" access="private" returntype="void">
-		<cfargument name="criteriaName" type="string" default="criteria">
-		<cfscript>
-			if(structKeyExists(cookie,criteriaName) and isJSON(cookie[criteriaName])) {
-				criteria = deserializeJSON(cookie[criteriaName]);
-				setValue("criteria", criteria);
-			} else {
-				prepareFilter(criteriaName);
-			}
-		</cfscript>		
 	</cffunction>
 	
 	<cffunction name="getHighestEntryID" access="private" returntype="numeric">
