@@ -14,7 +14,7 @@
 			var instanceName = "";
 			var app = getService("app");
 			var config = app.getConfig();
-			var publicEvents = "doLogin,login,requireLogin,rss.rss";
+			var publicEvents = "doLogin,login,requireLogin,rss";
 			var noLoginRedirectEvents = "dashboardContent";
 			var loginEvent = "login";
 
@@ -301,20 +301,50 @@
 	<cffunction name="rss" access="public" returntype="void">
 		<cfscript>
 			try {
-				qryApplications = getService("app").getApplications();
-				qryHosts = getService("app").getHosts();
+				var appService = getService("app");
+				var rssService = getService("rss");
+				var summary = getValue("summary",false);
 				
-				// set values
-				setValue("qryApplications", qryApplications);
-				setValue("qryHosts", qryHosts);
-				setValue("pageTitle", "RSS Feeds");
+				// check if we allow public/unauthenticated access to the RSS feeds
+				var isPublicAccessAllowed = appService.getConfig().getSetting("rss.allowPublicAccess",false);
+
+				// if public access is not allowed, see if client is sending a username/password to authenticate
+				// if so, then try to authenticate with that, otherwise deny access
+				if(!isPublicAccessAllowed) {
+					var userID = 0;
+					if(getValue("username") neq "" and getValue("password") neq "") {
+						// maybe is sent on the URL
+						userID = appService.checkLogin(username, password);
+					} else {
+						// otherwise request to be sent using HTTP Basic Authentication
+						var authHeader = GetPageContext().getRequest().getHeader("Authorization");
+						var authString = "";
+						if(isDefined("authHeader")) {
+							authString = ToString(BinaryDecode(ListLast(authHeader, " "),"Base64"));
+							userID = appService.checkLogin(GetToken(authString,1,":"), GetToken(authString,2,":"));
+						}
+					}
+					if(userID eq 0) throw(type="notAllowed");
+				}
+
+				var criteria = normalizeCriteria();
+				var rssXML = appService.buildRSSFeed(criteria, summary, rssService);
 				
-				setView("rss");
+				setValue("rssXML", rssXML);
+				setView("feed");
+				setLayout("xml");
+
+			} catch(notAllowed e) {
+				sendUnauthorizedHeader();
+				setMessage("warning", "Public access to RSS feeds is not allowed. Sorry.");
+				setView("");
+				setLayout("clean");
 
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("main");
+				setView("");
+				setLayout("clean");
 			}
 		</cfscript>	
 	</cffunction>
@@ -533,9 +563,10 @@
 	</cffunction>
 	
 	<cffunction name="normalizeCriteria" access="private" returntype="struct">
-		<cfargument name="criteria" type="struct" required="true">
+		<cfargument name="criteria" type="struct" required="false" default="#structNew()#">
 		<cfscript>
 			var thisEvent = getValue("event");
+			var appService = getService("app");
 
 			// make sure we have a complete criteria struct w/ default values
 			if(not structKeyExists(criteria,"numdays")) criteria.numDays = 1;
@@ -580,13 +611,14 @@
 			}
 
 			// build a url to tihs page with the full criteria
-			var href = "index.cfm?event=#thisEvent#";
+			var href = "";
 			var ignoreList = "startDate,endDate,rows";
 			for(var item in criteria) {
 				if(criteria[item] neq "" and criteria[item] neq 0 and not listFindNoCase(ignoreList,item))
 					href &= "&" & item & "=" & criteria[item];
 			}
-			criteria.url = href;
+			criteria.url = "index.cfm?event=#thisEvent#" & href;
+			criteria.rssurl = "index.cfm?event=rss" & href;
 			
 			return criteria;
 		</cfscript>
@@ -602,4 +634,10 @@
 		</cfquery>
 		<cfreturn val(qry.entryID)>
 	</cffunction>
+
+	<cffunction name="sendUnauthorizedHeader" access="private" returntype="void">
+		<cfheader statusCode="401" statusText="UNAUTHORIZED" />
+		<cfheader name="WWW-Authenticate" value="Basic realm=""BugLog""" />
+	</cffunction>
+
 </cfcomponent>

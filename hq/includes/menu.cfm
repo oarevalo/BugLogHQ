@@ -16,8 +16,6 @@
 					[ <a href="index.cfm?event=log" <cfif rs.event eq "log" or rs.event eq "log">style="font-weight:bold;"</cfif>>Detail</a> ] 
 					&nbsp;&nbsp;&nbsp;
 					[ <a href="index.cfm?event=extensions.main" <cfif eventPkg eq "extensions">style="font-weight:bold;"</cfif>>Rules</a> ]
-					&nbsp;&nbsp;&nbsp;
-					[ <img alt="RSS" width="16" height="16" src="#rs.assetsPath#images/icons/feed-icon16x16.gif" border="0" align="absmiddle"/> <a href="index.cfm?event=rss" <cfif rs.event eq "rss">style="font-weight:bold;"</cfif>>RSS</a> ]
 				</div>
 			</td>
 			<td align="right" width="300" style="font-size:13px;">

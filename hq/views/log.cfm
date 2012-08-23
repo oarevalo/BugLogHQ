@@ -70,6 +70,10 @@
 
 
 	<!--- Data table --->
+	<div style="float:right;">
+		<a href="#rs.criteria.rssurl#" target="_blank" title="Link to RSS feed for the current search criteria"><b>rss</b></a>
+		<a href="#rs.criteria.rssurl#" target="_blank" title="Link to RSS feed for the current search criteria"><img alt="RSS" width="16" height="16" src="#rs.assetsPath#images/icons/feed-icon16x16.gif" border="0" align="absmiddle"/></a>
+	</div>
 	<div style="font-size:10px;line-height:20px;margin-top:10px;font-weight:bold;">
 		Showing entries #startRow# - #endRow# of #qryEntries.recordCount#
 	</div>

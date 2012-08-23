@@ -429,6 +429,59 @@
 		<cfreturn qry>
 	</cffunction>
 		
+	<cffunction name="buildRSSFeed" access="public" returntype="xml">
+		<cfargument name="criteria" type="struct" required="true">
+		<cfargument name="summary" type="boolean" required="true">
+		<cfargument name="rssService" type="any" required="true">
+		<cfscript>
+			var maxEntries = 20;
+			var data = queryNew("title,body,link,subject,date");
+
+			// search bug reports
+			var qryEntries = searchEntries(argumentCollection = criteria);
+			if(summary)
+				qryEntries = applyGroupings(qryEntries, criteria.groupByApp, criteria.groupByHost);
+
+			// build rss feed
+			var meta = {
+				title = "BugLog",
+				link = getBaseBugLogHREF(),
+				description = "Recently received bugs"
+			};
+			
+			for(var i=1;i lte min(maxEntries, qryEntries.recordCount);i=i+1) {
+				queryAddRow(data,1);
+				if(summary) {
+					querySetCell(data,"title", qryEntries.message[i] & " (" & qryEntries.bugCount[i] & ")");
+					querySetCell(data,"body", composeMessage(qryEntries.createdOn[i], 
+																					qryEntries.applicationCode[i], 
+																					qryEntries.hostName[i], 
+																					qryEntries.severityCode[i], 
+																					"", 
+																					"", 
+																					"",
+																					qryEntries.bugCount[i] ));
+				} else {
+					querySetCell(data,"title","Bug ###qryEntries.entryID[i]#: " & qryEntries.message[i]);
+					querySetCell(data,"body",composeMessage(qryEntries.createdOn[i], 
+																					qryEntries.applicationCode[i], 
+																					qryEntries.hostName[i], 
+																					qryEntries.severityCode[i], 
+																					qryEntries.templatePath[i], 
+																					qryEntries.exceptionMessage[i], 
+																					qryEntries.exceptionDetails[i] ));
+				}
+				querySetCell(data,"link", getBugEntryHREF(qryEntries.entryID[i]));
+				querySetCell(data,"subject","Subject");
+				querySetCell(data,"date",now());
+			}
+			
+			var rssXML = rssService.generateRSS("rss1",data,meta);		
+			
+			return rssXML;
+		</cfscript>
+	</cffunction>	
+		
 
 	<!----- Extensions ----->	
 	<cffunction name="getRules" access="public" returnType="array" hint="Returns all rules that are available">
@@ -633,5 +686,70 @@
 			return path;
 		</cfscript>
 	</cffunction>
+	
+	<cffunction name="composeMessage" access="private" returntype="string">
+		<cfargument name="datetime" type="string" required="true">
+		<cfargument name="applicationCode" type="string" required="true">
+		<cfargument name="hostName" type="string" required="true">
+		<cfargument name="severityCode" type="string" required="true">
+		<cfargument name="templatePath" type="string" required="false" default="">
+		<cfargument name="exceptionMessage" type="string" required="false" default="">
+		<cfargument name="ExceptionDetails" type="string" required="false" default="">
+		<cfargument name="BugCount" type="numeric" required="false" default="0">
+
+		<cfset var tmpHTML = "">
+
+		<cfsavecontent variable="tmpHTML">
+			<cfoutput>
+			<table style="font-size:12px;">
+				<tr>
+					<td><b>Date/Time:</b></td>
+					<td>#lsDateFormat(arguments.datetime)# - #lsTimeFormat(arguments.datetime)#</td>
+				</tr>
+				<cfif arguments.applicationCode neq "">
+					<tr>
+						<td><b>Application:</b></td>
+						<td>#arguments.applicationCode#</td>
+					</tr>
+				</cfif>
+				<cfif arguments.hostname neq "">
+					<tr>
+						<td><b>Host:</b></td>
+						<td>#arguments.hostname#</td>
+					</tr>
+				</cfif>
+				<tr>
+					<td><b>Severity:</b></td>
+					<td>#arguments.severityCode#</td>
+				</tr>
+				<cfif arguments.templatePath neq "">
+					<tr>
+						<td><b>Template Path:</b></td>
+						<td>#arguments.templatePath#</td>
+					</tr>
+				</cfif>
+				<cfif arguments.exceptionMessage neq "">
+					<tr valign="top">
+						<td><b>Exception Message:</b></td>
+						<td>#arguments.exceptionMessage#</td>
+					</tr>
+				</cfif>
+				<cfif arguments.ExceptionDetails neq "">
+					<tr valign="top">
+						<td><b>Exception Detail:</b></td>
+						<td>#arguments.ExceptionDetails#</td>
+					</tr>
+				</cfif>
+				<cfif arguments.BugCount gt 0>
+					<tr>
+						<td><b>Count:</b></td>
+						<td>#arguments.bugCount#</td>
+					</tr>
+				</cfif>
+			</table>
+			</cfoutput>
+		</cfsavecontent>
+		<cfreturn tmpHTML>
+	</cffunction>	
 	
 </cfcomponent>

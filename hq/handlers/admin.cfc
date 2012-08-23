@@ -28,6 +28,7 @@
 						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
 						setValue("adminEmail", cfg.getSetting("adminEmail",""));
 						setValue("autoStart", app.getServiceSetting("autoStart",true));
+						setValue("allowPublicRSS", cfg.getSetting("rss.allowPublicAccess",false));
 						break;
 
 					case "changePassword":
@@ -300,6 +301,7 @@
 			var user = getValue("currentUser");
 			var autoStart = getValue("autoStart",false);
 			var adminEmail = getValue("adminEmail");
+			var allowPublicRSS = getValue("allowPublicRSS",false);
 			var config = getService("app").getConfig();
 			
 			try {
@@ -308,6 +310,7 @@
 				getService("app").setServiceSetting("autoStart", autoStart);
 				config.reload();
 				config.setSetting("adminEmail", adminEmail);
+				config.setSetting("rss.allowPublicAccess", allowPublicRSS);
 
 				setMessage("info","General settings updated.");
 				setNextEvent("admin.main","panel=general");
