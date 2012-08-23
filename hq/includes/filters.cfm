@@ -41,7 +41,7 @@
 		<input type="hidden" name="groupByApp" value="#rs.criteria.groupByApp#">
 		<input type="hidden" name="groupByHost" value="#rs.criteria.groupByHost#">
 		<input type="hidden" name="searchHTMLReport" value="#rs.criteria.searchHTMLReport#">
-		<input type="hidden" name="event" value="#rs.event#">
+		<input type="hidden" name="event" value="#rs.event#" id="currentEvent">
 		
 		<table  width="100%" class="well" cellpadding="0" cellspacing="0">
 			<tr align="center">
@@ -98,8 +98,7 @@
 				<td style="text-align:center;">
 					<label style="font-size:11px;">
 						<input type="checkbox" 
-								name="searchHTMLReportChk" 
-								id="searchHTMLReportChk" 
+								name="searchHTMLReport" 
 								value="true"
 								class="searchCheckbox" 
 								<cfif rs.criteria.searchHTMLReport>checked</cfif>>
@@ -112,7 +111,9 @@
 			<tr>
 				<td colspan="4" align="center">
 					<div style="float:right;margin-right:10px;font-size:10px;">
-						<a href="index.cfm?event=#rs.event#&resetCriteria=1">Reset Filters</a>
+						<a href="index.cfm?event=#rs.event#&resetCriteria=1">Reset</a>
+						&nbsp;|&nbsp;
+						<a href="#rs.criteria.url#" title="Generate a link with the full search criteria on this page"><img src="#rs.assetsPath#/images/icons/link.png"></a>
 					</div>
 					<div class="control-group">
 					<span <cfif rs.criteria.severityID neq "_ALL_">style="color:red;"</cfif>>Severity:</span> &nbsp;&nbsp;
@@ -122,7 +123,7 @@
 
 						<label class="inline">
 							<input type="checkbox" 
-									class="searchCheckbox"
+									class="searchSeverityCheckbox"
 									name="severityID" 
 									value="#rs.qrySeverities.severityID#"
 									<cfif rs.criteria.severityID eq "_ALL_" or listFind(rs.criteria.severityID, rs.qrySeverities.severityID)>checked</cfif>

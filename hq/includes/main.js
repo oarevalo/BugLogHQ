@@ -11,12 +11,26 @@ $(document).ready(function(){
 	});
 	
 	$('.searchSelector').change(function(){
-		if(typeof doSearch == 'function') doSearch();
+		var fldValue = $(this).val();
+		var fldName = $(this).attr("name");
+		var event = $("#currentEvent").val();
+		updateFilter(event, fldName, escape(fldValue));
 	});
 	$('.searchCheckbox').click(function(){
-		if(typeof doSearch == 'function') doSearch();
+		var fldName = $(this).attr("name");
+		var fldChecked = $(this).is(":checked");
+		var event = $("#currentEvent").val();
+		updateFilter(event, fldName, fldChecked);
 	});
-	
+	$('.searchSeverityCheckbox').click(function(){
+		var chks = [];
+		var fldName = $(this).attr("name");
+		var event = $("#currentEvent").val();
+		$('.searchSeverityCheckbox').each(function() {
+			if($(this).is(":checked")) chks.push($(this).val())
+		})
+		updateFilter(event, fldName, chks.join(","));
+	})
 	$('#newRuleSelector').change(function(){
 		var rel = $(this).val();
 		$('.ruleDescription').hide();
@@ -28,4 +42,7 @@ function confirmDeleteRule(index) {
 	if(confirm("Are you sure you wish to remove the rule")) {
 		document.location='index.cfm?event=extensions.doDeleteRule&index='+index;
 	}
+}
+function updateFilter(event, name, value) {
+	document.location = "index.cfm?event="+event+"&"+name+"="+value;
 }

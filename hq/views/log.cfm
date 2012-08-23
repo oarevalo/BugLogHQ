@@ -55,18 +55,6 @@
 			<!-- refresh every X seconds -->
 			<meta http-equiv="refresh" content="#refreshSeconds#">
 		</cfif>
-		
-		<script type="text/javascript">
-			function doSearch() {
-				var frm = document.frmSearch;
-				
-				frm.groupByApp.value = "#rs.criteria.groupByApp#";
-				frm.groupByHost.value = "#rs.criteria.groupByHost#";
-				frm.searchHTMLReport.value = document.getElementById("searchHTMLReportChk").checked;
-				
-				frm.submit();
-			}
-		</script>	
 	</cfoutput>
 </cfsavecontent>
 <cfhtmlhead text="#tmpHead#">

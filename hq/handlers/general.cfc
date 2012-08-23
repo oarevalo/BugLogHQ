@@ -497,6 +497,7 @@
 			var criteria = structNew();
 			var resetCriteria = getValue("resetCriteria", false);
 			var appService = getService("app"); 
+			var thisEvent = getValue("event");
 
 			if(resetCriteria) {
 				structDelete(cookie,criteriaName);
@@ -549,6 +550,15 @@
 				else
 					criteria.startDate = dateAdd("d", val(criteria.numDays) * -1, now());
 			}
+
+			// build a url to tihs page with the full criteria
+			var href = "index.cfm?event=#thisEvent#";
+			var ignoreList = "startDate,endDate,rows";
+			for(var item in criteria) {
+				if(criteria[item] neq "" and criteria[item] neq 0 and not listFindNoCase(ignoreList,item))
+					href &= "&" & item & "=" & criteria[item];
+			}
+			criteria.url = href;
 
 			// write cookie back
 			writeCookie(criteriaName,serializeJSON(criteria),30);

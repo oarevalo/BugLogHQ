@@ -61,18 +61,6 @@
 			<!-- refresh every X seconds -->
 			<meta http-equiv="refresh" content="#refreshSeconds#">
 		</cfif>
-		
-		<script type="text/javascript">
-			function doSearch() {
-				var frm = document.frmSearch;
-				
-				frm.groupByApp.value = document.getElementById("groupByApp").checked;
-				frm.groupByHost.value = document.getElementById("groupByHost").checked;
-				frm.searchHTMLReport.value = document.getElementById("searchHTMLReportChk").checked;
-				
-				frm.submit();
-			}
-		</script>	
 	</cfoutput>
 </cfsavecontent>
 <cfhtmlhead text="#tmpHead#">
@@ -96,7 +84,7 @@
 		<tr>
 			<th width="15" nowrap>&nbsp;</th>
 			<th width="120">
-				<input type="checkbox" name="groupByAppFld" id="groupByApp" value="1" <cfif groupByApp>checked</cfif> onclick="doSearch()" title="Breakdown bugs by application name">
+				<input type="checkbox" name="groupByApp" id="groupByApp" value="1" <cfif groupByApp>checked</cfif> class="searchCheckbox" title="Breakdown bugs by application name">
 				<cfif sortBy eq "applicationCode">
 					<a href="#pageURL#&sortBy=applicationCode&sortDir=#opSortDir#" title="Click to sort by application name">Application</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
@@ -105,7 +93,7 @@
 				</cfif>
 			</th>
 			<th width="120">
-				<input type="checkbox" name="groupByHostFld" id="groupByHost" value="1" <cfif groupByHost>checked</cfif> onclick="doSearch()" title="Breakdown bugs by host name">
+				<input type="checkbox" name="groupByHost" id="groupByHost" value="1" <cfif groupByHost>checked</cfif> class="searchCheckbox"  title="Breakdown bugs by host name">
 				<cfif sortBy eq "hostName">
 					<a href="#pageURL#&sortBy=hostName&sortDir=#opSortDir#" title="Click to sort by host name">Host</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />

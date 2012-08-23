@@ -3,12 +3,7 @@
 
 <cfsavecontent variable="tmpHead">
 	<cfoutput>
-		<script type="text/javascript">
-			function doSearch() {
-				var frm = document.frmSearch;
-				frm.submit();
-			}
-			
+		<script type="text/javascript">	
 			// miliseconds
 			var interval,delay = #val(rs.refreshSeconds)*1000#;
 
