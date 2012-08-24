@@ -49,16 +49,17 @@
 
 <cfinclude template="../includes/udf.cfm">
 
-<cfoutput>
-<h2>Bug ###entryID# : <span style="color:##cc0000;">#tmpMessage#</span></h2>
+<cfset rs.pageTitle = "Bug ###entryID# : <span style='color:##cc0000;'>#tmpMessage#</span>">
 
-<p>
+<cfoutput>
+
+<!--- Page headers --->			
+<cfinclude template="../includes/menu.cfm">
+
+<p style="margin-top:10px;">
 	<table width="100%" class="criteriaTable" cellpadding="0" cellspacing="0">
 		<tr>
 			<td style="border-right:1px solid ##ccc;">
-				<img alt="" width="16" height="16" src="#rs.assetsPath#images/icons/arrow_undo.png" align="absmiddle" />
-				<a href="index.cfm">Return To Log</a>
-				&nbsp;&nbsp;&nbsp;&nbsp;
 				<img width="16" height="16" src="#rs.assetsPath#images/icons/email.png" align="absmiddle" />
 				<a href="##" id="sendToEmailLink">Send to email</a>
 				

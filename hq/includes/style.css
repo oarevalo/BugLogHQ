@@ -94,6 +94,11 @@ label.inline {
 	text-align:center;
 	line-height:15px;
 }
+.pageTitle {
+	margin-bottom:3px;
+	padding-bottom:10px;
+	line-height:24px;
+}
 
 /**** dashboard ****/
 #dashboard-content {
