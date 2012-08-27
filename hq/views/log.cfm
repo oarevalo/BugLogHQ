@@ -7,7 +7,6 @@
 <cfset rowsPerPage = rs.rowsPerPage>
 <cfset refreshSeconds = rs.refreshSeconds>
 <cfset lastbugread = rs.lastbugread>
-<cfset dateFormatMask = rs.dateFormatMask>
 
 <cfset sortBy = rs.criteria.sortBy>
 <cfset sortDir = rs.criteria.sortDir>
@@ -15,7 +14,6 @@
 	<cfset sortBy = "createdOn">
 	<cfset sortDir = "DESC">
 </cfif>
-
 
 <!--- base URL for reloading --->
 <cfset pageURL = "index.cfm?event=log&msgFromEntryID=#rs.msgFromEntryID#">
@@ -149,7 +147,7 @@
 			<td class="cell_entry" width="15">
 				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#qryEntries.entryID#</a>
 			</td>
-			<td class="cell_datetime" align="center" width="110">#DateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</td>
+			<td class="cell_datetime" align="center" width="110">#showDateTime(qryEntries.createdOn)#</td>
 			<td class="cell_application" width="120"><a href="index.cfm?event=log&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a></td>
 			<td class="cell_hostname" width="120"><a href="index.cfm?event=log&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a></td>
 			<td class="cell_message" rel="index.cfm?event=entry&entryID=#qryEntries.entryID#" 

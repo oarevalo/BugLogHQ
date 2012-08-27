@@ -39,7 +39,7 @@
 				on <a href="#tmpAppURL#">#qryTriggers.application_Code#</a> 
 				(<a href="#tmpHostURL#">#qryTriggers.hostname#</a>)
 				received on
-				<a href="#tmpEntryURL#">#dateFormat(qryTriggers.entry_createdOn,dateMask)# #lsTimeFormat(qryTriggers.entry_createdOn)#</a>
+				<a href="#tmpEntryURL#">#showDateTime(qryTriggers.entry_createdOn)#</a>
 			</div>
 		</div>
 	</cfloop>

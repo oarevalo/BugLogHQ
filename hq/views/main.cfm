@@ -7,7 +7,6 @@
 <cfset rowsPerPage = rs.rowsPerPage>
 <cfset refreshSeconds = rs.refreshSeconds>
 <cfset lastbugread = rs.lastbugread>
-<cfset dateFormatMask = rs.dateFormatMask>
 <cfset assetsPath = rs.assetsPath>
 
 <cfset groupByApp = rs.criteria.groupByApp>
@@ -194,7 +193,7 @@
 				#bugCount#
 			</td>
 			<td class="cell_mostrecent" align="center" width="140">
-				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#DateFormat(qryEntries.createdOn,dateFormatMask)# #lsTimeFormat(qryEntries.createdOn)#</a>)
+				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#showDateTime(qryEntries.createdOn)#</a>
 			</td>
 			<td class="cell_details" align="center">
 				<a href="#zoomURL#" title="Click for more detail">

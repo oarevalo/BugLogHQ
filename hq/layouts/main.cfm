@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<cfset rs = request.requestState>
-<cfparam name="rs.applicationTitle" default="#application.applicationName#">
-<cfparam name="rs.pageTitle" default="">
-<cfparam name="rs.viewTemplatePath" default="">
-<cfparam name="rs.messageTemplatePath" default="">
-<cfparam name="rs.assetsPath" default="">
-<cfset htmlTitle = rs.applicationTitle>
-<cfif rs.pageTitle neq "">
-	<cfset htmlTitle = rs.applicationTitle & " :: " & rs.pageTitle>
-</cfif>
+<cfsilent>
+	<cfset rs = request.requestState>
+	<cfparam name="rs.applicationTitle" default="#application.applicationName#">
+	<cfparam name="rs.pageTitle" default="">
+	<cfparam name="rs.viewTemplatePath" default="">
+	<cfparam name="rs.messageTemplatePath" default="">
+	<cfparam name="rs.assetsPath" default="">
+	<cfset htmlTitle = rs.applicationTitle>
+	<cfif rs.pageTitle neq "">
+		<cfset htmlTitle = rs.applicationTitle & " :: " & rs.pageTitle>
+	</cfif>
+	<!--- common helper functions --->
+	<cfinclude template="../includes/udf.cfm">
+</cfsilent>
+
 <cfoutput>
 	<html lang="en">
 		<head>

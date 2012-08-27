@@ -218,7 +218,7 @@
 			<table style="font-size:12px;">
 				<tr>
 					<td><b>Date/Time:</b></td>
-					<td>#lsDateFormat(oEntry.getdatetime())# - #lsTimeFormat(oEntry.getdatetime())#</td>
+					<td>#showDateTime(oEntry.getCreatedOn())#</td>
 				</tr>
 				<tr>
 					<td><b>Application:</b></td>
@@ -704,7 +704,7 @@
 			<table style="font-size:12px;">
 				<tr>
 					<td><b>Date/Time:</b></td>
-					<td>#lsDateFormat(arguments.datetime)# - #lsTimeFormat(arguments.datetime)#</td>
+					<td>#showDateTime(arguments.datetime)#</td>
 				</tr>
 				<cfif arguments.applicationCode neq "">
 					<tr>
@@ -752,4 +752,18 @@
 		<cfreturn tmpHTML>
 	</cffunction>	
 	
+	<cffunction name="showDateTime" returnType="string" access="private">
+		<cfargument name="theDateTime" type="any" required="true">
+		<cfset var rtn = "">
+		<cfset var timezoneInfo = variables.config.getSetting("general.timezoneInfo","")>
+		<cfset var dateMask = variables.config.getSetting("general.dateFormat","mm/dd/yyyy")>
+		
+		<cfif timezoneInfo neq "">
+			<cfset var utils = createObject("component","bugLog.components.util").init() />
+			<cfset theDateTime = util.dateConvertZ("local2zone",theDateTime,timezoneInfo)>
+		</cfif>
+		<cfset rtn = dateFormat(theDateTime, dateMask) & " " & lsTimeFormat(theDateTime)>
+		<cfreturn rtn>
+	</cffunction>
+
 </cfcomponent>

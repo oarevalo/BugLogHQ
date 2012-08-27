@@ -26,7 +26,7 @@
 					<a href="index.cfm?event=serviceMonitor.main"><img src="#rs.assetsPath#images/icons/server_connect.png" border="0" align="absmiddle"></a>
 					<div style="font-size:9px;">
 						<strong>Last Start:</strong> 
-						#lsdateformat(rs.stInfo.startedOn)# #lstimeformat(rs.stInfo.startedOn)#
+						#showDateTime(rs.stInfo.startedOn)#
 					</div>
 				<cfelse>
 					<span style="color:red;font-weight:bold;">Stopped</span>

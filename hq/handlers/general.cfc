@@ -57,16 +57,21 @@
 				// get status of buglog server
 				stInfo = app.getServiceInfo();
 				
+				// get a util function used for date formatting
+				var dateConvertZFunc = createObject("component","bugLog.components.util").dateConvertZ;
+				
 				// set generally available values on the request context
 				setValue("hostName", hostName);
 				setValue("applicationTitle", appTitle);
 				setValue("stInfo", stInfo);
 				setValue("versionTag", versionTag);
 				setValue("currentUser", session.user);
-				setValue("dateFormatMask",config.getSetting("general.dateFormat"));
+				setValue("dateFormatMask",config.getSetting("general.dateFormat",""));
+				setValue("timezoneInfo",config.getSetting("general.timezoneInfo",""));
 				setValue("configKey", config.getConfigKey());
 				setValue("instanceName", app.getInstanceName());
 				setValue("assetsPath", assetsPath);
+				setValue("dateConvertZ", dateConvertZFunc);
 
 			} catch(any e) {
 				setMessage("error",e.message);

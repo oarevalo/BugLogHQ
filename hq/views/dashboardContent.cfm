@@ -1,6 +1,5 @@
 <cfset rs = request.requestState>
 <cfset qryData = rs.qryEntries>
-<cfset dateMask = rs.dateFormatMask>
 
 <cfinclude template="../includes/udf.cfm">
 

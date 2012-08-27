@@ -40,7 +40,7 @@
 			</td>
 			<td align="center">
 				<cfset tmpURL = "index.cfm?event=entry&entryID=#EntryID#">
-				<a href="#tmpURL#">#dateFormat(createdOn,dateMask)# #lsTimeFormat(createdOn)#</a>
+				<a href="#tmpURL#">#showDateTime(qrySummary.createdOn)#</a>
 			</td>
 		</tr>
 		<cfset prevAppCode = applicationCode>

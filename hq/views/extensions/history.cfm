@@ -33,7 +33,7 @@
 				<cfset tmpMessage = HtmlEditFormat(rs.qryHistory.message)>
 			</cfif>
 			<tr <cfif rs.qryHistory.currentRow mod 2>class="altRow"</cfif>>
-				<td>#dateFormat(rs.qryHistory.createdOn,rs.dateFormatMask)# #lsTimeFormat(rs.qryHistory.createdOn)#</td>
+				<td>#showDateTime(rs.qryHistory.createdOn)#</td>
 				<td>#name#</td>
 				<td>#application_code#</td>
 				<td>#hostname#</td>

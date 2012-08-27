@@ -19,7 +19,7 @@
 <cfoutput>
 [Bug ###entryID#|#bugLogEntryHREF#]
 
-* *Date/Time:* #lsDateFormat(oEntry.getDateTime())# - #lsTimeFormat(oEntry.getDateTime())#
+* *Date/Time:* #showDateTime(oEntry.getCreatedOn())#
 * *Application:* #oApp.getCode()#
 * *Host:* #oHost.getHostname()#
 * *Severity:* #tmpSeverity#

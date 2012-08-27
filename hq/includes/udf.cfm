@@ -41,3 +41,37 @@
 	</cfswitch>		
 	<cfreturn code />
 </cffunction>
+
+<cffunction name="showDate" returnType="string">
+	<cfargument name="theDate" type="any" required="true">
+	<cfargument name="mask" type="string" required="false" default="">
+	<cfset var rtn = "">
+	<cfif mask eq "">
+		<cfif structKeyExists(request.requestState,"dateFormatMask") and request.requestState.dateFormatMask neq "">
+			<cfset mask = request.requestState.dateFormatMask>
+		<cfelse>
+			<cfset mask = "dd/mm/yy">
+		</cfif>
+	</cfif>
+	<cfset rtn = dateFormat(theDate,mask)>
+	<cfreturn rtn>
+</cffunction>
+
+<cffunction name="showDateTime" returnType="string">
+	<cfargument name="theDateTime" type="any" required="true">
+	<cfargument name="dateMask" type="string" required="false" default="">
+	<cfargument name="timeMask" type="string" required="false" default="">
+	<cfset var rtn = "">
+	<cfif structKeyExists(request.requestState,"timezoneInfo") and request.requestState.timezoneInfo neq "">
+		<cfset theDateTime = request.requestState.dateConvertZ("local2zone",theDateTime,request.requestState.timezoneInfo)>
+	</cfif>
+	<cfset rtn = showDate(theDateTime,dateMask)>
+	<cfif timeMask neq "">
+		<cfset rtn = rtn & " " & lsTimeFormat(theDateTime,timeMask)>
+	<cfelse>
+		<cfset rtn = rtn & " " & lsTimeFormat(theDateTime)>
+	</cfif>
+	<cfreturn rtn>
+</cffunction>
+
+

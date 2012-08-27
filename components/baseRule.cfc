@@ -72,7 +72,7 @@
 					</tr>
 					<tr>
 						<td><b>Date/Time:</b></td>
-						<td>#lsDateFormat(stEntry.receivedOn)# - #lsTimeFormat(stEntry.receivedOn)#</td>
+						<td>#showDateTime(stEntry.receivedOn)#</td>
 					</tr>
 					<tr>
 						<td><b>Application:</b></td>
@@ -195,4 +195,18 @@
 		<cfreturn "">
 	</cffunction>
 
+	<cffunction name="showDateTime" returnType="string" access="private" hint="formats a date/time object according to user settings">
+		<cfargument name="theDateTime" type="any" required="true">
+		<cfset var rtn = "">
+		<cfset var timezoneInfo = getListener().getConfig().getSetting("general.timezoneInfo","")>
+		<cfset var dateMask = getListener().getConfig().getSetting("general.dateFormat","mm/dd/yyyy")>
+		
+		<cfif timezoneInfo neq "">
+			<cfset var utils = createObject("component","bugLog.components.util").init() />
+			<cfset theDateTime = util.dateConvertZ("local2zone",theDateTime,timezoneInfo)>
+		</cfif>
+		<cfset rtn = dateFormat(theDateTime, dateMask) & " " & lsTimeFormat(theDateTime)>
+		<cfreturn rtn>
+	</cffunction>
+	
 </cfcomponent>

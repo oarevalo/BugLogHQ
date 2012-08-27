@@ -6,6 +6,8 @@
 				]>
 <cfset lstPanelIDs = "">
 
+<cfinclude template="../includes/udf.cfm">
+
 <cfoutput>
 <cfinclude template="../includes/menu.cfm">
 

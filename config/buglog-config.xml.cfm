@@ -3,6 +3,13 @@
 	<setting name="general.adminEmail">admin@somedomain.org</setting>
 	<setting name="general.externalURL"></setting>
 	<setting name="general.dateFormat">mm/dd/yy</setting>
+
+	<!-- all dates/times are based on the current server time,
+		but you can use the following setting to display times
+		on a different time zone. Keep in mind that this is a basic
+		offset calculation and does not handle things like daylight savings
+		time and such. Use the format: "UTC+/-{hour offset}". Ex UTC+8 -->
+	<setting name="general.timezoneInfo"></setting>
 	
 	<setting name="db.dsn">bugLog</setting>
 	<setting name="db.dbtype">mysql</setting>

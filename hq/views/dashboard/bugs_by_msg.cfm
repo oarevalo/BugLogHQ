@@ -50,7 +50,7 @@
 				<div style="font-size:12px;margin-top:3px;">
 					on <a href="#tmpAppURL#" title="View all bug reports for this application">#qryListing.applicationCode#</a>
 					last received on
-					<a href="#tmpEntryURL#" title="View bug report">#dateFormat(qryListing.createdOn,dateMask)# #lsTimeFormat(qryListing.createdOn)#</a>
+					<a href="#tmpEntryURL#" title="View bug report">#showDateTime(qryListing.createdOn)#</a>
 				</div>
 			</td>
 			<td style="text-align:center;">

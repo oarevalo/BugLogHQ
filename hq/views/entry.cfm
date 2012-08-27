@@ -152,7 +152,7 @@
 			<tbody>
 				<tr>
 					<td style="width:115px;"><b>Date/Time:</b></td>
-					<td>#lsDateFormat(oEntry.getCreatedOn(),"long")# - #lsTimeFormat(oEntry.getCreatedOn())#</td>
+					<td>#showDateTime(oEntry.getCreatedOn())#</td>
 				</tr>
 				<tr>
 					<td><b>User Agent:</b></td>
@@ -164,7 +164,7 @@
 								<cfloop query="qryUAEntries" startrow="1" endrow="#min(maxPreviewEntries,qryUAEntries.recordCount)#">
 									<li>
 										<cfif qryUAEntries.entryID eq oEntry.getEntryID()><span class="label label-info">This</span> </cfif>
-										#dateFormat(qryUAEntries.createdOn,"m/d")# #timeFormat(qryUAEntries.createdOn,"hh:mm tt")#: 
+										#showDateTime(qryUAEntries.createdOn,"m/d","hh:mm tt")#: 
 										<b>#qryUAEntries.applicationCode#</b> on
 										<b>#qryUAEntries.hostName#</b> :
 										<a href="index.cfm?event=entry&entryID=#qryUAEntries.entryID#">#htmlEditFormat(qryUAEntries.message)#</a></li>
@@ -213,7 +213,7 @@
 						<cfloop query="rs.qryEntriesLast24" startrow="1" endrow="#min(maxPreviewEntries,rs.qryEntriesLast24.recordCount)#">
 							<li>
 								<cfif rs.qryEntriesLast24.entryID eq oEntry.getEntryID()><span class="label label-info">This</span> </cfif>
-								<a href="index.cfm?event=entry&entryID=#rs.qryEntriesLast24.entryID#">#dateFormat(rs.qryEntriesLast24.createdOn,"m/d")# #timeFormat(rs.qryEntriesLast24.createdOn,"hh:mm tt")#</a> 
+								<a href="index.cfm?event=entry&entryID=#rs.qryEntriesLast24.entryID#">#showDateTime(rs.qryEntriesLast24.createdOn,"m/d","hh:mm tt")#</a> 
 								 on
 								<b>#rs.qryEntriesLast24.hostName#</b>
 							</li>
@@ -233,12 +233,12 @@
 					This bug has ocurred 
 					<a href="##" onclick="$('##allentries').slideToggle()" title="click to expand"><b>#rs.qryEntriesAll.recordCount#</b> time<cfif rs.qryEntriesAll.recordCount gt 1>s</cfif> <i class="icon-circle-arrow-down"></i></a>
 					since 
-					<a href="index.cfm?event=entry&entryID=#firstOccurrenceID#"><b>#lsDateFormat(firstOccurrence,"long")# #lsTimeFormat(firstOccurrence)#</b></a>
+					<a href="index.cfm?event=entry&entryID=#firstOccurrenceID#"><b>#showDateTime(firstOccurrence)#</b></a>
 					<ul id="allentries" style="display:none;margin-top:5px;">
 						<cfloop query="rs.qryEntriesAll" startrow="1" endrow="#min(maxPreviewEntries,rs.qryEntriesAll.recordCount)#">
 							<li>
 								<cfif rs.qryEntriesAll.entryID eq oEntry.getEntryID()><span class="label label-info">This</span> </cfif>
-								<a href="index.cfm?event=entry&entryID=#rs.qryEntriesAll.entryID#">#dateFormat(rs.qryEntriesAll.createdOn,"m/d")# #timeFormat(rs.qryEntriesAll.createdOn,"hh:mm tt")#</a>
+								<a href="index.cfm?event=entry&entryID=#rs.qryEntriesAll.entryID#">#showDateTime(rs.qryEntriesAll.createdOn,"m/d","hh:mm tt")#</a>
 								 on
 								<b>#rs.qryEntriesAll.hostName#</b>
 							</li>
@@ -252,7 +252,7 @@
 			<cfif qryEntriesOthers.recordCount gt 0>
 				<li style="margin-top:4px;">
 					The previous time this bug was reported was on 
-					<a href="index.cfm?event=entry&entryID=#qryEntriesOthers.entryID#"><b>#lsDateFormat(qryEntriesOthers.createdOn,"long")# #lsTimeFormat(qryEntriesOthers.createdOn)#</b></a>
+					<a href="index.cfm?event=entry&entryID=#qryEntriesOthers.entryID#"><b>#showDateTime(qryEntriesOthers.createdOn)#</b></a>
 				</li>
 			</cfif>
 			</ul>
