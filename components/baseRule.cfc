@@ -72,7 +72,7 @@
 					</tr>
 					<tr>
 						<td><b>Date/Time:</b></td>
-						<td>#lsDateFormat(stEntry.dateTime)# - #lsTimeFormat(stEntry.dateTime)#</td>
+						<td>#lsDateFormat(stEntry.receivedOn)# - #lsTimeFormat(stEntry.receivedOn)#</td>
 					</tr>
 					<tr>
 						<td><b>Application:</b></td>
