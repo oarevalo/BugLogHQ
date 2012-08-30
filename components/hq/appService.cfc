@@ -233,7 +233,7 @@
 			<a href="#bugURL#">#bugURL#</a>
 			<br><br><br>
 			** This email has been sent from the BugLog server at 
-			<a href="#arguments#">#arguments#</a>
+			<a href="#buglogHref#">#buglogHref#</a>
 		</cfmail>
 		
 	</cffunction>
