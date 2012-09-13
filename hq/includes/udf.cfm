@@ -2,11 +2,15 @@
 
 <cffunction name="getSeverityIconURL" returntype="string">
 	<cfargument name="severityCode" type="string" required="true">
-	<cfset var tmpURL = "images/severity/#lcase(severityCode)#.png">
+	<cfset var assetsPath = "">
+	<cfif structKeyExists(request, "requestState") and structKeyExists(request.requestState, "assetsPath")>
+		<cfset assetsPath = request.requestState.assetsPath>
+	</cfif>
+	<cfset var tmpURL = assetsPath & "images/severity/#lcase(severityCode)#.png">
 	<cfif not fileExists(expandPath(tmpURL))>
-		<cfset tmpURL = "images/severity/default.png">
+		<cfset tmpURL = assetsPath & "images/severity/default.png">
 	<cfelse>
-		<cfset tmpURL = "images/severity/#lcase(severityCode)#.png">
+		<cfset tmpURL = assetsPath & "images/severity/#lcase(severityCode)#.png">
 	</cfif>
 	<cfreturn tmpURL>
 </cffunction>
