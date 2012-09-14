@@ -233,7 +233,7 @@ There is now a Google Groups for the BugLogHQ project. Use them to ask any quest
 ---------------------------------------------------------------------------
 Since BugLog listens for bug reports through standard protocols via HTTP (REST and SOAP), you can use it to aggregate bug reports from any application, not just ones made in CFML. An application just needs to point to the right listener endpoint and pass the necessary parameters.
 
-On the /client folder you can find very basic versions of PHP and Python classes that can be used to have an easier integration between php and python apps and BugLog. Please note that this scripts are on an "experimental" state, so they are a bit more simpler than the CFML version. They also use only the REST listener, not the SOAP one.
+On the /client folder you can find basic versions of PHP, Python and JavaScript clients that can be used to have an easier integration between your applications and BugLog. Please note that this scripts are on an "experimental" state, so they are a bit more simpler than the CFML version. They also use only the REST listener, not the SOAP one.
 
 
 
