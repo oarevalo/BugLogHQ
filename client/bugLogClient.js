@@ -98,14 +98,14 @@ var BugLog = {
 	createNotifier: function(tagName) {
 		var notifier = document.createElement(tagName);
 		notifier.id = "buglog" + (+new Date);;
-		var head = document.getElementsByTagName("body")[0];
+		var head = document.getElementsByTagName("head")[0];
 		head.appendChild(notifier);
 		return notifier;
 	},
 	
 	destroyNotifier: function(notifier) {
 		var elm = document.getElementById(notifier.id);
-		var head = document.getElementsByTagName("body")[0];
+		var head = document.getElementsByTagName("head")[0];
 		head.removeChild(elm);
 	}
 
