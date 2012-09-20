@@ -377,10 +377,20 @@
 	</cffunction>
 	
 	<cffunction name="doStop" access="public" returnType="void">
-		<cfset var nextEvent = getValue("nextEvent")>
-		<cfset getService("app").stopService()>
-		<cfset setMessage("info","BugLogListener has been stopped!")>
-		<cfset setNextEvent(nextEvent)>
+		<cfscript>
+			var nextEvent = getValue("nextEvent");
+			try {
+				// stop service
+				getService("app").stopService();
+				setMessage("info","BugLogListener has been stopped!");
+				
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+			}
+
+			setNextEvent(nextEvent);
+		</cfscript>
 	</cffunction>
 
 	<cffunction name="doSend" access="public" returnType="void">
