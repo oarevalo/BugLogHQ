@@ -40,9 +40,9 @@
 			</td>
 			<td style="width:120px;font-weight:bold;">
 				<cfif not item.enabled>
-					<span style="color:red;">Disabled</span>
+					<span class="label label-important">Disabled</span>
 				<cfelse>
-					<span style="color:green;">Enabled</span>
+					<span class="label label-success">Enabled</span>
 				</cfif>
 			</td>
 		
