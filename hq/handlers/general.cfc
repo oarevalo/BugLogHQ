@@ -392,7 +392,7 @@
 		<cfscript>
 			try {
 				entryID = getValue("entryID",0);
-				sender = getService("app").getConfig().getSetting("adminEmail");
+				sender = getService("app").getConfig().getSetting("general.adminEmail");
 				recipient = getValue("to","");
 				comment = getValue("comment","");
 				

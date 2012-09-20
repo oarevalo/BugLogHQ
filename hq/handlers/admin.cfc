@@ -26,7 +26,7 @@
 				switch(panel) {
 					case "general":
 						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
-						setValue("adminEmail", cfg.getSetting("adminEmail",""));
+						setValue("adminEmail", cfg.getSetting("general.adminEmail",""));
 						setValue("autoStart", app.getServiceSetting("autoStart",true));
 						setValue("allowPublicRSS", cfg.getSetting("rss.allowPublicAccess",false));
 						break;
@@ -309,7 +309,7 @@
 				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("admin.main");}
 				getService("app").setServiceSetting("autoStart", autoStart);
 				config.reload();
-				config.setSetting("adminEmail", adminEmail);
+				config.setSetting("general.adminEmail", adminEmail);
 				config.setSetting("rss.allowPublicAccess", allowPublicRSS);
 
 				setMessage("info","General settings updated.");
