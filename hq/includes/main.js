@@ -36,6 +36,12 @@ $(document).ready(function(){
 		$('.ruleDescription').hide();
 		$('#rule_'+rel).show();
 	})
+	
+	if (typeof __removeAlert === 'undefined') {
+		// nothing here
+	} else {
+		setTimeout(removeAlert,3000);
+	}	
 });
 
 function confirmDeleteRule(index) {
@@ -45,4 +51,8 @@ function confirmDeleteRule(index) {
 }
 function updateFilter(event, name, value) {
 	document.location = "index.cfm?event="+event+"&"+name+"="+value;
+}
+
+function removeAlert() {
+	$("#alert").fadeOut().empty();
 }

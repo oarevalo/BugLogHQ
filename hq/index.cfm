@@ -10,6 +10,7 @@
 <cfset app.paths.app = "/bugLog/hq">
 <cfset app.paths.core = "/bugLog/core">
 <cfset app.paths.coreImages = "../core/images">
+<cfset app.paths.message = "/bugLog/hq/includes/message.cfm">
 
 <cfset app.dirs.handlers = "handlers">
 <cfset app.dirs.layouts = "layouts">
