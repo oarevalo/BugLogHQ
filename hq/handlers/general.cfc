@@ -26,11 +26,6 @@
 				if(not structKeyExists(session,"userID")) session.userID = 0;
 				if(not structKeyExists(session,"user")) session.user = 0;
 				
-				// make sure that we always access everything via events
-				if(event eq "") {
-					throw("All requests must specify the event to execute. Direct access to views is not allowed");
-				}
-
 				// check login
 				if(not listFindNoCase(publicEvents, event) and session.userID eq 0) {
 					if(not listFindNoCase(noLoginRedirectEvents, event)) {
