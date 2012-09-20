@@ -433,12 +433,12 @@
 				username = getValue("username","");
 				password = getValue("password","");
 				
-				if(username eq "") throw("Please enter your username");		
-				if(password eq "") throw("Please enter your password");
+				if(username eq "") throw(type="validation", message="Please enter your username");		
+				if(password eq "") throw(type="validation", message="Please enter your password");
 				if(nextEvent eq "") nextEvent = "";
 				
 				userID = getService("app").checkLogin(username, password);
-				if(userID eq 0) throw("Invalid username/password combination");
+				if(userID eq 0) throw(type="validation", message="Invalid username/password combination");
 				session.userID = abs(userID);
 				session.user = getService("app").getUserByID(abs(userID));
 
@@ -461,7 +461,7 @@
 
 				setNextEvent(nextEvent,qs);
 				
-			} catch(custom e) {
+			} catch(validation e) {
 				setMessage("warning",e.message);
 				setNextEvent("login");
 
@@ -470,7 +470,6 @@
 				getService("bugTracker").notifyService(e.message, e);
 				setNextEvent("login");
 			}
-
 		</cfscript>		
 	</cffunction>
 	
