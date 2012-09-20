@@ -1,5 +1,20 @@
 <cfset maxRows = rs.criteria.rows>
-<cfset sortField = "bugCount desc,createdOn desc">
+<cfset sortBy = rs.criteria.sortBy>
+
+<!--- determine required sort field --->
+<cfswitch expression="#sortBy#">
+	<cfcase value="most_recent">
+		<cfset sortField = "createdOn desc,bugCount desc">
+	</cfcase>
+	<cfcase value="most_frequent">
+		<cfset sortField = "bugCount desc,createdOn desc">
+	</cfcase>
+	<cfdefaultcase>
+		<cfset sortBy = "most_recent">
+		<cfset sortField = "bugCount desc,createdOn desc">
+	</cfdefaultcase>
+</cfswitch>
+
 <cfquery name="qryListing" dbtype="query">
 	SELECT ApplicationCode, ApplicationID, 
 			SeverityCode, SeverityID,
@@ -72,6 +87,15 @@
 			&nbsp;|&nbsp;
 		</cfif>
 		<a href="index.cfm?event=main&sortBy=bugCount&sortDir=desc&applicationID=#rs.criteria.applicationID#&hostID=#rs.criteria.hostID#">Show All</a>	
+	</div>
+	<div>
+		<cfif sortBy eq "most_frequent">
+			<b>&raquo; Showing most frequent first</b>
+			(<a href="index.cfm?event=dashboard&sortBy=most_recent">toggle to most recent</a>)
+		<cfelse>
+			<b>&raquo; Showing most recent first</b>
+			(<a href="index.cfm?event=dashboard&sortBy=most_frequent">toggle to most frequent</a>)
+		</cfif>
 	</div>
 </cfif>
 </cfoutput>
