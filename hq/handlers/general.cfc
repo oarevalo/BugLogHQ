@@ -396,15 +396,15 @@
 				recipient = getValue("to","");
 				comment = getValue("comment","");
 				
-				if(val(entryID) eq 0) throw("Please select an entry to send");		
-				if(recipient eq "") throw("Please enter the email address of the recipient");
-				if(sender eq "") throw("The sender email address has not been configured.");
+				if(val(entryID) eq 0) throw(type="validation", message="Please select an entry to send");		
+				if(recipient eq "") throw(type="validation", message="Please enter the email address of the recipient");
+				if(sender eq "") throw(type="validation", message="The sender email address has not been configured.");
 				
 				oEntry = getService("app").sendEntry(entryID, sender, recipient, comment);
 				
 				setMessage("info","Email has been sent!");
 			
-			} catch(custom e) {
+			} catch(validation e) {
 				setMessage("warning",e.message);
 
 			} catch(any e) {

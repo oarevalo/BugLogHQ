@@ -25,7 +25,7 @@
 			try {
 				switch(panel) {
 					case "general":
-						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
 						setValue("adminEmail", cfg.getSetting("adminEmail",""));
 						setValue("autoStart", app.getServiceSetting("autoStart",true));
 						setValue("allowPublicRSS", cfg.getSetting("rss.allowPublicAccess",false));
@@ -35,24 +35,24 @@
 						break;
 
 					case "userManagement":
-						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
 						setValue("qryUsers", app.getUsers() );
 						break;
 
 					case "purgeHistory":
-						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
 						setValue("purgeHistoryDays", cfg.getSetting("purging.numberOfDays",30));
 						setValue("enabled", cfg.getSetting("purging.enabled",false));
 						break;
 
 					case "APISecurity":
-						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
 						setValue("requireAPIKey", app.getServiceSetting("requireAPIKey",false));
 						setValue("APIKey", app.getServiceSetting("APIKey"));
 						break;
 
 					case "jira":
-						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
 						jiraConfig.enabled = jira.getSetting("enabled",false);
 						jiraConfig.wsdl = jira.getSetting("wsdl");
 						jiraConfig.username = jira.getSetting("username");
@@ -61,7 +61,7 @@
 						break;
 
 					case "digest":
-						if(not user.getIsAdmin()) throw(variables.msgs.userNotAllowed,"validation");
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
 						digestConfig = app.getDigestSettings();
 						setValue("enabled", digestConfig.enabled);			
 						setValue("recipients", digestConfig.recipients);			
@@ -197,8 +197,8 @@
 			var email = getValue("email");
 			
 			try {
-				if(username eq "") throw("Username cannot be empty","validation");
-				if(val(userID) eq 0 and password eq "") throw("Password cannot be empty","validation");
+				if(username eq "") throw(type="validation", message="Username cannot be empty");
+				if(val(userID) eq 0 and password eq "") throw(type="validation", message="Password cannot be empty");
 
 				if(userID gt 0) 
 					oUser = getService("app").getUserByID(userID);

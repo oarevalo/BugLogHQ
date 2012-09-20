@@ -6,7 +6,7 @@
 			var entryID = getValue("entryID");
 
 			try {
-				if(val(entryID) eq 0) throw("Please select an entry to view");		
+				if(val(entryID) eq 0) throw(type="validation", message="Please select an entry to view");		
 				
 				oEntry = getService("app").getEntry(entryID);
 				projects = oJIRA.getProjects();
@@ -18,6 +18,10 @@
 				setValue("issueTypes", issueTypes);
 				setValue("bugLogEntryHREF", getService("app").getBugEntryHREF(entryID));
 				setView("sendToJira");
+
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("entry","entryID=#entryID#");
 
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -37,14 +41,14 @@
 			var description = getValue("description");
 			
 			try {
-				if(val(entryID) eq 0) throw("Please select an entry to send");		
-				if(summary eq "") throw("Please enter a summary for this issue");
+				if(val(entryID) eq 0) throw(type="validation", message="Please select an entry to send");		
+				if(summary eq "") throw(type="validation", message="Please enter a summary for this issue");
 				
 				oJira.createIssue(project,issueType,summary,description);
 				
 				setMessage("info","Bug report sent to JIRA!");
 			
-			} catch(custom e) {
+			} catch(validation e) {
 				setMessage("warning",e.message);
 
 			} catch(any e) {

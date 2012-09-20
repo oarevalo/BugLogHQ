@@ -44,7 +44,7 @@
 			var app = getService("app");
 
 			try {
-				if(ruleName eq "") throw("Please select a valid rule type","validation");
+				if(ruleName eq "") throw(type="validation", message="Please select a valid rule type");
 				
 				stRule = app.getRuleInfo(ruleName);
 	
