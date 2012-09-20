@@ -138,6 +138,19 @@ CREATE TABLE `bl_Extension` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
+--
+-- Table structure for table `bl_ExtensionLog`
+--
+DROP TABLE IF EXISTS `bl_extensionlog`;
+CREATE TABLE `bl_extensionlog` (
+  `extensionLogID` int(11) NOT NULL AUTO_INCREMENT,
+  `extensionID` int(11) NOT NULL,
+  `createdOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `entryID` int(11) NOT NULL,
+  PRIMARY KEY (`extensionLogID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
