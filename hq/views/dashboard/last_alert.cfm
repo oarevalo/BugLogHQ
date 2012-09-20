@@ -48,7 +48,7 @@
 			<cfset tmp = qryTriggers.recordCount-numAlerts>
 			#tmp# more alert<cfif tmp gt 1>s</cfif> fired.
 		</cfif>
-		<a href="index.cfm?event=extensions.main">More...</a>
+		<a href="index.cfm?event=extensions.main&panel=history">More...</a>
 	</div>
 </cfoutput>
 
