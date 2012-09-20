@@ -13,15 +13,26 @@
 
 <br />
 
-<div id="extensions-content" class="clearfix">
+<div id="extensions-content">
 	<div id="extensions-side">
+		<div class="well well-small">
+			<span class="label label-important">Important:</span>
+			<span style="color:##990000;">
+			<cfif currentUser.getIsAdmin()>
+				Any changes to extensions will only become effective after restarting the bugLog service.
+			<cfelse>
+				Only an administrator can create or modify rules
+			</cfif>
+			</span>
+		</div>
+
 		<cfif currentUser.getIsAdmin()>
-			<div class="well">
+			<div class="well well-small">
 				<h3>Create a Rule</h3>
 				<form name="frm" method="get" action="index.cfm" style="margin-top:5px;">
 					<input type="hidden" name="event" value="extensions.rule">
 			
-					<select name="ruleName" style="width:200px;" id="newRuleSelector">
+					<select name="ruleName" style="width:180px;" id="newRuleSelector">
 						<option value="">-- Select rule type --</option>
 						<cfloop from="1" to="#arrayLen(rs.aRules)#" index="i">
 							<cfset ruleName = listLast(rs.aRules[i].name,".")>
@@ -40,25 +51,14 @@
 			</div>
 		</cfif>	
 
-		<div class="well">
+		<div class="well well-small">
 			<h3>What Are Rules?</h3>
 			<p>Rules are processes that are executed as each bug report is processed. Use rules to perform tasks such
 			as monitoring for specific error messages, or messages coming from specific applications.</p>
 		</div>
 	</div>
-
+	
 	<div id="extensions-main">
-		<p>
-			<span class="label label-important">Important:</span>
-			<span style="color:##990000;">
-			<cfif currentUser.getIsAdmin()>
-				Any changes to extensions will only become effective after restarting the bugLog service.
-			<cfelse>
-				Only an administrator can create or modify rules
-			</cfif>
-			</span>
-		</p>
-
 		<cfif rs.hasExtensionsXMLFile and currentUser.getIsAdmin()>
 			<div class="migrationNotice">
 				<b style="color:##990000">UPGRADE REQUIRED:</b>
@@ -70,17 +70,18 @@
 				&nbsp;
 				<input type="button" name="btn" value="No, just delete the file" onclick="if(confirm('Are you sure?')) document.location='?event=extensions.doDeleteExtensionsXML'">
 			</div>
+			<br />
 		</cfif>
 		
-		<br />
-		
-		<div>
+		<div class="span4" style="margin-left:0px;">
+		<ul class="nav nav-pills">
 			<cfloop from="1" to="#arrayLen(aPanels)#" index="i">
-				<a href="index.cfm?event=extensions.main&panel=#aPanels[i].id#" style="text-decoration:none;"
-					><span <cfif rs.panel eq aPanels[i].id>class="label"</cfif>>#aPanels[i].label#</a></span>
-				&nbsp;
+				<li <cfif rs.panel eq aPanels[i].id>class="active"</cfif>>
+					<a href="index.cfm?event=extensions.main&panel=#aPanels[i].id#" style="text-decoration:none;">#aPanels[i].label#</a>
+				</li>
 				<cfset lstPanelIDs = listAppend(lstPanelIDs,aPanels[i].id)>
 			</cfloop>
+		</ul>
 		</div>
 
 		<br />
@@ -89,16 +90,7 @@
 		<cfelse>
 			<em>Select an option from the menu</em>
 		</cfif>
-	</div>
-
-
+	</div>	
 </div>
-
-
-
 <hr />
-
-
-
-
 </cfoutput>

@@ -191,11 +191,11 @@ label.inline {
 	width:100%;
 }
 #extensions-main {
-	margin-right:310px;
+	margin-right:260px;
 }
 #extensions-side {
 	float:right;
-	width:300px;
+	width:250px;
 }
 .extensionItem {
 	background-color:#ebebeb;
