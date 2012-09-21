@@ -1,11 +1,11 @@
-BugLogHQ (v1.6)
+BugLogHQ (v1.7)
 ===============
 https://github.com/oarevalo/BugLogHQ
 
 **BugLogHQ** is a tool to centralize the handling of automated bug reports from multiple applications. BugLogHQ provides a unified view of error messages sent from any number of applications, allowing the developer to search, graph, forward, and explore the bug reports submitted by the applications.
 
 
-> Copyright 2009 - Oscar Arevalo (http://www.oscararevalo.com)
+> Copyright 2009-2012 - Oscar Arevalo (http://www.oscararevalo.com)
 >
 > Licensed under the Apache License, Version 2.0 (the "License"); 
 > you may not use this file except in compliance with the License. 
@@ -43,6 +43,20 @@ graph, forward, and explore the bug reports submitted by the applications. All b
 
 2. Release Notes
 -----------------------------------------------------------------------
+
+### New in 1.7 (9/2012)
+* A new “Dashboard” homepage.
+* More granular and finer timespans to view received errors. 
+* A log of each time an alert is fired with information on the bug report that triggered the alert.
+* Optional HTTP Basic authentication for access to RSS feeds.
+* Expose the results of any search criteria as an RSS feed.
+* A new client written in JavaScript to allow client-side webapps to report errors to a BugLog server.
+* Centralized and standardized display of dates and times, including support for time zone conversion.
+* Display additional insights and context for each bug report (timeline, other reports from same user agent, host distribution)
+* Allow deletion of bug reports
+* Improved listing of current rules to provide a human-readable description of what they actually do.
+* Use jQuery and Twitter Bootstrap for the main user interface.
+
 
 ### New in 1.6 (7/2012)
 * Support for "Named Instance" deployment. A Named Instance means that you can have multiple instances of BugLog running on the same server at the same time. Each instance have their own configuration and point to their own databases.
