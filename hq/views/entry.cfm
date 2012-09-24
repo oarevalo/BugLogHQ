@@ -47,8 +47,6 @@
 	<cfset qryUAEntries = queryNew("")>
 </cfif>
 
-<cfinclude template="../includes/udf.cfm">
-
 <cfset rs.pageTitle = "Bug ###entryID# : <span style='color:##cc0000;'>#tmpMessage#</span>">
 
 <cfoutput>
