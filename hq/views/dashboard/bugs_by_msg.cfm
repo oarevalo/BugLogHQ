@@ -10,7 +10,7 @@
 		<cfset sortField = "bugCount desc,createdOn desc">
 	</cfcase>
 	<cfdefaultcase>
-		<cfset sortBy = "most_recent">
+		<cfset sortBy = "most_frequent">
 		<cfset sortField = "bugCount desc,createdOn desc">
 	</cfdefaultcase>
 </cfswitch>
