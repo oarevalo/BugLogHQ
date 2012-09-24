@@ -3,7 +3,7 @@
 	<settings>
 		<!-- Application Title -->
 		<setting name="applicationTitle" value="BugLogHQ"/>
-		<setting name="versionTag" value="1.7.0" />
+		<setting name="versionTag" value="1.7.1" />
 		
 		<!-- These two settings are used for reporting internal
 			errors of the HQ application -->
