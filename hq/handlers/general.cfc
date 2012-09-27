@@ -350,7 +350,7 @@
 	</cffunction>
 
 	<cffunction name="updatePassword" access="public" returntype="void">
-		<cfset setView("vwUpdatePassword")>
+		<cfset setView("UpdatePassword")>
 	</cffunction>
 	
 	<cffunction name="doStart" access="public" returnType="void">
