@@ -17,7 +17,7 @@
 
 <cfsavecontent variable="defaultDescription">
 <cfoutput>
-[Bug ###entryID#|#bugLogEntryHREF#]
+[Bug ###entryID#|#rs.bugLogEntryHREF#]
 
 * *Date/Time:* #showDateTime(oEntry.getCreatedOn())#
 * *Application:* #oApp.getCode()#
