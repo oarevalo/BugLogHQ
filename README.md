@@ -61,7 +61,7 @@ graph, forward, and explore the bug reports submitted by the applications. All b
 ### New in 1.6 (7/2012)
 * Support for "Named Instance" deployment. A Named Instance means that you can have multiple instances of BugLog running on the same server at the same time. Each instance have their own configuration and point to their own databases.
 * BugLog can now (optionally) run out-of-the-box on any directory (even the webroot).
-* Added support for PostgreSQL (contributed by morgdenn)
+* Added support for PostgreSQL (contributed by Morgan Dennithorne)
 
 ### New in 1.5 (2/2011)
 * Extensions are now stored on a database instead of an XML file
@@ -231,7 +231,7 @@ Currently BugLogHQ supports the following databases:
 * Thanks to Tom DeManincor for creating the SQL script for MSSQL
 * Thanks to Chuck Weidler for updating and providing the SQL scripts for Access, MS SQL Server 2000, MSSQL Server 2005
 * Thanks to WST crew at Mentor Graphics for the great suggestions and ideas to improve BugLog
-* Thanks to Morgan Dennitor for adding support for PostgreSQL
+* Thanks to Morgan Dennithorne for adding support for PostgreSQL
 * Thanks to everyone that contributes code and patches to the project!
 
 
