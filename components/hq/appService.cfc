@@ -114,6 +114,7 @@
 		<cfargument name="search_cfid" type="string" required="false" default="">
 		<cfargument name="search_cftoken" type="string" required="false" default="">
 		<cfargument name="userAgent" type="string" required="false" default="">
+		<cfargument name="searchHTMLReport" type="string" required="false" default="">
 		<cfscript>
 			var oEntryFinder = 0;
 			var qry = 0;
@@ -138,6 +139,9 @@
 				args.severityID = 0;
 				args.severityCode = trim(arguments.severityID);
 			}
+			
+			// make sure that searchHTMLReport is a valid boolean value
+			args.searchHTMLReport = (isBoolean(arguments.searchHTMLReport) and arguments.searchHTMLReport);
 						
 			// get entries
 			oEntryFinder = createModelObject("components.entryFinder").init( variables.oEntryDAO );
