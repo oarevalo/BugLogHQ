@@ -4,7 +4,8 @@
 <!--- this is to make sure that this template can only be invoked
 	from the sendDigest template, so that we don't show its contents
 	to everyone --->
-<cfif getFileFromPath(getBaseTemplatePath()) neq "sendDigest">
+<cfif getFileFromPath(getBaseTemplatePath()) neq "sendDigest.cfm">
+	<cfoutput>This template cannot be called directly. Sorry.</cfoutput>
 	<cfabort>
 </cfif>
 

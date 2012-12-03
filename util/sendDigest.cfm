@@ -9,15 +9,20 @@
 <cfset settings = oAppService.getDigestSettings()>
 
 <cfset adminEmail = oConfig.getSetting("general.adminEmail")>
+<cfset recipients = adminEmail>
 
 <cfif !settings.enabled>
 	<cfoutput>Digest report is not enabled.</cfoutput>
 	<cfabort>
 </cfif>
+<cfif adminEmail eq "" or !isValid("email",adminEmail)>
+	<cfoutput>The Administrator Email setting must be a valid email address.</cfoutput>
+	<cfabort>
+</cfif>
 
 <cfscript>
-	if(settings.recipients eq "")
-		settings.recipients = adminEmail;
+	if(trim(settings.recipients) neq "" and find("@",settings.recipients))
+		recipients = trim(settings.recipients);
 </cfscript>
 
 <cfsavecontent variable="tmpHTML">
@@ -32,9 +37,11 @@
 
 <cfif qrydata.recordCount gt 0 or (qryData.recordCount eq 0 and settings.sendIfEmpty)>
 	<cfmail from="#adminEmail#" 
-			to="#settings.recipients#"
+			to="#recipients#"
 			subject="BugLogHQ Digest"
 			type="html">#tmpHTML#</cfmail>
+	<cfoutput>Done. (email sent to #recipients#)</cfoutput>.
+<cfelse>
+	<cfoutput>Done. (email not sent)</cfoutput>.
 </cfif>
 
-<cfoutput>Done.</cfoutput>.
