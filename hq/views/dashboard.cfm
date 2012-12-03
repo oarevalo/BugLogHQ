@@ -16,7 +16,10 @@
 			function runIntervalAjax(){		
 				$("##dashboardContent").load("index.cfm?event=dashboardContent");
 			}
-
+	
+			// avoid caching the dashboard contents
+			$.ajaxSetup({ cache: false });
+			
 			$(document).ready(function(){
 				startInterval()
 			});
