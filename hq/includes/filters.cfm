@@ -40,7 +40,6 @@
 	<form name="frmSearch" id="frmSearch" action="index.cfm" method="get" style="margin:0px;padding-top:10px;" class="form-inline">
 		<input type="hidden" name="groupByApp" value="#rs.criteria.groupByApp#">
 		<input type="hidden" name="groupByHost" value="#rs.criteria.groupByHost#">
-		<input type="hidden" name="searchHTMLReport" value="#rs.criteria.searchHTMLReport#">
 		<input type="hidden" name="event" value="#rs.event#" id="currentEvent">
 		
 		<table  width="100%" class="well" cellpadding="0" cellspacing="0">
