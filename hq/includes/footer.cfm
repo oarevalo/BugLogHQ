@@ -9,4 +9,6 @@
 	<cfif request.requestState.instanceName neq "" and request.requestState.instanceName neq "default">
 		(#request.requestState.instanceName#)
 	</cfif>
+	&nbsp; | &nbsp;
+	<a href="../mobile">Mobile</a>
 </cfoutput>
