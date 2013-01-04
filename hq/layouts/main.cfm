@@ -37,7 +37,13 @@
 					</cfif>
 
 					<cfif rs.viewTemplatePath neq "">
-						<cfinclude template="#rs.viewTemplatePath#">
+						<cftry>
+							<cfinclude template="#rs.viewTemplatePath#">
+							<cfcatch type="any">
+								<cfset rs.bugTracker.notifyService(cfcatch.message, cfcatch)>
+								<cfrethrow>
+							</cfcatch>
+						</cftry>
 					</cfif>
 				</div>
 			</div>

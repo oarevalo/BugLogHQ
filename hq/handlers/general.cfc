@@ -67,6 +67,7 @@
 				setValue("instanceName", app.getInstanceName());
 				setValue("assetsPath", assetsPath);
 				setValue("dateConvertZ", dateConvertZFunc);
+				setValue("bugTracker", getService("bugTracker"));
 
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -126,10 +127,10 @@
 				loadFilter("dashboard");
 				
 				// get current filters selected
-				criteria = getValue("criteria");
+				var criteria = getValue("criteria");
 				
-				qryEntries = appService.searchEntries(argumentCollection = criteria);
-				qryTriggers = appService.getExtensionsLog(criteria.startDate);
+				var qryEntries = appService.searchEntries(argumentCollection = criteria);
+				var qryTriggers = appService.getExtensionsLog(criteria.startDate);
 
 				setValue("qryEntries",qryEntries);
 				setValue("qryTriggers",qryTriggers);

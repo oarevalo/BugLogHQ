@@ -78,4 +78,18 @@
 	<cfreturn rtn>
 </cffunction>
 
+<cffunction name="renderContent" returntype="string">
+	<cfargument name="templateName" type="string">
+	<cfset var html = "">
+	<cftry>
+		<cfsavecontent variable="html">
+			<cfinclude template="../#arguments.templateName#">
+		</cfsavecontent>
+		<cfcatch type="any">
+			<cfset rs.bugTracker.notifyService(cfcatch.message, cfcatch)>
+			<cfset html = "Error: #cfcatch.message#">
+		</cfcatch>
+	</cftry>
+	<cfreturn html>
+</cffunction>
 
