@@ -17,6 +17,12 @@
 
 		<p>The BugLog Digest is a report sent via email containing a summary of BugLog activity for the last X hours. You can configure how
 		often you want to receive the report.</p>
+		
+		<div class="well">
+			<span class="label label-important">Important:</span>
+			After enabling, disabling, or changing the scheduling settings of the Digest email you <b>MUST</b> restart the BugLog Listener service 
+			for changes to take effect.
+		</div>
 
 		<form name="settings" action="index.cfm" method="post">
 			<input type="hidden" name="event" value="admin.doSaveDigestSettings">

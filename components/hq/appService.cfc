@@ -368,9 +368,6 @@
 		<cfargument name="severity" type="string" required="true">
 		<cfargument name="application" type="string" required="true">
 		<cfargument name="host" type="string" required="true">
-
-		<cfset var scheduler = createObject("component","bugLog.components.schedulerService").init(config,instanceName)>
-		
 		<cfset variables.config.setSetting("digest.enabled", arguments.enabled)>
 		<cfset variables.config.setSetting("digest.recipients", arguments.recipients)>
 		<cfset variables.config.setSetting("digest.schedulerIntervalHours", arguments.interval)>
@@ -379,15 +376,6 @@
 		<cfset variables.config.setSetting("digest.severity", arguments.severity)>
 		<cfset variables.config.setSetting("digest.application", arguments.application)>
 		<cfset variables.config.setSetting("digest.host", arguments.host)>
-
-		<cfif arguments.enabled>
-			<cfset scheduler.setupTask("bugLogSendDigest", 
-										"util/sendDigest.cfm",
-										arguments.startTime,
-										arguments.interval*3600) />		
-		<cfelse>
-			<cfset scheduler.removeTask("bugLogSendDigest") />
-		</cfif>
 	</cffunction>
 
 	<cffunction name="getConfigKey" access="public" returntype="string">

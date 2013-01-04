@@ -341,7 +341,7 @@
 				if(interval eq "") {setMessage("warning","Please set the digest interval"); setNextEvent("admin.main","panel=digest");};
 				if(startTime eq "") {setMessage("warning","Please enter the start time"); setNextEvent("admin.main","panel=digest");};
 				getService("app").setDigestSettings(enabled, recipients, interval, startTime, sendIfEmpty, severity, app, host);
-				setMessage("info","Digest settings updated.");
+				setMessage("info","Digest settings settings updated. You must restart the BugLogListener service for changes to take effect.");
 				setNextEvent("admin.main","panel=digest");
 							
 			} catch(any e) {

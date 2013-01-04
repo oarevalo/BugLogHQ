@@ -16,7 +16,6 @@
 	<cfset variables.oConfig = 0>
 	<cfset variables.msgLog = arrayNew(1)>
 	<cfset variables.maxLogSize = 10>
-	<cfset variables.purgeHistoryEnabled = false>
 	<cfset variables.instanceName = "">
 
 	<cffunction name="init" access="public" returntype="bugLogListener" hint="This is the constructor">
@@ -32,7 +31,6 @@
 	
 			// load settings
 			variables.maxLogSize = arguments.config.getSetting("service.maxLogSize");
-			variables.purgeHistoryEnabled = arguments.config.getSetting("purging.enabled");
 			
 			// load DAO Factory
 			variables.oDAOFactory = createObject("component","bugLog.components.DAOFactory").init( variables.oConfig );
@@ -60,6 +58,9 @@
 						
 			// configure history purging
 			configureHistoryPurging();
+			
+			// configure the digest sender
+			configureDigest();
 
 			// record the date at which the service started 
 			variables.startedOn = Now();
@@ -313,11 +314,28 @@
 	</cffunction>
 
 	<cffunction name="configureHistoryPurging" access="private" output="false" returntype="void">
-		<cfif variables.purgeHistoryEnabled>
+		<cfset var enabled = getConfig().getSetting("purging.enabled")>
+		<cfif enabled>
 			<cfset scheduler.setupTask("bugLogPurgeHistory", 
 										"util/purgeHistory.cfm",
 										"03:00",
 										"daily") />
+		<cfelse>
+			<cfset scheduler.removeTask("bugLogPurgeHistory") />
+		</cfif>
+	</cffunction>
+
+	<cffunction name="configureDigest" access="private" output="false" returntype="void">
+		<cfset var config = getConfig()>
+		<cfset var enabled = config.getSetting("digest.enabled")>
+		<cfset var interval = config.getSetting("digest.schedulerIntervalHours")>
+		<cfset var startTime = config.getSetting("digest.schedulerStartTime")>
+
+		<cfif enabled>
+			<cfset scheduler.setupTask("bugLogSendDigest", 
+										"util/sendDigest.cfm",
+										startTime,
+										interval*3600) />
 		<cfelse>
 			<cfset scheduler.removeTask("bugLogPurgeHistory") />
 		</cfif>
