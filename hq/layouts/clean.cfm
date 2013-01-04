@@ -28,8 +28,7 @@
 				</cfif>
 
 				<cfcatch type="any">
-					<b>#cfcatch.Message#</b><br>
-					#cfcatch.Detail#
+					<cfset app.onError(cfcatch, rs.event)>
 				</cfcatch>
 			</cftry>
 			<script type="text/javascript" src="#rs.assetsPath#/includes/bootstrap/js/bootstrap.min.js"></script>

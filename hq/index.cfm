@@ -17,6 +17,7 @@
 <cfset app.dirs.views = "views">
 
 <cfset app.mainHandler = "general">
+<cfset app.errorHandler = "onError">
 <cfset app.defaultEvent = "dashboard">
 <cfset app.defaultLayout = "main">
 <cfset app.configDoc = "config/config.xml.cfm">

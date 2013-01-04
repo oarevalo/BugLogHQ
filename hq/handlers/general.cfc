@@ -81,6 +81,12 @@
 		<!--- code to execute at the end of each request --->
 	</cffunction>
 
+	<cffunction name="onError">
+		<cfset var e = getValue("exception")>
+		<cfparam name="e.message" default="">
+		<cfset getService("bugTracker").notifyService(e.message, e)>
+	</cffunction>
+
 	<cffunction name="login" access="public" returntype="void">
 		<cfset setView("login")>
 		<cfset setLayout("clean")>

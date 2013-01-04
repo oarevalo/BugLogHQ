@@ -40,8 +40,7 @@
 						<cftry>
 							<cfinclude template="#rs.viewTemplatePath#">
 							<cfcatch type="any">
-								<cfset rs.bugTracker.notifyService(cfcatch.message, cfcatch)>
-								<cfrethrow>
+								<cfset app.onError(cfcatch, rs.event)>
 							</cfcatch>
 						</cftry>
 					</cfif>

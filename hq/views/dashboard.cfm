@@ -13,8 +13,14 @@
 				},delay);
 			}
 			
-			function runIntervalAjax(){		
-				$("##dashboardContent").load("index.cfm?event=dashboardContent");
+			function stopInterval() {
+				clearInterval(interval);
+			}
+			
+			function runIntervalAjax(){
+				var d = 	$("##dashboardContent");
+				if(d.html()=="") d.html("loading...");
+				d.load("index.cfm?event=dashboardContent");
 			}
 	
 			// avoid caching the dashboard contents
@@ -42,7 +48,7 @@
 	<cfinclude template="../includes/filters.cfm">
 	
 	<!--- Dashboard --->
-	<div id="dashboardContent">Loading...</div>
+	<div id="dashboardContent"></div>
 
 	<p style="font-size:10px;margin-top:10px">
 		* Content will refresh automatically every #rs.refreshSeconds# seconds.
