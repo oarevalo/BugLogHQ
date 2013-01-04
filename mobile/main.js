@@ -15,6 +15,8 @@ var serverInfo = {
 var listingRefreshTimer = 0;
 var mainViewCallback = 0;
 
+$.ajaxSetup({ cache: false });
+
 function initApp() {
 	// attach actions
 	$("#app_main").click(doRefresh);

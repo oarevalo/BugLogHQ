@@ -43,9 +43,11 @@
 				<cfset severities = "_ALL_">
 			</cfif>
 			
+
+			
 			<!--- get listing --->
 			<cfset qryEntries = oAppService.searchEntries(searchTerm = "",
-															startDate = dateAdd("d",-1 * val(numDays),now()), 
+															startDate = calculateStartDate(val(numDays)), 
 															applicationID=val(applicationID),
 															hostID=val(hostID),
 															severityID=severities)>
@@ -106,7 +108,7 @@
 				}				
 			</cfscript>
 			<cfset qryEntries = oAppService.searchEntries(searchTerm = searchTerm,
-															startDate = dateAdd("d",-1 * val(numDays),now()), 
+															startDate = calculateStartDate(val(numDays)), 
 															applicationID=applicationID,
 															hostID=hostID,
 															message = message)>
@@ -274,4 +276,15 @@
 <cffunction name="validateToken" access="private" returntype="boolean">
 	<cfargument name="token" type="string" required="true">
 	<cfreturn structKeyExists(session,"token") and session.token eq arguments.token>
+</cffunction>
+<cffunction name="calculateStartDate" access="private" returntype="date">
+	<cfargument name="numDays" type="numeric" required="true">
+	<cfscript>
+		var startDate = now();
+		if(numdays lt 1) 
+			startDate = dateAdd("h", numDays * 24 * -1, now());
+		else
+			startDate = dateAdd("d", numDays * -1, now());
+		return startDate;
+	</cfscript>
 </cffunction>
