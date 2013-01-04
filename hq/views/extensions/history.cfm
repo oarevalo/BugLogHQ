@@ -1,6 +1,6 @@
 <!--- page parameters used for paging records --->
 <cfparam name="rs.startRow" default="1">
-<cfparam name="rs.rowsPerPage" default="10">
+<cfparam name="rs.rowsPerPage" default="20">
 
 <!--- setup variables for paging records --->
 <cfset numPages = ceiling(rs.qryHistory.recordCount / rs.rowsPerPage)>
