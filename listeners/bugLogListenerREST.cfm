@@ -18,7 +18,7 @@
 <cfparam name="args.APIKey" type="string" default="">
 
 <!--- log how we got this report --->
-<cfset args.source = ucase(cgi.HTTP_METHOD)>
+<cfset args.source = ucase(cgi.request_method)>
 
 <!--- See if we this is a named instance of buglog --->
 <cfif structKeyExists(request,"bugLogInstance") and request.bugLogInstance neq "">
