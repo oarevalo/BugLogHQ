@@ -78,6 +78,13 @@
 							date_part('hour', e.createdOn) as entry_hour, 
 							date_part('minute', e.createdOn) as entry_minute
 						</cfcase>
+						<cfcase value="oracle">
+							extract(year from e.createdOn) as entry_year, 
+							extract(month from e.createdOn) as entry_month, 
+							extract(day from e.createdOn) as entry_day,
+							extract(hour from e.createdOn) as entry_hour, 
+							extract(minute from e.createdOn) as entry_minute
+						</cfcase>
 						<cfdefaultcase>
 							year(e.createdOn) as entry_year, 
 							month(e.createdOn) as entry_month, 

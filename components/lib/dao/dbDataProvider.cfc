@@ -156,6 +156,9 @@
 		<cfset var dbtype = variables.oConfigBean.getDBType()>
 		<cfset var lstFields = structKeyList(arguments.columns)>
 		<cfset var tableName = arguments._mapTableInfo.tableName>
+		<!---Next two vars only used if dbtype EQ "oracle"--->
+		<cfset var seqName= tableName & "_seq">
+		<cfset var pkeyName= arguments._mapTableInfo.PKName>
 		<cfset var isCF8 = (
 								findNoCase("ColdFusion", server.ColdFusion.ProductName)
 								and left(server.ColdFusion.ProductVersion,1) eq "8"
@@ -163,67 +166,89 @@
 		<cfset var newID = 0>
 		<cfset var qryInfo = 0>
 		
-		<cfif not isCF8>
-			<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#">
-				INSERT INTO #getSafeTableName(tableName)# (#lstFields#)
-					VALUES (
-						<cfloop list="#lstFields#" index="col">
-							<cfqueryparam cfsqltype="#arguments.columns[col].cfsqltype#" 
-											value="#arguments.columns[col].value#" 
-											null="#arguments.columns[col].isNull#">
-							<cfif i neq listLen(lstFields)>,</cfif>
-							<cfset i = i + 1>
-						</cfloop>
-					)
-				<cfif dbtype eq "mssql">
-					SELECT SCOPE_IDENTITY() AS lastID	
-				<cfelseif dbtype eq "pgsql">
-					;SELECT lastval() AS lastID;
-				</cfif>
-			</cfquery>		
-
-			<cfif dbtype eq "mysql">
+		<cfif dbtype eq "oracle">
+			<cftransaction>	
+				<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#">
+					INSERT INTO #getSafeTableName(tableName)# (#pkeyName#,#lstFields#)
+						VALUES (
+							#seqName#.nextVal,
+							<cfloop list="#lstFields#" index="col">
+								<cfqueryparam cfsqltype="#arguments.columns[col].cfsqltype#" 
+												value="#arguments.columns[col].value#" 
+												null="#arguments.columns[col].isNull#">
+								<cfif i neq listLen(lstFields)>,</cfif>
+								<cfset i = i + 1>
+							</cfloop>
+						)
+				</cfquery>
+				
 				<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#" result="qryInfo">
-					SELECT LAST_INSERT_ID() AS lastID
-				</cfquery>		
-			<cfelseif dbtype eq "msaccess">
-				<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#" result="qryInfo">
-					SELECT @@IDENTITY AS lastID
-				</cfquery>		
-			</cfif>
-			
-			<cfif not listFindnocase("mssql,mysql,msaccess,pgsql", dbtype)>
-				<cfthrow message="database type not supported for INSERT" type="dao.dbDataProvider.dbNotSupported">
-			</cfif>
-	
+					select #seqName#.currVal as lastId from dual
+				</cfquery>
+			</cftransaction>
 			<cfset newID = qry.lastID>
 		<cfelse>
-			<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#" result="qryInfo">
-				INSERT INTO #getSafeTableName(tableName)# (#lstFields#)
-					VALUES (
-						<cfloop list="#lstFields#" index="col">
-							<cfqueryparam cfsqltype="#arguments.columns[col].cfsqltype#" 
-											value="#arguments.columns[col].value#" 
-											null="#arguments.columns[col].isNull#">
-							<cfif i neq listLen(lstFields)>,</cfif>
-							<cfset i = i + 1>
-						</cfloop>
-					)
-			</cfquery>		
-
-			<cfswitch expression="#dbtype#">
-				<cfcase value="mysql">
-					<cfset newID = qryInfo.generated_key>
-				</cfcase>
-				<cfcase value="mssql,msaccess">
-					<cfset newID = qryInfo.identitycol>
-				</cfcase>		
-				<cfdefaultcase>
+			<cfif not isCF8>
+				<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#">
+					INSERT INTO #getSafeTableName(tableName)# (#lstFields#)
+						VALUES (
+							<cfloop list="#lstFields#" index="col">
+								<cfqueryparam cfsqltype="#arguments.columns[col].cfsqltype#" 
+												value="#arguments.columns[col].value#" 
+												null="#arguments.columns[col].isNull#">
+								<cfif i neq listLen(lstFields)>,</cfif>
+								<cfset i = i + 1>
+							</cfloop>
+						)
+					<cfif dbtype eq "mssql">
+						SELECT SCOPE_IDENTITY() AS lastID	
+					<cfelseif dbtype eq "pgsql">
+						;SELECT lastval() AS lastID;
+					</cfif>
+				</cfquery>		
+	
+				<cfif dbtype eq "mysql">
+					<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#" result="qryInfo">
+						SELECT LAST_INSERT_ID() AS lastID
+					</cfquery>		
+				<cfelseif dbtype eq "msaccess">
+					<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#" result="qryInfo">
+						SELECT @@IDENTITY AS lastID
+					</cfquery>		
+				</cfif>
+				
+				<cfif not listFindnocase("mssql,mysql,msaccess,pgsql", dbtype)>
 					<cfthrow message="database type not supported for INSERT" type="dao.dbDataProvider.dbNotSupported">
-				</cfdefaultcase>
-			</cfswitch>		
+				</cfif>
+		
+				<cfset newID = qry.lastID>
+			<cfelse>
+				<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#" result="qryInfo">
+					INSERT INTO #getSafeTableName(tableName)# (#lstFields#)
+						VALUES (
+							<cfloop list="#lstFields#" index="col">
+								<cfqueryparam cfsqltype="#arguments.columns[col].cfsqltype#" 
+												value="#arguments.columns[col].value#" 
+												null="#arguments.columns[col].isNull#">
+								<cfif i neq listLen(lstFields)>,</cfif>
+								<cfset i = i + 1>
+							</cfloop>
+						)
+				</cfquery>		
+	
+				<cfswitch expression="#dbtype#">
+					<cfcase value="mysql">
+						<cfset newID = qryInfo.generated_key>
+					</cfcase>
+					<cfcase value="mssql,msaccess">
+						<cfset newID = qryInfo.identitycol>
+					</cfcase>		
+					<cfdefaultcase>
+						<cfthrow message="database type not supported for INSERT" type="dao.dbDataProvider.dbNotSupported">
+					</cfdefaultcase>
+				</cfswitch>		
+			</cfif>
 		</cfif>
-
 		<cfreturn newID>
 	</cffunction>			
 
