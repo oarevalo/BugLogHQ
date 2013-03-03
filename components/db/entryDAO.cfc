@@ -15,7 +15,7 @@
 		<cfset addColumn("CFID", "cf_sql_varchar")>
 		<cfset addColumn("CFTOKEN", "cf_sql_varchar")>
 		<cfset addColumn("UserAgent", "cf_sql_varchar")>
-		<cfset addColumn("HTMLReport", "cf_sql_clob")>
+		<cfset addColumn("TemplatePath", "cf_sql_varchar")>
 		<cfset addColumn("CreatedOn", "cf_sql_timestamp")>
 		
 		<cfif variables.oDataProvider.getConfig().getDBType() EQ "oracle">
