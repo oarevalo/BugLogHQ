@@ -9,9 +9,15 @@
 		<cfset addColumn("type", "cf_sql_varchar")>
 		<cfset addColumn("enabled", "cf_sql_numeric")>
 		<cfset addColumn("description", "cf_sql_varchar")>
-		<cfset addColumn("properties", "cf_sql_varchar")>
 		<cfset addColumn("createdBy", "cf_sql_numeric")>
 		<cfset addColumn("createdOn", "cf_sql_timestamp")>
+		
+		<cfif variables.oDataProvider.getConfig().getDBType() EQ "oracle">
+			<cfset addColumn("properties", "cf_sql_clob")>
+		<cfelse>
+			<cfset addColumn("properties", "cf_sql_varchar")>
+		</cfif>
+		
 	</cffunction>
 	
 </cfcomponent>

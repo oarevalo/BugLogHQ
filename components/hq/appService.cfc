@@ -339,6 +339,8 @@
 						DATEDIFF(day, createdOn, GETDATE()) > #purgeHistoryDays#
 					<cfelseif dbType EQ "pgsql">
 						createdOn < CURRENT_TIMESTAMP - INTERVAL '#purgeHistoryDays# days'
+					<cfelseif dbType EQ "oracle">
+						(extract(day from CURRENT_TIMESTAMP) - extract(day from createdOn)) > #purgeHistoryDays#
 					</cfif>
 			</cfoutput>
 		</cfsavecontent>

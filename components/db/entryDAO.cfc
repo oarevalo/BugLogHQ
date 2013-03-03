@@ -12,13 +12,20 @@
 		<cfset addColumn("severityID", "cf_sql_numeric")>
 		<cfset addColumn("hostID", "cf_sql_numeric")>
 		<cfset addColumn("exceptionMessage", "cf_sql_varchar")>
-		<cfset addColumn("exceptionDetails", "cf_sql_varchar")>
 		<cfset addColumn("CFID", "cf_sql_varchar")>
 		<cfset addColumn("CFTOKEN", "cf_sql_varchar")>
 		<cfset addColumn("UserAgent", "cf_sql_varchar")>
 		<cfset addColumn("TemplatePath", "cf_sql_varchar")>
-		<cfset addColumn("HTMLReport", "cf_sql_varchar")>
 		<cfset addColumn("CreatedOn", "cf_sql_timestamp")>
+		
+		<cfif variables.oDataProvider.getConfig().getDBType() EQ "oracle">
+			<cfset addColumn("exceptionDetails", "cf_sql_clob")>
+			<cfset addColumn("HTMLReport", "cf_sql_clob")>
+		<cfelse>
+			<cfset addColumn("exceptionDetails", "cf_sql_varchar")>
+			<cfset addColumn("HTMLReport", "cf_sql_varchar")>
+		</cfif>
+		
 	</cffunction>
 
 </cfcomponent>
