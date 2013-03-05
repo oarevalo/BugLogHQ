@@ -45,7 +45,7 @@ graph, forward, and explore the bug reports submitted by the applications. All b
 -----------------------------------------------------------------------
 
 ### New in 1.7 (9/2012)
-* A new “Dashboard” homepage.
+* A new "Dashboard" homepage.
 * More granular and finer timespans to view received errors. 
 * A log of each time an alert is fired with information on the bug report that triggered the alert.
 * Optional HTTP Basic authentication for access to RSS feeds.
@@ -155,7 +155,7 @@ To access the BugLogHQ interface, go to `/bugLog/` on your bugLog server; the in
 Change the `<setting />` tags for:
 
 	db.dsn:	datasource name as defined in the CF administrator (by default is bugLog)
-	db.dbtype: database type. Can be mysql, mssql (for Microsot SQL Server) or pgsql (for PostgreSQL). The default is mysql
+	db.dbtype: database type. Can be mysql, mssql (for Microsot SQL Server), pgsql (for PostgreSQL) or oracle. The default is mysql
 	db.username: username for the datasource (if needed)
 	db.password: password for the datasource (if needed)
 	
@@ -220,6 +220,7 @@ Currently BugLogHQ supports the following databases:
 * Microsoft SQL Server 2005
 * Microsoft Access
 * PostgreSQL
+* Oracle
 
 **IMPORTANT:** Make sure you enable CLOB/BLOB support on the CF datasource settings in the ColdFusion Administrator, otherwise your bug reports might get truncated.
 
@@ -231,7 +232,8 @@ Currently BugLogHQ supports the following databases:
 * Thanks to Tom DeManincor for creating the SQL script for MSSQL
 * Thanks to Chuck Weidler for updating and providing the SQL scripts for Access, MS SQL Server 2000, MSSQL Server 2005
 * Thanks to WST crew at Mentor Graphics for the great suggestions and ideas to improve BugLog
-* Thanks to Morgan Dennithorne for adding support for PostgreSQL
+* Thanks to Morgan Dennithorne (https://github.com/morgdenn) for adding support for PostgreSQL
+* Thanks to Brian Swartzfager (https://github.com/bcswartz) for adding support for Oracle
 * Thanks to everyone that contributes code and patches to the project!
 
 
