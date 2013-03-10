@@ -1,6 +1,17 @@
-<!--- Build a collection of all incoming URL & Form parameters --->
-<cfset args = duplicate(form) />
-<cfset structAppend(args, url) />
+<cfsetting enablecfoutputonly="true">
+
+<!--- This endpoint must respond to both JSON and regular HTTP requests --->
+<cfset requestBody = toString( getHttpRequestData().content ) />
+<cfif isJSON(requestBody)>
+	<!--- json is what we got --->
+	<cfset args = deserializeJSON(requestBody)>
+	<cfset args.message = args.message>
+<cfelse>
+	<!--- This is a regular http request, so let's build a 
+		collection of all incoming URL & Form parameters --->
+	<cfset args = duplicate(form) />
+	<cfset structAppend(args, url) />
+</cfif>
 
 <!--- Make sure we have the required elements --->
 <cfparam name="args.message" type="string" default="">
@@ -34,3 +45,5 @@
 								argumentCollection = args
 							) />
 
+
+<cfoutput>OK</cfoutput>

@@ -7,6 +7,8 @@
 	<cfset variables.useListener = true>
 	<cfset variables.defaultSeverityCode = "ERROR">
 	<cfset variables.apikey = "">
+	<cfset variables.postToRESTasJSON = false> 
+	<cfset variables.userAgent = "bugloghq-coldfusion-client">
 	
 	<!--- Handle cases in which the application scope is not defined (Fix contributed by Morgan Dennithorne) --->
 	<cfif isDefined("application.applicationName")>
@@ -115,6 +117,7 @@
 		<cfset var longMessage = "">
 		<cfset var tmpCFID = "">
 		<cfset var tmpCFTOKEN = "">
+		<cfset var data = {}>
 		
 		<!--- make sure we have required members --->
 		<cfparam name="arguments.exception.message" default="">
@@ -134,42 +137,53 @@
 		
 		<!--- submit error --->
 		<cftry>
+			<cfset data = {
+						"dateTime" = Now(),
+						"message" = arguments.message,
+						"applicationCode" = variables.appName,
+						"severityCode" = arguments.severityCode,
+						"hostName" = variables.hostName,
+						"exceptionMessage" = arguments.exception.message,
+						"exceptionDetails" = arguments.exception.detail,
+						"CFID" = tmpCFID,
+						"CFTOKEN" = tmpCFTOKEN,
+						"userAgent" = cgi.HTTP_USER_AGENT,
+						"templatePath" = getBaseTemplatePath(),
+						"HTMLReport" = longMessage,
+						"APIKey" = variables.apiKey
+					}>
+
 			<cfif variables.useListener>
 				<cfif variables.protocol eq "REST">
 					<!--- send bug via a REST interface --->
-					<cfhttp method="post" throwonerror="false" timeout="0" url="#variables.bugLogListener#">
-						<cfhttpparam type="formfield" name="dateTime" value="#Now()#">
-						<cfhttpparam type="formfield" name="message" value="#arguments.message#">
-						<cfhttpparam type="formfield" name="applicationCode" value="#variables.appName#">
-						<cfhttpparam type="formfield" name="severityCode" value="#arguments.severityCode#">
-						<cfhttpparam type="formfield" name="hostName" value="#variables.hostName#">
-						<cfhttpparam type="formfield" name="exceptionMessage" value="#arguments.exception.message#">
-						<cfhttpparam type="formfield" name="exceptionDetails" value="#arguments.exception.detail#">
-						<cfhttpparam type="formfield" name="CFID" value="#tmpCFID#">
-						<cfhttpparam type="formfield" name="CFTOKEN" value="#tmpCFTOKEN#">
-						<cfhttpparam type="formfield" name="userAgent" value="#cgi.HTTP_USER_AGENT#">
-						<cfhttpparam type="formfield" name="templatePath" value="#GetBaseTemplatePath()#">
-						<cfhttpparam type="formfield" name="HTMLReport" value="#longMessage#">
-						<cfhttpparam type="formfield" name="APIKey" value="#variables.apikey#">
+					<cfhttp method="post" throwonerror="false" timeout="10" url="#variables.bugLogListener#" charset="UTF-8" useragent="#variables.userAgent#">
+						<cfif variables.postToRESTasJSON>
+							<cfhttpparam type="header" name="Content-Type" value="application/json">
+							<cfhttpparam type="body" value="#serializeJson(data)#">
+						<cfelse>
+							<cfloop list="#structKeyList(data)#" index="key">
+								<cfhttpparam type="formfield" name="#key#" value="#data[key]#">
+							</cfloop>
+						</cfif>
 					</cfhttp>
 					<cfif NOT find( 200 , cfhttp.StatusCode )>
 						<cfthrow message="Invalid HTTP Response Received" detail="#cfhttp.FileContent#" />
 					</cfif>
 				<cfelse>
 					<!--- send bug via a webservice (SOAP) --->
-					<cfset variables.oBugLogListener.logEntry(Now(), 
-																sanitizeForXML(arguments.message), 
-																variables.appName, 
-																arguments.severityCode,
-																variables.hostName,
-																sanitizeForXML(arguments.exception.message),
-																sanitizeForXML(arguments.exception.detail),
-																tmpCFID,
-																tmpCFTOKEN,
-																cgi.HTTP_USER_AGENT,
-																GetBaseTemplatePath(),
-																sanitizeForXML(longMessage),
-																variables.apikey )>
+					<cfset variables.oBugLogListener.logEntry(data.dateTime, 
+																sanitizeForXML(data.message), 
+																data.applicationCode, 
+																data.severityCode,
+																data.hostName,
+																sanitizeForXML(data.exceptionMessage),
+																sanitizeForXML(data.exceptionDetails),
+																data.CFID,
+																data.CFTOKEN,
+																data.userAgent,
+																data.templatePath,
+																sanitizeForXML(data.HTMLReport),
+																data.apikey)>
 				</cfif>
 			<cfelse>
 				<cfif variables.bugEmailRecipients neq "">
