@@ -59,4 +59,10 @@
 		<cfreturn variables.instance>
 	</cffunction>
 
+	<cffunction name="setMemento" access="public" returntype="rawEntryBean">
+		<cfargument name="data" type="struct" required="true">
+		<cfset variables.instance = duplicate(arguments.data)>
+		<cfreturn this>
+	</cffunction>
+
 </cfcomponent>
