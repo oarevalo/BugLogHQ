@@ -255,6 +255,7 @@
 				var entryID = getValue("entryID");
 				var argsSearch = {};
 				var qryEntriesUA = queryNew("");
+				var currentUser = getValue("currentUser");
 
 				if(val(entryID) eq 0) {
 					setMessage("warning","Please select an entry to view");
@@ -262,7 +263,7 @@
 				}		
 				
 				// get requested entry object
-				oEntry = appService.getEntry(entryID);
+				oEntry = appService.getEntry(entryID, currentUser);
 				
 				// search for recent ocurrences (last 24 hours)
 				args.message = "__EMPTY__";
@@ -296,6 +297,10 @@
 				setValue("qryEntriesUA", qryEntriesUA);
 				setValue("oEntry", oEntry);
 				setView("entry");
+
+			} catch(notAllowed e) {
+				setMessage("warning","You are not allowed to view this bug report");
+				setNextEvent("main");
 
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -583,6 +588,7 @@
 		<cfscript>
 			var thisEvent = getValue("event");
 			var appService = getService("app");
+			var currentUser = getValue("currentUser");
 
 			// make sure we have a complete criteria struct w/ default values
 			if(not structKeyExists(criteria,"numdays")) criteria.numDays = 1;
@@ -617,6 +623,12 @@
 				sortDir = getValue("sortDir", criteria.sortDir),
 				rows = getValue("rows", criteria.rows)
 			};
+			
+			if(!currentUser.getIsAdmin()) {
+				criteria.userID = currentUser.getUserID();
+			} else {
+				structDelete(criteria,"userID",false);
+			}
 
 			// calculate how far back to query the data
 			if(isNumeric(criteria.numdays)) {

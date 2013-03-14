@@ -40,6 +40,7 @@
 		<cfset variables.oSeverityDAO = variables.oDAOFactory.getDAO("severity")>
 		<cfset variables.oSourceDAO = variables.oDAOFactory.getDAO("source")>
 		<cfset variables.oUserDAO = variables.oDAOFactory.getDAO("user")>
+		<cfset variables.oUserApplicationDAO = variables.oDAOFactory.getDAO("userApplication")>
 
 		<!--- setup extensions --->
 		<cfset variables.extensionsPath = variables.cfcPath & ".extensions.">
@@ -115,6 +116,7 @@
 		<cfargument name="search_cftoken" type="string" required="false" default="">
 		<cfargument name="userAgent" type="string" required="false" default="">
 		<cfargument name="searchHTMLReport" type="string" required="false" default="">
+		<cfargument name="userID" type="numeric" required="false" default="0">
 		<cfscript>
 			var oEntryFinder = 0;
 			var qry = 0;
@@ -153,17 +155,23 @@
 
 	<cffunction name="getEntry" access="public" returntype="any">
 		<cfargument name="entryID" type="numeric" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="false">
 		<cfscript>
 			var oEntryFinder = 0;
-			var qry = 0;
+			var entry = 0;
 
 			// create the dao factory
 			oEntryFinder = createModelObject("components.entryFinder").init( variables.oEntryDAO );
 			
 			// get entries
-			qry = oEntryFinder.findByID(arguments.entryID);
+			entry = oEntryFinder.findByID(arguments.entryID);
 			
-			return qry;
+			// if we are passing a user, make sure that user can view the entry
+			if(structKeyExists(arguments,"user") and !arguments.user.isApplicationAllowed(entry.getApplicationID())) {
+				throw(message="Not allowed",type="notAllowed");
+			}
+			
+			return entry;
 		</cfscript>
 	</cffunction>
 	
@@ -592,7 +600,9 @@
 		<cfargument name="userID" type="numeric" required="true">
 		<cfscript>
 			var oFinder = createModelObject("components.userFinder").init( oUserDAO );
-			return oFinder.findByID( arguments.userID );
+			var user = oFinder.findByID( arguments.userID );
+			user.setAllowedApplications( getUserApplications(arguments.userID) );
+			return user;
 		</cfscript>
 	</cffunction>
 
@@ -619,6 +629,31 @@
 		<cfargument name="newPassword" type="string" required="true" hint="the new password">
 		<cfset arguments.userToSave.setPassword(hash(arguments.newPassword))>
 		<cfset arguments.userToSave.save()>
+	</cffunction>
+	
+	<cffunction name="getUserApplications" access="public" returntype="array" hint="returns the applications that a user is allowed to see">
+		<cfargument name="userID" type="numeric" required="true">
+		<cfscript>
+			var qryUserApps = oUserApplicationDAO.search(userID = arguments.userID);
+			var oFinder = createModelObject("components.appFinder").init(oApplicationDAO);
+			var apps = oFinder.findByIDList(valueList("qryUserApps.applicationID"));
+			return apps;
+		</cfscript>		
+	</cffunction>
+
+	<cffunction name="setUserApplications" access="public" returntype="void" hint="sets the applications that a user is allowed to see">
+		<cfargument name="userID" type="numeric" required="true">
+		<cfargument name="applicationID" type="array" required="true">
+		<cfscript>
+			var i = 0;
+			var qryUserApps = oUserApplicationDAO.search(userID = arguments.userID);
+			oUserApplicationDAO.delete(valueList("qryUserApps.applicationID"));
+			
+			for(i=1;i lte arrayLen(applicationID);i++) {
+				oUserApplicationDAO.save(userID = arguments.userID,
+										applicationID = applicationID[i]);
+			}
+		</cfscript>		
 	</cffunction>
 	
 	

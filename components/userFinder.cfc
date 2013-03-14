@@ -13,6 +13,7 @@
 				o.setPassword(qry.password);
 				o.setIsAdmin(qry.isAdmin);
 				o.setEmail(qry.email);
+				o.setAPIKey(qry.apiKey);
 				return o;
 			} else {
 				throw("ID not found","userFinderException.IDNotFound");
@@ -33,6 +34,7 @@
 				o.setPassword(qry.password);
 				o.setIsAdmin(qry.isAdmin);
 				o.setEmail(qry.email);
+				o.setAPIKey(qry.apiKey);
 				return o;
 			} else {
 				throw("Username not found","userFinderException.usernameNotFound");

@@ -99,13 +99,16 @@
 		<cfscript>
 			var userID = getValue("userID");
 			var oUser = 0;
+			var app = getService("app");
 			
 			try {
 				if(userID gt 0) 
-					oUser = getService("app").getUserByID(userID);
+					oUser = app.getUserByID(userID);
 				else
-					oUser = getService("app").getBlankUser();
+					oUser = app.getBlankUser();
 				
+				setValue("apps",app.getApplications());
+				setValue("userApps",app.getUserApplications(val(userID)));
 				setValue("oUser",oUser);			
 				setValue("pageTitle", "BugLog Settings & Management > Add/Edit User");	
 				setView("editUser");
@@ -195,6 +198,7 @@
 			var password = getValue("password");
 			var isAdmin = getValue("isAdmin",false);
 			var email = getValue("email");
+			var apps = getValue("applicationIDList");
 			
 			try {
 				if(username eq "") throw(type="validation", message="Username cannot be empty");
@@ -209,8 +213,10 @@
 				if(userID eq 0) oUser.setPassword(hash(password));
 				oUser.setIsAdmin(isAdmin);
 				oUser.setEmail(email);
-
+				
 				getService("app").saveUser(oUser);
+				getService("app").setUserApplications(oUser.getUserID(), listToArray(apps));
+				
 				setMessage("info","User information has been saved");
 				setNextEvent("admin.main","panel=userManagement");
 							

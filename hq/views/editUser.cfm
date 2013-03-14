@@ -5,6 +5,11 @@
 <cfset isAdmin = oUser.getIsAdmin()>
 <cfset email = oUser.getEmail()>
 
+<cfset userAppIDs = []>
+<cfloop array="#rs.userApps#" index="i">
+	<cfset arrayAppend(userAppIds,i.getApplicationID())>
+</cfloop>
+
 <cfoutput>
 	<cfinclude template="../includes/menu.cfm">
 	
@@ -32,6 +37,16 @@
 				<td>
 					<input type="radio" name="isadmin" value="1" <cfif isAdmin>checked</cfif>>Yes 
 					<input type="radio" name="isadmin" value="0" <cfif not isAdmin>checked</cfif>>No
+				</td>
+			</tr>
+			<tr valign="top">
+				<td><b>Allowed Applications:</b></td>
+				<td>
+					<select name="applicationIDList" multiple="true" size="5" <cfif isAdmin>disabled</cfif>>
+						<cfloop query="rs.apps">
+							<option value="#rs.apps.applicationID#" <cfif arrayFind(userAppIds,rs.apps.applicationID)>selected</cfif>>#rs.apps.code#</option>
+						</cfloop>
+					</select>
 				</td>
 			</tr>
 		</table>
