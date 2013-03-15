@@ -41,6 +41,7 @@
 			variables.oHostFinder = createObject("component","bugLog.components.hostFinder").init( variables.oDAOFactory.getDAO("host") );
 			variables.oSeverityFinder = createObject("component","bugLog.components.severityFinder").init( variables.oDAOFactory.getDAO("severity") );
 			variables.oSourceFinder = createObject("component","bugLog.components.sourceFinder").init( variables.oDAOFactory.getDAO("source") );
+			variables.oUserFinder = createObject("component","bugLog.components.userFinder").init( variables.oDAOFactory.getDAO("user") );
 			
 			// load the rule processor
 			variables.oRuleProcessor = createObject("component","bugLog.components.ruleProcessor").init();
@@ -51,8 +52,9 @@
 			// create cache instances
 			variables.oAppCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
 			variables.oHostCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
-			variables.oSeverityCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);
+			variables.oSeverityCache = createObject("component","bugLog.components.lib.cache.cacheService").init(10, cacheTTL, false);
 			variables.oSourceCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);		
+			variables.oUserCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);		
 						
 			// load scheduler
 			variables.scheduler = createObject("component","bugLog.components.schedulerService").init( variables.oConfig, variables.instanceName );			
@@ -156,7 +158,24 @@
 		<cfargument name="apiKey" type="string" required="true">
 		<cfscript>
 			// validate API
-			validateAPIKey(arguments.apiKey);
+			if(getConfig().getSetting("service.requireAPIKey",false)) {
+				if(arguments.apiKey eq "") {
+					throw(message="Invalid API Key",type="bugLog.invalidAPIKey");
+				}
+				var masterKey = getConfig().getSetting("service.APIKey");
+				if(arguments.apiKey neq masterKey) {
+					var user = getUserByAPIKey(arguments.apiKey);
+					if(!user.getIsAdmin() and arrayLen(user.getAllowedApplications())) {
+						// key is good, but since the user is a non-admin
+						// we need to validate the user can post bugs to the requested
+						// application.
+						var app = getApplicationFromBean( entryBean, false );
+						if(!user.isApplicationAllowed(app)) {
+							throw(message="Application not allowed",type="applicationNotAllowed");
+						}
+					}
+				}
+			}
 			
 			// validate application
 			if(!allowAutoCreate("application")) {
@@ -291,6 +310,37 @@
 		<cfreturn oSeverity>
 	</cffunction>
 	
+	<cffunction name="getUserByAPIKey" access="private" returntype="user" hint="Finds a user object using by its API Key">
+		<cfargument name="apiKey" type="string" required="true">
+		<cfscript>
+			var oUser = 0;
+			
+			try {
+				// first we try to get it from the cache
+				oUser = variables.oUserCache.retrieve( apiKey ); 
+			
+			} catch(cacheService.itemNotFound e) {
+				// entry not in cache, so we get it from DB
+				try {
+					oUser = variables.oUserFinder.findByAPIKey( apiKey );
+					
+					var qryUserApps = oDAOFactory.getDAO("userApplication").search(userID = oUser.getUserID());
+					var apps = oAppFinder.findByIDList(valueList("qryUserApps.applicationID"));
+					oUser.setAllowedApplications(apps);
+				
+				} catch(sourceFinderException.usernameNotFound e) {
+					// code does not exist, so we need to create it (if autocreate enabled)
+					throw(message="Invalid API Key",type="bugLog.invalidAPIKey");
+				}
+				
+				// store entry in cache
+				variables.oUserCache.store( key, oUser );
+			}
+			
+			return oUser;
+		</cfscript>
+	</cffunction>		
+
 	<cffunction name="getSourceFromBean" access="private" returntype="source" hint="Uses the information on the rawEntryBean to retrieve the corresponding Source object">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
 		<cfargument name="createIfNeeded" type="boolean" default="false">
@@ -324,7 +374,7 @@
 			}
 		</cfscript>
 		<cfreturn oSource>
-	</cffunction>		
+	</cffunction>	
 
 	<cffunction name="loadRules" access="private" returntype="void" hint="this method loads the rules into the rule processor">
 		<cfscript>
@@ -386,14 +436,6 @@
 		</cfif>
 	</cffunction>
 
-	<cffunction name="validateAPIKey" returntype="boolean" access="private" hint="Validates that an API key is valid, if not throws an error. This only applies when the requireAPIKey setting is true, otherwise returns True always">
-		<cfargument name="apiKeyToCheck" type="string" required="true">
-		<cfif getConfig().getSetting("requireAPIKey",false) and apiKeyToCheck neq getConfig().getSetting("APIKey")>
-			<cfthrow message="Invalid API Key." type="bugLog.invalidAPIKey">
-		</cfif>
-		<cfreturn True>
-	</cffunction>
-	
 	<cffunction name="allowAutoCreate" returnType="boolean" access="private">
 		<cfargument name="entityType" type="string" required="true">
 		<cfreturn getConfig().getSetting("autocreate." & arguments.entityType, variables.autoCreateDefault)>

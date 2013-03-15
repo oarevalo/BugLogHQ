@@ -10,15 +10,21 @@
 		<form name="frmSecurity" action="index.cfm" method="post">
 			<input type="hidden" name="event" value="admin.doSetAPISecSettings">
 			
+			<label>
 			<input type="checkbox" name="requireAPIKey" value="true" 
 					<cfif requireAPIKey>checked</cfif>
 					 <cfif !allowConfigEditing>disabled</cfif>> Require the use of an API key to submit bug reports.<br />
+			</label>
 
-			API Key:
+			Master API Key:
 			<input type="text" name="APIKey" value="#APIKey#" class="formField"  <cfif !allowConfigEditing>disabled</cfif>>
 			<input type="submit" name="generateNewKey" value="Generate New Key" 
 					onclick="return(confirm('WARNING:\n\nExisting clients will not be able to submit bug reports until updated with the new key'))"
 					 <cfif !allowConfigEditing>disabled</cfif>>
+			<br /><br />
+			<span class="label label-info">Tip:</span>
+			You can also assign API keys to individual users in the 
+			<a href="index.cfm?event=admin.main&panel=userManagement">User Management</a> section without sharing the master API Key. 
 			<br /><br />
 
 			<input type="submit" name="btn" value="Apply Changes" <cfif !allowConfigEditing>disabled</cfif>>

@@ -217,11 +217,16 @@
 				oUser.setIsAdmin(isAdmin);
 				oUser.setEmail(email);
 				
+				if(getValue("removeAPIKey",false))
+					oUser.setAPIKey("");
+				if(getValue("assignAPIKey",false))
+					oUser.setAPIKey(createuuid());
+				
 				getService("app").saveUser(oUser);
 				getService("app").setUserApplications(oUser.getUserID(), listToArray(apps));
 				
 				setMessage("info","User information has been saved");
-				setNextEvent("admin.main","panel=userManagement");
+				setNextEvent("admin.user","userID=#oUser.getUserID()#");
 							
 			} catch(validation e) {
 				setMessage("warning",e.message);

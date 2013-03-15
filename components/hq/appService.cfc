@@ -647,7 +647,7 @@
 		<cfscript>
 			var i = 0;
 			var qryUserApps = oUserApplicationDAO.search(userID = arguments.userID);
-			oUserApplicationDAO.delete(valueList("qryUserApps.applicationID"));
+			oUserApplicationDAO.delete(valueList("qryUserApps.userApplicationID"));
 			
 			for(i=1;i lte arrayLen(applicationID);i++) {
 				oUserApplicationDAO.save(userID = arguments.userID,
