@@ -23,21 +23,14 @@
 		<cfargument name="APIKey" type="string" required="false" default="">
 		<cfargument name="source" type="string" required="false" default="Unknown">
 		<cfscript>
-			var oBugLogListener = 0;
-			var oService = 0;
-			var oRawEntry = 0;
-
 			// get listener service wrapper
-			oService = createObject("component", "bugLog.components.service").init( instanceName = variables.instanceName );
-			
-			// validate API Key
-			oService.validateAPIKey(arguments.APIKey);
-			
+			var serviceLoader = createObject("component", "bugLog.components.service").init( instanceName = variables.instanceName );
+
 			// get handle to bugLogListener service
-			oBugLogListener = oService.getService();
-			
+			var bugLogListener = serviceLoader.getService();
+
 			// create entry bean
-			oRawEntry = createObject("component","bugLog.components.rawEntryBean")
+			var rawEntry = createObject("component","bugLog.components.rawEntryBean")
 								.init()
 								.setDateTime(arguments.dateTime)
 								.setMessage(arguments.message)
@@ -53,9 +46,12 @@
 								.setTemplatePath(arguments.templatePath)
 								.setHTMLReport(arguments.HTMLReport)
 								.setReceivedOn(now());
-			
+
+			// validate Entry
+			bugLogListener.validate(rawEntry, arguments.APIKey);
+						
 			// log entry
-			oBugLogListener.logEntry(oRawEntry);
+			bugLogListener.logEntry(rawEntry);
 		</cfscript>
 	</cffunction>
 	

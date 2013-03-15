@@ -69,14 +69,6 @@
 		<cfset getConfig().setSetting("service." & arguments.settingName, arguments.settingValue)>
 	</cffunction>
 	
-	<cffunction name="validateAPIKey" returntype="boolean" access="public" hint="Validates that an API key is valid, if not throws an error. This only applies when the requireAPIKey setting is true, otherwise returns True always">
-		<cfargument name="apiKeyToCheck" type="string" required="true">
-		<cfif getSetting("requireAPIKey",false) and apiKeyToCheck neq getSetting("APIKey")>
-			<cfthrow message="Invalid API Key." type="bugLog.invalidAPIKey">
-		</cfif>
-		<cfreturn True>
-	</cffunction>
-
 	<cffunction name="getInstanceName" returntype="string" access="public" hint="Returns the name of the associated buglog instance">
 		<cfreturn variables.instanceName>
 	</cffunction>

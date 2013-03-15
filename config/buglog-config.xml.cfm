@@ -41,6 +41,15 @@
 	<setting name="digest.application"></setting>
 	<setting name="digest.host"></setting>
 		
+	<!-- setting any of the following autoCreate options to false,
+		will disable the automatic creation of new records for
+		applications/hosts/severities when processing bug reports.
+		If undefined, BugLog will always autocreate.	
+	 -->
+	<setting name="autoCreate.application">true</setting>	
+	<setting name="autoCreate.host">true</setting>	
+	<setting name="autoCreate.severity">true</setting>	
+		
 	<!-- Environment-specific Settings: 
 		
 		You can override any of the above settings for specific environments. 

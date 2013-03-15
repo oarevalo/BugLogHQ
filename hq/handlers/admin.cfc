@@ -29,6 +29,9 @@
 						setValue("adminEmail", cfg.getSetting("general.adminEmail",""));
 						setValue("autoStart", app.getServiceSetting("autoStart",true));
 						setValue("allowPublicRSS", cfg.getSetting("rss.allowPublicAccess",false));
+						setValue("autoCreateApplication", cfg.getSetting("autocreate.application",true));
+						setValue("autoCreateSeverity", cfg.getSetting("autocreate.severity",true));
+						setValue("autoCreateHost", cfg.getSetting("autocreate.host",true));
 						break;
 
 					case "changePassword":
@@ -308,6 +311,9 @@
 			var autoStart = getValue("autoStart",false);
 			var adminEmail = getValue("adminEmail");
 			var allowPublicRSS = getValue("allowPublicRSS",false);
+			var autoCreateApplication = getValue("autoCreateApplication",false);
+			var autoCreateHost = getValue("autoCreateHost",false);
+			var autoCreateSeverity = getValue("autoCreateSeverity",false);
 			var config = getService("app").getConfig();
 			
 			try {
@@ -317,6 +323,9 @@
 				config.reload();
 				config.setSetting("general.adminEmail", adminEmail);
 				config.setSetting("rss.allowPublicAccess", allowPublicRSS);
+				config.setSetting("autoCreate.application", autoCreateApplication);
+				config.setSetting("autoCreate.host", autoCreateHost);
+				config.setSetting("autoCreate.severity", autoCreateSeverity);
 
 				setMessage("info","General settings updated.");
 				setNextEvent("admin.main","panel=general");

@@ -17,6 +17,7 @@
 	<cfset variables.msgLog = arrayNew(1)>
 	<cfset variables.maxLogSize = 10>
 	<cfset variables.instanceName = "">
+	<cfset variables.autoCreateDefault = true>
 
 	<cffunction name="init" access="public" returntype="bugLogListener" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
@@ -83,11 +84,17 @@
 			var oSource = 0;
 			var oDF = variables.oDAOFactory;
 				
+			// get autocreate settings	
+			var autoCreateApp = allowAutoCreate("application");
+			var autoCreateHost = allowAutoCreate("host");
+			var autoCreateSeverity = allowAutoCreate("severity");
+			var autoCreateSource = allowAutoCreate("source");
+				
 			// extract related objects from bean
-			oApp = getApplicationFromBean( bean );
-			oHost = getHostFromBean( bean );
-			oSeverity = getSeverityFromBean( bean );
-			oSource = getSourceFromBean( bean );
+			oApp = getApplicationFromBean( bean, autoCreateApp );
+			oHost = getHostFromBean( bean, autoCreateHost );
+			oSeverity = getSeverityFromBean( bean, autoCreateSeverity );
+			oSource = getSourceFromBean( bean, autoCreateSource );
 
 			// create entry
 			oEntry = createObject("component","bugLog.components.entry").init( oDF.getDAO("entry") );
@@ -144,12 +151,43 @@
 		<cfreturn variables.instanceName>
 	</cffunction>
 
+	<cffunction name="validate" returntype="boolean" access="public" hint="Validates that a bug report is valid, if not throws an error. This only applies when the requireAPIKey setting is true, otherwise returns True always">
+		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="apiKey" type="string" required="true">
+		<cfscript>
+			// validate API
+			validateAPIKey(arguments.apiKey);
+			
+			// validate application
+			if(!allowAutoCreate("application")) {
+				getApplicationFromBean( entryBean, false );
+			}
+			
+			// validate host
+			if(!allowAutoCreate("host")) {
+				getHostFromBean( entryBean, false );
+			}
+			
+			// validte severity
+			if(!allowAutoCreate("severity")) {
+				getSeverityFromBean( entryBean, false );
+			}
+			
+			// validate source
+			if(!allowAutoCreate("source")) {
+				getSourceFromBean( entryBean, false );
+			}
+			
+			return true;
+		</cfscript>
+	</cffunction>
 	
 	
 	<!---- Private Methods ---->
 	
 	<cffunction name="getApplicationFromBean" access="private" returntype="app" hint="Uses the information on the rawEntryBean to retrieve the corresponding Application object">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="createIfNeeded" type="boolean" default="false">
 		<cfscript>
 			var key = "";
 			var bean = arguments.entryBean;
@@ -167,7 +205,8 @@
 					oApp = variables.oAppFinder.findByCode( key );
 	
 				} catch(appFinderException.ApplicationCodeNotFound e) {
-					// code does not exist, so we need to create it
+					// code does not exist, so we need to create it (if autocreate enabled)
+					if(!arguments.createIfNeeded) throw(message="Invalid Application",type="invalidApplication");
 					oApp = createObject("component","bugLog.components.app").init( oDF.getDAO("application") );
 					oApp.setCode( key );
 					oApp.setName( key );
@@ -183,6 +222,7 @@
 		
 	<cffunction name="getHostFromBean" access="private" returntype="host" hint="Uses the information on the rawEntryBean to retrieve the corresponding Host object">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="createIfNeeded" type="boolean" default="false">
 		<cfscript>
 			var key = "";
 			var bean = arguments.entryBean;
@@ -201,7 +241,8 @@
 					oHost = variables.oHostFinder.findByName( key );
 	
 				} catch(hostFinderException.HostNameNotFound e) {
-					// code does not exist, so we need to create it
+					// code does not exist, so we need to create it (if autocreate enabled)
+					if(!arguments.createIfNeeded) throw(message="Invalid Host",type="invalidHost");
 					oHost = createObject("component","bugLog.components.host").init( oDF.getDAO("host") );
 					oHost.setHostName(key);
 					oHost.save();
@@ -216,6 +257,7 @@
 	
 	<cffunction name="getSeverityFromBean" access="private" returntype="severity" hint="Uses the information on the rawEntryBean to retrieve the corresponding Severity object">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="createIfNeeded" type="boolean" default="false">
 		<cfscript>
 			var key = "";
 			var bean = arguments.entryBean;
@@ -234,7 +276,8 @@
 					oSeverity = variables.oSeverityFinder.findByCode( key );
 	
 				} catch(severityFinderException.codeNotFound e) {
-					// code does not exist, so we need to create it
+					// code does not exist, so we need to create it (if autocreate enabled)
+					if(!arguments.createIfNeeded) throw(message="Invalid Severity",type="invalidSeverity");
 					oSeverity = createObject("component","bugLog.components.severity").init( oDF.getDAO("severity") );
 					oSeverity.setCode( key );
 					oSeverity.setName( key );
@@ -250,6 +293,7 @@
 	
 	<cffunction name="getSourceFromBean" access="private" returntype="source" hint="Uses the information on the rawEntryBean to retrieve the corresponding Source object">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="createIfNeeded" type="boolean" default="false">
 		<cfscript>
 			var key = "";
 			var bean = arguments.entryBean;
@@ -268,7 +312,8 @@
 					oSource = variables.oSourceFinder.findByName( key );
 	
 				} catch(sourceFinderException.codeNotFound e) {
-					// code does not exist, so we need to create it
+					// code does not exist, so we need to create it (if autocreate enabled)
+					if(!arguments.createIfNeeded) throw(message="Invalid Source",type="invalidSource");
 					oSource = createObject("component","bugLog.components.source").init( oDF.getDAO("source") );
 					oSource.setName( key );
 					oSource.save();
@@ -339,6 +384,19 @@
 		<cfelse>
 			<cfset scheduler.removeTask("bugLogPurgeHistory") />
 		</cfif>
+	</cffunction>
+
+	<cffunction name="validateAPIKey" returntype="boolean" access="private" hint="Validates that an API key is valid, if not throws an error. This only applies when the requireAPIKey setting is true, otherwise returns True always">
+		<cfargument name="apiKeyToCheck" type="string" required="true">
+		<cfif getConfig().getSetting("requireAPIKey",false) and apiKeyToCheck neq getConfig().getSetting("APIKey")>
+			<cfthrow message="Invalid API Key." type="bugLog.invalidAPIKey">
+		</cfif>
+		<cfreturn True>
+	</cffunction>
+	
+	<cffunction name="allowAutoCreate" returnType="boolean" access="private">
+		<cfargument name="entityType" type="string" required="true">
+		<cfreturn getConfig().getSetting("autocreate." & arguments.entityType, variables.autoCreateDefault)>
 	</cffunction>
 	
 </cfcomponent>
