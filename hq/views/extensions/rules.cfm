@@ -1,5 +1,8 @@
 <cfparam name="rs.aRules" default="#arrayNew(1)#">
 <cfparam name="rs.aActiveRules" default="#arrayNew(1)#">
+<cfset isAdmin = rs.currentUser.getIsAdmin()>
+<cfset userID = rs.currentUser.getUserID()>
+<cfset rulesShown = 0>
 
 <cfoutput>
 <table class="table" style="width:100%;">
@@ -9,12 +12,14 @@
 		<cfset ruleName = listLast(item.component,".")>
 		<cfset lstProps = listSort(structKeyList(item.config),"textnocase")>
 		<cfset msg = item.instance.explain()>
+		<cfset show = isAdmin or (item.createdBy eq userID) or (val(item.createdBy) eq 0)>
 		
+		<cfif show>
 		<tr>
 			<td>
 				<h4>
 					#ruleName#
-					<cfif currentUser.getIsAdmin()>
+					<cfif isAdmin>
 						&nbsp;&nbsp;
 						<a href="index.cfm?event=extensions.rule&index=#i#&ruleName=#ruleName#" style="font-size:10px;">Modify</a>
 						&nbsp;
@@ -45,27 +50,14 @@
 					<span class="label label-success">Enabled</span>
 				</cfif>
 			</td>
-		
-			<!---
-			<table cellpadding="0" cellspacing="0">
-				<tr>
-					<cfloop list="#lstProps#" index="fld">
-						<td><b>#fld#</b></td>
-					</cfloop>
-				</tr>
-				<tr>
-					<cfloop list="#lstProps#" index="fld">
-						<td>#item.config[fld]#</td>
-					</cfloop>
-				</tr>
-			</table>
-			--->
 		</tr>
+		<cfset rulesShown++>
+		</cfif>
 	</cfloop>
 	</tbody>
 </table>
 
-<cfif arrayLen(rs.aActiveRules) eq 0>
-	<em>There are no active rules</em>
+<cfif rulesShown eq 0>
+	<em>There are no rules to display</em>
 </cfif>
 </cfoutput>

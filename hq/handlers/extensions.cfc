@@ -15,7 +15,7 @@
 						setValue("aActiveRules", aActiveRules);
 						break;
 					case "history":
-						qryHistory = appService.getExtensionsLog();
+						qryHistory = appService.getExtensionsLog(user=getValue("currentUser"));
 						setValue("qryHistory", qryHistory);
 						break;
 				}

@@ -100,4 +100,38 @@
 		<cfset loadExtensions()>
 	</cffunction>
 	
+	<cffunction name="getHistory" access="public" returntype="query" hint="returns the history of rule firings">
+		<cfargument name="sinceDate" type="date" required="false" default="1/1/1800">
+		<cfargument name="userID" type="numeric" required="false" default="0">
+		<cfset var dsn = variables.oDAO.getDataProvider().getConfig().getDSN()>
+		<cfset var qry = 0>
+		<cfquery name="qry" datasource="#dsn#">
+			SELECT el.extensionLogID, el.createdOn,
+						ext.extensionID, ext.name, ext.type, ext.description,   
+						e.entryID, e.message, e.mydatetime, e.createdOn as entry_createdOn,
+						a.applicationID, a.code as application_code,
+						h.hostID, h.hostName,
+						s.severityID, s.name as severity_code
+				FROM bl_extensionlog el
+					INNER JOIN bl_Extension ext ON el.extensionID = ext.extensionID
+					INNER JOIN bl_Entry e ON el.entryID = e.entryID 
+					INNER JOIN bl_Application a ON e.applicationID = a.applicationID
+					INNER JOIN bl_Host h ON e.hostID = h.hostID
+					INNER JOIN bl_Severity s ON e.severityID = s.severityID
+				WHERE 1=1
+				<cfif arguments.sinceDate neq "1/1/1800">
+					AND el.createdOn >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.sinceDate#">
+				</cfif>
+				<cfif arguments.userID gt 0>
+					AND e.applicationID IN (
+						SELECT applicationID 
+							FROM bl_UserApplication
+							WHERE userID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.userID#">
+					)
+				</cfif>
+				ORDER BY el.createdOn DESC
+		</cfquery>
+		<cfreturn qry>		
+	</cffunction>
+	
 </cfcomponent>

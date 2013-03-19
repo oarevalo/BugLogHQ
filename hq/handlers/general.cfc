@@ -136,7 +136,7 @@
 				var criteria = getValue("criteria");
 				
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
-				var qryTriggers = appService.getExtensionsLog(criteria.startDate);
+				var qryTriggers = appService.getExtensionsLog(criteria.startDate, getValue("currentUser"));
 
 				setValue("qryEntries",qryEntries);
 				setValue("qryTriggers",qryTriggers);
