@@ -44,9 +44,9 @@ $(document).ready(function(){
 	}	
 });
 
-function confirmDeleteRule(index) {
+function confirmDeleteRule(id) {
 	if(confirm("Are you sure you wish to remove the rule")) {
-		document.location='index.cfm?event=extensions.doDeleteRule&index='+index;
+		document.location='index.cfm?event=extensions.doDeleteRule&id='+id;
 	}
 }
 function updateFilter(event, name, value) {

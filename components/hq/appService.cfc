@@ -176,7 +176,18 @@
 	</cffunction>
 	
 	<cffunction name="getApplications" access="public" returntype="query">
-		<cfset var qry = variables.oApplicationDAO.getAll()>
+		<cfargument name="user" type="any" required="false">
+		<cfif not structKeyExists(arguments,"user") or user.getIsAdmin() or not arrayLen(user.getAllowedApplications())>
+			<cfset var qry = variables.oApplicationDAO.getAll()>
+		<cfelse>
+			<cfset var apps = user.getAllowedApplications()>
+			<cfset var ids = []>
+			<cfset var app = 0>
+			<cfloop array="#apps#" index="app">
+				<cfset arrayAppend(ids,app.getApplicationID())>
+			</cfloop>
+			<cfset var qry = variables.oApplicationDAO.get(arrayToList(ids))>
+		</cfif>
 		<cfquery name="qry" dbtype="query">
 			SELECT *
 				FROM qry
@@ -517,9 +528,20 @@
 		<cfreturn getCFCInfo(variables.extensionsPath & "rules." & arguments.ruleName )>
 	</cffunction>
 
+	<cffunction name="getRule" access="public" returntype="any" hint="Finds a given rule by its ID">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="true">
+		<cfscript>
+			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
+				throw(message="User cannot access this rule",type="notAuthorized");
+			return oExtensionsService.getRuleByID(arguments.id);
+		</cfscript>
+	</cffunction>
+
 	<cffunction name="saveRule" access="public" returntype="void" hint="adds or updates a rule">
-		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfargument name="id" type="numeric" required="false" default="0">
 		<cfargument name="ruleName" type="string" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="true">
 		<!--- rule settings are passed as individual arguments --->
 		
 		<cfscript>
@@ -540,32 +562,44 @@
 			if(structKeyExists(arguments,"description"))
 				desc = arguments.description;
 			
-			if(arguments.index gt 0) 
-				oExtensionsService.updateRule(arguments.index, stProperties, desc);
-			 else 
-				oExtensionsService.createRule(arguments.ruleName, stProperties, desc);
+			if(arguments.id gt 0) {
+				if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
+					throw(message="User cannot update this rule",type="notAuthorized");
+				oExtensionsService.updateRule(arguments.id, stProperties, desc);
+			} else {
+				oExtensionsService.createRule(arguments.ruleName, stProperties, desc, user.getUserID());
+			}
 		</cfscript>
 		
 	</cffunction>
 
 	<cffunction name="deleteRule" access="public" returntype="void" hint="delete a rule">
-		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="true">
 		<cfscript>
-			oExtensionsService.removeRule(arguments.index);
+			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
+				throw(message="User cannot delete this rule",type="notAuthorized");
+			oExtensionsService.removeRule(arguments.id);
 		</cfscript>		
 	</cffunction>
 
 	<cffunction name="enableRule" access="public" returntype="void" hint="enables a rule">
-		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="true">
 		<cfscript>
-			oExtensionsService.enableRule(arguments.index);
+			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
+				throw(message="User cannot enable this rule",type="notAuthorized");
+			oExtensionsService.enableRule(arguments.id);
 		</cfscript>		
 	</cffunction>
 
 	<cffunction name="disableRule" access="public" returntype="void" hint="disables a rule">
-		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="true">
 		<cfscript>
-			oExtensionsService.disableRule(arguments.index);
+			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
+				throw(message="User cannot disable this rule",type="notAuthorized");
+			oExtensionsService.disableRule(arguments.id);
 		</cfscript>		
 	</cffunction>
 

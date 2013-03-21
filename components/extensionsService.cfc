@@ -8,67 +8,38 @@
 	
 	<cffunction name="init" access="public" returnType="extensionsService">
 		<cfargument name="dao" type="bugLog.components.lib.dao.DAO" required="true">
-		<cfscript>
-			// store the dao object for the extensions table
-			variables.oDAO = arguments.dao;
-	
-			// read and parse the different types of extensions
-			loadExtensions();
-		</cfscript>
-						
+		<cfset variables.oDAO = arguments.dao>
 		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="getRules" access="public" returntype="array">
-		<cfreturn variables.aRules>
+		<cfset var qry = variables.oDAO.getAll()>
+		<cfset var aRules = buildRules(qry)>
+		<cfreturn aRules>
 	</cffunction>
 
-	<cffunction name="loadExtensions" access="private" returntype="void">
-		<cfset var qry = variables.oDAO.getAll()>
-		<cfset var st = {}>
-		<cfset var obj = 0>
-		<cfset var pathToRuleCFC = "">
-
-		<cfset variables.aRules = []>
-
-		<cfloop query="qry">
-			<cfswitch expression="#qry.type#">
-				<cfcase value="rule">
-					<cfset pathToRuleCFC = variables.extensionsPath & "rules." & qry.name>
-					<cfset st = {
-								id = qry.extensionID,
-								component = pathToRuleCFC,
-								description = qry.description,
-								config = {},
-								enabled = (qry.enabled gt 0),
-								createdBy = qry.createdBy,
-								createdOn = qry.createdOn
-							}>
-					<cfif isJson(qry.properties)>
-						<cfset st.config = deserializeJSON(qry.properties)>
-					</cfif>
-					<cfset obj = createObject("component",pathToRuleCFC).init(argumentCollection = st.config)>
-					<cfset st.instance = obj>
-					<cfset arrayAppend(variables.aRules, duplicate(st))>
-				</cfcase>
-			</cfswitch>
-		</cfloop>	
+	<cffunction name="getRuleByID" access="public" returntype="struct">
+		<cfargument name="id" type="numeric" required="true">
+		<cfset var qry = variables.oDAO.get(arguments.id)>
+		<cfif qry.recordCount eq 0>
+			<cfthrow message="Requested rule not found" type="ruleNotFound">
+		</cfif>
+		<cfset var aRules = buildRules(qry)>
+		<cfreturn aRules[1]>
 	</cffunction>
 
 	<cffunction name="removeRule" access="public" returntype="void" hint="removes a rule from the active rules">
-		<cfargument name="index" type="string" required="true">
-		<cfset variables.oDAO.delete(variables.aRules[index].id)>
-		<cfset loadExtensions()>
+		<cfargument name="id" type="numeric" required="true">
+		<cfset variables.oDAO.delete(arguments.id)>
 	</cffunction>
 	
 	<cffunction name="updateRule" access="public" returntype="void" hint="updates the settings of a rule">
-		<cfargument name="index" type="string" required="true">
+		<cfargument name="id" type="numeric" required="true">
 		<cfargument name="properties" type="struct" required="true">
 		<cfargument name="description" type="string" required="false" default="">
-		<cfset variables.oDAO.save(id = variables.aRules[index].id,
+		<cfset variables.oDAO.save(id = arguments.id,
 								description = arguments.description,
 								properties = serializeJSON(arguments.properties))>
-		<cfset loadExtensions()>
 	</cffunction>
 
 	<cffunction name="createRule" access="public" returntype="void" hint="creates a new rule">
@@ -85,19 +56,16 @@
 			<cfset args.createdBy = arguments.createdBy>
 		</cfif>
 		<cfset variables.oDAO.save(argumentCollection = args)>
-		<cfset loadExtensions()>
 	</cffunction>
 
 	<cffunction name="enableRule" access="public" returntype="void" hint="enables a rule for processing">
-		<cfargument name="index" type="string" required="true">
-		<cfset variables.oDAO.save(id = variables.aRules[index].id, enabled = 1)>
-		<cfset loadExtensions()>
+		<cfargument name="id" type="numeric" required="true">
+		<cfset variables.oDAO.save(id = arguments.id, enabled = 1)>
 	</cffunction>
 
 	<cffunction name="disableRule" access="public" returntype="void" hint="disables a rule for processing">
-		<cfargument name="index" type="string" required="true">
-		<cfset variables.oDAO.save(id = variables.aRules[index].id, enabled = 0)>
-		<cfset loadExtensions()>
+		<cfargument name="id" type="numeric" required="true">
+		<cfset variables.oDAO.save(id = arguments.id, enabled = 0)>
 	</cffunction>
 	
 	<cffunction name="getHistory" access="public" returntype="query" hint="returns the history of rule firings">
@@ -132,6 +100,55 @@
 				ORDER BY el.createdOn DESC
 		</cfquery>
 		<cfreturn qry>		
+	</cffunction>
+
+	<cffunction name="isAllowed" access="public" returntype="boolean" hint="Return true if the given user is allowed to modify the given rule">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="user" type="user" required="true">
+		<cfscript>
+			// admin users can modify any rule, other users can only modify rules they created
+			if(user.getIsAdmin())
+				return true;
+			var qryRule = variables.oDAO.get(arguments.id);
+			var isAllowed = (user.getUserID() eq qryRule.createdBy);
+			return isAllowed;
+		</cfscript>
+	</cffunction>
+	
+	<cffunction name="buildRules" access="private" returntype="array">
+		<cfargument name="qryRules" required="true" type="query">
+		<cfset var aRules = []>
+		<cfset var st = {}>
+		<cfset var obj = 0>
+		<cfset var pathToRuleCFC = "">
+
+		<cfloop query="qryRules">
+			<cfswitch expression="#qryRules.type#">
+				<cfcase value="rule">
+					<cfset pathToRuleCFC = variables.extensionsPath & "rules." & qryRules.name>
+					<cfset st = {
+								id = qryRules.extensionID,
+								name = qryRules.name,
+								component = pathToRuleCFC,
+								description = qryRules.description,
+								config = {},
+								enabled = (qryRules.enabled gt 0),
+								createdBy = qryRules.createdBy,
+								createdOn = qryRules.createdOn
+							}>
+					<cfif isJson(qryRules.properties)>
+						<cfset st.config = deserializeJSON(qryRules.properties)>
+					</cfif>
+					<cfset obj = createObject("component",pathToRuleCFC)
+									.init(argumentCollection = st.config)
+									.setExtensionID( st.id )>
+					<cfset st.instance = obj>
+					<cfset arrayAppend(aRules, duplicate(st))>
+				</cfcase>
+			</cfswitch>
+		</cfloop>	
+		
+		<cfreturn aRules>
 	</cffunction>
 	
 </cfcomponent>

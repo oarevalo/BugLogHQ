@@ -13,6 +13,7 @@
 
 <div id="extensions-content">
 	<div id="extensions-side">
+		<!---
 		<div class="well well-small">
 			<span class="label label-important">Important:</span>
 			<span style="color:##990000;">
@@ -23,31 +24,30 @@
 			</cfif>
 			</span>
 		</div>
+		--->
 
-		<cfif currentUser.getIsAdmin()>
-			<div class="well well-small">
-				<h3>Create a Rule</h3>
-				<form name="frm" method="get" action="index.cfm" style="margin-top:5px;">
-					<input type="hidden" name="event" value="extensions.rule">
-			
-					<select name="ruleName" style="width:180px;" id="newRuleSelector">
-						<option value="">-- Select rule type --</option>
-						<cfloop from="1" to="#arrayLen(rs.aRules)#" index="i">
-							<cfset ruleName = listLast(rs.aRules[i].name,".")>
-							<option value="#ruleName#">#ruleName#</option>
-						</cfloop>
-					</select>
-					<input type="submit" value="GO">
+		<div class="well well-small">
+			<h3>Create a Rule</h3>
+			<form name="frm" method="get" action="index.cfm" style="margin-top:5px;">
+				<input type="hidden" name="event" value="extensions.rule">
+		
+				<select name="ruleName" style="width:180px;" id="newRuleSelector">
+					<option value="">-- Select rule type --</option>
 					<cfloop from="1" to="#arrayLen(rs.aRules)#" index="i">
 						<cfset ruleName = listLast(rs.aRules[i].name,".")>
-						<div id="rule_#ruleName#" class="ruleDescription" style="display:none;">
-							<img src="#rs.assetsPath#images/icons/information.png">
-							#rs.aRules[i].description#
-						</div>
+						<option value="#ruleName#">#ruleName#</option>
 					</cfloop>
-				</form>
-			</div>
-		</cfif>	
+				</select>
+				<input type="submit" value="GO">
+				<cfloop from="1" to="#arrayLen(rs.aRules)#" index="i">
+					<cfset ruleName = listLast(rs.aRules[i].name,".")>
+					<div id="rule_#ruleName#" class="ruleDescription" style="display:none;">
+						<img src="#rs.assetsPath#images/icons/information.png">
+						#rs.aRules[i].description#
+					</div>
+				</cfloop>
+			</form>
+		</div>
 
 		<div class="well well-small">
 			<h3>What Are Rules?</h3>
