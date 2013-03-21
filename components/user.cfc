@@ -47,6 +47,7 @@
 		<cfscript>
 			var appID = isNumeric(arguments.app) ? arguments.app : arguments.app.getApplicationID();
 			if(getIsAdmin()) return true;
+			if(arrayLen(apps) eq 0) return true;
 			for(var i=1;i lte arrayLen(apps);i++) {
 				if(apps[i].getApplicationID() eq appID) {
 					return true;

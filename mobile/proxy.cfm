@@ -5,6 +5,9 @@
 <cfset error = false>
 <cfset errorMessage = "">
 
+<cfset args = form>
+<cfset structAppend(args,url)>
+
 <cftry>
 	<cfset oAppService = application.appService>
 	
@@ -13,44 +16,47 @@
 	<cfswitch expression="#action#">
 		
 		<cfcase value="checkLogin">
-			<cfparam name="username" default="">
-			<cfparam name="password" default="">
-	
-			<cfset userID = oAppService.checkLogin(username, password)>
-			<cfset session.token = createUUID()>
-			
+			<cfparam name="args.username" default="">
+			<cfparam name="args.password" default="">
+
+			<cfset userID = oAppService.checkLogin(args.username, args.password)>
+
 			<cfif userID gt 0>
+				<cfset session.token = createUUID()>
+				<cfset session.user = oAppService.getUserByID(userID)>
 				<cfset results = session.token>
 			<cfelse>
+				<cfset results = "">
+				<cfset structDelete(session,"token")>
+				<cfset structDelete(session,"user")>
 				<cfset error = true>
 				<cfset errorMessage = "Invalid user/password">
 			</cfif>		
 		</cfcase>
 	
 		<cfcase value="getSummary">
-			<cfparam name="numDays" default="1">
-			<cfparam name="token" default="">
-			<cfparam name="applicationID" default="0">
-			<cfparam name="hostID" default="0">
-			<cfparam name="severities" default="">
+			<cfparam name="args.numDays" default="1">
+			<cfparam name="args.token" default="">
+			<cfparam name="args.applicationID" default="0">
+			<cfparam name="args.hostID" default="0">
+			<cfparam name="args.severities" default="">
 			
 			<!--- validate token --->
-			<cfif not validateToken(token)>
+			<cfif not validateToken(args.token)>
 				<cfthrow message="Invalid token. Please login first" type="invalidToken">
 			</cfif>
 			
-			<cfif severities eq "">
-				<cfset severities = "_ALL_">
+			<cfif args.severities eq "">
+				<cfset args.severities = "_ALL_">
 			</cfif>
-			
-
 			
 			<!--- get listing --->
 			<cfset qryEntries = oAppService.searchEntries(searchTerm = "",
-															startDate = calculateStartDate(val(numDays)), 
-															applicationID=val(applicationID),
-															hostID=val(hostID),
-															severityID=severities)>
+															startDate = calculateStartDate(val(args.numDays)), 
+															applicationID=val(args.applicationID),
+															hostID=val(args.hostID),
+															severityID=args.severities,
+															user=session.user)>
 			<cfquery name="qryEntries" dbtype="query">
 				SELECT ApplicationCode, ApplicationID,  
 						Message, COUNT(*) AS bugCount, MAX(createdOn) as createdOn, MAX(entryID) AS EntryID, MAX(severityCode) AS SeverityCode
@@ -80,18 +86,18 @@
 		</cfcase>
 	
 		<cfcase value="getListing">
-			<cfparam name="numDays" default="1">
-			<cfparam name="token" default="">
-			<cfparam name="applicationID" default="0">
-			<cfparam name="hostID" default="0">
-			<cfparam name="msgFromEntryID" default="">
-			<cfparam name="searchTerm" default="">
-			<cfparam name="startRow" default="1">
-			<cfparam name="rowsPerPage" default="50">
-			<cfparam name="message" default="">
+			<cfparam name="args.numDays" default="1">
+			<cfparam name="args.token" default="">
+			<cfparam name="args.applicationID" default="0">
+			<cfparam name="args.hostID" default="0">
+			<cfparam name="args.msgFromEntryID" default="">
+			<cfparam name="args.searchTerm" default="">
+			<cfparam name="args.startRow" default="1">
+			<cfparam name="args.rowsPerPage" default="50">
+			<cfparam name="args.message" default="">
 			
 			<!--- validate token --->
-			<cfif not validateToken(token)>
+			<cfif not validateToken(args.token)>
 				<cfthrow message="Invalid token. Please login first" type="invalidToken">
 			</cfif>
 			
@@ -99,19 +105,20 @@
 			<cfscript>
 				// if we are passing an entryID, then get the message from there
 				var  = "";
-				if(val(msgFromEntryID) gt 0) {
-					oEntry = oAppService.getEntry( msgFromEntryID );
+				if(val(args.msgFromEntryID) gt 0) {
+					oEntry = oAppService.getEntry( args.msgFromEntryID );
 					if(oEntry.getMessage() eq "")
 						message = "__EMPTY__";
 					else
 						message = oEntry.getMessage();
 				}				
 			</cfscript>
-			<cfset qryEntries = oAppService.searchEntries(searchTerm = searchTerm,
-															startDate = calculateStartDate(val(numDays)), 
-															applicationID=applicationID,
-															hostID=hostID,
-															message = message)>
+			<cfset qryEntries = oAppService.searchEntries(searchTerm = args.searchTerm,
+															startDate = calculateStartDate(val(args.numDays)), 
+															applicationID=args.applicationID,
+															hostID=args.hostID,
+															message = message,
+															user=session.user)>
 			<cfquery name="qryEntries" dbtype="query">
 				SELECT *
 					FROM qryEntries
@@ -119,7 +126,7 @@
 			</cfquery>
 			
 			<cfsavecontent variable="results">
-				<cfoutput query="qryEntries" maxrows="#rowsPerPage#" startrow="#startRow#">
+				<cfoutput query="qryEntries" maxrows="#args.rowsPerPage#" startrow="#args.startRow#">
 					<cfif qryEntries.message eq "">
 						<cfset tmpMessage = "<em>No message</em>">
 					<cfelse>		
@@ -140,16 +147,16 @@
 		</cfcase>	
 	
 		<cfcase value="getEntry">
-			<cfparam name="entryID" default="0" type="numeric">
-			<cfparam name="token" default="">
+			<cfparam name="args.entryID" default="0" type="numeric">
+			<cfparam name="args.token" default="">
 			
 			<!--- validate token --->
-			<cfif not validateToken(token)>
+			<cfif not validateToken(args.token)>
 				<cfthrow message="Invalid token. Please login first" type="invalidToken">
 			</cfif>
 			
 			<!--- get listing --->
-			<cfset oEntry = oAppService.getEntry(entryID)>
+			<cfset oEntry = oAppService.getEntry(args.entryID, session.user)>
 
 			<cfif oEntry.getMessage() eq "">
 				<cfset tmpMessage = "<em>No message</em>">
@@ -181,12 +188,14 @@
 		</cfcase>	
 	
 		<cfcase value="getApplications">
+			<cfparam name="args.token" default="">
+
 			<!--- validate token --->
-			<cfif not validateToken(token)>
+			<cfif not validateToken(args.token)>
 				<cfthrow message="Invalid token. Please login first" type="invalidToken">
 			</cfif>
 
-			<cfset qryData = oAppService.getApplications()>
+			<cfset qryData = oAppService.getApplications(session.user)>
 
 			<cfquery name="qryData" dbtype="query">
 				SELECT *, upper(code) as u_code
@@ -205,8 +214,10 @@
 		</cfcase>
 
 		<cfcase value="getHosts">
+			<cfparam name="args.token" default="">
+
 			<!--- validate token --->
-			<cfif not validateToken(token)>
+			<cfif not validateToken(args.token)>
 				<cfthrow message="Invalid token. Please login first" type="invalidToken">
 			</cfif>
 
@@ -229,8 +240,10 @@
 		</cfcase>
 
 		<cfcase value="getSeverities">
+			<cfparam name="args.token" default="">
+
 			<!--- validate token --->
-			<cfif not validateToken(token)>
+			<cfif not validateToken(args.token)>
 				<cfthrow message="Invalid token. Please login first" type="invalidToken">
 			</cfif>
 

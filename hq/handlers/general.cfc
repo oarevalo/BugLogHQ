@@ -275,11 +275,13 @@
 				var qryEntriesLast24 = appService.searchEntries(argumentCollection = args);
 				var qryEntriesAll = appService.searchEntries(message = args.message, 
 															 searchTerm = "",
-															 applicationID = args.applicationID);
+															 applicationID = args.applicationID,
+															 user = currentUser);
 				if(oEntry.getUserAgent() neq "") {
 					qryEntriesUA = appService.searchEntries(startDate = args.startDate,
-																						userAgent = oEntry.getUserAgent(),
-																						searchTerm = "");
+															userAgent = oEntry.getUserAgent(),
+															searchTerm = "",
+															 user = currentUser);
 				}
 				
 				
@@ -548,6 +550,7 @@
 			var criteria = structNew();
 			var resetCriteria = getValue("resetCriteria", false);
 			var appService = getService("app"); 
+			var currentUser = getValue("currentUser");
 
 			if(resetCriteria) {
 				structDelete(cookie,criteriaName);
@@ -566,6 +569,9 @@
 
 			qrySeverities = appService.getSeverities();
 			
+			// set current user (do it now, because we don't want to save that to the cookie)
+			criteria.user = currentUser;
+			
 			setValue("criteria", criteria);
 			setValue("qrySeverities", qrySeverities);
 		</cfscript>
@@ -576,6 +582,7 @@
 		<cfscript>
 			if(structKeyExists(cookie,criteriaName) and isJSON(cookie[criteriaName])) {
 				criteria = deserializeJSON(cookie[criteriaName]);
+				criteria.user = getValue("currentUser");
 				setValue("criteria", criteria);
 			} else {
 				prepareFilter(criteriaName);
@@ -588,7 +595,6 @@
 		<cfscript>
 			var thisEvent = getValue("event");
 			var appService = getService("app");
-			var currentUser = getValue("currentUser");
 
 			// make sure we have a complete criteria struct w/ default values
 			if(not structKeyExists(criteria,"numdays")) criteria.numDays = 1;
@@ -624,12 +630,6 @@
 				rows = getValue("rows", criteria.rows)
 			};
 			
-			if(!currentUser.getIsAdmin()) {
-				criteria.userID = currentUser.getUserID();
-			} else {
-				structDelete(criteria,"userID",false);
-			}
-
 			// calculate how far back to query the data
 			if(isNumeric(criteria.numdays)) {
 				if(criteria.numdays lt 1) 

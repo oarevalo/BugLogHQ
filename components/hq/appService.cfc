@@ -116,7 +116,7 @@
 		<cfargument name="search_cftoken" type="string" required="false" default="">
 		<cfargument name="userAgent" type="string" required="false" default="">
 		<cfargument name="searchHTMLReport" type="string" required="false" default="">
-		<cfargument name="userID" type="numeric" required="false" default="0">
+		<cfargument name="user" type="any" required="false">
 		<cfscript>
 			var oEntryFinder = 0;
 			var qry = 0;
@@ -144,6 +144,14 @@
 			
 			// make sure that searchHTMLReport is a valid boolean value
 			args.searchHTMLReport = (isBoolean(arguments.searchHTMLReport) and arguments.searchHTMLReport);
+						
+			// see if we need to restrict search for the given user
+			if(structKeyExists(arguments,"user")) {
+				if(!arguments.user.getIsAdmin() and arrayLen(arguments.user.getAllowedApplications())) {
+					args.userID = arguments.user.getUserID();
+				}
+				structDelete(args,"user");
+			}			
 						
 			// get entries
 			oEntryFinder = createModelObject("components.entryFinder").init( variables.oEntryDAO );
@@ -317,6 +325,8 @@
 		<cfscript>
 			var oFinder = 0;
 			var o = 0;
+
+			if(arguments.username eq "") return 0;
 
 			// create the finder
 			oFinder = createModelObject("components.userFinder").init( oUserDAO );
