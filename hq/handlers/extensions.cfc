@@ -138,7 +138,7 @@
 				}
 				args.user = getValue("currentUser");
 				getService("app").saveRule(argumentCollection = args);
-				setMessage("info","Rule saved. Changes will be effective the next time the listener service is started.");
+				setMessage("info","Rule saved.");
 			
 			} catch(notAuthorized e) {
 				setMessage("warning",e.message);
@@ -159,7 +159,7 @@
 			
 			try {
 				getService("app").deleteRule(id, user);
-				setMessage("info","Rule has been removed. Changes will be effective the next time the listener service is started.");
+				setMessage("info","Rule has been removed.");
 			
 			} catch(notAuthorized e) {
 				setMessage("warning",e.message);
@@ -180,7 +180,7 @@
 			
 			try {
 				getService("app").disableRule(id, user);
-				setMessage("info","Rule has been disabled. Changes will be effective the next time the listener service is started.");
+				setMessage("info","Rule has been disabled.");
 			
 			} catch(notAuthorized e) {
 				setMessage("warning",e.message);
@@ -201,7 +201,7 @@
 			
 			try {
 				getService("app").enableRule(id, user);
-				setMessage("info","Rule has been enabled. Changes will be effective the next time the listener service is started.");
+				setMessage("info","Rule has been enabled.");
 			
 			} catch(notAuthorized e) {
 				setMessage("warning",e.message);

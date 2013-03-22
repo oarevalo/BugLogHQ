@@ -8,6 +8,7 @@
 	<cfset variables.OSPathSeparator = createObject("java","java.lang.System").getProperty("file.separator")>
 	<cfset variables.config = 0>
 	<cfset variables.instanceName = "">
+	<cfset variables.autoApplyRuleChanges = true>
 
 	<cffunction name="init" access="public" returntype="appService">
 		<cfargument name="instanceName" type="string" required="false" default="">
@@ -45,6 +46,9 @@
 		<!--- setup extensions --->
 		<cfset variables.extensionsPath = variables.cfcPath & ".extensions.">
 		<cfset variables.oExtensionsService = createModelObject("components.extensionsService").init( variables.oDAOFactory.getDAO("extension") )>
+
+		<!--- other settings --->
+		<cfset variables.autoApplyRuleChanges = variables.config.getSetting("hq.autoApplyRuleChanges", true)>
 
 		<cfreturn this>		
 	</cffunction>
@@ -579,6 +583,11 @@
 			} else {
 				oExtensionsService.createRule(arguments.ruleName, stProperties, desc, user.getUserID());
 			}
+			
+			// reload rules
+			if(variables.autoApplyRuleChanges) {
+				getServiceLoader().getService().reloadRules();
+			}
 		</cfscript>
 		
 	</cffunction>
@@ -590,6 +599,11 @@
 			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
 				throw(message="User cannot delete this rule",type="notAuthorized");
 			oExtensionsService.removeRule(arguments.id);
+
+			// reload rules
+			if(variables.autoApplyRuleChanges) {
+				getServiceLoader().getService().reloadRules();
+			}
 		</cfscript>		
 	</cffunction>
 
@@ -600,6 +614,11 @@
 			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
 				throw(message="User cannot enable this rule",type="notAuthorized");
 			oExtensionsService.enableRule(arguments.id);
+
+			// reload rules
+			if(variables.autoApplyRuleChanges) {
+				getServiceLoader().getService().reloadRules();
+			}
 		</cfscript>		
 	</cffunction>
 
@@ -610,6 +629,11 @@
 			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
 				throw(message="User cannot disable this rule",type="notAuthorized");
 			oExtensionsService.disableRule(arguments.id);
+
+			// reload rules
+			if(variables.autoApplyRuleChanges) {
+				getServiceLoader().getService().reloadRules();
+			}
 		</cfscript>		
 	</cffunction>
 

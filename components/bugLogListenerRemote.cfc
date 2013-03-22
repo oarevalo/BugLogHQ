@@ -76,7 +76,10 @@
 	<cffunction name="getKey" access="public" returntype="string">
 		<cfreturn "n/a">
 	</cffunction>	
-	
+
+	<cffunction name="reloadRules" access="public" returntype="void">
+		<cfset getRemoteService().reloadRules(variables.remoteInstance)>
+	</cffunction>		
 
 	<!--- Private Methods --->
 	

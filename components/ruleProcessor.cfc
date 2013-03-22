@@ -37,6 +37,10 @@
 		<cfdump var="BugLog::RuleProcessor: #arguments.message#" output="console">
 	</cffunction>
 
+	<cffunction name="flushRules" access="public" returnType="void" hint="clears all the loaded rules">
+		<cfset variables.aRules = arrayNew(1)>
+	</cffunction>
+
 
 	<cffunction name="_processRules" access="private" returntype="void">
 		<cfargument name="method" type="string" required="true">

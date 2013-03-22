@@ -200,6 +200,11 @@
 			return true;
 		</cfscript>
 	</cffunction>
+
+	<cffunction name="reloadRules" access="public" returntype="void" hint="Reloads all rules">
+		<cfset loadRules()>
+	</cffunction>
+
 	
 	
 	<!---- Private Methods ---->
@@ -384,6 +389,9 @@
 			var i = 0;
 			var dao = 0;
 			var thisRule = 0;
+
+			// clear all existing rules
+			variables.oRuleProcessor.flushRules();
 			
 			// get the rule definitions from the extensions service
 			dao = variables.oDAOFactory.getDAO("extension");
@@ -395,11 +403,9 @@
 				thisRule = aRules[i];
 				
 				if(thisRule.enabled) {
-					oRule = createObject("component", thisRule.component )
-								.init( argumentCollection = thisRule.config )
-								.setListener(this)
-								.setDAOFactory( variables.oDAOFactory )
-								.setExtensionID( thisRule.id );
+					oRule = thisRule.instance;
+					oRule.setListener(this);
+					oRule.setDAOFactory( variables.oDAOFactory );
 	
 					// add rule to processor
 					variables.oRuleProcessor.addRule(oRule);
