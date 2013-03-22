@@ -27,7 +27,7 @@
 	
 	<cffunction name="logEntry" access="public" returntype="void" hint="This method adds a bug report entry into BugLog. Bug reports must be passed as RawEntryBeans">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
-		<cflock name="bugLogListenerAsync_logEntry" type="exclusive" timeout="10">
+		<cflock name="bugLogListenerAsync_logEntry_#variables.instanceName#" type="exclusive" timeout="10">
 			<cfif arrayLen(variables.queue) lte variables.maxQueueSize>
 				<cfset arrayAppend(variables.queue, arguments.entryBean)>
 			<cfelse>
@@ -49,7 +49,7 @@
 			<cfreturn 0>
 		</cfif>
 		
-		<cflock name="bugLogListenerAsync_processQueue" type="exclusive" timeout="10">
+		<cflock name="bugLogListenerAsync_processQueue_#variables.instanceName#" type="exclusive" timeout="10">
 			<cfset myQueue = duplicate(variables.queue)> <!--- get a snapshot of the queue as of right now --->
 			<cfset variables.queue = arrayNew(1)>	<!--- clear the queue now --->
 			<cfset variables.oRuleProcessor.processQueueStart(myQueue, dp, variables.oConfig )>
