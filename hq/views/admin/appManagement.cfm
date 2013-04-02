@@ -69,8 +69,8 @@
 				&nbsp;&nbsp;
 				<a href="index.cfm?event=admin.main&panel=appManagement">Cancel</a>
 				<cfif theID gt 0>
-					&nbsp;&nbsp;|&nbsp;&nbsp;
-					<a href="index.cfm?event=main&applicationID=#theID#">View Bug Reports</a>
+					&nbsp;&nbsp;|&nbsp;&nbsp;	
+					<a href="index.cfm?event=main&applicationID=#theid#&hostID=0&severityID=0&numdays=30">View Bug Reports (Last 30 days)</a>
 				</cfif>
 			</form>
 			<br><br><br>

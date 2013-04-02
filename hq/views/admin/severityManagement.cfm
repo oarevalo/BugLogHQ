@@ -70,7 +70,7 @@
 				<a href="index.cfm?event=admin.main&panel=severityManagement">Cancel</a>
 				<cfif theID gt 0>
 					&nbsp;&nbsp;|&nbsp;&nbsp;
-					<a href="index.cfm?event=main&severityID=#theID#">View Bug Reports</a>
+					<a href="index.cfm?event=main&applicationID=0&hostID=0&severityID=#theID#&numdays=30">View Bug Reports (Last 30 days)</a>
 				</cfif>
 			</form>
 			<br><br><br>

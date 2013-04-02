@@ -44,12 +44,12 @@
 					<tr valign="top">
 						<td><b>Existing Bug Reports...</b></td>
 						<td>
-							<label><input type="radio" name="entryAction" value="delete"> Delete all reports for this Severity</label>
-							<label><input type="radio" name="entryAction" value="move"> Move all reports to a different Severity:
+							<label><input type="radio" name="entryAction" value="delete"> Delete all reports for this Hostname</label>
+							<label><input type="radio" name="entryAction" value="move"> Move all reports to a different Hostname:
 							<select name="moveTohostID">
 								<cfloop query="qryData">
 									<cfif qryData.hostID neq theID>
-										<option value="#qryData.hostID#">#qryData.name#</option>
+										<option value="#qryData.hostID#">#qryData.hostname#</option>
 									</cfif>
 								</cfloop>
 							</select>
@@ -62,7 +62,7 @@
 				<a href="index.cfm?event=admin.main&panel=hostManagement">Cancel</a>
 				<cfif theID gt 0>
 					&nbsp;&nbsp;|&nbsp;&nbsp;
-					<a href="index.cfm?event=main&hostID=#theID#">View Bug Reports</a>
+					<a href="index.cfm?event=main&hostID=#theID#&applicationID=0&severityID=0&numdays=30">View Bug Reports (Last 30 days)</a>
 				</cfif>
 			</form>
 			<br><br><br>
