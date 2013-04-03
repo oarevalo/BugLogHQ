@@ -80,6 +80,7 @@
 			<thead>
 				<tr>
 					<th width="15">&nbsp;</th>
+					<th width="25">Icon</th>
 					<th align="left">Code</th>
 					<th align="left">Name</th>
 					<th>&nbsp;</th>
@@ -89,6 +90,7 @@
 				<cfloop query="qryData">
 					<tr>
 						<td width="15" align="right">#qryData.currentRow#.</td>
+						<td width="25" style="text-align:center;"><img src="#getSeverityIconURL(qryData.code)#"></td>
 						<td><a href="index.cfm?event=admin.main&panel=severityManagement&id=#qryData.severityID#">#qryData.code#</a></td>
 						<td><a href="index.cfm?event=admin.main&panel=severityManagement&id=#qryData.severityID#">#qryData.name#</a></td>
 						<td align="center" style="width:110px;">
