@@ -503,26 +503,24 @@
 		<cfscript>
 			var id = getValue("id");
 			var code = getValue("code");
-			var name = getValue("name");
 			var user = getValue("currentUser");
 			
 			try {
 				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main");}
 				if(code eq "") throw(type="validation", message="Code cannot be empty");
-				if(name eq "") throw(type="validation", message="Name cannot be empty");
 
-				getService("app").saveSeverity(id,code,name);
+				getService("app").saveSeverity(id,code);
 				
 				setMessage("info","Severity has been saved");
 				setNextEvent("admin.main","panel=severityManagement");
 							
 			} catch(validation e) {
 				setMessage("warning",e.message);
-				setNextEvent("admin.main","panel=severityManagement&id=#id#&code=#code#&name=#name#");
+				setNextEvent("admin.main","panel=severityManagement&id=#id#&code=#code#");
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("admin.main","panel=severityManagement&id=#id#&code=#code#&name=#name#");
+				setNextEvent("admin.main","panel=severityManagement&id=#id#&code=#code#");
 			}		
 		</cfscript>
 	</cffunction>	

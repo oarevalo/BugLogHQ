@@ -15,12 +15,8 @@
 				<input type="hidden" name="id" value="#rs.id#">
 				<table>
 					<tr>
-						<td><b>Code:</b></td>
+						<td><b>Severity:</b></td>
 						<td><input type="text" name="code" value="#qryItem.code#"></td>
-					</tr>
-					<tr>
-						<td><b>Name:</b></td>
-						<td><input type="text" name="name" value="#qryItem.name#"></td>
 					</tr>
 				</table>
 				<input type="submit" value="Apply Changes">
@@ -42,12 +38,8 @@
 				<input type="hidden" name="id" value="#theID#">
 				<table>
 					<tr>
-						<td><b>Code:</b></td>
+						<td><b>Severity:</b></td>
 						<td><input type="text" name="code" value="#qryItem.code#" disabled="true"></td>
-					</tr>
-					<tr>
-						<td><b>Name:</b></td>
-						<td><input type="text" name="name" value="#qryItem.name#" disabled="true"></td>
 					</tr>
 					<tr valign="top">
 						<td><b>Existing Bug Reports...</b></td>
@@ -57,7 +49,7 @@
 							<select name="moveToSeverityID">
 								<cfloop query="qryData">
 									<cfif qryData.severityID neq theID>
-										<option value="#qryData.severityID#">#qryData.name#</option>
+										<option value="#qryData.severityID#">#qryData.code#</option>
 									</cfif>
 								</cfloop>
 							</select>
@@ -81,8 +73,7 @@
 				<tr>
 					<th width="15">&nbsp;</th>
 					<th width="25">Icon</th>
-					<th align="left">Code</th>
-					<th align="left">Name</th>
+					<th align="left">Severity</th>
 					<th>&nbsp;</th>
 				</tr>
 			</thead>
@@ -92,7 +83,6 @@
 						<td width="15" align="right">#qryData.currentRow#.</td>
 						<td width="25" style="text-align:center;"><img src="#getSeverityIconURL(qryData.code)#"></td>
 						<td><a href="index.cfm?event=admin.main&panel=severityManagement&id=#qryData.severityID#">#qryData.code#</a></td>
-						<td><a href="index.cfm?event=admin.main&panel=severityManagement&id=#qryData.severityID#">#qryData.name#</a></td>
 						<td align="center" style="width:110px;">
 							<a href="index.cfm?event=admin.main&panel=severityManagement&id=#qryData.severityID#">[ Edit ]</a>
 							&nbsp;

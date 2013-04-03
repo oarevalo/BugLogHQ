@@ -81,7 +81,7 @@
 				<tr>
 					<th width="15">&nbsp;</th>
 					<th align="left">Code</th>
-					<th align="left">Name</th>
+					<th align="left">Name/Description</th>
 					<th>&nbsp;</th>
 				</tr>
 			</thead>
