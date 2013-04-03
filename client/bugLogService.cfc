@@ -9,6 +9,7 @@
 	<cfset variables.apikey = "">
 	<cfset variables.postToRESTasJSON = false> 
 	<cfset variables.userAgent = "bugloghq-coldfusion-client">
+	<cfset variables.checkpointsKey = "__buglog_checkpoints__">
 	
 	<!--- Handle cases in which the application scope is not defined (Fix contributed by Morgan Dennithorne) --->
 	<cfif isDefined("application.applicationName")>
@@ -122,6 +123,11 @@
 		<!--- make sure we have required members --->
 		<cfparam name="arguments.exception.message" default="">
 		<cfparam name="arguments.exception.detail" default="">
+		
+		<!--- if we are tracking checkpoints, then add the buglog call as the last checkpoint --->
+		<cfif arrayLen(getCheckpoints())>
+			<cfset checkpoint("bugLog.notifyService() called")>
+		</cfif>
 
 		<!--- compose short and full messages --->
 		<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
@@ -374,22 +380,58 @@
 					</td>
 				</tr>					
 			</table>
-
-			<h3>Exception Info</h3>
-			<cfset stEx = structNew()>
-			<cfloop collection="#arguments.exception#" item="key">
-				<cfif not listFindNoCase("message,detail,tagcontext,type",key)>
-					<cfset stEx[key] = arguments.exception[key]>
-				</cfif>
-			</cfloop>
-			<cfdump var="#stEx#">
 			<br />
 			
-			<h3>Additional Info</h3>
-			<cfif isSimpleValue(arguments.ExtraInfo)>
-				#arguments.ExtraInfo#
-			<cfelse>
-				<cfdump var="#arguments.ExtraInfo#">
+			<h3>Exception Info</h3>
+			<table style="font-size:11px;font-family:arial;">
+				<cfloop collection="#arguments.exception#" item="key">
+					<cfif not listFindNoCase("message,detail,tagcontext,type",key)>
+						<tr valign="top">
+							<td><b>#key#:</b></td>
+							<td>
+								<cfif isSimpleValue(arguments.exception[key])>
+									#arguments.exception[key]#
+								<cfelse>
+									<cfdump var="#arguments.exception[key]#">
+								</cfif>
+							</td>
+						</tr>
+					</cfif>
+				</cfloop>
+			</table>
+			<br />
+			
+			<cfif not isSimpleValue(arguments.ExtraInfo) or arguments.ExtraInfo neq "">
+				<h3>Additional Info</h3>
+				<cfif isSimpleValue(arguments.ExtraInfo)>
+					#arguments.ExtraInfo#
+				<cfelse>
+					<cfdump var="#arguments.ExtraInfo#">
+				</cfif>
+			</cfif>
+			
+			<cfset var checkpoints = getCheckpoints()>
+			<cfif arrayLen(checkpoints)>
+				<br />
+				<h3>Checkpoints</h3>
+				<table border="1" cellspacing="0" cellpadding="3">
+					<tr>
+						<th>##</th>
+						<th>Checkpoint</th>
+						<th>Delta (ms)</th>
+						<th>Elapsed (ms)</th>
+					</tr>
+					<cfset var prevTs = 0>
+					<cfloop from="1" to="#arrayLen(checkpoints)#" index="i">
+						<tr <cfif i mod 2>style="background-color:##ebebeb;"</cfif>>
+							<td style="text-align:right;">#i#.</td>
+							<td>#checkpoints[i].cp#</td>
+							<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-prevTs#<cfelse>-</cfif></td>
+							<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-checkpoints[1].ts#<cfelse>-</cfif></td>
+						</tr>
+						<cfset prevTs = checkpoints[i].ts>
+					</cfloop>
+				</table>
 			</cfif>
 			</cfoutput>
 		</cfsavecontent>
@@ -410,6 +452,25 @@
 		</cfloop>		
 		<cfset matcher.appendTail(buffer) />
 		<cfreturn buffer.toString() />
+	</cffunction>
+	
+	<cffunction name="checkpoint" access="public" returntype="void" hint="marks a checkpoint in the current request">
+		<cfargument name="checkpoint" type="string" required="true">
+		<cfscript>
+			var checkpoints = getCheckpoints();
+			var item = {
+				ts = getTickCount(),
+				cp = arguments.checkpoint
+			};
+			arrayAppend(checkpoints, item);
+		</cfscript>
+	</cffunction>
+	
+	<cffunction name="getCheckpoints" access="public" returntype="array" hint="returns the checkpoints saved for the current request">
+		<cfif not structKeyExists(request,checkpointsKey)>
+			<cfset request[checkpointsKey] = arrayNew(1)>
+		</cfif>
+		<cfreturn request[checkpointsKey]>
 	</cffunction>
 	
 </cfcomponent>
