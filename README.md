@@ -44,6 +44,17 @@ graph, forward, and explore the bug reports submitted by the applications. All b
 2. Release Notes
 -----------------------------------------------------------------------
 
+### New in 1.8 (4/2012)
+* Users can now be restricted to access only specific applications assigned by the Administrator. Restricted users will only be able to see bug reports for their assigned applications and create rules for those applications.
+* CRUD screens to manage Severities, Hosts and Applications. These are accessed through the Settings page and are only accessible to users in Admin role.
+* The REST listener can now receive data in the body of the HTTP request encoded as a JSON object
+* Checkpoint Tracking. The CFM listener now has a checkpoint() method that you can use to track checkpoints or milestons during the page execution. If a bug is sent, then those checkpoints will be displayed on the full bug report.
+* Remote Listener. This is a different listener type that allows the BugLog webapp and the Listener endpoint to be on separate servers, while at the same time allowing the webapp to control the listener.
+* Individual users can now be assigned their own API keys to submit bug reports
+* Added option to toggle on/off the automatic creation of hosts/severities/applications when a new bug report is received.
+* Rules changes are now applied inmediately without the need to restart the listener service.
+
+
 ### New in 1.7 (9/2012)
 * A new "Dashboard" homepage.
 * More granular and finer timespans to view received errors. 
