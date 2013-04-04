@@ -86,6 +86,7 @@ CREATE TABLE bl_User (
   Password varchar(50) NOT NULL,
   IsAdmin INTEGER NOT NULL default 0,
   Email varchar(255) NULL,
+  ApiKey varchar(100) NULL,
   CONSTRAINT bl_User_pkey PRIMARY KEY (UserID)
 ) ;
 
@@ -128,4 +129,16 @@ CREATE TABLE bl_extensionlog (
 );
 
 
+--
+-- Table structure for table `bl_userApplication`
+--
+DROP TABLE IF EXISTS bl_userApplication;
+CREATE TABLE bl_userApplication (
+   userApplicationID SERIAL,
+   userID INTEGER NOT NULL references bl_User,
+   applicationID INTEGER NOT NULL references bl_Application,
+  CONSTRAINT bl_UserApplication_pkey PRIMARY KEY (userApplicationID)
+);
+ 
+ 
 
