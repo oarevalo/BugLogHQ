@@ -1,4 +1,4 @@
-BugLogHQ (v1.7)
+BugLogHQ (v1.8)
 ===============
 https://github.com/oarevalo/BugLogHQ
 
