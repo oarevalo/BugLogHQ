@@ -68,7 +68,7 @@
 						<label><input type="checkbox" name="removeAPIKey" value="1"> Remove API Key</label>
 						<input type="text" name="APIKey" value="#APIKey#" readonly="true" class="formField">
 						<div class="formFieldTip">
-							Remember to enable API Key requirement in the <a href="index.cfm?admin.main&panel=APISecurity">API Security</a> section
+							Remember to enable API Key requirement in the <a href="index.cfm?event=admin.main&panel=APISecurity">API Security</a> section
 							for key checking to be enforced.
 						</div>
 					<cfelse>

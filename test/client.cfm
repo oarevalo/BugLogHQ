@@ -9,7 +9,7 @@
 		reset: unloads the buglog client from memory after the test
 --->
 
-<cfparam name="protocol" default="cfc">
+<cfparam name="protocol" default="rest">
 <cfparam name="pathToService" default="bugLog.client.bugLogService">
 <cfparam name="severity" default="FATAL">
 <cfparam name="reset" default="true">
@@ -36,7 +36,6 @@
 	<cfset bugLogListener.rest = "#path#listeners/bugLogListenerREST.cfm">
 	<cfset adminPath = "hq/">
 </cfif>
-<cfset bugLogListener.cfc = "bugLog.listeners.bugLogListenerWS">
 
 <cfoutput>
 <html>
