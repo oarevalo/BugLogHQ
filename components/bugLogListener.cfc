@@ -330,7 +330,7 @@
 					oUser = variables.oUserFinder.findByAPIKey( apiKey );
 					
 					var qryUserApps = oDAOFactory.getDAO("userApplication").search(userID = oUser.getUserID());
-					var apps = oAppFinder.findByIDList(valueList("qryUserApps.applicationID"));
+					var apps = oAppFinder.findByIDList(valueList(qryUserApps.applicationID));
 					oUser.setAllowedApplications(apps);
 				
 				} catch(sourceFinderException.usernameNotFound e) {

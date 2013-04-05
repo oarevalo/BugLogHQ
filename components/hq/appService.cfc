@@ -689,7 +689,7 @@
 		<cfscript>
 			var qryUserApps = oUserApplicationDAO.search(userID = arguments.userID);
 			var oFinder = createModelObject("components.appFinder").init(oApplicationDAO);
-			var apps = oFinder.findByIDList(valueList("qryUserApps.applicationID"));
+			var apps = oFinder.findByIDList(valueList(qryUserApps.applicationID));
 			return apps;
 		</cfscript>		
 	</cffunction>
@@ -700,7 +700,7 @@
 		<cfscript>
 			var i = 0;
 			var qryUserApps = oUserApplicationDAO.search(userID = arguments.userID);
-			oUserApplicationDAO.delete(valueList("qryUserApps.userApplicationID"));
+			oUserApplicationDAO.delete(valueList(qryUserApps.userApplicationID));
 			
 			for(i=1;i lte arrayLen(applicationID);i++) {
 				oUserApplicationDAO.save(userID = arguments.userID,
