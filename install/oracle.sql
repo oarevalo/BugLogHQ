@@ -130,6 +130,6 @@
 		"APPLICATIONID" integer NOT NULL,
 		CONSTRAINT bl_userApplication_pkey PRIMARY KEY ("USERAPPLICATIONID"),
 		CONSTRAINT fk_userApplication_userId FOREIGN KEY ("USERID") REFERENCES bl_User("USERID"),
-		CONSTRAINT fk_userApplication_ApplicationId FOREIGN KEY ("APPLICATIONID") REFERENCES bl_Application("APPLICATIONID")
+		CONSTRAINT fk_userApplication_AppId FOREIGN KEY ("APPLICATIONID") REFERENCES bl_Application("APPLICATIONID")
 	);
 	
