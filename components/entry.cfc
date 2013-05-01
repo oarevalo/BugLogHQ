@@ -20,17 +20,17 @@
 		
 		function setEntryID(data) {variables.instance.ID = arguments.data;}
 		function setDateTime(data) {variables.instance.mydateTime = arguments.data;}
-		function setMessage(data) {variables.instance.message = arguments.data;}
+		function setMessage(data) {variables.instance.message = left(arguments.data,500);}
 		function setApplicationID(data) {variables.instance.applicationID = arguments.data;}
 		function setSourceID(data) {variables.instance.sourceID = arguments.data;}
 		function setSeverityID(data) {variables.instance.severityID = arguments.data;}
 		function setHostID(data) {variables.instance.hostID = arguments.data;}
-		function setExceptionMessage(data) {variables.instance.exceptionMessage = arguments.data;}
+		function setExceptionMessage(data) {variables.instance.exceptionMessage = left(arguments.data,500);}
 		function setExceptionDetails(data) {variables.instance.exceptionDetails = arguments.data;}
-		function setCFID(data) {variables.instance.CFID = arguments.data;}
-		function setCFTOKEN(data) {variables.instance.CFTOKEN = arguments.data;}
-		function setUserAgent(data) {variables.instance.userAgent = arguments.data;}
-		function setTemplatePath(data) {variables.instance.templatePath = arguments.data;}
+		function setCFID(data) {variables.instance.CFID = left(arguments.data,255);}
+		function setCFTOKEN(data) {variables.instance.CFTOKEN = left(arguments.data,255);}
+		function setUserAgent(data) {variables.instance.userAgent = left(arguments.data,500);}
+		function setTemplatePath(data) {variables.instance.templatePath = left(arguments.data,500);}
 		function setHTMLReport(data) {variables.instance.HTMLReport = arguments.data;}
 		function setCreatedOn(data) {variables.instance.createdOn = arguments.data;}
 		
