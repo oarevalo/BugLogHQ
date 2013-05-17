@@ -340,28 +340,12 @@
 					<td>#HtmlEditFormat(cgi.REQUEST_METHOD)#</td>
 				</tr>
 				<tr valign="top">
-					<td><strong>Coldfusion ID:</strong></td>
+					<td><strong>ColdFusion ID:</strong></td>
 					<td>
 						<cftry>
 							[SESSION] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID =
-							<cfif structKeyExists(SESSION, 'CFID')>
-								#SESSION.CFID#;
-							<cfelse>
-								&mdash;
-							</cfif>
-							CFTOKEN =
-							<cfif structKeyExists(SESSION, 'CFTOKEN')>
-								#SESSION.CFTOKEN#
-							<cfelse>
-								&mdash;
-							</cfif>
-							JSessionID =
-							<cfif structKeyExists(SESSION, 'JSessionID')>
-								#SESSION.JSessionID#
-							<cfelse>
-								&mdash;
-							</cfif>
+							CFID = <cfif structKeyExists(session, 'CFID')>#session.CFID#<cfelse>&mdash;</cfif> ;
+							CFTOKEN = <cfif structKeyExists(session, 'CFTOKEN')>#session.CFTOKEN#<cfelse>&mdash;</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
@@ -369,18 +353,8 @@
 						
 						<cftry>
 							[CLIENT] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID =
-							<cfif structKeyExists(CLIENT, 'cfid')>
-								#client.cfid#
-							<cfelse>
-								&mdash;
-							</cfif>;
-							CFTOKEN =
-							<cfif structKeyExists(CLIENT, 'cftoken')>
-								#client.cftoken#
-							<cfelse>
-								&mdash;
-							</cfif>
+							CFID = <cfif structKeyExists(client, 'cfid')>#client.cfid#<cfelse>&mdash;</cfif> ;
+							CFTOKEN = <cfif structKeyExists(client, 'cftoken')>#client.cftoken#<cfelse>&mdash;</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
@@ -388,8 +362,8 @@
 						
 						<cftry>
 							[COOKIES] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #cookie.cfid#;
-							CFTOKEN = #cookie.cftoken#
+							CFID = <cfif structKeyExists(cookie, 'cfid')>#cookie.cfid#<cfelse>&mdash;</cfif> ;
+							CFTOKEN = <cfif structKeyExists(cookie, 'cftoken')>#cookie.cftoken#<cfelse>&mdash;</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
@@ -399,9 +373,11 @@
 							[J2EE SESSION] &nbsp;&nbsp;
 							JSessionID = 
 							<cfif structKeyExists(session,"JSessionID")>
-								#session.JSessionID#;
+								#session.JSessionID#
 							<cfelseif structKeyExists(session,"SessionID")>
-								#session.SessionID#;
+								#session.SessionID#
+							<cfelse>
+								&mdash;
 							</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
