@@ -372,7 +372,12 @@
 						
 						<cftry>
 							[J2EE SESSION] &nbsp;&nbsp;
-							JSessionID = #session.JSessionID#;
+							JSessionID = 
+							<cfif structKeyExists(session,"JSessionID")>
+								#session.JSessionID#;
+							<cfelseif structKeyExists(session,"SessionID")>
+								#session.SessionID#;
+							</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
