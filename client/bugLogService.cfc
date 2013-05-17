@@ -344,9 +344,24 @@
 					<td>
 						<cftry>
 							[SESSION] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #session.cfid#;
-							CFTOKEN = #session.cftoken#
-							JSessionID=#session.sessionID#
+							CFID =
+							<cfif structKeyExists(SESSION, 'CFID')>
+								#SESSION.CFID#;
+							<cfelse>
+								&mdash;
+							</cfif>
+							CFTOKEN =
+							<cfif structKeyExists(SESSION, 'CFTOKEN')>
+								#SESSION.CFTOKEN#
+							<cfelse>
+								&mdash;
+							</cfif>
+							JSessionID =
+							<cfif structKeyExists(SESSION, 'JSessionID')>
+								#SESSION.JSessionID#
+							<cfelse>
+								&mdash;
+							</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
@@ -354,8 +369,18 @@
 						
 						<cftry>
 							[CLIENT] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #client.cfid#;
-							CFTOKEN = #client.cftoken#
+							CFID =
+							<cfif structKeyExists(CLIENT, 'cfid')>
+								#client.cfid#
+							<cfelse>
+								&mdash;
+							</cfif>;
+							CFTOKEN =
+							<cfif structKeyExists(CLIENT, 'cftoken')>
+								#client.cftoken#
+							<cfelse>
+								&mdash;
+							</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
@@ -469,13 +494,13 @@
 	</cffunction>
 	
 	<cffunction name="sanitizeDump" access="private" returntype="string" hint="Performs a sanitized dump, where JavaScript has been removed to minimize XSS risks">
-	    <cfargument name="data" type="any" required="true">
-	    <cfset var out = "">
-	    <cfif isSimpleValue(arguments.data)>
+		<cfargument name="data" type="any" required="true">
+		<cfset var out = "">
+		<cfif isSimpleValue(arguments.data)>
 			<cfset out = arguments.data>
 		<cfelse>
-		    <cfsavecontent variable="out"><cfoutput><cfdump var="#arguments.data#"></cfoutput></cfsavecontent>
-		    <cfset out = reReplaceNoCase(out, "<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>", "<em>JavaScript code removed for security</em>","all")>
+			<cfsavecontent variable="out"><cfoutput><cfdump var="#arguments.data#"></cfoutput></cfsavecontent>
+			<cfset out = reReplaceNoCase(out, "<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>", "<em>JavaScript code removed for security</em>","all")>
 		</cfif>
 		<cfreturn out>
 	</cffunction>
