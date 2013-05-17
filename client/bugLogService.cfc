@@ -344,13 +344,14 @@
 					<td>
 						<cftry>
 							[SESSION] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = <cfif structKeyExists(session, 'CFID')>#session.CFID#<cfelse>&mdash;</cfif> ;
-							CFTOKEN = <cfif structKeyExists(session, 'CFTOKEN')>#session.CFTOKEN#<cfelse>&mdash;</cfif>
+							CFID = <cfif structKeyExists(session, 'CFID')>#session.CFID#<cfelse>&dash;</cfif> ;
+							CFTOKEN = <cfif structKeyExists(session, 'CFTOKEN')>#session.CFTOKEN#<cfelse>&mdash;</cfif> ;
+							SESSIONID = <cfif structKeyExists(session, 'SESSIONID')>#session.SESSIONID#<cfelse>&mdash;</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
 						</cftry><br>
-						
+
 						<cftry>
 							[CLIENT] &nbsp;&nbsp;&nbsp;&nbsp;
 							CFID = <cfif structKeyExists(client, 'cfid')>#client.cfid#<cfelse>&mdash;</cfif> ;
@@ -363,28 +364,14 @@
 						<cftry>
 							[COOKIES] &nbsp;&nbsp;&nbsp;&nbsp;
 							CFID = <cfif structKeyExists(cookie, 'cfid')>#cookie.cfid#<cfelse>&mdash;</cfif> ;
-							CFTOKEN = <cfif structKeyExists(cookie, 'cftoken')>#cookie.cftoken#<cfelse>&mdash;</cfif>
-							<cfcatch type="any">
-								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
-							</cfcatch>
-						</cftry><br>
-						
-						<cftry>
-							[J2EE SESSION] &nbsp;&nbsp;
-							JSessionID = 
-							<cfif structKeyExists(session,"JSessionID")>
-								#session.JSessionID#
-							<cfelseif structKeyExists(session,"SessionID")>
-								#session.SessionID#
-							<cfelse>
-								&mdash;
-							</cfif>
+							CFTOKEN = <cfif structKeyExists(cookie, 'cftoken')>#cookie.cftoken#<cfelse>&mdash;</cfif> ;
+							JSessionID = <cfif structKeyExists(cookie,"JSessionID")>#cookie.JSessionID#<cfelse>&mdash;</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
 						</cftry>
 					</td>
-				</tr>					
+				</tr>				
 			</table>
 			<br />
 			
@@ -394,7 +381,13 @@
 					<cfif not listFindNoCase("message,detail,tagcontext,type",key)>
 						<tr valign="top">
 							<td><b>#key#:</b></td>
-							<td>#sanitizeDump(arguments.exception[key])#</td>
+							<td>
+								<cfif key eq "StackTrace">
+									<pre>#arguments.exception[key]#</pre>
+								<cfelse>
+									#sanitizeDump(arguments.exception[key])#
+								</cfif>
+							</td>
 						</tr>
 					</cfif>
 				</cfloop>
@@ -474,6 +467,10 @@
 		<cfset var out = "">
 		<cfif isSimpleValue(arguments.data)>
 			<cfset out = arguments.data>
+		<cfelseif isStruct(arguments.data) and structisempty(arguments.data)>
+			<cfset out = "<em>Empty struct</em>">
+		<cfelseif isArray(arguments.data) and not arrayLen(arguments.data)>
+			<cfset out = "<em>Empty array</em>">
 		<cfelse>
 			<cfsavecontent variable="out"><cfoutput><cfdump var="#arguments.data#"></cfoutput></cfsavecontent>
 			<cfset out = reReplaceNoCase(out, "<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>", "<em>JavaScript code removed for security</em>","all")>
