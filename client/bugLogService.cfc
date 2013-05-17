@@ -388,13 +388,7 @@
 					<cfif not listFindNoCase("message,detail,tagcontext,type",key)>
 						<tr valign="top">
 							<td><b>#key#:</b></td>
-							<td>
-								<cfif isSimpleValue(arguments.exception[key])>
-									#arguments.exception[key]#
-								<cfelse>
-									<cfdump var="#arguments.exception[key]#">
-								</cfif>
-							</td>
+							<td>#sanitizeDump(arguments.exception[key])#</td>
 						</tr>
 					</cfif>
 				</cfloop>
@@ -403,11 +397,7 @@
 			
 			<cfif not isSimpleValue(arguments.ExtraInfo) or arguments.ExtraInfo neq "">
 				<h3>Additional Info</h3>
-				<cfif isSimpleValue(arguments.ExtraInfo)>
-					#arguments.ExtraInfo#
-				<cfelse>
-					<cfdump var="#arguments.ExtraInfo#">
-				</cfif>
+				#sanitizeDump(arguments.ExtraInfo)#
 			</cfif>
 			
 			<cfset var checkpoints = getCheckpoints()>
@@ -471,6 +461,18 @@
 			<cfset request[checkpointsKey] = arrayNew(1)>
 		</cfif>
 		<cfreturn request[checkpointsKey]>
+	</cffunction>
+	
+	<cffunction name="sanitizeDump" access="private" returntype="string" hint="Performs a sanitized dump, where JavaScript has been removed to minimize XSS risks">
+	    <cfargument name="data" type="any" required="true">
+	    <cfset var out = "">
+	    <cfif isSimpleValue(arguments.data)>
+			<cfset out = arguments.data>
+		<cfelse>
+		    <cfsavecontent variable="out"><cfoutput><cfdump var="#arguments.data#"></cfoutput></cfsavecontent>
+		    <cfset out = reReplaceNoCase(out, "<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>", "<em>JavaScript code removed for security</em>","all")>
+		</cfif>
+		<cfreturn out>
 	</cffunction>
 	
 </cfcomponent>
