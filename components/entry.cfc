@@ -26,7 +26,7 @@
 		function setSeverityID(data) {variables.instance.severityID = arguments.data;}
 		function setHostID(data) {variables.instance.hostID = arguments.data;}
 		function setExceptionMessage(data) {variables.instance.exceptionMessage = left(arguments.data,500);}
-		function setExceptionDetails(data) {variables.instance.exceptionDetails = arguments.data;}
+		function setExceptionDetails(data) {variables.instance.exceptionDetails = left(arguments.data,5000);}
 		function setCFID(data) {variables.instance.CFID = left(arguments.data,255);}
 		function setCFTOKEN(data) {variables.instance.CFTOKEN = left(arguments.data,255);}
 		function setUserAgent(data) {variables.instance.userAgent = left(arguments.data,500);}
