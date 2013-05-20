@@ -72,7 +72,7 @@ GO
 CREATE TABLE [dbo].[bl_Entry] (
 		[EntryID]              int IDENTITY (1,1) NOT NULL,
 		[myDateTime]           datetime NOT NULL,
-		[Message]              varchar(250) NOT NULL,
+		[Message]              varchar(500) NOT NULL,
 		[ApplicationID]        int NOT NULL,
 		[SourceID]             int NOT NULL,
 		[SeverityID]           int NOT NULL,
