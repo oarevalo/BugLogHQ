@@ -582,6 +582,7 @@
 		<cfscript>
 			if(structKeyExists(cookie,criteriaName) and isJSON(cookie[criteriaName])) {
 				criteria = deserializeJSON(cookie[criteriaName]);
+				criteria = normalizeCriteria(criteria);
 				criteria.user = getValue("currentUser");
 				setValue("criteria", criteria);
 			} else {
