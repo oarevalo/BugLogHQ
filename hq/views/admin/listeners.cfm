@@ -1,15 +1,15 @@
 <cfif rs.instanceName neq "default">
 	<cfset bugLogListener.soap = "#rs.bugLogHREF#listener.cfc?wsdl">
 	<cfset bugLogListener.rest = "#rs.bugLogHREF#listener.cfm">
-	<cfset testhref.soap = "/bugLog/test/client.cfm?protocol=soap&instance=#rs.instanceName#&bugloghref=#rs.bugLogHREF#&returnTo=admin">
-	<cfset testhref.rest = "/bugLog/test/client.cfm?protocol=rest&instance=#rs.instanceName#&bugloghref=#rs.bugLogHREF#&returnTo=admin">
-	<cfset testhref.cfc = "/bugLog/test/client.cfm?protocol=cfc&instance=#rs.instanceName#&bugloghref=#rs.bugLogHREF#&returnTo=admin">
+	<cfset testhref.soap = "/bugLog/test/client.cfm?protocol=soap&instance=#rs.instanceName#&bugloghref=#rs.bugLogHREF#&returnTo=admin&apikey=#rs.APIKey#">
+	<cfset testhref.rest = "/bugLog/test/client.cfm?protocol=rest&instance=#rs.instanceName#&bugloghref=#rs.bugLogHREF#&returnTo=admin&apikey=#rs.APIKey#">
+	<cfset testhref.cfc = "/bugLog/test/client.cfm?protocol=cfc&instance=#rs.instanceName#&bugloghref=#rs.bugLogHREF#&returnTo=admin&apikey=#rs.APIKey#">
 <cfelse>
 	<cfset bugLogListener.soap = "#rs.bugLogHREF#listeners/bugLogListenerWS.cfc?wsdl">
 	<cfset bugLogListener.rest = "#rs.bugLogHREF#listeners/bugLogListenerREST.cfm">
-	<cfset testhref.soap = rs.bugLogHREF & "test/client.cfm?protocol=soap&bugloghref=#rs.bugLogHREF#&returnTo=admin">
-	<cfset testhref.rest = rs.bugLogHREF & "test/client.cfm?protocol=rest&bugloghref=#rs.bugLogHREF#&returnTo=admin">
-	<cfset testhref.cfc = rs.bugLogHREF & "test/client.cfm?protocol=cfc&bugloghref=#rs.bugLogHREF#&returnTo=admin">
+	<cfset testhref.soap = rs.bugLogHREF & "test/client.cfm?protocol=soap&bugloghref=#rs.bugLogHREF#&returnTo=admin&apikey=#rs.APIKey#">
+	<cfset testhref.rest = rs.bugLogHREF & "test/client.cfm?protocol=rest&bugloghref=#rs.bugLogHREF#&returnTo=admin&apikey=#rs.APIKey#">
+	<cfset testhref.cfc = rs.bugLogHREF & "test/client.cfm?protocol=cfc&bugloghref=#rs.bugLogHREF#&returnTo=admin&apikey=#rs.APIKey#">
 </cfif>
 <cfset bugLogListener.cfc = "bugLog.listeners.bugLogListenerWS">
 
