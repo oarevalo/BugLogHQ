@@ -342,41 +342,24 @@
 				<tr valign="top">
 					<td><strong>Coldfusion ID:</strong></td>
 					<td>
-						<cftry>
-							[SESSION] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #session.cfid#;
-							CFTOKEN = #session.cftoken#
-							JSessionID=#session.sessionID#
-							<cfcatch type="any">
-								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
-							</cfcatch>
-						</cftry><br>
+						[SESSION] &nbsp;&nbsp;&nbsp;&nbsp;
+						CFID = <cfif isDefined("session.CFID")>#session.CFID#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						CFTOKEN = <cfif isDefined("session.CFTOKEN")>#session.CFTOKEN#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						JSessionID = <cfif isDefined("session.sessionID")>#session.sessionID#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						<br>
 						
-						<cftry>
-							[CLIENT] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #client.cfid#;
-							CFTOKEN = #client.cftoken#
-							<cfcatch type="any">
-								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
-							</cfcatch>
-						</cftry><br>
+						[CLIENT] &nbsp;&nbsp;&nbsp;&nbsp;
+						CFID = <cfif isDefined("client.CFID")>#client.CFID#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						CFTOKEN = <cfif isDefined("client.CFTOKEN")>#client.CFTOKEN#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						<br>
 						
-						<cftry>
-							[COOKIES] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #cookie.cfid#;
-							CFTOKEN = #cookie.cftoken#
-							<cfcatch type="any">
-								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
-							</cfcatch>
-						</cftry><br>
+						[COOKIES] &nbsp;&nbsp;&nbsp;&nbsp;
+						CFID = <cfif isDefined("cookie.CFID")>#cookie.CFID#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						CFTOKEN = <cfif isDefined("cookie.CFTOKEN")>#cookie.CFTOKEN#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						<br>
 						
-						<cftry>
-							[J2EE SESSION] &nbsp;&nbsp;
-							JSessionID = #session.JSessionID#;
-							<cfcatch type="any">
-								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
-							</cfcatch>
-						</cftry>
+						[J2EE SESSION] &nbsp;&nbsp;
+						JSessionID = <cfif isDefined("session.JSessionID")>#session.JSessionID#<cfelse><span style="color:red;">Undefined</span></cfif>;
 					</td>
 				</tr>					
 			</table>
