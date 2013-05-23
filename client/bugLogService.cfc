@@ -1,5 +1,4 @@
 <cfcomponent>
-	<cfset variables.autoProcessQueue = false>
 	<cfset variables.bugEmailSender = "">
 	<cfset variables.bugEmailRecipients = "">
 	<cfset variables.bugLogListener = "">
@@ -27,7 +26,6 @@
 		<cfargument name="bugEmailSender" type="string" required="false" default="">
 		<cfargument name="hostname" type="string" required="false" default="">
 		<cfargument name="apikey" type="string" required="false" default="">
-		<cfargument name="autoProcessQueue" type="boolean" required="false" default="false">
 		
 		<cfscript>
 			var wsParams = structNew();
@@ -57,7 +55,6 @@
 			variables.bugEmailSender = arguments.bugEmailSender;
 			variables.bugEmailRecipients = arguments.bugEmailRecipients;
 			variables.apikey = arguments.apikey;
-			variables.autoProcessQueue = arguments.autoProcessQueue;
 			
 			if(arguments.bugEmailSender eq "" and arguments.bugEmailRecipients neq "")
 				arguments.bugEmailSender = listFirst(arguments.bugEmailRecipients);
@@ -123,8 +120,6 @@
 		<cfset var tmpCFID = "">
 		<cfset var tmpCFTOKEN = "">
 		<cfset var data = {}>
-		<cfset var oListener = 0>
-		<cfset var oService = 0>
 		
 		<!--- make sure we have required members --->
 		<cfparam name="arguments.exception.message" default="">
@@ -213,15 +208,6 @@
 			<cflog type="error" 
 				   text="#shortMessage#" 
 				   file="#arguments.AppName#_BugTrackingErrors">
-		</cfif>
-		
-		<cfif variables.autoProcessQueue>
-			<!--- Process entries in queue immediately. --->
-			<cfscript>
-				oService = createObject("component","bugLog.components.service").init();
-				oListener = oService.getService();
-				oListener.processQueue( oListener.getKey() );
-			</cfscript>
 		</cfif>
 
 	</cffunction>
