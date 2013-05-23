@@ -214,7 +214,7 @@
 				   text="#shortMessage#" 
 				   file="#arguments.AppName#_BugTrackingErrors">
 		</cfif>
-
+		
 		<cfif variables.autoProcessQueue>
 			<!--- Process entries in queue immediately. --->
 			<cfscript>
@@ -267,10 +267,12 @@
 		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
 
 		<cfscript>
-			var tmpHTML = "";
-			var i = 0;
 			var aTags = arrayNew(1);
+			var i = 0;
+			var key = "";
 			var qryTagContext = queryNew("template,line");
+			var stEx = {};
+			var tmpHTML = "";
 			var tmpURL = "";
 			
 			if(structKeyExists(arguments.exception,"tagContext")) {
@@ -375,7 +377,7 @@
 						[J2EE SESSION] &nbsp;&nbsp;
 						JSessionID = <cfif isDefined("session.JSessionID")>#session.JSessionID#<cfelse><span style="color:red;">Undefined</span></cfif>;
 					</td>
-				</tr>					
+				</tr>
 			</table>
 
 			<h3>Exception Info</h3>
@@ -385,14 +387,22 @@
 					<cfset stEx[key] = arguments.exception[key]>
 				</cfif>
 			</cfloop>
-			<cfdump var="#stEx#">
+			<cfif StructIsEmpty(stEx)>
+				<span>Empty Struct</span>
+			<cfelse>
+				<cfdump var="#stEx#">
+			</cfif>
 			<br />
 			
 			<h3>Additional Info</h3>
 			<cfif isSimpleValue(arguments.ExtraInfo)>
 				#arguments.ExtraInfo#
 			<cfelse>
-				<cfdump var="#arguments.ExtraInfo#">
+				<cfif StructIsEmpty(stEx)>
+					<span>Empty Struct</span>
+				<cfelse>
+					<cfdump var="#arguments.ExtraInfo#">
+				</cfif>
 			</cfif>
 			</cfoutput>
 		</cfsavecontent>
