@@ -156,7 +156,7 @@ CREATE TABLE `bl_extensionlog` (
 -- Table structure for table `bl_userApplication`
 --
 DROP TABLE IF EXISTS `bl_UserApplication`;
-CREATE TABLE bl_userApplication (
+CREATE TABLE bl_UserApplication (
    userApplicationID INT AUTO_INCREMENT NOT NULL,
    userID INT NOT NULL,
    applicationID INT NOT NULL,
