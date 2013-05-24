@@ -3,7 +3,7 @@
 	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
 			try {
-				oService = createObject("component","bugLog.components.service").init();
+				oService = getService("app").getServiceLoader();
 				aMsgLog = oService.getService().getMessageLog();
 				aQueue = oService.getService().getEntryQueue();
 				
@@ -29,7 +29,7 @@
 			var rtn = 0;
 
 			try {
-				oService = createObject("component","bugLog.components.service").init();
+				oService = getService("app").getServiceLoader();
 				oListener = oService.getService();
 				rtn = oListener.processQueue( oListener.getKey() );
 				setMessage("info","Queue processed (#rtn#)");
