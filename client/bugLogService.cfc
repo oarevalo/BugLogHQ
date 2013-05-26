@@ -7,7 +7,7 @@
 	<cfset variables.useListener = true>
 	<cfset variables.defaultSeverityCode = "ERROR">
 	<cfset variables.apikey = "">
-	<cfset variables.maxDumpDepth = 9999>
+	<cfset variables.maxDumpDepth = 15>
 	<cfset variables.postToRESTasJSON = false>
 	<cfset variables.userAgent = "bugloghq-coldfusion-client">
 	<cfset variables.checkpointsKey = "__buglog_checkpoints__">
@@ -28,7 +28,7 @@
 		<cfargument name="bugEmailSender" type="string" required="false" default="">
 		<cfargument name="hostname" type="string" required="false" default="">
 		<cfargument name="apikey" type="string" required="false" default="">
-		<cfargument name="maxDumpDepth" type="numeric" required="false" default="9999">
+		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 
 		<cfscript>
 			var wsParams = structNew();
@@ -161,8 +161,7 @@
 						"userAgent" = cgi.HTTP_USER_AGENT,
 						"templatePath" = getBaseTemplatePath(),
 						"HTMLReport" = longMessage,
-						"APIKey" = variables.apiKey,
-						"maxDumpDepth" = arguments.maxDumpDepth
+						"APIKey" = variables.apiKey
 					}>
 
 			<cfif variables.useListener>
@@ -195,8 +194,7 @@
 																data.userAgent,
 																data.templatePath,
 																sanitizeForXML(data.HTMLReport),
-																data.apikey,
-																data.maxDumpDepth)>
+																data.apikey)>
 				</cfif>
 			<cfelse>
 				<cfif variables.bugEmailRecipients neq "">
