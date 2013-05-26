@@ -253,10 +253,12 @@
 		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
 
 		<cfscript>
-			var tmpHTML = "";
-			var i = 0;
 			var aTags = arrayNew(1);
+			var i = 0;
+			var key = "";
 			var qryTagContext = queryNew("template,line");
+			var stEx = {};
+			var tmpHTML = "";
 			var tmpURL = "";
 			
 			if(structKeyExists(arguments.exception,"tagContext")) {
@@ -342,43 +344,26 @@
 				<tr valign="top">
 					<td><strong>Coldfusion ID:</strong></td>
 					<td>
-						<cftry>
-							[SESSION] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #session.cfid#;
-							CFTOKEN = #session.cftoken#
-							JSessionID=#session.sessionID#
-							<cfcatch type="any">
-								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
-							</cfcatch>
-						</cftry><br>
+						[SESSION] &nbsp;&nbsp;&nbsp;&nbsp;
+						CFID = <cfif isDefined("session.CFID")>#session.CFID#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						CFTOKEN = <cfif isDefined("session.CFTOKEN")>#session.CFTOKEN#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						JSessionID = <cfif isDefined("session.sessionID")>#session.sessionID#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						<br>
 						
-						<cftry>
-							[CLIENT] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #client.cfid#;
-							CFTOKEN = #client.cftoken#
-							<cfcatch type="any">
-								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
-							</cfcatch>
-						</cftry><br>
+						[CLIENT] &nbsp;&nbsp;&nbsp;&nbsp;
+						CFID = <cfif isDefined("client.CFID")>#client.CFID#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						CFTOKEN = <cfif isDefined("client.CFTOKEN")>#client.CFTOKEN#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						<br>
 						
-						<cftry>
-							[COOKIES] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #cookie.cfid#;
-							CFTOKEN = #cookie.cftoken#
-							<cfcatch type="any">
-								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
-							</cfcatch>
-						</cftry><br>
+						[COOKIES] &nbsp;&nbsp;&nbsp;&nbsp;
+						CFID = <cfif isDefined("cookie.CFID")>#cookie.CFID#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						CFTOKEN = <cfif isDefined("cookie.CFTOKEN")>#cookie.CFTOKEN#<cfelse><span style="color:red;">Undefined</span></cfif>;
+						<br>
 						
-						<cftry>
-							[J2EE SESSION] &nbsp;&nbsp;
-							JSessionID = #session.JSessionID#;
-							<cfcatch type="any">
-								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
-							</cfcatch>
-						</cftry>
+						[J2EE SESSION] &nbsp;&nbsp;
+						JSessionID = <cfif isDefined("session.JSessionID")>#session.JSessionID#<cfelse><span style="color:red;">Undefined</span></cfif>;
 					</td>
-				</tr>					
+				</tr>
 			</table>
 
 			<h3>Exception Info</h3>
@@ -388,14 +373,22 @@
 					<cfset stEx[key] = arguments.exception[key]>
 				</cfif>
 			</cfloop>
-			<cfdump var="#stEx#">
+			<cfif StructIsEmpty(stEx)>
+				<span>Empty Struct</span>
+			<cfelse>
+				<cfdump var="#stEx#">
+			</cfif>
 			<br />
 			
 			<h3>Additional Info</h3>
 			<cfif isSimpleValue(arguments.ExtraInfo)>
 				#arguments.ExtraInfo#
 			<cfelse>
-				<cfdump var="#arguments.ExtraInfo#">
+				<cfif StructIsEmpty(stEx)>
+					<span>Empty Struct</span>
+				<cfelse>
+					<cfdump var="#arguments.ExtraInfo#">
+				</cfif>
 			</cfif>
 			</cfoutput>
 		</cfsavecontent>
