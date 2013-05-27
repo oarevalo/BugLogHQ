@@ -4,7 +4,6 @@
 	<property name="msgSuccessBuild" value="Finished preparing file for deployment:"/>
 	<property name="src"             value="${basedir}"/>
 	<property name="output"          value="${basedir}/deploy/"/>
-	<property name="lib"             value="${basedir}/lib/"/>
 	<property name="archive"         value="${ant.project.name}-deploy.zip"/>
 
 
