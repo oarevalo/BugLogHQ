@@ -1,4 +1,5 @@
 <cfcomponent>
+	<cfset variables.bugLogClientVersion = "1.8-c1">	<!--- bugloghq client version --->
 	<cfset variables.bugEmailSender = "">
 	<cfset variables.bugEmailRecipients = "">
 	<cfset variables.bugLogListener = "">
