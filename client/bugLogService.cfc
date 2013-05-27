@@ -11,6 +11,7 @@
 	<cfset variables.postToRESTasJSON = false>
 	<cfset variables.userAgent = "bugloghq-coldfusion-client">
 	<cfset variables.checkpointsKey = "__buglog_checkpoints__">
+	<cfset variables.writeToCFLog = true>	<!--- indicates whether to write to the local log or not ---->
 
 	<!--- Handle cases in which the application scope is not defined (Fix contributed by Morgan Dennithorne) --->
 	<cfif isDefined("application.applicationName")>
@@ -28,7 +29,9 @@
 		<cfargument name="bugEmailSender" type="string" required="false" default="">
 		<cfargument name="hostname" type="string" required="false" default="">
 		<cfargument name="apikey" type="string" required="false" default="">
+		<cfargument name="appName" type="string" required="false" default="#variables.appName#">
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
+		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
 
 		<cfscript>
 			var wsParams = structNew();
@@ -42,6 +45,7 @@
 			arguments.hostname = trim(arguments.hostname);
 			arguments.apikey = trim(arguments.apikey);
 			arguments.maxDumpDepth = int(arguments.maxDumpDepth);
+			arguments.appName = trim(arguments.appName);
 
 			// determine the protocol based on the bugLogListener location
 			// this will tell us how to locate and talk to the listener
@@ -60,6 +64,9 @@
 			variables.bugEmailRecipients = arguments.bugEmailRecipients;
 			variables.apikey = arguments.apikey;
 			variables.maxDumpDepth = arguments.maxDumpDepth;
+			variables.writeToCFLog = arguments.writeToCFLog;
+			if(arguments.appName neq "")
+				variables.appName = arguments.appName;
 
 			if(arguments.bugEmailSender eq "" and arguments.bugEmailRecipients neq "")
 				arguments.bugEmailSender = listFirst(arguments.bugEmailRecipients);
@@ -115,9 +122,10 @@
 	<cffunction name="notifyService" access="public" returntype="void" hint="Use this method to tell the bugTrackerService that an error has ocurred" output="false">
 		<cfargument name="message" type="string" required="true">
 		<cfargument name="exception" type="any" required="false" default="#structNew()#">
-		<cfargument name="ExtraInfo" type="any" required="false" default="">
+		<cfargument name="extraInfo" type="any" required="false" default="">
 		<cfargument name="severityCode" type="string" required="false" default="#variables.defaultSeverityCode#">
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
+		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
 
 		<cfset var shortMessage = "">
 		<cfset var longMessage = "">
@@ -213,9 +221,11 @@
 		</cftry>
 
 		<!--- add entry to coldfusion log --->
-		<cflog type="error"
-			   text="#shortMessage#"
-			   file="#variables.appName#_BugTrackingErrors">
+		<cfif arguments.writeToCFLog>
+			<cflog type="error"
+				   text="#shortMessage#"
+				   file="#variables.appName#_BugTrackingErrors">
+		</cfif>
 
 	</cffunction>
 
