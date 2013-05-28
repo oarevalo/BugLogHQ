@@ -15,7 +15,7 @@
 						setValue("aActiveRules", aActiveRules);
 						break;
 					case "history":
-						qryHistory = appService.getExtensionsLog();
+						qryHistory = appService.getExtensionsLog(user=getValue("currentUser"));
 						setValue("qryHistory", qryHistory);
 						break;
 				}
@@ -39,16 +39,17 @@
 
 	<cffunction name="rule" access="public" returntype="void">
 		<cfscript>
-			var index = getValue("index",0);
+			var id = val(getValue("id"));
 			var ruleName = getValue("ruleName","");
 			var app = getService("app");
+			var user = getValue("currentUser");
 
 			try {
-				if(ruleName eq "") throw(type="validation", message="Please select a valid rule type");
+				if(id eq 0 and ruleName eq "") throw(type="validation", message="Please select a valid rule type");
 				
 				stRule = app.getRuleInfo(ruleName);
 	
-				setValue("qryApplications", app.getApplications());
+				setValue("qryApplications", app.getApplications(user));
 				setValue("qryHosts", app.getHosts());
 				setValue("qrySeverities", app.getSeverities());
 
@@ -58,16 +59,19 @@
 					setValue("defaultEmail", app.getConfig().getSetting("general.adminEmail",""));
 
 				setValue("stRule", stRule);
-				setValue("index", index);
+				setValue("id", id);
 				setValue("ruleName", ruleName);
 				
-				if(index gt 0) {
-					aActiveRules = app.getActiveRules();
-					setValue("aActiveRule", aActiveRules[index]);
+				if(id gt 0) {
+					setValue("aActiveRule", app.getRule(id,user));
 				}
 	
 				setValue("pageTitle", "Rules > Add/Edit Rule");
 				setView("extensions/edit");
+
+			} catch(notAuthorized e) {
+				setMessage("warning",e.message);
+				setNextEvent("extensions.main");
 
 			} catch(validation e) {
 				setMessage("warning",e.message);
@@ -114,12 +118,10 @@
 		
 	<cffunction name="doSaveRule" access="public" returntype="void">
 		<cfscript>
-			var user = getValue("currentUser");
 			var args = {};
 			var lstIgnoreFields = "event,fieldnames,btnSave";
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to create or modify a rule"); setNextEvent("extensions.main");}
 				for(fld in form) {
 					if(!listFindNoCase(lstIgnoreFields,fld)) {
 						if(structKeyExists(form,fld & "_other")) {
@@ -134,9 +136,13 @@
 						}
 					}
 				}
+				args.user = getValue("currentUser");
 				getService("app").saveRule(argumentCollection = args);
-				setMessage("info","Rule saved. Changes will be effective the next time the listener service is started.");
+				setMessage("info","Rule saved.");
 			
+			} catch(notAuthorized e) {
+				setMessage("warning",e.message);
+				
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
@@ -149,12 +155,15 @@
 	<cffunction name="doDeleteRule" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
+			var id = val(getValue("id"));
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to delete a rule"); setNextEvent("extensions.main");}
-				getService("app").deleteRule(index);
-				setMessage("info","Rule has been removed. Changes will be effective the next time the listener service is started.");
+				getService("app").deleteRule(id, user);
+				setMessage("info","Rule has been removed.");
 			
+			} catch(notAuthorized e) {
+				setMessage("warning",e.message);
+				
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
@@ -167,12 +176,15 @@
 	<cffunction name="doDisableRule" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
+			var id = val(getValue("id"));
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to enable or disable a rule"); setNextEvent("extensions.main");}
-				getService("app").disableRule(index);
-				setMessage("info","Rule has been disabled. Changes will be effective the next time the listener service is started.");
+				getService("app").disableRule(id, user);
+				setMessage("info","Rule has been disabled.");
 			
+			} catch(notAuthorized e) {
+				setMessage("warning",e.message);
+				
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
@@ -185,12 +197,15 @@
 	<cffunction name="doEnableRule" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
+			var id = val(getValue("id"));
 			
 			try {
-				if(not user.getIsAdmin()) {setMessage("warning","You must be an administrator to enable or disable a rule"); setNextEvent("extensions.main");}
-				getService("app").enableRule(index);
-				setMessage("info","Rule has been enabled. Changes will be effective the next time the listener service is started.");
+				getService("app").enableRule(id, user);
+				setMessage("info","Rule has been enabled.");
 			
+			} catch(notAuthorized e) {
+				setMessage("warning",e.message);
+				
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);

@@ -1,4 +1,5 @@
 <cfcomponent>
+	<cfset variables.bugLogClientVersion = "1.8-c1">	<!--- bugloghq client version --->
 	<cfset variables.bugEmailSender = "">
 	<cfset variables.bugEmailRecipients = "">
 	<cfset variables.bugLogListener = "">
@@ -7,26 +8,32 @@
 	<cfset variables.useListener = true>
 	<cfset variables.defaultSeverityCode = "ERROR">
 	<cfset variables.apikey = "">
-	<cfset variables.postToRESTasJSON = false> 
+	<cfset variables.maxDumpDepth = 15>
+	<cfset variables.postToRESTasJSON = false>
 	<cfset variables.userAgent = "bugloghq-coldfusion-client">
-	
+	<cfset variables.checkpointsKey = "__buglog_checkpoints__">
+	<cfset variables.writeToCFLog = true>	<!--- indicates whether to write to the local log or not ---->
+
 	<!--- Handle cases in which the application scope is not defined (Fix contributed by Morgan Dennithorne) --->
 	<cfif isDefined("application.applicationName")>
 		<cfset variables.appName = replace(application.applicationName," ","","all") />
 	<cfelse>
 		<cfset variables.appName = "undefined" />
 	</cfif>
-			
-	<cfset variables.escapePattern = createObject('java','java.util.regex.Pattern').compile("[^\u0009\u000a\u000d\u0020-\ud7ff\ud800\udc00\ue000-\ufffd\u100000-\u10ffff]") /> 
 
-	
+	<cfset variables.escapePattern = createObject('java','java.util.regex.Pattern').compile("[^\u0009\u000a\u000d\u0020-\ud7ff\ud800\udc00\ue000-\ufffd\u100000-\u10ffff]") />
+
+
 	<cffunction name="init" returntype="bugLogService" access="public" hint="Constructor" output="false">
 		<cfargument name="bugLogListener" type="string" required="true">
 		<cfargument name="bugEmailRecipients" type="string" required="false" default="">
 		<cfargument name="bugEmailSender" type="string" required="false" default="">
 		<cfargument name="hostname" type="string" required="false" default="">
 		<cfargument name="apikey" type="string" required="false" default="">
-		
+		<cfargument name="appName" type="string" required="false" default="#variables.appName#">
+		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
+		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
+
 		<cfscript>
 			var wsParams = structNew();
 			wsParams.refreshWsdl = true;
@@ -38,16 +45,18 @@
 			arguments.bugEmailSender = trim(arguments.bugEmailSender);
 			arguments.hostname = trim(arguments.hostname);
 			arguments.apikey = trim(arguments.apikey);
-			
-			// determine the protocol based on the bugLogListener location 
+			arguments.maxDumpDepth = int(arguments.maxDumpDepth);
+			arguments.appName = trim(arguments.appName);
+
+			// determine the protocol based on the bugLogListener location
 			// this will tell us how to locate and talk to the listener
-			if(left(arguments.bugLogListener,4) eq "http" and right(arguments.bugLogListener,5) eq "?WSDL") 
+			if(left(arguments.bugLogListener,4) eq "http" and right(arguments.bugLogListener,5) eq "?WSDL")
 				variables.protocol = "SOAP";
 
-			if(left(arguments.bugLogListener,4) eq "http" and right(arguments.bugLogListener,4) eq ".cfm") 
+			if(left(arguments.bugLogListener,4) eq "http" and right(arguments.bugLogListener,4) eq ".cfm")
 				variables.protocol = "REST";
 
-			if(left(arguments.bugLogListener,4) neq "http") 
+			if(left(arguments.bugLogListener,4) neq "http")
 				variables.protocol = "CFC";
 
 			// store settings
@@ -55,7 +64,11 @@
 			variables.bugEmailSender = arguments.bugEmailSender;
 			variables.bugEmailRecipients = arguments.bugEmailRecipients;
 			variables.apikey = arguments.apikey;
-			
+			variables.maxDumpDepth = arguments.maxDumpDepth;
+			variables.writeToCFLog = arguments.writeToCFLog;
+			if(arguments.appName neq "")
+				variables.appName = arguments.appName;
+
 			if(arguments.bugEmailSender eq "" and arguments.bugEmailRecipients neq "")
 				arguments.bugEmailSender = listFirst(arguments.bugEmailRecipients);
 
@@ -72,7 +85,7 @@
 				}
 			}
 
-			// Instantiate appropriate reference to listener		
+			// Instantiate appropriate reference to listener
 			switch(variables.protocol) {
 				case "SOAP":
 					try {
@@ -80,13 +93,13 @@
 							variables.oBugLogListener = createObject("webservice", variables.bugLogListener);
 						else
 							variables.oBugLogListener = createObject("webservice", variables.bugLogListener, wsParams);
-						
+
 					} catch(any e) {
 						if(variables.bugEmailRecipients neq "") sendEmail("",e.detail,e.message);
 						variables.useListener = false;
 					}
 					break;
-					
+
 				case "CFC":
 					try {
 						variables.oBugLogListener = createObject("component", variables.bugLogListener);
@@ -95,54 +108,59 @@
 						variables.useListener = false;
 					}
 					break;
-				
+
 				case "REST":
 					variables.oBugLogListener = 0;	// no reference needed
 					break;
-					
+
 				default:
-					throwError("The location provided for the bugLogListener is invalid.");	
+					throwError("The location provided for the bugLogListener is invalid.");
 			}
 		</cfscript>
 		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="notifyService" access="public" returntype="void" hint="Use this method to tell the bugTrackerService that an error has ocurred" output="false"> 
+	<cffunction name="notifyService" access="public" returntype="void" hint="Use this method to tell the bugTrackerService that an error has ocurred" output="false">
 		<cfargument name="message" type="string" required="true">
 		<cfargument name="exception" type="any" required="false" default="#structNew()#">
-		<cfargument name="ExtraInfo" type="any" required="false" default="">
+		<cfargument name="extraInfo" type="any" required="false" default="">
 		<cfargument name="severityCode" type="string" required="false" default="#variables.defaultSeverityCode#">
-		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
-		<cfargument name="doCFLog" type="boolean" required="true" default="true" />
+		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
+		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
 
 		<cfset var shortMessage = "">
 		<cfset var longMessage = "">
 		<cfset var tmpCFID = "">
 		<cfset var tmpCFTOKEN = "">
 		<cfset var data = {}>
-		
+
 		<!--- make sure we have required members --->
 		<cfparam name="arguments.exception.message" default="">
 		<cfparam name="arguments.exception.detail" default="">
 
+		<!--- if we are tracking checkpoints, then add the buglog call as the last checkpoint --->
+		<cfif arrayLen(getCheckpoints())>
+			<cfset checkpoint("bugLog.notifyService() called")>
+		</cfif>
+
 		<!--- compose short and full messages --->
 		<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
-		<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.AppName)>
-		
+		<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth)>
+
 		<!--- check if there are valid CFID/CFTOKEN values available --->
 		<cfif isDefined("cfid")>
 			<cfset tmpCFID = cfid>
 		</cfif>
 		<cfif isDefined("cftoken")>
 			<cfset tmpCFTOKEN = cftoken>
-		</cfif>		
-		
+		</cfif>
+
 		<!--- submit error --->
 		<cftry>
 			<cfset data = {
 						"dateTime" = Now(),
 						"message" = arguments.message,
-						"applicationCode" = arguments.AppName,
+						"applicationCode" = variables.AppName,
 						"severityCode" = arguments.severityCode,
 						"hostName" = variables.hostName,
 						"exceptionMessage" = arguments.exception.message,
@@ -173,9 +191,9 @@
 					</cfif>
 				<cfelse>
 					<!--- send bug via a webservice (SOAP) --->
-					<cfset variables.oBugLogListener.logEntry(data.dateTime, 
-																sanitizeForXML(data.message), 
-																data.applicationCode, 
+					<cfset variables.oBugLogListener.logEntry(data.dateTime,
+																sanitizeForXML(data.message),
+																data.applicationCode,
 																data.severityCode,
 																data.hostName,
 																sanitizeForXML(data.exceptionMessage),
@@ -198,16 +216,16 @@
 				<cfif variables.bugEmailRecipients neq "">
 					<cfset sendEmail(arguments.message, longMessage, cfcatch.message & cfcatch.detail)>
 				<cfelse>
-					<cfrethrow> 
+					<cfrethrow>
 				</cfif>
-			</cfcatch>		
+			</cfcatch>
 		</cftry>
-		
-		<cfif arguments.doCFLog>
-			<!--- add entry to coldfusion log --->	
-			<cflog type="error" 
-				   text="#shortMessage#" 
-				   file="#arguments.AppName#_BugTrackingErrors">
+
+		<!--- add entry to coldfusion log --->
+		<cfif arguments.writeToCFLog>
+			<cflog type="error"
+				   text="#shortMessage#"
+				   file="#variables.appName#_BugTrackingErrors">
 		</cfif>
 
 	</cffunction>
@@ -218,16 +236,16 @@
 		<cfargument name="otherError" type="string" required="true">
 		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
 
-		<cfmail to="#variables.bugEmailRecipients#" 
-				from="#variables.bugEmailSender#" 
-				subject="BUG REPORT: [#arguments.AppName#] [#variables.hostName#] #arguments.message#" 
+		<cfmail to="#variables.bugEmailRecipients#"
+				from="#variables.bugEmailSender#"
+				subject="BUG REPORT: [#variables.appName#] [#variables.hostName#] #arguments.message#"
 				type="html">
 			<div style="margin:5px;border:1px solid silver;background-color:##ebebeb;font-family:arial;font-size:12px;padding:5px;">
 				This email is sent because the buglog server could not be contacted. The error was:
 				#arguments.otherError#
 			</div>
 			#arguments.longMessage#
-		</cfmail>		
+		</cfmail>
 	</cffunction>
 
 	<cffunction name="composeShortMessage" access="private" returntype="string" output="false">
@@ -237,11 +255,11 @@
 		<cfscript>
 			var aBuffer = arrayNew(1);
 			var e = arguments.exception;
-			
+
 			arrayAppend(aBuffer, arguments.message);
 			if(e.message neq arguments.message) arrayAppend(aBuffer, ". Message: " & e.message);
 			if(e.detail neq "")					arrayAppend(aBuffer, ". Details: " & e.detail);
-			
+
 			return arrayToList(aBuffer, "");
 		</cfscript>
 	</cffunction>
@@ -250,7 +268,7 @@
 		<cfargument name="message" type="string" required="true">
 		<cfargument name="exception" type="any" required="false" default="#structNew()#">
 		<cfargument name="ExtraInfo" type="any" required="no" default="">
-		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
+		<cfargument name="maxDumpDepth" type="numeric" required="no" default="#variables.maxDumpDepth#">
 
 		<cfscript>
 			var tmpHTML = "";
@@ -258,13 +276,13 @@
 			var aTags = arrayNew(1);
 			var qryTagContext = queryNew("template,line");
 			var tmpURL = "";
-			
+
 			if(structKeyExists(arguments.exception,"tagContext")) {
 				aTags = duplicate(arguments.exception.tagContext);
 				for(i=1;i lte arrayLen(aTags);i=i+1) {
 					QueryAddRow(qryTagContext);
-					QuerySetCell(qryTagContext, "template", htmlEditFormat(aTags[i].template));				
-					QuerySetCell(qryTagContext, "line", aTags[i].line);				
+					QuerySetCell(qryTagContext, "template", htmlEditFormat(aTags[i].template));
+					QuerySetCell(qryTagContext, "line", aTags[i].line);
 				}
 			}
 
@@ -273,7 +291,7 @@
 			if(cgi.QUERY_STRING neq "")
 				tmpURL = tmpURL & "?" & cgi.QUERY_STRING;
 		</cfscript>
-		
+
 
 		<cfsavecontent variable="tmpHTML">
 			<cfoutput>
@@ -281,7 +299,7 @@
 			<table style="font-size:11px;font-family:arial;">
 				<tr>
 					<td><b>Application:</b></td>
-						<td>#HtmlEditFormat(arguments.AppName)#</td>
+					<td>#HtmlEditFormat(variables.AppName)#</td>
 				</tr>
 				<tr>
 					<td><b>Host:</b></td>
@@ -340,62 +358,87 @@
 					<td>#HtmlEditFormat(cgi.REQUEST_METHOD)#</td>
 				</tr>
 				<tr valign="top">
-					<td><strong>Coldfusion ID:</strong></td>
+					<td><strong>ColdFusion ID:</strong></td>
 					<td>
 						<cftry>
 							[SESSION] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #session.cfid#;
-							CFTOKEN = #session.cftoken#
-							JSessionID=#session.sessionID#
+							CFID = <cfif structKeyExists(session, 'CFID')>#session.CFID#<cfelse>&dash;</cfif> ;
+							CFTOKEN = <cfif structKeyExists(session, 'CFTOKEN')>#session.CFTOKEN#<cfelse>&mdash;</cfif> ;
+							SESSIONID = <cfif structKeyExists(session, 'SESSIONID')>#session.SESSIONID#<cfelse>&mdash;</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
 						</cftry><br>
-						
+
 						<cftry>
 							[CLIENT] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #client.cfid#;
-							CFTOKEN = #client.cftoken#
+							CFID = <cfif structKeyExists(client, 'cfid')>#client.cfid#<cfelse>&mdash;</cfif> ;
+							CFTOKEN = <cfif structKeyExists(client, 'cftoken')>#client.cftoken#<cfelse>&mdash;</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
 						</cftry><br>
-						
+
 						<cftry>
 							[COOKIES] &nbsp;&nbsp;&nbsp;&nbsp;
-							CFID = #cookie.cfid#;
-							CFTOKEN = #cookie.cftoken#
-							<cfcatch type="any">
-								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
-							</cfcatch>
-						</cftry><br>
-						
-						<cftry>
-							[J2EE SESSION] &nbsp;&nbsp;
-							JSessionID = #session.JSessionID#;
+							CFID = <cfif structKeyExists(cookie, 'cfid')>#cookie.cfid#<cfelse>&mdash;</cfif> ;
+							CFTOKEN = <cfif structKeyExists(cookie, 'cftoken')>#cookie.cftoken#<cfelse>&mdash;</cfif> ;
+							JSessionID = <cfif structKeyExists(cookie,"JSessionID")>#cookie.JSessionID#<cfelse>&mdash;</cfif>
 							<cfcatch type="any">
 								<span style="color:red;">#HtmlEditFormat(cfcatch.message)#</span>
 							</cfcatch>
 						</cftry>
 					</td>
-				</tr>					
+				</tr>
 			</table>
+			<br />
 
 			<h3>Exception Info</h3>
-			<cfset stEx = structNew()>
-			<cfloop collection="#arguments.exception#" item="key">
-				<cfif not listFindNoCase("message,detail,tagcontext,type",key)>
-					<cfset stEx[key] = arguments.exception[key]>
-				</cfif>
-			</cfloop>
-			<cfdump var="#stEx#">
+			<table style="font-size:11px;font-family:arial;">
+				<cfloop collection="#arguments.exception#" item="key">
+					<cfif not listFindNoCase("message,detail,tagcontext,type",key)>
+						<tr valign="top">
+							<td><b>#key#:</b></td>
+							<td>
+								<cfif key eq "StackTrace">
+									<pre>#arguments.exception[key]#</pre>
+								<cfelse>
+									#sanitizeDump(arguments.exception[key], arguments.maxDumpDepth)#
+								</cfif>
+							</td>
+						</tr>
+					</cfif>
+				</cfloop>
+			</table>
 			<br />
-			
-			<h3>Additional Info</h3>
-			<cfif isSimpleValue(arguments.ExtraInfo)>
-				#arguments.ExtraInfo#
-			<cfelse>
-				<cfdump var="#arguments.ExtraInfo#">
+
+			<cfif not isSimpleValue(arguments.ExtraInfo) or arguments.ExtraInfo neq "">
+				<h3>Additional Info</h3>
+				#sanitizeDump(arguments.ExtraInfo, arguments.maxDumpDepth)#
+			</cfif>
+
+			<cfset var checkpoints = getCheckpoints()>
+			<cfif arrayLen(checkpoints)>
+				<br />
+				<h3>Checkpoints</h3>
+				<table border="1" cellspacing="0" cellpadding="3">
+					<tr>
+						<th>##</th>
+						<th>Checkpoint</th>
+						<th>Delta (ms)</th>
+						<th>Elapsed (ms)</th>
+					</tr>
+					<cfset var prevTs = 0>
+					<cfloop from="1" to="#arrayLen(checkpoints)#" index="i">
+						<tr <cfif i mod 2>style="background-color:##ebebeb;"</cfif>>
+							<td style="text-align:right;">#i#.</td>
+							<td>#checkpoints[i].cp#</td>
+							<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-prevTs#<cfelse>-</cfif></td>
+							<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-checkpoints[1].ts#<cfelse>-</cfif></td>
+						</tr>
+						<cfset prevTs = checkpoints[i].ts>
+					</cfloop>
+				</table>
 			</cfif>
 			</cfoutput>
 		</cfsavecontent>
@@ -406,16 +449,52 @@
 		<cfargument name="message" type="String" required="true">
 		<cfthrow message="#arguments.message#">
 	</cffunction>
-	
+
 	<cffunction name="sanitizeForXML" access="private" returnType="string" hint="sanitizes a string to make it safe for xml">
 		<cfargument name="inString" type="string" required="true" />
 		<cfset var matcher = variables.escapePattern.matcher(inString) />
 		<cfset var buffer = createObject('java','java.lang.StringBuffer').init('') />
 		<cfloop condition="matcher.find()">
 			<cfset matcher.appendReplacement(buffer,"") />
-		</cfloop>		
+		</cfloop>
 		<cfset matcher.appendTail(buffer) />
 		<cfreturn buffer.toString() />
 	</cffunction>
-	
+
+	<cffunction name="checkpoint" access="public" returntype="void" hint="marks a checkpoint in the current request">
+		<cfargument name="checkpoint" type="string" required="true">
+		<cfscript>
+			var checkpoints = getCheckpoints();
+			var item = {
+				ts = getTickCount(),
+				cp = arguments.checkpoint
+			};
+			arrayAppend(checkpoints, item);
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="getCheckpoints" access="public" returntype="array" hint="returns the checkpoints saved for the current request">
+		<cfif not structKeyExists(request,checkpointsKey)>
+			<cfset request[checkpointsKey] = arrayNew(1)>
+		</cfif>
+		<cfreturn request[checkpointsKey]>
+	</cffunction>
+
+	<cffunction name="sanitizeDump" access="private" returntype="string" hint="Performs a sanitized dump, where JavaScript has been removed to minimize XSS risks">
+		<cfargument name="data" type="any" required="true">
+		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
+		<cfset var out = "">
+		<cfif isSimpleValue(arguments.data)>
+			<cfset out = arguments.data>
+		<cfelseif isStruct(arguments.data) and structisempty(arguments.data)>
+			<cfset out = "<em>Empty struct</em>">
+		<cfelseif isArray(arguments.data) and not arrayLen(arguments.data)>
+			<cfset out = "<em>Empty array</em>">
+		<cfelse>
+			<cfsavecontent variable="out"><cfoutput><cfdump var="#arguments.data#" top="#arguments.maxDumpDepth#"></cfoutput></cfsavecontent>
+			<cfset out = reReplaceNoCase(out, "<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>", "<em>JavaScript code removed for security</em>","all")>
+		</cfif>
+		<cfreturn out>
+	</cffunction>
+
 </cfcomponent>

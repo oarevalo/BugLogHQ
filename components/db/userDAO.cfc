@@ -9,6 +9,10 @@
 		<cfset addColumn("Password", "cf_sql_varchar")>
 		<cfset addColumn("Email", "cf_sql_varchar")>
 		<cfset addColumn("IsAdmin", "cf_sql_numeric")>
+		<cfset addColumn("apiKey", "cf_sql_varchar")>
+		<cfset addColumn("allowedApplications", "cf_sql_varchar")>
+		<cfset addColumn("maxApplications", "cf_sql_numeric")>
+		<cfset addColumn("maxHostsPerApplication", "cf_sql_numeric")>
 	</cffunction>
 	
 </cfcomponent>

@@ -36,4 +36,23 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="findByIDList" returnType="array" access="public">
+		<cfargument name="ids" type="string" required="true">
+		<cfscript>
+			var qry = variables.oDAO.get(arguments.ids);
+			var o = 0;
+			var rtn = [];
+			
+			for(var i=1;i lte qry.recordCount;i++) {
+				o = createObject("component","bugLog.components.app").init( variables.oDAO );
+				o.setApplicationID(qry.applicationID[i]);
+				o.setName(qry.name[i]);
+				o.setCode(qry.code[i]);
+				arrayAppend(rtn,o);
+			}
+			
+			return rtn;
+		</cfscript>
+	</cffunction>
+	
 </cfcomponent>

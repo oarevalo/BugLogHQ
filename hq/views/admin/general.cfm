@@ -1,9 +1,15 @@
 <cfparam name="request.requestState.adminEmail" default="">
 <cfparam name="request.requestState.autoStart" default="true">
 <cfparam name="request.requestState.allowPublicRSS" default="false">
+<cfparam name="request.requestState.autoCreateApplication" default="false">
+<cfparam name="request.requestState.autoCreateHost" default="false">
+<cfparam name="request.requestState.autoCreateSeverity" default="false">
 <cfset adminEmail = request.requestState.adminEmail>
 <cfset autoStart = request.requestState.autoStart>
 <cfset allowPublicRSS = request.requestState.allowPublicRSS>
+<cfset autoCreateApplication = request.requestState.autoCreateApplication>
+<cfset autoCreateHost = request.requestState.autoCreateHost>
+<cfset autoCreateSeverity = request.requestState.autoCreateSeverity>
 
 <cfoutput>
 	<h3>General Settings:</h3>
@@ -46,6 +52,20 @@
 							by anyone without requiring authentication. When disabled, consumers of the RSS feeds
 							must provide a valid username and password to get access.<br><br />
 							<span class="label label-important">Warning!</span> <b>Allowing public access to bug reports can be a security risk</b>
+						</div>
+					</td>
+				</tr>
+				<tr valign="top">
+					<td>Allow Auto-Create:</td>
+					<td>
+						<input type="checkbox" name="autoCreateApplication" value="true" <cfif autoCreateApplication>checked</cfif>> Applications
+						&nbsp;&nbsp;
+						<input type="checkbox" name="autoCreateHost" value="true" <cfif autoCreateHost>checked</cfif>> Hosts
+						&nbsp;&nbsp;
+						<input type="checkbox" name="autoCreateSeverity" value="true" <cfif autoCreateSeverity>checked</cfif>> Severities
+						<div class="formFieldTip">
+							This setting controls whether to automatically create a new record for each entity type
+							when receiving a bug report.
 						</div>
 					</td>
 				</tr>

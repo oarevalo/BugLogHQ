@@ -11,6 +11,9 @@
 	<cfset ruleLabel = rs.stRule.displayName>
 </cfif>
 
+<cfset isAdmin = rs.currentUser.getIsAdmin()>
+<cfset userID = rs.currentUser.getUserID()>
+
 <script type="text/javascript">
 	function toggleOther(fieldName, fieldValue) {
 		if(fieldValue == "__OTHER__") {
@@ -37,7 +40,7 @@
 	<form name="frm" method="post" action="index.cfm">
 		<input type="hidden" name="event" value="extensions.doSaveRule">
 		<input type="hidden" name="ruleName" value="#ruleName#">
-		<input type="hidden" name="index" value="#rs.index#">
+		<input type="hidden" name="id" value="#rs.id#">
 	
 		<table>
 			<tr valign="top">
@@ -73,7 +76,9 @@
 							<cfcase value="application">
 								<cfset valueFound = (tmpValue eq "")>
 								<select name="#tmpName#" id="#tmpName#" onchange="toggleOther(this.name, this.value)" class="formField">
-									<option value=""></option>
+									<cfif isAdmin>
+										<option value=""></option>
+									</cfif>
 									<cfloop query="rs.qryApplications">
 										<option value="#rs.qryApplications.code#"
 												<cfif rs.qryApplications.code eq tmpValue>selected</cfif>
@@ -82,7 +87,9 @@
 											<cfset valueFound = true>
 										</cfif>
 									</cfloop>
-									<option value="__OTHER__" <cfif !valueFound>selected</cfif>>Other...</option>
+									<cfif isAdmin>
+										<option value="__OTHER__" <cfif !valueFound>selected</cfif>>Other...</option>
+									</cfif>
 								</select>
 								<input type="text" name="#tmpName#_other" id="#tmpName#_other" value="#tmpValue#" <cfif valueFound>style="display:none;"</cfif>>
 							</cfcase>

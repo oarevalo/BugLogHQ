@@ -70,7 +70,7 @@
 							and entry_day = #day(theDate)#
 							and entry_month = #month(theDate)#
 							and entry_year = #year(theDate)#
-							<cfset datePartValue = timeFormat(theDate,"mm")>
+							<cfset datePartValue = timeFormat(theDate,"h:mm tt")>
 						</cfcase>
 						<cfcase value="hour">
 							<cfset theDate = dateAdd("h",i,rs.criteria.startDate)>
@@ -78,14 +78,18 @@
 							and entry_day = #day(theDate)#
 							and entry_month = #month(theDate)#
 							and entry_year = #year(theDate)#
-							<cfset datePartValue = timeFormat(theDate,"h tt")>
+							<cfif i eq 0 or hour(theDate) eq 0>
+								<cfset datePartValue = dateFormat(theDate,"m/d") & " " & timeFormat(theDate,"h tt")>
+							<cfelse>
+								<cfset datePartValue = timeFormat(theDate,"h tt")>
+							</cfif>
 						</cfcase>
 						<cfcase value="day">
 							<cfset theDate = dateAdd("d",i,rs.criteria.startDate)>
 							entry_day = #day(theDate)#
 							and entry_month = #month(theDate)#
 							and entry_year = #year(theDate)#
-							<cfset datePartValue = dateFormat(theDate,"mm/dd")>
+							<cfset datePartValue = dateFormat(theDate,"m/d")>
 						</cfcase>
 						<cfcase value="month">
 							<cfset theDate = dateAdd("m",i,rs.criteria.startDate)>

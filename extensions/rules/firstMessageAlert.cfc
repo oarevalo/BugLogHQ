@@ -10,12 +10,12 @@
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
-		<cfargument name="timespan" type="numeric" required="true">
+		<cfargument name="timespan" type="string" required="true">
 		<cfargument name="application" type="string" required="false" default="">
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="severity" type="string" required="false" default="">
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
-		<cfset variables.config.timespan = arguments.timespan>
+		<cfset variables.config.timespan = val(arguments.timespan)>
 		<cfset variables.config.application = arguments.application>
 		<cfset variables.config.host = arguments.host>
 		<cfset variables.config.severity = arguments.severity>

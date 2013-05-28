@@ -38,7 +38,6 @@
 		Getting service instance...<br>
 		<cfset oBugLogListener = oService.getService()>
 		
-		
 		Creating and populating rawEntryBean....<br>
 		<cfscript>
 			// create entry bean
@@ -51,8 +50,8 @@
 			oRawEntry.setHostName( hostName );
 			oRawEntry.setExceptionMessage("This is a test");
 			oRawEntry.setExceptionDetails("");
-			oRawEntry.setCFID(cfid);
-			oRawEntry.setCFTOKEN(cftoken);
+			oRawEntry.setCFID("11111");
+			oRawEntry.setCFTOKEN("22222");
 			oRawEntry.setUserAgent( "" );
 			oRawEntry.setTemplatePath( "" );
 			oRawEntry.setHTMLReport( "" );

@@ -201,6 +201,9 @@
 			</td>
 		</tr>
 	</cfloop>
+	<cfif qryEntries.recordCount eq 0>
+		<td colspan="7"><em>No entries found.</em></td>
+	</cfif>
 	</table>
 	
 	

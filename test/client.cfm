@@ -6,13 +6,11 @@
 	URL Parameters:
 		protocol: determines which buglog listener to use. values are cfc, soap and rest
 		severity: type of error to send. Values are ERROR, FATAL, CRITICAL and INFO
-		reset: unloads the buglog client from memory after the test
 --->
 
-<cfparam name="protocol" default="cfc">
+<cfparam name="protocol" default="rest">
 <cfparam name="pathToService" default="bugLog.client.bugLogService">
 <cfparam name="severity" default="FATAL">
-<cfparam name="reset" default="true">
 <cfparam name="apikey" default="">
 <cfparam name="instance" default="">
 <cfparam name="bugLogHREF" default="">
@@ -23,7 +21,6 @@
 <cfelse>
 	<cfset path = "http://#cgi.HTTP_HOST#/bugLog/">
 </cfif>
-
 
 <cfset bugLogListener = structNew()>
 
@@ -36,7 +33,6 @@
 	<cfset bugLogListener.rest = "#path#listeners/bugLogListenerREST.cfm">
 	<cfset adminPath = "hq/">
 </cfif>
-<cfset bugLogListener.cfc = "bugLog.listeners.bugLogListenerWS">
 
 <cfoutput>
 <html>
@@ -59,23 +55,16 @@
 			the BugLog app.</b></p>
 		</cfif>
 
-		<!--- Load bugLog client into application scope (if needed) --->
-		Checking if buglog client is in memory...<br>
-		<cfif not IsDefined("application.oBugLogService") or reset>
-			<cflock name="buglogservice" timeout="5" type="exclusive">
-				<cfif not IsDefined("application.oBugLogService") or reset>
-					BugLog client not loaded. Creating instance and loading into Application scope now... <br>
-					... Listener type is: <b>#protocol#</b><br />
-					... Listener is: <a href="#bugLogListener[protocol]#">#bugLogListener[protocol]#</a><br />
-					<cfif apikey neq "">
-					... Listener API Key is: <b>#apikey#</b><br />
-					</cfif>
-					<cfset application.oBugLogService = createObject("component",pathToService).init(bugLogListener = bugLogListener[protocol],
-																									 apiKey = apiKey)>
-				</cfif>
-			</cflock>
+		<!--- Initializing bugLog client instance --->
+		Creating client instance... <br>
+		... Listener type is: <b>#protocol#</b><br />
+		... Listener is: <a href="#bugLogListener[protocol]#">#bugLogListener[protocol]#</a><br />
+		<cfif apikey neq "">
+		... Listener API Key is: <b>#apikey#</b><br />
 		</cfif>
-
+		<cfset oBugLogService = createObject("component",pathToService).init(bugLogListener = bugLogListener[protocol],
+																			 apiKey = apiKey)>
+		
 		<br />
 
 		<cftry>
@@ -86,15 +75,9 @@
 			<cfcatch type="any">
 				<!--- notify bugLog of error --->
 				Notify service via  <strong>[#protocol#]</strong> using severity <strong>[#severity#]</strong>....<br>
-				<cfset application.oBugLogService.notifyService(cfcatch.message, cfcatch, "", severity)>
+				<cfset oBugLogService.notifyService(cfcatch.message, cfcatch, "", severity)>
 			</cfcatch>
 		</cftry>
-		
-		<cfif reset>	
-			<!--- remove bugLog from application scope --->
-			Removing bugLog client from memory...<br>
-			<cfset structDelete(application, "oBugLogService")>
-		</cfif>
 		
 		<br>
 		Done.
@@ -103,7 +86,7 @@
 		
 		<strong>Send test bug report via:</strong> 
 		<cfloop collection="#bugLogListener#" item="key">
-			<a href="client.cfm?protocol=#key#&instance=#instance#&bugloghref=#bugloghref#&returnTo=#returnTo#">#key#</a>
+			<a href="client.cfm?protocol=#key#&instance=#instance#&bugloghref=#bugloghref#&returnTo=#returnTo#&apiKey=#apiKey#">#key#</a>
 			&nbsp;|&nbsp;
 		</cfloop>
 

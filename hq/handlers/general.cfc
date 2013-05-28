@@ -136,7 +136,7 @@
 				var criteria = getValue("criteria");
 				
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
-				var qryTriggers = appService.getExtensionsLog(criteria.startDate);
+				var qryTriggers = appService.getExtensionsLog(criteria.startDate, getValue("currentUser"));
 
 				setValue("qryEntries",qryEntries);
 				setValue("qryTriggers",qryTriggers);
@@ -255,6 +255,7 @@
 				var entryID = getValue("entryID");
 				var argsSearch = {};
 				var qryEntriesUA = queryNew("");
+				var currentUser = getValue("currentUser");
 
 				if(val(entryID) eq 0) {
 					setMessage("warning","Please select an entry to view");
@@ -262,7 +263,7 @@
 				}		
 				
 				// get requested entry object
-				oEntry = appService.getEntry(entryID);
+				oEntry = appService.getEntry(entryID, currentUser);
 				
 				// search for recent ocurrences (last 24 hours)
 				args.message = "__EMPTY__";
@@ -274,11 +275,13 @@
 				var qryEntriesLast24 = appService.searchEntries(argumentCollection = args);
 				var qryEntriesAll = appService.searchEntries(message = args.message, 
 															 searchTerm = "",
-															 applicationID = args.applicationID);
+															 applicationID = args.applicationID,
+															 user = currentUser);
 				if(oEntry.getUserAgent() neq "") {
 					qryEntriesUA = appService.searchEntries(startDate = args.startDate,
-																						userAgent = oEntry.getUserAgent(),
-																						searchTerm = "");
+															userAgent = oEntry.getUserAgent(),
+															searchTerm = "",
+															 user = currentUser);
 				}
 				
 				
@@ -296,6 +299,10 @@
 				setValue("qryEntriesUA", qryEntriesUA);
 				setValue("oEntry", oEntry);
 				setView("entry");
+
+			} catch(notAllowed e) {
+				setMessage("warning","You are not allowed to view this bug report");
+				setNextEvent("main");
 
 			} catch(any e) {
 				setMessage("error",e.message);
@@ -543,6 +550,7 @@
 			var criteria = structNew();
 			var resetCriteria = getValue("resetCriteria", false);
 			var appService = getService("app"); 
+			var currentUser = getValue("currentUser");
 
 			if(resetCriteria) {
 				structDelete(cookie,criteriaName);
@@ -561,6 +569,9 @@
 
 			qrySeverities = appService.getSeverities();
 			
+			// set current user (do it now, because we don't want to save that to the cookie)
+			criteria.user = currentUser;
+			
 			setValue("criteria", criteria);
 			setValue("qrySeverities", qrySeverities);
 		</cfscript>
@@ -571,6 +582,8 @@
 		<cfscript>
 			if(structKeyExists(cookie,criteriaName) and isJSON(cookie[criteriaName])) {
 				criteria = deserializeJSON(cookie[criteriaName]);
+				criteria = normalizeCriteria(criteria);
+				criteria.user = getValue("currentUser");
 				setValue("criteria", criteria);
 			} else {
 				prepareFilter(criteriaName);
@@ -617,7 +630,7 @@
 				sortDir = getValue("sortDir", criteria.sortDir),
 				rows = getValue("rows", criteria.rows)
 			};
-
+			
 			// calculate how far back to query the data
 			if(isNumeric(criteria.numdays)) {
 				if(criteria.numdays lt 1) 

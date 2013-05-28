@@ -45,6 +45,7 @@
 		<cfargument name="hostName" type="string" required="false" default="">
 		<cfargument name="severityCode" type="string" required="false" default="">
 		<cfargument name="userAgent" type="string" required="false" default="">
+		<cfargument name="userID" type="numeric" required="false" default="0">
 
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var dbType = oDataProvider.getConfig().getDBType()>
@@ -157,6 +158,13 @@
 					</cfif>
 					<cfif arguments.userAgent neq "">
 						AND userAgent LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.userAgent#"> 
+					</cfif>
+					<cfif arguments.userID gt 0>
+						AND e.applicationID IN (
+							SELECT applicationID 
+								FROM bl_UserApplication
+								WHERE userID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.userID#">
+						)
 					</cfif>
 				ORDER BY e.createdOn DESC, entryID DESC
 		</cfquery>

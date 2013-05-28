@@ -17,6 +17,7 @@
 	<cfset variables.msgLog = arrayNew(1)>
 	<cfset variables.maxLogSize = 10>
 	<cfset variables.instanceName = "">
+	<cfset variables.autoCreateDefault = true>
 
 	<cffunction name="init" access="public" returntype="bugLogListener" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
@@ -40,6 +41,7 @@
 			variables.oHostFinder = createObject("component","bugLog.components.hostFinder").init( variables.oDAOFactory.getDAO("host") );
 			variables.oSeverityFinder = createObject("component","bugLog.components.severityFinder").init( variables.oDAOFactory.getDAO("severity") );
 			variables.oSourceFinder = createObject("component","bugLog.components.sourceFinder").init( variables.oDAOFactory.getDAO("source") );
+			variables.oUserFinder = createObject("component","bugLog.components.userFinder").init( variables.oDAOFactory.getDAO("user") );
 			
 			// load the rule processor
 			variables.oRuleProcessor = createObject("component","bugLog.components.ruleProcessor").init();
@@ -50,8 +52,9 @@
 			// create cache instances
 			variables.oAppCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
 			variables.oHostCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
-			variables.oSeverityCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);
+			variables.oSeverityCache = createObject("component","bugLog.components.lib.cache.cacheService").init(10, cacheTTL, false);
 			variables.oSourceCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);		
+			variables.oUserCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);		
 						
 			// load scheduler
 			variables.scheduler = createObject("component","bugLog.components.schedulerService").init( variables.oConfig, variables.instanceName );			
@@ -83,11 +86,17 @@
 			var oSource = 0;
 			var oDF = variables.oDAOFactory;
 				
+			// get autocreate settings	
+			var autoCreateApp = allowAutoCreate("application");
+			var autoCreateHost = allowAutoCreate("host");
+			var autoCreateSeverity = allowAutoCreate("severity");
+			var autoCreateSource = allowAutoCreate("source");
+				
 			// extract related objects from bean
-			oApp = getApplicationFromBean( bean );
-			oHost = getHostFromBean( bean );
-			oSeverity = getSeverityFromBean( bean );
-			oSource = getSourceFromBean( bean );
+			oApp = getApplicationFromBean( bean, autoCreateApp );
+			oHost = getHostFromBean( bean, autoCreateHost );
+			oSeverity = getSeverityFromBean( bean, autoCreateSeverity );
+			oSource = getSourceFromBean( bean, autoCreateSource );
 
 			// create entry
 			oEntry = createObject("component","bugLog.components.entry").init( oDF.getDAO("entry") );
@@ -144,12 +153,68 @@
 		<cfreturn variables.instanceName>
 	</cffunction>
 
+	<cffunction name="validate" returntype="boolean" access="public" hint="Validates that a bug report is valid, if not throws an error. This only applies when the requireAPIKey setting is true, otherwise returns True always">
+		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="apiKey" type="string" required="true">
+		<cfscript>
+			// validate API
+			if(getConfig().getSetting("service.requireAPIKey",false)) {
+				if(arguments.apiKey eq "") {
+					throw(message="Invalid API Key",type="bugLog.invalidAPIKey");
+				}
+				var masterKey = getConfig().getSetting("service.APIKey");
+				if(arguments.apiKey neq masterKey) {
+					var user = getUserByAPIKey(arguments.apiKey);
+					if(!user.getIsAdmin() and arrayLen(user.getAllowedApplications())) {
+						// key is good, but since the user is a non-admin
+						// we need to validate the user can post bugs to the requested
+						// application.
+						var app = getApplicationFromBean( entryBean, false );
+						if(!user.isApplicationAllowed(app)) {
+							throw(message="Application not allowed",type="applicationNotAllowed");
+						}
+					}
+				}
+			}
+			
+			// validate application
+			if(!allowAutoCreate("application")) {
+				getApplicationFromBean( entryBean, false );
+			}
+			
+			// validate host
+			if(!allowAutoCreate("host")) {
+				getHostFromBean( entryBean, false );
+			}
+			
+			// validte severity
+			if(!allowAutoCreate("severity")) {
+				getSeverityFromBean( entryBean, false );
+			}
+			
+			// validate source
+			if(!allowAutoCreate("source")) {
+				getSourceFromBean( entryBean, false );
+			}
+			
+			return true;
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="reloadRules" access="public" returntype="void" hint="Reloads all rules">
+		<cfset loadRules()>
+	</cffunction>
+
+	<cffunction name="getMessageLog" access="public" returntype="array">
+		<cfreturn variables.msgLog>
+	</cffunction>
 	
 	
 	<!---- Private Methods ---->
 	
 	<cffunction name="getApplicationFromBean" access="private" returntype="app" hint="Uses the information on the rawEntryBean to retrieve the corresponding Application object">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="createIfNeeded" type="boolean" default="false">
 		<cfscript>
 			var key = "";
 			var bean = arguments.entryBean;
@@ -167,7 +232,8 @@
 					oApp = variables.oAppFinder.findByCode( key );
 	
 				} catch(appFinderException.ApplicationCodeNotFound e) {
-					// code does not exist, so we need to create it
+					// code does not exist, so we need to create it (if autocreate enabled)
+					if(!arguments.createIfNeeded) throw(message="Invalid Application",type="invalidApplication");
 					oApp = createObject("component","bugLog.components.app").init( oDF.getDAO("application") );
 					oApp.setCode( key );
 					oApp.setName( key );
@@ -183,6 +249,7 @@
 		
 	<cffunction name="getHostFromBean" access="private" returntype="host" hint="Uses the information on the rawEntryBean to retrieve the corresponding Host object">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="createIfNeeded" type="boolean" default="false">
 		<cfscript>
 			var key = "";
 			var bean = arguments.entryBean;
@@ -201,7 +268,8 @@
 					oHost = variables.oHostFinder.findByName( key );
 	
 				} catch(hostFinderException.HostNameNotFound e) {
-					// code does not exist, so we need to create it
+					// code does not exist, so we need to create it (if autocreate enabled)
+					if(!arguments.createIfNeeded) throw(message="Invalid Host",type="invalidHost");
 					oHost = createObject("component","bugLog.components.host").init( oDF.getDAO("host") );
 					oHost.setHostName(key);
 					oHost.save();
@@ -216,6 +284,7 @@
 	
 	<cffunction name="getSeverityFromBean" access="private" returntype="severity" hint="Uses the information on the rawEntryBean to retrieve the corresponding Severity object">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="createIfNeeded" type="boolean" default="false">
 		<cfscript>
 			var key = "";
 			var bean = arguments.entryBean;
@@ -234,7 +303,8 @@
 					oSeverity = variables.oSeverityFinder.findByCode( key );
 	
 				} catch(severityFinderException.codeNotFound e) {
-					// code does not exist, so we need to create it
+					// code does not exist, so we need to create it (if autocreate enabled)
+					if(!arguments.createIfNeeded) throw(message="Invalid Severity",type="invalidSeverity");
 					oSeverity = createObject("component","bugLog.components.severity").init( oDF.getDAO("severity") );
 					oSeverity.setCode( key );
 					oSeverity.setName( key );
@@ -248,8 +318,40 @@
 		<cfreturn oSeverity>
 	</cffunction>
 	
+	<cffunction name="getUserByAPIKey" access="private" returntype="user" hint="Finds a user object using by its API Key">
+		<cfargument name="apiKey" type="string" required="true">
+		<cfscript>
+			var oUser = 0;
+			
+			try {
+				// first we try to get it from the cache
+				oUser = variables.oUserCache.retrieve( apiKey ); 
+			
+			} catch(cacheService.itemNotFound e) {
+				// entry not in cache, so we get it from DB
+				try {
+					oUser = variables.oUserFinder.findByAPIKey( apiKey );
+					
+					var qryUserApps = oDAOFactory.getDAO("userApplication").search(userID = oUser.getUserID());
+					var apps = oAppFinder.findByIDList(valueList(qryUserApps.applicationID));
+					oUser.setAllowedApplications(apps);
+				
+				} catch(sourceFinderException.usernameNotFound e) {
+					// code does not exist, so we need to create it (if autocreate enabled)
+					throw(message="Invalid API Key",type="bugLog.invalidAPIKey");
+				}
+				
+				// store entry in cache
+				variables.oUserCache.store( key, oUser );
+			}
+			
+			return oUser;
+		</cfscript>
+	</cffunction>		
+
 	<cffunction name="getSourceFromBean" access="private" returntype="source" hint="Uses the information on the rawEntryBean to retrieve the corresponding Source object">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="createIfNeeded" type="boolean" default="false">
 		<cfscript>
 			var key = "";
 			var bean = arguments.entryBean;
@@ -268,7 +370,8 @@
 					oSource = variables.oSourceFinder.findByName( key );
 	
 				} catch(sourceFinderException.codeNotFound e) {
-					// code does not exist, so we need to create it
+					// code does not exist, so we need to create it (if autocreate enabled)
+					if(!arguments.createIfNeeded) throw(message="Invalid Source",type="invalidSource");
 					oSource = createObject("component","bugLog.components.source").init( oDF.getDAO("source") );
 					oSource.setName( key );
 					oSource.save();
@@ -279,7 +382,7 @@
 			}
 		</cfscript>
 		<cfreturn oSource>
-	</cffunction>		
+	</cffunction>	
 
 	<cffunction name="loadRules" access="private" returntype="void" hint="this method loads the rules into the rule processor">
 		<cfscript>
@@ -289,6 +392,9 @@
 			var i = 0;
 			var dao = 0;
 			var thisRule = 0;
+
+			// clear all existing rules
+			variables.oRuleProcessor.flushRules();
 			
 			// get the rule definitions from the extensions service
 			dao = variables.oDAOFactory.getDAO("extension");
@@ -300,11 +406,9 @@
 				thisRule = aRules[i];
 				
 				if(thisRule.enabled) {
-					oRule = createObject("component", thisRule.component )
-								.init( argumentCollection = thisRule.config )
-								.setListener(this)
-								.setDAOFactory( variables.oDAOFactory )
-								.setExtensionID( thisRule.id );
+					oRule = thisRule.instance;
+					oRule.setListener(this);
+					oRule.setDAOFactory( variables.oDAOFactory );
 	
 					// add rule to processor
 					variables.oRuleProcessor.addRule(oRule);
@@ -339,6 +443,11 @@
 		<cfelse>
 			<cfset scheduler.removeTask("bugLogPurgeHistory") />
 		</cfif>
+	</cffunction>
+
+	<cffunction name="allowAutoCreate" returnType="boolean" access="private">
+		<cfargument name="entityType" type="string" required="true">
+		<cfreturn getConfig().getSetting("autocreate." & arguments.entityType, variables.autoCreateDefault)>
 	</cffunction>
 	
 </cfcomponent>

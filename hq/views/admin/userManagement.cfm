@@ -3,13 +3,16 @@
 <cfoutput>
 	<h3>User Management:</h3>
 	<div style="margin-left:30px;">
-		<table width="450" border="1" style="border-collapse:collapse;border-color:##ccc;" cellpadding="2">
-			<tr>
-				<th width="15">&nbsp;</th>
-				<th align="left">Username</th>
-				<th>Administrator?</th>
-				<th>&nbsp;</th>
-			</tr>
+		<table class="table table-bordered table-condensed table-striped">
+			<thead>
+				<tr>
+					<th width="15">&nbsp;</th>
+					<th align="left">Username</th>
+					<th>Administrator?</th>
+					<th>&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
 			<cfloop query="qryUsers">
 				<tr>
 					<td width="15" align="right">#qryUsers.currentRow#.</td>
@@ -22,6 +25,7 @@
 					</td>
 				</tr>
 			</cfloop>
+			</tbody>
 		</table>
 		<br /><a href="index.cfm?event=admin.user">[ Create New User ]</a>
 		<br /><br />

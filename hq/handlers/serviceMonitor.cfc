@@ -3,13 +3,15 @@
 	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
 			try {
-				oService = createObject("component","bugLog.components.service").init();
-				aMsgLog = oService.getService().getMessageLog();
-				aQueue = oService.getService().getEntryQueue();
+				oService = getService("app").getServiceLoader().getService();
+				aMsgLog = oService.getMessageLog();
+
+				if(structKeyExists(oService,"getEntryQueue")) {
+					setValue("aQueue", oService.getEntryQueue());
+				}
 				
 				// set values
 				setValue("aMsgLog", aMsgLog);
-				setValue("aQueue", aQueue);
 				setValue("pageTitle", "Service Monitor");
 				
 				setView("serviceMonitor");
@@ -29,7 +31,7 @@
 			var rtn = 0;
 
 			try {
-				oService = createObject("component","bugLog.components.service").init();
+				oService = getService("app").getServiceLoader();
 				oListener = oService.getService();
 				rtn = oListener.processQueue( oListener.getKey() );
 				setMessage("info","Queue processed (#rtn#)");

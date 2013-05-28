@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" ?>
+<project default="main" name="bugLog">
+	<property name="msgSuccessClean" value="Successfully removed old build files"/>
+	<property name="msgSuccessBuild" value="Finished preparing file for deployment:"/>
+	<property name="src"             value="${basedir}"/>
+	<property name="output"          value="${basedir}/deploy/"/>
+	<property name="archive"         value="${ant.project.name}-deploy.zip"/>
+
+
+	<target name="main" depends="archive">
+		<echo>${msgSuccessBuild} ${archive}</echo>
+	</target>
+
+	<target name="ensureTargetExists">
+		<mkdir dir="${output}" />
+	</target>
+
+	<target name="clean" depends="ensureTargetExists">
+		<delete includeemptydirs="true">
+			<fileset dir="${output}" excludes="**/.svn" defaultexcludes="false"/>
+		</delete>
+		<echo>${msgSuccessClean}</echo> 
+	</target>
+
+
+	<target name="archive" depends="clean">
+		<zip destfile="${output}${archive}" basedir="${src}" excludes="deploy/,install/,*.git/**,.settings/**,.project,build.xml,.pydevproject" defaultexcludes="yes"/>
+	</target>
+</project>

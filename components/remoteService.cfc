@@ -61,6 +61,12 @@
 		<cfset getLoader(instanceName).getService().logEntry(bean)>
 		<cfreturn true>
 	</cffunction>		
+
+	<cffunction name="reloadRules" access="remote" returntype="boolean">
+		<cfargument name="instanceName" type="string" required="true">
+		<cfset getLoader(instanceName).getService().reloadRules()>
+		<cfreturn true>
+	</cffunction>		
 	
 	<cffunction name="getLoader" access="private" returntype="bugLog.components.service">
 		<cfargument name="instanceName" type="string" required="true">

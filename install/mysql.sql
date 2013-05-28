@@ -107,6 +107,7 @@ CREATE TABLE `bl_User` (
   `Password` varchar(50) NOT NULL COMMENT '\n',
   `IsAdmin` int(11) NOT NULL default 0,
   `Email` varchar(255) NULL,
+  `apiKey` VARCHAR(100) NULL,
   PRIMARY KEY  (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -150,6 +151,20 @@ CREATE TABLE `bl_extensionlog` (
   PRIMARY KEY (`extensionLogID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+--
+-- Table structure for table `bl_userApplication`
+--
+DROP TABLE IF EXISTS `bl_UserApplication`;
+CREATE TABLE bl_UserApplication (
+   userApplicationID INT AUTO_INCREMENT NOT NULL,
+   userID INT NOT NULL,
+   applicationID INT NOT NULL,
+  CONSTRAINT fk_userapplication_user FOREIGN KEY (userID) REFERENCES bl_User (UserID) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_userapplication_application FOREIGN KEY (applicationID) REFERENCES bl_Application (ApplicationID) ON UPDATE CASCADE ON DELETE CASCADE,
+  PRIMARY KEY (userApplicationID)
+) ENGINE = InnoDB ROW_FORMAT = DEFAULT;
+ 
 
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

@@ -29,6 +29,9 @@
 						setValue("adminEmail", cfg.getSetting("general.adminEmail",""));
 						setValue("autoStart", app.getServiceSetting("autoStart",true));
 						setValue("allowPublicRSS", cfg.getSetting("rss.allowPublicAccess",false));
+						setValue("autoCreateApplication", cfg.getSetting("autocreate.application",true));
+						setValue("autoCreateSeverity", cfg.getSetting("autocreate.severity",true));
+						setValue("autoCreateHost", cfg.getSetting("autocreate.host",true));
 						break;
 
 					case "changePassword":
@@ -37,6 +40,21 @@
 					case "userManagement":
 						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
 						setValue("qryUsers", app.getUsers() );
+						break;
+						
+					case "appManagement":
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
+						setValue("qryData", app.getApplications() );
+						break;
+
+					case "hostManagement":
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
+						setValue("qryData", app.getHosts() );
+						break;
+
+					case "severityManagement":
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
+						setValue("qryData", app.getSeverities() );
 						break;
 
 					case "purgeHistory":
@@ -74,6 +92,7 @@
 						break;
 						
 					case "listeners":
+						setValue("APIKey", app.getServiceSetting("APIKey"));
 						setValue("bugLogHREF", app.getBaseBugLogHREF());	
 						if(user.getIsAdmin())
 							setValue("APIKey", app.getServiceSetting("APIKey"));
@@ -103,13 +122,16 @@
 		<cfscript>
 			var userID = getValue("userID");
 			var oUser = 0;
+			var app = getService("app");
 			
 			try {
 				if(userID gt 0) 
-					oUser = getService("app").getUserByID(userID);
+					oUser = app.getUserByID(userID);
 				else
-					oUser = getService("app").getBlankUser();
+					oUser = app.getBlankUser();
 				
+				setValue("apps",app.getApplications());
+				setValue("userApps",app.getUserApplications(val(userID)));
 				setValue("oUser",oUser);			
 				setValue("pageTitle", "BugLog Settings & Management > Add/Edit User");	
 				setView("editUser");
@@ -199,6 +221,7 @@
 			var password = getValue("password");
 			var isAdmin = getValue("isAdmin",false);
 			var email = getValue("email");
+			var apps = getValue("applicationIDList");
 			
 			try {
 				if(username eq "") throw(type="validation", message="Username cannot be empty");
@@ -213,10 +236,17 @@
 				if(userID eq 0) oUser.setPassword(hash(password));
 				oUser.setIsAdmin(isAdmin);
 				oUser.setEmail(email);
-
+				
+				if(getValue("removeAPIKey",false))
+					oUser.setAPIKey("");
+				if(getValue("assignAPIKey",false))
+					oUser.setAPIKey(createuuid());
+				
 				getService("app").saveUser(oUser);
+				getService("app").setUserApplications(oUser.getUserID(), listToArray(apps));
+				
 				setMessage("info","User information has been saved");
-				setNextEvent("admin.main","panel=userManagement");
+				setNextEvent("admin.user","userID=#oUser.getUserID()#");
 							
 			} catch(validation e) {
 				setMessage("warning",e.message);
@@ -306,6 +336,9 @@
 			var autoStart = getValue("autoStart",false);
 			var adminEmail = getValue("adminEmail");
 			var allowPublicRSS = getValue("allowPublicRSS",false);
+			var autoCreateApplication = getValue("autoCreateApplication",false);
+			var autoCreateHost = getValue("autoCreateHost",false);
+			var autoCreateSeverity = getValue("autoCreateSeverity",false);
 			var config = getService("app").getConfig();
 			
 			try {
@@ -315,6 +348,9 @@
 				config.reload();
 				config.setSetting("general.adminEmail", adminEmail);
 				config.setSetting("rss.allowPublicAccess", allowPublicRSS);
+				config.setSetting("autoCreate.application", autoCreateApplication);
+				config.setSetting("autoCreate.host", autoCreateHost);
+				config.setSetting("autoCreate.severity", autoCreateSeverity);
 
 				setMessage("info","General settings updated.");
 				setNextEvent("admin.main","panel=general");
@@ -356,6 +392,173 @@
 		</cfscript>	
 	</cffunction>	
 		
+	<cffunction name="doSaveApplication" access="public" returntype="void">
+		<cfscript>
+			var id = getValue("id");
+			var code = getValue("code");
+			var name = getValue("name");
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main");}
+				if(code eq "") throw(type="validation", message="Code cannot be empty");
+				if(name eq "") throw(type="validation", message="Name cannot be empty");
+
+				getService("app").saveApplication(id,code,name);
+				
+				setMessage("info","Application has been saved");
+				setNextEvent("admin.main","panel=appManagement");
+							
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("admin.main","panel=appManagement&id=#id#&code=#code#&name=#name#");
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("admin.main","panel=appManagement&id=#id#&code=#code#&name=#name#");
+			}		
+		</cfscript>
+	</cffunction>	
+		
+	<cffunction name="doDeleteApplication" access="public" returntype="void">
+		<cfscript>
+			var id = val(getValue("id"));
+			var entryAction = getValue("entryAction");
+			var moveToAppID = val(getValue("moveToAppID"));
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main");}
+				if(id eq 0) setNextEvent("admin.main");
+				if(entryAction eq "") throw(type="validation", message="Select what action to take with existing bug reports that link to this application");
+				if(entryAction eq "move" and moveToAppID eq 0)  throw(type="validation", message="Select the application to migrate existing bug reports that link to this application");
+
+				getService("app").deleteApplication(id,entryAction,moveToAppID);
+				
+				setMessage("info","Application has been deleted");
+				setNextEvent("admin.main","panel=appManagement");
+							
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("admin.main","panel=appManagement&id=DELETE:#id#");
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("admin.main","panel=appManagement&id=DELETE:#id#");
+			}		
+		</cfscript>
+	</cffunction>	
+		
+	<cffunction name="doSaveHost" access="public" returntype="void">
+		<cfscript>
+			var id = getValue("id");
+			var name = getValue("name");
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main");}
+				if(name eq "") throw(type="validation", message="Name cannot be empty");
+
+				getService("app").saveHost(id,name);
+				
+				setMessage("info","Host has been saved");
+				setNextEvent("admin.main","panel=hostManagement");
+							
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("admin.main","panel=hostManagement&id=#id#&code=#code#&name=#name#");
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("admin.main","panel=hostManagement&id=#id#&code=#code#&name=#name#");
+			}		
+		</cfscript>
+	</cffunction>	
+		
+	<cffunction name="doDeleteHost" access="public" returntype="void">
+		<cfscript>
+			var id = val(getValue("id"));
+			var entryAction = getValue("entryAction");
+			var moveToHostID = val(getValue("moveToHostID"));
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main");}
+				if(id eq 0) setNextEvent("admin.main");
+				if(entryAction eq "") throw(type="validation", message="Select what action to take with existing bug reports that link to this host");
+				if(entryAction eq "move" and moveToHostID eq 0)  throw(type="validation", message="Select the host name to migrate existing bug reports that link to this host");
+
+				getService("app").deleteHost(id,entryAction,moveToHostID);
+				
+				setMessage("info","Hostname has been deleted");
+				setNextEvent("admin.main","panel=hostManagement");
+							
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("admin.main","panel=hostManagement&id=DELETE:#id#");
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("admin.main","panel=hostManagement&id=DELETE:#id#");
+			}		
+		</cfscript>
+	</cffunction>	
+
+	<cffunction name="doSaveSeverity" access="public" returntype="void">
+		<cfscript>
+			var id = getValue("id");
+			var code = getValue("code");
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main");}
+				if(code eq "") throw(type="validation", message="Code cannot be empty");
+
+				getService("app").saveSeverity(id,code);
+				
+				setMessage("info","Severity has been saved");
+				setNextEvent("admin.main","panel=severityManagement");
+							
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("admin.main","panel=severityManagement&id=#id#&code=#code#");
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("admin.main","panel=severityManagement&id=#id#&code=#code#");
+			}		
+		</cfscript>
+	</cffunction>	
+		
+	<cffunction name="doDeleteSeverity" access="public" returntype="void">
+		<cfscript>
+			var id = val(getValue("id"));
+			var entryAction = getValue("entryAction");
+			var moveToSeverityID = val(getValue("moveToSeverityID"));
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main");}
+				if(id eq 0) setNextEvent("admin.main");
+				if(entryAction eq "") throw(type="validation", message="Select what action to take with existing bug reports that link to this severity");
+				if(entryAction eq "move" and moveToSeverityID eq 0)  throw(type="validation", message="Select the severity to migrate existing bug reports that link to this severity");
+
+				getService("app").deleteSeverity(id,entryAction,moveToSeverityID);
+				
+				setMessage("info","Severity code has been deleted");
+				setNextEvent("admin.main","panel=severityManagement");
+							
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("admin.main","panel=severityManagement&id=DELETE:#id#");
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("admin.main","panel=severityManagement&id=DELETE:#id#");
+			}		
+		</cfscript>
+	</cffunction>	
+						
 	<cffunction name="isConfigEditingAllowed" access="private" returntype="boolean">
 		<cfset var rtn = false>
 		<cfset var allowConfigEditing = getSetting("allowConfigEditing")>

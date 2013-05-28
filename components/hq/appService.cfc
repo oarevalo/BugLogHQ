@@ -8,6 +8,7 @@
 	<cfset variables.OSPathSeparator = createObject("java","java.lang.System").getProperty("file.separator")>
 	<cfset variables.config = 0>
 	<cfset variables.instanceName = "">
+	<cfset variables.autoApplyRuleChanges = true>
 
 	<cffunction name="init" access="public" returntype="appService">
 		<cfargument name="instanceName" type="string" required="false" default="">
@@ -40,10 +41,14 @@
 		<cfset variables.oSeverityDAO = variables.oDAOFactory.getDAO("severity")>
 		<cfset variables.oSourceDAO = variables.oDAOFactory.getDAO("source")>
 		<cfset variables.oUserDAO = variables.oDAOFactory.getDAO("user")>
+		<cfset variables.oUserApplicationDAO = variables.oDAOFactory.getDAO("userApplication")>
 
 		<!--- setup extensions --->
 		<cfset variables.extensionsPath = variables.cfcPath & ".extensions.">
 		<cfset variables.oExtensionsService = createModelObject("components.extensionsService").init( variables.oDAOFactory.getDAO("extension") )>
+
+		<!--- other settings --->
+		<cfset variables.autoApplyRuleChanges = variables.config.getSetting("hq.autoApplyRuleChanges", true)>
 
 		<cfreturn this>		
 	</cffunction>
@@ -115,6 +120,7 @@
 		<cfargument name="search_cftoken" type="string" required="false" default="">
 		<cfargument name="userAgent" type="string" required="false" default="">
 		<cfargument name="searchHTMLReport" type="string" required="false" default="">
+		<cfargument name="user" type="any" required="false">
 		<cfscript>
 			var oEntryFinder = 0;
 			var qry = 0;
@@ -143,6 +149,14 @@
 			// make sure that searchHTMLReport is a valid boolean value
 			args.searchHTMLReport = (isBoolean(arguments.searchHTMLReport) and arguments.searchHTMLReport);
 						
+			// see if we need to restrict search for the given user
+			if(structKeyExists(arguments,"user")) {
+				if(!arguments.user.getIsAdmin() and arrayLen(arguments.user.getAllowedApplications())) {
+					args.userID = arguments.user.getUserID();
+				}
+				structDelete(args,"user");
+			}			
+						
 			// get entries
 			oEntryFinder = createModelObject("components.entryFinder").init( variables.oEntryDAO );
 			qry = oEntryFinder.search(argumentCollection = args);
@@ -153,22 +167,39 @@
 
 	<cffunction name="getEntry" access="public" returntype="any">
 		<cfargument name="entryID" type="numeric" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="false">
 		<cfscript>
 			var oEntryFinder = 0;
-			var qry = 0;
+			var entry = 0;
 
 			// create the dao factory
 			oEntryFinder = createModelObject("components.entryFinder").init( variables.oEntryDAO );
 			
 			// get entries
-			qry = oEntryFinder.findByID(arguments.entryID);
+			entry = oEntryFinder.findByID(arguments.entryID);
 			
-			return qry;
+			// if we are passing a user, make sure that user can view the entry
+			if(structKeyExists(arguments,"user") and !arguments.user.isApplicationAllowed(entry.getApplicationID())) {
+				throw(message="Not allowed",type="notAllowed");
+			}
+			
+			return entry;
 		</cfscript>
 	</cffunction>
 	
 	<cffunction name="getApplications" access="public" returntype="query">
-		<cfset var qry = variables.oApplicationDAO.getAll()>
+		<cfargument name="user" type="any" required="false">
+		<cfif not structKeyExists(arguments,"user") or user.getIsAdmin() or not arrayLen(user.getAllowedApplications())>
+			<cfset var qry = variables.oApplicationDAO.getAll()>
+		<cfelse>
+			<cfset var apps = user.getAllowedApplications()>
+			<cfset var ids = []>
+			<cfset var app = 0>
+			<cfloop array="#apps#" index="app">
+				<cfset arrayAppend(ids,app.getApplicationID())>
+			</cfloop>
+			<cfset var qry = variables.oApplicationDAO.get(arrayToList(ids))>
+		</cfif>
 		<cfquery name="qry" dbtype="query">
 			SELECT *
 				FROM qry
@@ -298,6 +329,8 @@
 		<cfscript>
 			var oFinder = 0;
 			var o = 0;
+
+			if(arguments.username eq "") return 0;
 
 			// create the finder
 			oFinder = createModelObject("components.userFinder").init( oUserDAO );
@@ -509,9 +542,20 @@
 		<cfreturn getCFCInfo(variables.extensionsPath & "rules." & arguments.ruleName )>
 	</cffunction>
 
+	<cffunction name="getRule" access="public" returntype="any" hint="Finds a given rule by its ID">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="true">
+		<cfscript>
+			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
+				throw(message="User cannot access this rule",type="notAuthorized");
+			return oExtensionsService.getRuleByID(arguments.id);
+		</cfscript>
+	</cffunction>
+
 	<cffunction name="saveRule" access="public" returntype="void" hint="adds or updates a rule">
-		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfargument name="id" type="numeric" required="false" default="0">
 		<cfargument name="ruleName" type="string" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="true">
 		<!--- rule settings are passed as individual arguments --->
 		
 		<cfscript>
@@ -532,58 +576,75 @@
 			if(structKeyExists(arguments,"description"))
 				desc = arguments.description;
 			
-			if(arguments.index gt 0) 
-				oExtensionsService.updateRule(arguments.index, stProperties, desc);
-			 else 
-				oExtensionsService.createRule(arguments.ruleName, stProperties, desc);
+			if(arguments.id gt 0) {
+				if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
+					throw(message="User cannot update this rule",type="notAuthorized");
+				oExtensionsService.updateRule(arguments.id, stProperties, desc);
+			} else {
+				oExtensionsService.createRule(arguments.ruleName, stProperties, desc, user.getUserID());
+			}
+			
+			// reload rules
+			if(variables.autoApplyRuleChanges) {
+				getServiceLoader().getService().reloadRules();
+			}
 		</cfscript>
 		
 	</cffunction>
 
 	<cffunction name="deleteRule" access="public" returntype="void" hint="delete a rule">
-		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="true">
 		<cfscript>
-			oExtensionsService.removeRule(arguments.index);
+			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
+				throw(message="User cannot delete this rule",type="notAuthorized");
+			oExtensionsService.removeRule(arguments.id);
+
+			// reload rules
+			if(variables.autoApplyRuleChanges) {
+				getServiceLoader().getService().reloadRules();
+			}
 		</cfscript>		
 	</cffunction>
 
 	<cffunction name="enableRule" access="public" returntype="void" hint="enables a rule">
-		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="true">
 		<cfscript>
-			oExtensionsService.enableRule(arguments.index);
+			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
+				throw(message="User cannot enable this rule",type="notAuthorized");
+			oExtensionsService.enableRule(arguments.id);
+
+			// reload rules
+			if(variables.autoApplyRuleChanges) {
+				getServiceLoader().getService().reloadRules();
+			}
 		</cfscript>		
 	</cffunction>
 
 	<cffunction name="disableRule" access="public" returntype="void" hint="disables a rule">
-		<cfargument name="index" type="numeric" required="false" default="0">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="true">
 		<cfscript>
-			oExtensionsService.disableRule(arguments.index);
+			if(!oExtensionsService.isAllowed(arguments.id, arguments.user))
+				throw(message="User cannot disable this rule",type="notAuthorized");
+			oExtensionsService.disableRule(arguments.id);
+
+			// reload rules
+			if(variables.autoApplyRuleChanges) {
+				getServiceLoader().getService().reloadRules();
+			}
 		</cfscript>		
 	</cffunction>
 
 	<cffunction name="getExtensionsLog" access="public" returntype="query" hint="get a list of the most recent rule firings">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
-		<cfset var dsn = variables.config.getSetting("db.dsn")>
-		<cfset var qry = 0>
-		<cfquery name="qry" datasource="#dsn#">
-			SELECT el.extensionLogID, el.createdOn,
-						ext.extensionID, ext.name, ext.type, ext.description,   
-						e.entryID, e.message, e.mydatetime, e.createdOn as entry_createdOn,
-						a.applicationID, a.code as application_code,
-						h.hostID, h.hostName,
-						s.severityID, s.name as severity_code
-				FROM bl_extensionlog el
-					INNER JOIN bl_Extension ext ON el.extensionID = ext.extensionID
-					INNER JOIN bl_Entry e ON el.entryID = e.entryID 
-					INNER JOIN bl_Application a ON e.applicationID = a.applicationID
-					INNER JOIN bl_Host h ON e.hostID = h.hostID
-					INNER JOIN bl_Severity s ON e.severityID = s.severityID
-				<cfif startDate neq "1/1/1800">
-					WHERE el.createdOn >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.startDate#">
-				</cfif>
-				ORDER BY el.createdOn DESC
-		</cfquery>
-		<cfreturn qry>
+		<cfargument name="user" type="bugLog.components.user" required="false">
+		<cfscript>
+			var userID = (structKeyExists(arguments,"user") and !arguments.user.getIsAdmin()) ? arguments.user.getUserID() : 0;
+			var qry = oExtensionsService.getHistory(arguments.startDate, userID);
+			return qry;
+		</cfscript>
 	</cffunction>
 
 
@@ -592,7 +653,9 @@
 		<cfargument name="userID" type="numeric" required="true">
 		<cfscript>
 			var oFinder = createModelObject("components.userFinder").init( oUserDAO );
-			return oFinder.findByID( arguments.userID );
+			var user = oFinder.findByID( arguments.userID );
+			user.setAllowedApplications( getUserApplications(arguments.userID) );
+			return user;
 		</cfscript>
 	</cffunction>
 
@@ -621,7 +684,98 @@
 		<cfset arguments.userToSave.save()>
 	</cffunction>
 	
+	<cffunction name="getUserApplications" access="public" returntype="array" hint="returns the applications that a user is allowed to see">
+		<cfargument name="userID" type="numeric" required="true">
+		<cfscript>
+			var qryUserApps = oUserApplicationDAO.search(userID = arguments.userID);
+			var oFinder = createModelObject("components.appFinder").init(oApplicationDAO);
+			var apps = oFinder.findByIDList(valueList(qryUserApps.applicationID));
+			return apps;
+		</cfscript>		
+	</cffunction>
+
+	<cffunction name="setUserApplications" access="public" returntype="void" hint="sets the applications that a user is allowed to see">
+		<cfargument name="userID" type="numeric" required="true">
+		<cfargument name="applicationID" type="array" required="true">
+		<cfscript>
+			var i = 0;
+			var qryUserApps = oUserApplicationDAO.search(userID = arguments.userID);
+			oUserApplicationDAO.delete(valueList(qryUserApps.userApplicationID));
+			
+			for(i=1;i lte arrayLen(applicationID);i++) {
+				oUserApplicationDAO.save(userID = arguments.userID,
+										applicationID = applicationID[i]);
+			}
+		</cfscript>		
+	</cffunction>
 	
+	
+	<!---- Data Management --->
+	<cffunction name="saveApplication" access="public" returntype="numeric">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="code" type="string" required="true">
+		<cfargument name="name" type="string" required="false" default="#arguments.code#">
+		<cfset var newID = variables.oApplicationDAO.save(id=arguments.id, 
+															code=arguments.code, 
+															name=arguments.name)>
+		<cfreturn newID>
+	</cffunction>
+
+	<cffunction name="saveHost" access="public" returntype="numeric">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="hostName" type="string" required="true">
+		<cfset var newID = variables.oHostDAO.save(id=arguments.id, 
+															hostName=arguments.hostName)>
+		<cfreturn newID>
+	</cffunction>
+
+	<cffunction name="saveSeverity" access="public" returntype="numeric">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="code" type="string" required="true">
+		<cfargument name="name" type="string" required="false" default="#arguments.code#">
+		<cfset var newID = variables.oSeverityDAO.save(id=arguments.id, 
+															code=arguments.code, 
+															name=arguments.name)>
+		<cfreturn newID>
+	</cffunction>
+
+	<cffunction name="deleteApplication" access="public" returntype="void">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="entryAction" type="string" required="true">
+		<cfargument name="moveToID" type="numeric" required="false" default="0">
+		<cfif arguments.entryAction eq "delete">
+			<cfset variables.oEntryDAO.deleteByApplicationID(arguments.id)>
+		<cfelseif arguments.entryAction eq "move" and arguments.moveToID gt 0>
+			<cfset variables.oEntryDAO.updateApplicationID(arguments.id, arguments.moveToID)>
+		</cfif>
+		<cfset variables.oApplicationDAO.delete(arguments.id)>
+	</cffunction>
+
+	<cffunction name="deleteHost" access="public" returntype="void">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="entryAction" type="string" required="true">
+		<cfargument name="moveToAppID" type="numeric" required="false" default="0">
+		<cfif arguments.entryAction eq "delete">
+			<cfset variables.oEntryDAO.deleteByHostID(arguments.id)>
+		<cfelseif arguments.entryAction eq "move" and arguments.moveToID gt 0>
+			<cfset variables.oEntryDAO.updateHostID(arguments.id, arguments.moveToID)>
+		</cfif>
+		<cfset variables.oHostDAO.delete(arguments.id)>
+	</cffunction>
+	
+	<cffunction name="deleteSeverity" access="public" returntype="void">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="entryAction" type="string" required="true">
+		<cfargument name="moveToAppID" type="numeric" required="false" default="0">
+		<cfif arguments.entryAction eq "delete">
+			<cfset variables.oEntryDAO.deleteBySeverityID(arguments.id)>
+		<cfelseif arguments.entryAction eq "move" and arguments.moveToID gt 0>
+			<cfset variables.oEntryDAO.updateSeverityID(arguments.id, arguments.moveToID)>
+		</cfif>
+		<cfset variables.oSeverityDAO.delete(arguments.id)>
+	</cffunction>
+
+		
 	<!----- Private Methods ---->
 	<cffunction name="createModelObject" access="private" returntype="any">
 		<cfargument name="cfc" type="string" required="true">

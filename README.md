@@ -1,11 +1,11 @@
-BugLogHQ (v1.7)
+BugLogHQ (v1.8)
 ===============
 https://github.com/oarevalo/BugLogHQ
 
 **BugLogHQ** is a tool to centralize the handling of automated bug reports from multiple applications. BugLogHQ provides a unified view of error messages sent from any number of applications, allowing the developer to search, graph, forward, and explore the bug reports submitted by the applications.
 
 
-> Copyright 2009-2012 - Oscar Arevalo (http://www.oscararevalo.com)
+> Copyright 2009-2013 - Oscar Arevalo (http://www.oscararevalo.com)
 >
 > Licensed under the Apache License, Version 2.0 (the "License"); 
 > you may not use this file except in compliance with the License. 
@@ -43,6 +43,18 @@ graph, forward, and explore the bug reports submitted by the applications. All b
 
 2. Release Notes
 -----------------------------------------------------------------------
+
+### New in 1.8 (4/2012)
+* Users can now be restricted to access only specific applications assigned by the Administrator. Restricted users will only be able to see bug reports for their assigned applications and create rules for those applications.
+* CRUD screens to manage Severities, Hosts and Applications. These are accessed through the Settings page and are only accessible to users in Admin role.
+* The REST listener can now receive data in the body of the HTTP request encoded as a JSON object
+* Checkpoint Tracking. The CFM client now has a checkpoint() method that you can use to track checkpoints or milestones during the page execution. If a bug is sent, then those checkpoints will be displayed on the full bug report.
+* Remote Listener. This is a different listener type that allows the BugLog webapp and the Listener endpoint to be on separate servers, while at the same time allowing the webapp to control the listener.
+* Individual users can now be assigned their own API keys to submit bug reports
+* Added option to toggle on/off the automatic creation of hosts/severities/applications when a new bug report is received.
+* Rules changes are now applied immediately without the need to restart the listener service.
+* CFM applications using the buglog client can now set the application name explicitly, max depth for cfdumps and toggle logging messages locally.
+* Added a basic ANT build script for generating a ZIP file suitable for deployment.
 
 ### New in 1.7 (9/2012)
 * A new "Dashboard" homepage.
