@@ -205,6 +205,9 @@
 		<cfset loadRules()>
 	</cffunction>
 
+	<cffunction name="getMessageLog" access="public" returntype="array">
+		<cfreturn variables.msgLog>
+	</cffunction>
 	
 	
 	<!---- Private Methods ---->

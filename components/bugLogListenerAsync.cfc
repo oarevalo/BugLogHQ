@@ -104,10 +104,6 @@
 	
 	<!--- Getters --->
 	
-	<cffunction name="getMessageLog" access="public" returntype="array">
-		<cfreturn variables.msgLog>
-	</cffunction>
-
 	<cffunction name="getEntryQueue" access="public" returntype="array">
 		<cfreturn variables.queue>
 	</cffunction>

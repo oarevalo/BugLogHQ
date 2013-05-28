@@ -3,13 +3,15 @@
 	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
 			try {
-				oService = getService("app").getServiceLoader();
-				aMsgLog = oService.getService().getMessageLog();
-				aQueue = oService.getService().getEntryQueue();
+				oService = getService("app").getServiceLoader().getService();
+				aMsgLog = oService.getMessageLog();
+
+				if(structKeyExists(oService,"getEntryQueue")) {
+					setValue("aQueue", oService.getEntryQueue());
+				}
 				
 				// set values
 				setValue("aMsgLog", aMsgLog);
-				setValue("aQueue", aQueue);
 				setValue("pageTitle", "Service Monitor");
 				
 				setView("serviceMonitor");
