@@ -19,5 +19,5 @@ ALTER TABLE [dbo].[bl_userApplication]
 GO
 
 
-ALTER TABLE [bl_User] ADD COLUMN apiKey VARCHAR(100) NULL;
+ALTER TABLE [bl_User] ADD apiKey VARCHAR(100) NULL;
 GO

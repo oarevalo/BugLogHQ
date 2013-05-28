@@ -127,6 +127,7 @@
 		<cfargument name="severityCode" type="string" required="false" default="#variables.defaultSeverityCode#">
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
+		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
 
 		<cfset var shortMessage = "">
 		<cfset var longMessage = "">
@@ -145,7 +146,7 @@
 
 		<!--- compose short and full messages --->
 		<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
-		<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth)>
+		<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth, arguments.AppName)>
 
 		<!--- check if there are valid CFID/CFTOKEN values available --->
 		<cfif isDefined("cfid")>
@@ -160,7 +161,7 @@
 			<cfset data = {
 						"dateTime" = Now(),
 						"message" = arguments.message,
-						"applicationCode" = variables.appName,
+						"applicationCode" = arguments.AppName,
 						"severityCode" = arguments.severityCode,
 						"hostName" = variables.hostName,
 						"exceptionMessage" = arguments.exception.message,
@@ -225,7 +226,7 @@
 		<cfif arguments.writeToCFLog>
 			<cflog type="error"
 				   text="#shortMessage#"
-				   file="#variables.appName#_BugTrackingErrors">
+				   file="#arguments.AppName#_BugTrackingErrors">
 		</cfif>
 
 	</cffunction>
@@ -234,10 +235,11 @@
 		<cfargument name="message" type="string" required="true">
 		<cfargument name="longMessage" type="string" required="true">
 		<cfargument name="otherError" type="string" required="true">
+		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
 
 		<cfmail to="#variables.bugEmailRecipients#"
 				from="#variables.bugEmailSender#"
-				subject="BUG REPORT: [#variables.appName#] [#variables.hostName#] #arguments.message#"
+				subject="BUG REPORT: [#arguments.appName#] [#variables.hostName#] #arguments.message#"
 				type="html">
 			<div style="margin:5px;border:1px solid silver;background-color:##ebebeb;font-family:arial;font-size:12px;padding:5px;">
 				This email is sent because the buglog server could not be contacted. The error was:
@@ -268,6 +270,7 @@
 		<cfargument name="exception" type="any" required="false" default="#structNew()#">
 		<cfargument name="ExtraInfo" type="any" required="no" default="">
 		<cfargument name="maxDumpDepth" type="numeric" required="no" default="#variables.maxDumpDepth#">
+		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
 
 		<cfscript>
 			var tmpHTML = "";
@@ -298,7 +301,7 @@
 			<table style="font-size:11px;font-family:arial;">
 				<tr>
 					<td><b>Application:</b></td>
-						<td>#HtmlEditFormat(variables.appName)#</td>
+					<td>#HtmlEditFormat(arguments.AppName)#</td>
 				</tr>
 				<tr>
 					<td><b>Host:</b></td>
