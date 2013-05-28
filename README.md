@@ -5,7 +5,7 @@ https://github.com/oarevalo/BugLogHQ
 **BugLogHQ** is a tool to centralize the handling of automated bug reports from multiple applications. BugLogHQ provides a unified view of error messages sent from any number of applications, allowing the developer to search, graph, forward, and explore the bug reports submitted by the applications.
 
 
-> Copyright 2009-2012 - Oscar Arevalo (http://www.oscararevalo.com)
+> Copyright 2009-2013 - Oscar Arevalo (http://www.oscararevalo.com)
 >
 > Licensed under the Apache License, Version 2.0 (the "License"); 
 > you may not use this file except in compliance with the License. 
