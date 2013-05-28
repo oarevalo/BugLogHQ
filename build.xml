@@ -24,6 +24,6 @@
 
 
 	<target name="archive" depends="clean">
-		<zip destfile="${output}${archive}" basedir="${src}" excludes="deploy/,install/,*.git/**,.settings/**,.project,build.xml,README.md,.pydevproject" defaultexcludes="yes"/>
+		<zip destfile="${output}${archive}" basedir="${src}" excludes="deploy/,install/,*.git/**,.settings/**,.project,build.xml,.pydevproject" defaultexcludes="yes"/>
 	</target>
 </project>
