@@ -92,6 +92,7 @@
 						break;
 						
 					case "listeners":
+						setValue("APIKey", app.getServiceSetting("APIKey"));
 						setValue("bugLogHREF", app.getBaseBugLogHREF());	
 						break;
 				}
