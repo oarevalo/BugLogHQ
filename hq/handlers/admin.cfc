@@ -94,10 +94,6 @@
 					case "listeners":
 						setValue("APIKey", app.getServiceSetting("APIKey"));
 						setValue("bugLogHREF", app.getBaseBugLogHREF());	
-						if(user.getIsAdmin())
-							setValue("APIKey", app.getServiceSetting("APIKey"));
-						else
-							setValue("APIKey","");
 						break;
 				}
 
