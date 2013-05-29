@@ -1,3 +1,5 @@
+<cfsetting requesttimeout="120">	<!--- set request timeout to 120 seconds to minimize overlapping with the next scheduler run --->
+
 <cfparam name="key" type="string" default="">
 <cfparam name="instance" type="string" default="">
 
