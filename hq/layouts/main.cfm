@@ -25,6 +25,9 @@
 			<link rel="stylesheet" href="#rs.assetsPath#/includes/style.css" type="text/css">
 			<script type="text/javascript" src="#rs.assetsPath#/includes/jquery-1.8.0.min.js"></script>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<!-- ACF cfdump assets -->
+			<script type="text/javascript" src="#rs.assetsPath#/includes/cfdump/acf_dump.js"></script>
+			<link rel="stylesheet" href="#rs.assetsPath#/includes/cfdump/acf_dump.css" type="text/css">
 		</head>
 		<body>
 			<div id="header">

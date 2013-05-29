@@ -1,0 +1,155 @@
+/*
+ * This is the loose CSS that CF outputs for every instance of cfdump.
+ * */
+
+table.cfdump_wddx,
+table.cfdump_xml,
+table.cfdump_struct,
+table.cfdump_varundefined,
+table.cfdump_array,
+table.cfdump_query,
+table.cfdump_cfc,
+table.cfdump_object,
+table.cfdump_binary,
+table.cfdump_udf,
+table.cfdump_udfbody,
+table.cfdump_udfarguments {
+	font-size: xx-small;
+	font-family: verdana, arial, helvetica, sans-serif;
+	cell-spacing: 2px;
+}
+
+table.cfdump_wddx th,
+table.cfdump_xml th,
+table.cfdump_struct th,
+table.cfdump_varundefined th,
+table.cfdump_array th,
+table.cfdump_query th,
+table.cfdump_cfc th,
+table.cfdump_object th,
+table.cfdump_binary th,
+table.cfdump_udf th,
+table.cfdump_udfbody th,
+table.cfdump_udfarguments th {
+	text-align: left;
+	color: white;
+	padding: 5px;
+}
+
+table.cfdump_wddx td,
+table.cfdump_xml td,
+table.cfdump_struct td,
+table.cfdump_varundefined  td,
+table.cfdump_array td,
+table.cfdump_query td,
+table.cfdump_cfc td,
+table.cfdump_object td,
+table.cfdump_binary td,
+table.cfdump_udf td,
+table.cfdump_udfbody td,
+table.cfdump_udfarguments td {
+	padding: 3px;
+	background-color: #ffffff;
+	vertical-align : top;
+}
+
+table.cfdump_wddx {
+	background-color: #000000;
+}
+table.cfdump_wddx th.wddx {
+	background-color: #444444;
+}
+
+
+table.cfdump_xml {
+	background-color: #888888;
+}
+table.cfdump_xml th.xml {
+	background-color: #aaaaaa;
+}
+table.cfdump_xml td.xml {
+	background-color: #dddddd;
+}
+
+table.cfdump_struct {
+	background-color: #0000cc ;
+}
+table.cfdump_struct th.struct {
+	background-color: #4444cc ;
+}
+table.cfdump_struct td.struct {
+	background-color: #ccddff;
+}
+
+table.cfdump_varundefined {
+	background-color: #CC3300 ;
+}
+table.cfdump_varundefined th.varundefined {
+	background-color: #CC3300 ;
+}
+table.cfdump_varundefined td.varundefined {
+	background-color: #ccddff;
+}
+
+table.cfdump_array {
+	background-color: #006600 ;
+}
+table.cfdump_array th.array {
+	background-color: #009900 ;
+}
+table.cfdump_array td.array {
+	background-color: #ccffcc ;
+}
+
+table.cfdump_query {
+	background-color: #884488 ;
+}
+table.cfdump_query th.query {
+	background-color: #aa66aa ;
+}
+table.cfdump_query td.query {
+	background-color: #ffddff ;
+}
+
+
+table.cfdump_cfc {
+	background-color: #ff0000;
+}
+table.cfdump_cfc th.cfc{
+	background-color: #ff4444;
+}
+table.cfdump_cfc td.cfc {
+	background-color: #ffcccc;
+}
+
+
+table.cfdump_object {
+	background-color : #ff0000;
+}
+table.cfdump_object th.object{
+	background-color: #ff4444;
+}
+
+table.cfdump_binary {
+	background-color : #eebb00;
+}
+table.cfdump_binary th.binary {
+	background-color: #ffcc44;
+}
+table.cfdump_binary td {
+	font-size: x-small;
+}
+table.cfdump_udf {
+	background-color: #aa4400;
+}
+table.cfdump_udf th.udf {
+	background-color: #cc6600;
+}
+table.cfdump_udfarguments {
+	background-color: #dddddd;
+	cell-spacing: 3;
+}
+table.cfdump_udfarguments th {
+	background-color: #eeeeee;
+	color: #000000;
+}
