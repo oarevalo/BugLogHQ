@@ -348,6 +348,10 @@
 					<td>#HtmlEditFormat(cgi.HTTP_USER_AGENT)#</td>
 				</tr>
 				<tr>
+					<td><b>Remote Address:</b></td>
+					<td>#HtmlEditFormat(cgi.REMOTE_ADDR)#</td>
+				</tr>
+				<tr>
 					<td><b>Referrer:</b></td>
 					<td>#HtmlEditFormat(cgi.HTTP_REFERER)#</td>
 				</tr>
