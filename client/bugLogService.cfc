@@ -1,5 +1,5 @@
 <cfcomponent>
-	<cfset variables.bugLogClientVersion = "1.8-c2">	<!--- bugloghq client version --->
+	<cfset variables.bugLogClientVersion = "1.8-c3">	<!--- bugloghq client version --->
 	<cfset variables.bugEmailSender = "">
 	<cfset variables.bugEmailRecipients = "">
 	<cfset variables.bugLogListener = "">
@@ -139,15 +139,6 @@
 		<cfparam name="arguments.exception.message" default="">
 		<cfparam name="arguments.exception.detail" default="">
 
-		<!--- if we are tracking checkpoints, then add the buglog call as the last checkpoint --->
-		<cfif arrayLen(getCheckpoints())>
-			<cfset checkpoint("bugLog.notifyService() called")>
-		</cfif>
-
-		<!--- compose short and full messages --->
-		<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
-		<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth, arguments.AppName)>
-
 		<!--- check if there are valid CFID/CFTOKEN values available --->
 		<cfif isDefined("cfid")>
 			<cfset tmpCFID = cfid>
@@ -156,8 +147,17 @@
 			<cfset tmpCFTOKEN = cftoken>
 		</cfif>
 
-		<!--- submit error --->
 		<cftry>
+			<!--- if we are tracking checkpoints, then add the buglog call as the last checkpoint --->
+			<cfif arrayLen(getCheckpoints())>
+				<cfset checkpoint("bugLog.notifyService() called")>
+			</cfif>
+	
+			<!--- compose short and full messages --->
+			<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
+			<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth, arguments.AppName)>
+	
+			<!--- submit error --->
 			<cfset data = {
 						"dateTime" = Now(),
 						"message" = arguments.message,
