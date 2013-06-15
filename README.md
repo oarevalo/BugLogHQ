@@ -126,7 +126,7 @@ Applications can send bug reports to BugLogHQ via three different ways:
 * http post
 * direct CFC call
 
-BugLogHQ provides a CFC that can be used to send the bug reports. This CFC is located in `/bugLog/client/bugLogService.cfc`. This is the only file that needs to be distributed with any application that wants to submit reports to BugLogHQ.
+BugLogHQ provides a CFC that can be used to send the bug reports. This CFC is located in `/bugLog/client/bugLogService.cfc`. This is the only file that needs to be distributed with any application that wants to submit reports to BugLogHQ. The client cfc requires at least a CFML engine compatible with Adobe ColdFusion 8.
 
 You may instantiate and keep the instance of this CFC in some a scope such as Application and then just call the `notifyService()` method in it whenever the application needs to submit a bug report.
 
@@ -157,6 +157,8 @@ To access the BugLogHQ interface, go to `/bugLog/` on your bugLog server; the in
 * To install BugLog just unpack the zip file into the root of your webserver. BugLogHQ assumes it will be installed on a directory named /bugLog. If you want, you can also put BugLog directly on the web root or any other directory.
 
 **NOTE:** If you want to install bugLog on a location other than the default (/bugLog/), you will need to update the setting `general.externalURL` with the path to where you installed BugLog. The path must always end with a "/". Examples: "/", "/mybuglog/", "/bugtrackingthingy/", etc.
+
+**NOTE:** The BugLogHQ webapp requires a CFML engine compatible with at least Adobe ColdFusion 9; however it can receive bug reports from any version of CFML engines (or pretty much anything that can make an HTTP post)
 
 * Run the corresponding SQL script for your database. The script can be found in the `/install` directory. This will create the necessary tables.
 
