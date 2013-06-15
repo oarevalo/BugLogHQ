@@ -177,7 +177,7 @@
 			<cfif variables.useListener>
 				<cfif variables.protocol eq "REST">
 					<!--- send bug via a REST interface --->
-					<cfhttp method="post" throwonerror="false" timeout="10" url="#variables.bugLogListener#" charset="UTF-8" useragent="#variables.userAgent#">
+					<cfhttp method="post" throwonerror="true" timeout="10" url="#variables.bugLogListener#" charset="UTF-8" useragent="#variables.userAgent#">
 						<cfif variables.postToRESTasJSON>
 							<cfhttpparam type="header" name="Content-Type" value="application/json">
 							<cfhttpparam type="body" value="#serializeJson(data)#">
@@ -187,9 +187,6 @@
 							</cfloop>
 						</cfif>
 					</cfhttp>
-					<cfif NOT find( 200 , cfhttp.StatusCode )>
-						<cfthrow message="Invalid HTTP Response Received" detail="#cfhttp.FileContent#" />
-					</cfif>
 				<cfelse>
 					<!--- send bug via a webservice (SOAP) --->
 					<cfset variables.oBugLogListener.logEntry(data.dateTime,
