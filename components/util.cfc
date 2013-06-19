@@ -183,16 +183,16 @@
 		    utcDate = DateConvert("Local2Utc", dateObj) ;
 		    // Add the target zone difference
 		    targetDate = utcDate + targetSpan;
-		    return "{ts '" & DateFormat(targetDate, "yyyy-mm-dd ") & TimeFormat(targetDate, "HH:mm:ss") & "'}";
+		    return DateFormat(targetDate, "yyyy-mm-dd ") & TimeFormat(targetDate, "HH:mm:ss");
 		  }
 		  else if (conversionType is "zone2local") {
 		    //date is in the target zone so convert it to utc first
 		    targetDate = dateObj - targetSpan;
 		    //convert it back from utc to local
 		    targetDate = DateConvert("Utc2local", targetDate);    
-		    return "{ts '" & DateFormat(targetDate, "yyyy-mm-dd ") & TimeFormat(targetDate, "HH:mm:ss") & "'}";
+		    return DateFormat(targetDate, "yyyy-mm-dd ") & TimeFormat(targetDate, "HH:mm:ss");
 		  }
-		  return "{ts 'yyyy-mm-dd HH:mm:ss'}"; // error return
+		  return "'yyyy-mm-dd HH:mm:ss"; // error return
 		</cfscript>
 	</cffunction>
 </cfcomponent>
