@@ -222,8 +222,8 @@ label.inline {
 .cell_hostname {}
 .cell_message {width:700px;overflow:hidden;}
 .cell_count {text-align:right;}
-.cell_mostrecent {text-align:center;}
-.cell_datetime {text-align:center;}
+.cell_mostrecent {text-align:center;white-space: nowrap;}
+.cell_datetime {text-align:center;white-space: nowrap;}
 .cell_details {text-align:center;}
 
 
