@@ -154,7 +154,7 @@
 			<td class="cell_application"><a href="index.cfm?event=log&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a></td>
 			<td class="cell_hostname"><a href="index.cfm?event=log&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a></td>
 			<td class="cell_message" rel="index.cfm?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">
-				<div style="width:700px;overflow:hidden;">#tmpMessage#</div>
+				<div class="cell_message_content">#tmpMessage#</div>
 			</td>
 			<td class="cell_details">
 				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">

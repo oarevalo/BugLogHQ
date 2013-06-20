@@ -192,7 +192,7 @@
 				</cfif>	
 			</td>
 			<td class="cell_message" rel="#zoomURL#" title="Click for more details">
-				<div style="width:700px;overflow:hidden;">#tmpMessage#</div>
+				<div class="cell_message_content">#tmpMessage#</div>
 			</td>
 			<td class="cell_count">
 				#bugCount#

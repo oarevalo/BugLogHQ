@@ -220,7 +220,8 @@ label.inline {
 .cell_entry {width:30px;}
 .cell_application {}
 .cell_hostname {}
-.cell_message {width:700px;overflow:hidden;}
+.cell_message {}
+.cell_message_content {max-width:700px;overflow:hidden;}
 .cell_count {text-align:right;}
 .cell_mostrecent {text-align:center;white-space: nowrap;}
 .cell_datetime {text-align:center;white-space: nowrap;}
@@ -232,8 +233,8 @@ label.inline {
 }
 .summaryTable .header_severity {width:20px;}
 .summaryTable .header_application {width:120px;}
-.summaryTable .header_hostname {width:120px;}
-.summaryTable .header_message {width:700px;}
+.summaryTable .header_hostname {}
+.summaryTable .header_message {}
 .summaryTable .header_count {width:60px;}
 .summaryTable .header_mostrecent {width:110px;}
 .summaryTable .header_details {width:22px;}
@@ -245,8 +246,8 @@ label.inline {
 .detailTable .header_entry {width:30px;}
 .detailTable .header_datetime {width:110px;}
 .detailTable .header_application {width:120px;}
-.detailTable .header_hostname {width:120px;}
-.detailTable .header_message {width:700px;}
+.detailTable .header_hostname {}
+.detailTable .header_message {}
 .detailTable .header_details {width:22px;}
 
 
