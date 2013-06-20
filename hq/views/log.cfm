@@ -75,10 +75,11 @@
 	<div style="font-size:10px;line-height:20px;margin-top:10px;font-weight:bold;">
 		Showing entries #startRow# - #endRow# of #qryEntries.recordCount#
 	</div>
-	<table class="browseTable" style="width:100%">	
+	<table class="browseTable detailTable">	
+		<thead>
 		<tr>
-			<th width="15" nowrap>&nbsp;</th>
-			<th width="20" nowrap>
+			<th class="header_severity">&nbsp;</th>
+			<th class="header_entry">
 				<cfif sortBy eq "entryID">
 					<a href="#pageURL#&sortBy=entryID&sortDir=#opSortDir#" title="Click to sort by bug ##">##</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
@@ -86,7 +87,7 @@
 					<a href="#pageURL#&sortBy=entryID" title="Click to sort by bug ##">##</a>
 				</cfif>
 			</th>
-			<th width="110">
+			<th class="header_datetime">
 				<cfif sortBy eq "createdOn">
 					<a href="#pageURL#&sortBy=createdOn&sortDir=#opSortDir#" title="Click to sort by bug date/time">Date/Time</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
@@ -94,7 +95,7 @@
 					<a href="#pageURL#&sortBy=createdOn" title="Click to sort by bug date/time">Date/Time</a>
 				</cfif>
 			</th>
-			<th width="120">
+			<th class="header_application">
 				<cfif sortBy eq "applicationCode">
 					<a href="#pageURL#&sortBy=applicationCode&sortDir=#opSortDir#" title="Click to sort by application name">Application</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
@@ -102,7 +103,7 @@
 					<a href="#pageURL#&sortBy=applicationCode" title="Click to sort by application name">Application</a>
 				</cfif>
 			</th>
-			<th width="120">
+			<th class="header_hostname">
 				<cfif sortBy eq "hostName">
 					<a href="#pageURL#&sortBy=hostName&sortDir=#opSortDir#" title="Click to sort by host name">Host</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
@@ -110,7 +111,7 @@
 					<a href="#pageURL#&sortBy=hostName" title="Click to sort by host name">Host</a>
 				</cfif>
 			</th>
-			<th>
+			<th class="header_message">
 				<cfif sortBy eq "message">
 					<a href="#pageURL#&sortBy=message&sortDir=#opSortDir#" title="Click to sort by message">Message</a>
 					<img src="#imgSortDir#" align="absmiddle" border="0" style="text-decoration:none;" />
@@ -118,8 +119,10 @@
 					<a href="#pageURL#&sortBy=message" title="Click to sort by message">Message</a>
 				</cfif>
 			</th>
-			<th width="10">&nbsp;</th>
+			<th class="header_details">&nbsp;</th>
 		</tr>
+		</thead>
+		<tbody>
 	<cfloop query="qryEntries" startrow="#startRow#" endrow="#startRow+rowsPerPage-1#">
 		<cfset isNew = qryEntries.entryID gt lastbugread>
 		<cfset tmpRowClass = "row_app_" & replace(qryEntries.applicationCode," ","","ALL") & " "
@@ -132,7 +135,7 @@
 		</cfif>
 
 		<tr class="#LCase(tmpRowClass)#<cfif qryEntries.currentRow mod 2> altRow</cfif>" <cfif isNew>style="font-weight:bold;"</cfif>>
-			<td class="cell_severity" width="15" align="center" style="padding:0px;">
+			<td class="cell_severity">
 				<cfset tmpImgName = "images/severity/default.png">
 				<cfif qryEntries.SeverityCode neq "">
 					<cfif fileExists(expandPath("images/severity/#lcase(qryEntries.SeverityCode)#.png"))>
@@ -144,15 +147,16 @@
 						alt="#lcase(qryEntries.SeverityCode)#" 
 						title="#lcase(qryEntries.SeverityCode)#">
 			</td>
-			<td class="cell_entry" width="15">
+			<td class="cell_entry">
 				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">#qryEntries.entryID#</a>
 			</td>
-			<td class="cell_datetime" align="center" width="110">#showDateTime(qryEntries.createdOn)#</td>
-			<td class="cell_application" width="120"><a href="index.cfm?event=log&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a></td>
-			<td class="cell_hostname" width="120"><a href="index.cfm?event=log&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a></td>
-			<td class="cell_message" rel="index.cfm?event=entry&entryID=#qryEntries.entryID#" 
-				title="Click to view full details of bug">#tmpMessage#</td>
-			<td class="cell_details" align="center">
+			<td class="cell_datetime">#showDateTime(qryEntries.createdOn)#</td>
+			<td class="cell_application"><a href="index.cfm?event=log&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a></td>
+			<td class="cell_hostname"><a href="index.cfm?event=log&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a></td>
+			<td class="cell_message" rel="index.cfm?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">
+				<div style="width:700px;overflow:hidden;">#tmpMessage#</div>
+			</td>
+			<td class="cell_details">
 				<a href="?event=entry&entryID=#qryEntries.entryID#" title="Click to view full details of bug">
 					<img alt="View details" width="16" height="16" src="#rs.assetsPath#images/icons/zoom.png" align="absmiddle" border="0" /></a>
 			</td>
@@ -161,6 +165,7 @@
 	<cfif qryEntries.recordCount eq 0>
 		<td colspan="7"><em>No entries found.</em></td>
 	</cfif>
+		</tbody>
 	</table>
 	
 	

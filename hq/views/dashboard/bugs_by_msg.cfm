@@ -54,13 +54,13 @@
 
 		<tr>
 			<td>
-				<div style="font-weight:bold;font-size:13px;">
+				<div style="font-weight:bold;font-size:13px;width:540px;overflow:hidden;">
 					<span class="badge badge-#color_code_severity#">
 						<img src="#tmpImgURL#" align="absmiddle" alt="#qryListing.severityCode#" title="#qryListing.severityCode#">
 						#lcase(qryListing.severityCode)#
 					</span>
 					&nbsp;
-					<span class="cell_message" rel="#tmpEntryURL#">#tmpMessage#</span>
+					<span class="cell_message" rel="#tmpEntryURL#" title="#htmlEditFormat(tmpMessage)#">#tmpMessage#</span>
 				</div>
 				<div style="font-size:12px;margin-top:3px;">
 					on <a href="#tmpAppURL#" title="View all bug reports for this application">#qryListing.applicationCode#</a>
