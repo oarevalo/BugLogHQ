@@ -139,7 +139,7 @@
 			<cfset bugCount = 1>
 		</cfif>
 		<cfif bugCount gt 1>
-			<cfset zoomURL = "index.cfm?event=log&msgFromEntryID=#qryEntries.entryID#">
+			<cfset zoomURL = "index.cfm?event=log&msgFromEntryID=#qryEntries.entryID#&numDays=#rs.criteria.numdays#">
 			<cfif groupByApp>
 				<Cfset zoomURL = zoomURL & "&ApplicationID=#qryEntries.applicationID#">
 			</cfif>		
@@ -173,7 +173,7 @@
 						<cfset tmpImgName = "images/severity/#lcase(qryEntries.SeverityCode)#.png">
 					</cfif>
 				</cfif>
-				<a href="index.cfm?event=log&severityID=#qryEntries.SeverityCode#" 
+				<a href="index.cfm?event=log&severityID=#qryEntries.SeverityCode#&numDays=#rs.criteria.numdays#" 
 					title="Click to view all #qryEntries.SeverityCode# bugs"><img 
 						src="#rs.assetsPath##tmpImgName#" 
 						align="absmiddle"
@@ -183,12 +183,12 @@
 			</td>
 			<td class="cell_application">
 				<cfif groupByApp>
-					<a href="index.cfm?event=log&applicationID=#qryEntries.applicationID#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a>
+					<a href="index.cfm?event=log&applicationID=#qryEntries.applicationID#&numDays=#rs.criteria.numdays#" title="Click to view all #qryEntries.applicationCode# bugs">#qryEntries.applicationCode#</a>
 				</cfif>
 			</td>
 			<td class="cell_hostname">
 				<cfif groupByHost>
-					<a href="index.cfm?event=log&hostID=#qryEntries.hostID#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a>
+					<a href="index.cfm?event=log&hostID=#qryEntries.hostID#&numDays=#rs.criteria.numdays#" title="Click to view all bugs from #qryEntries.hostName#">#qryEntries.hostName#</a>
 				</cfif>	
 			</td>
 			<td class="cell_message" rel="#zoomURL#" title="Click for more details">
