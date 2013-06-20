@@ -36,7 +36,7 @@
 	</div>
 </cfif>
 <b>Recent Messages <cfif  qryListing.recordCount gt 0>(#qryListing.recordCount#)</cfif></b>	
-<table style="width:100%" class="table table-striped">	
+<table style="width:100%;" class="table table-striped">	
 	<tbody>
 	<cfloop query="qryListing" endrow="#maxRows#">
 		<cfset tmpEntryURL = "index.cfm?event=entry&entryID=#qryListing.EntryID#">
@@ -54,7 +54,12 @@
 
 		<tr>
 			<td>
-				<div style="font-weight:bold;font-size:13px;width:540px;overflow:hidden;">
+				<div class="pull-right" style="position:relative;z-index:2;">
+					<span class="badge badge-#color_code_count#">
+						<a href="#tmpMsgURL#" title="This bug report has occurred #qryListing.bugCount# times">#qryListing.bugCount#</a>
+					</span>
+				</div>
+				<div style="font-weight:bold;font-size:13px;">
 					<span class="badge badge-#color_code_severity#">
 						<img src="#tmpImgURL#" align="absmiddle" alt="#qryListing.severityCode#" title="#qryListing.severityCode#">
 						#lcase(qryListing.severityCode)#
@@ -68,15 +73,10 @@
 					<a href="#tmpEntryURL#" title="View bug report">#showDateTime(qryListing.createdOn)#</a>
 				</div>
 			</td>
-			<td style="text-align:center;">
-					<span class="badge badge-#color_code_count#">
-						<a href="#tmpMsgURL#" title="This bug report has occurred #qryListing.bugCount# times">#qryListing.bugCount#</a>
-					</span>
-			</td>
 		</tr>
 	</cfloop>
 	<cfif qryListing.recordCount eq 0>
-		<tr><td colspan="2"><em>No bug reports received! Yay!</em></td></tr>
+		<tr><td><em>No bug reports received! Yay!</em></td></tr>
 	</cfif>
 	</tbody>
 </table>

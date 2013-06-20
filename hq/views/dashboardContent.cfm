@@ -14,15 +14,13 @@
 	<cfoutput>
 		#contents.top#
 		<hr />
-		<div class="row">
-			<div class="span6">
+		<div id="dashboard-content" class="clearfix">
+			<div id="dashboard-left">
 				#contents.left1#	
 			</div>
-			<div class="span6">
-				<div style="margin-left:10px;">
-					#contents.right1#	
-					#contents.right2#	
-				</div>
+			<div id="dashboard-right">
+				#contents.right1#	
+				#contents.right2#	
 			</div>
 		</div>
 	</cfoutput>

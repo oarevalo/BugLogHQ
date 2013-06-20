@@ -45,7 +45,7 @@
 		<table  width="100%" class="well" cellpadding="0" cellspacing="0">
 			<tr align="center">
 				<td style="padding-top:5px;">
-					Show for last: &nbsp;&nbsp;
+					Show for last: 
 					<select name="numDays" style="width:100px;" class="searchSelector">
 						<cfloop array="#times#" index="item">
 							<option value="#item.value#" <cfif rs.criteria.numDays eq item.value>selected</cfif>>#item.label#</option>
@@ -53,13 +53,13 @@
 					</select>				
 				</td>
 				<td style="padding-top:5px;">
-					<span <cfif rs.criteria.searchTerm neq "">style="color:red;"</cfif>>Search:</span> &nbsp;&nbsp;
-					<input type="text" name="searchTerm" value="#rs.criteria.searchTerm#" style="width:200px;" class="searchSelector">
+					<span <cfif rs.criteria.searchTerm neq "">style="color:red;"</cfif>>Search:</span> 
+					<input type="text" name="searchTerm" value="#rs.criteria.searchTerm#" class="searchSelector">
 
 				</td>
 				<td style="padding-top:5px;">
-					<span <cfif rs.criteria.applicationID gt 0>style="color:red;"</cfif>>Application:</span> &nbsp;&nbsp;
-					<select name="applicationID" style="width:200px;" class="searchSelector">
+					<span <cfif rs.criteria.applicationID gt 0>style="color:red;"</cfif>>Application:</span> 
+					<select name="applicationID" class="searchSelector">
 						<option value="0">All</option>
 						<cfset found = false>
 						<cfloop query="qryApplicationsCurrent">
@@ -75,8 +75,8 @@
 					</select>
 				</td>
 				<td style="padding-top:5px;">
-					<span <cfif rs.criteria.hostID gt 0>style="color:red;"</cfif>>Host:</span> &nbsp;&nbsp;
-					<select name="hostID" style="width:200px;" class="searchSelector">
+					<span <cfif rs.criteria.hostID gt 0>style="color:red;"</cfif>>Host:</span> 
+					<select name="hostID"  class="searchSelector">
 						<option value="0">All</option>
 						<cfset found = false>
 						<cfloop query="qryHostsCurrent">

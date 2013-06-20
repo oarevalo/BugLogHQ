@@ -172,6 +172,19 @@ label.inline {
 #entry-stats {
 	width:300px;
 }
+.breakable {
+	-ms-word-break: break-all;
+	word-break: break-all;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	hyphens: auto;    	
+}
+
+.searchSelector {
+	width:100%;
+	min-width:100px;
+	max-width:200px;
+}
 
 /***** Extensions & Rules *******/
 #extensions-content {
@@ -215,13 +228,35 @@ label.inline {
 }
 
 
+/**** dashboard ****/
+#dashboard-content {
+	width:100%;
+	clear:both;
+}
+#dashboard-left {
+	width:49%;
+	float:left;
+}
+#dashboard-right {
+	width:49%;
+	float:right;
+}
+
+
 /****** Table Views *****/
 .cell_severity {text-align:center;}
 .cell_entry {width:30px;}
 .cell_application {}
 .cell_hostname {}
-.cell_message {}
-.cell_message_content {max-width:700px;overflow:hidden;}
+/*.cell_message {word-wrap:break-word;}*/
+.cell_message {
+	-ms-word-break: break-all;
+	word-break: break-all;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	hyphens: auto;    
+}
+.cell_message_content {max-width:700px;}
 .cell_count {text-align:right;}
 .cell_mostrecent {text-align:center;white-space: nowrap;}
 .cell_datetime {text-align:center;white-space: nowrap;}
@@ -232,8 +267,8 @@ label.inline {
 	width:100%;
 }
 .summaryTable .header_severity {width:20px;}
-.summaryTable .header_application {width:120px;}
-.summaryTable .header_hostname {}
+.summaryTable .header_application {max-width:120px;}
+.summaryTable .header_hostname {max-width:120px;}
 .summaryTable .header_message {}
 .summaryTable .header_count {width:60px;}
 .summaryTable .header_mostrecent {width:110px;}
@@ -243,10 +278,10 @@ label.inline {
 	width:100%;
 }
 .detailTable .header_severity {width:20px;}
-.detailTable .header_entry {width:30px;}
-.detailTable .header_datetime {width:110px;}
-.detailTable .header_application {width:120px;}
-.detailTable .header_hostname {}
+.detailTable .header_entry {width:20px;}
+.detailTable .header_datetime {width:100px;}
+.detailTable .header_application {max-width:120px;}
+.detailTable .header_hostname {max-width:120px;}
 .detailTable .header_message {}
 .detailTable .header_details {width:22px;}
 
