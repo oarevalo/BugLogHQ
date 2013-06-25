@@ -53,7 +53,7 @@
 				<td valign="middle" colspan="2">
 					<input style="font-size:11px;width:100px" 
 							type="text" name="username" 
-							required="yes" message="Your email address is required">
+							required="yes" message="Your username is required">
 				</td>
 			</tr>
 			<tr>
