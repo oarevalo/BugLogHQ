@@ -30,12 +30,9 @@
 				startInterval()
 			});
 		</script>	
-		<!---
 		<link type="text/css" rel="stylesheet" href="#rs.assetsPath#/includes/rickshaw/rickshaw.min.css">
-		<script src="#rs.assetsPath#/includes/d3/d3.min.js"></script> 
-		<script src="#rs.assetsPath#/includes/d3/d3.layout.min.js"></script> 
+		<script src="#rs.assetsPath#/includes/d3/d3.v3.min.js"></script> 
 		<script src="#rs.assetsPath#/includes/rickshaw/rickshaw.min.js"></script> 
-		--->
 	</cfoutput>
 </cfsavecontent>
 <cfhtmlhead text="#tmpHead#">

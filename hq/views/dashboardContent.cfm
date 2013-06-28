@@ -8,7 +8,7 @@
 		top = renderContent("views/dashboard/bugs_by_severity.cfm"),
 		left1 = renderContent("views/dashboard/bugs_by_msg.cfm"),
 		right1 = renderContent("views/dashboard/last_alert.cfm"),
-		right2 = renderContent("views/dashboard/bugs_by_time.cfm")
+		right2 = renderContent("views/dashboard/bugs_by_time_js.cfm")
 	}>
 	
 	<cfoutput>
