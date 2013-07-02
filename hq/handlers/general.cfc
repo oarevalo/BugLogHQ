@@ -21,11 +21,11 @@
 			// url path used to find html/js/css resources
 			var assetsPath = app.getLocalAssetsPath();
 			setValue("_coreImagesPath",assetsPath & "../core/images");
-			
+
 			try {
 				if(not structKeyExists(session,"userID")) session.userID = 0;
 				if(not structKeyExists(session,"user")) session.user = 0;
-				
+
 				// check login
 				if(not listFindNoCase(publicEvents, event) and session.userID eq 0) {
 					if(not listFindNoCase(noLoginRedirectEvents, event)) {
@@ -51,10 +51,10 @@
 
 				// get status of buglog server
 				stInfo = app.getServiceInfo();
-				
+
 				// get a util function used for date formatting
 				var dateConvertZFunc = createObject("component","bugLog.components.util").dateConvertZ;
-				
+
 				// set generally available values on the request context
 				setValue("hostName", hostName);
 				setValue("applicationTitle", appTitle);
@@ -100,15 +100,15 @@
 	<cffunction name="dashboard" access="public" returntype="void">
 		<cfscript>
 			var refreshSeconds = 60;
-			var appService = getService("app"); 
+			var appService = getService("app");
 
 			try {
 				// prepare filters panel
 				prepareFilter("dashboard");
-				
+
 				// get current filters selected
 				criteria = getValue("criteria");
-				
+
 				qryEntries = appService.searchEntries(argumentCollection = criteria);
 
 				setValue("qryEntries",qryEntries);
@@ -125,16 +125,16 @@
 
 	<cffunction name="dashboardContent" access="public" returntype="void">
 		<cfscript>
-			var appService = getService("app"); 
+			var appService = getService("app");
 			var numTriggersToDisplay = 10;
 
 			try {
 				// prepare filters panel
 				loadFilter("dashboard");
-				
+
 				// get current filters selected
 				var criteria = getValue("criteria");
-				
+
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
 				var qryTriggers = appService.getExtensionsLog(criteria.startDate, getValue("currentUser"));
 
@@ -149,39 +149,39 @@
 			}
 		</cfscript>
 	</cffunction>
-	
+
 	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
 			var refreshSeconds = 60;
 			var rowsPerPage = 20;
-			var appService = getService("app"); 
+			var appService = getService("app");
 
 			try {
 				// prepare filters panel
 				prepareFilter("summary");
-				
+
 				// get current filters selected
 				var criteria = getValue("criteria");
-				
-				// perform search				
+
+				// perform search
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
-	
+
 				// save the last entryID on a cookie, this allows to detect unread entries
 				var lastEntryID = getHighestEntryID(qryEntries);
 				if(not structKeyExists(cookie,"lastbugread")) {
 					writeCookie("lastbugread",lastEntryID,30);
 				}
 				setValue("lastbugread", cookie.lastbugread);
-	
+
 				// set the page title to reflect any recenly received messages
-				if(lastEntryID gt cookie.lastbugread) 
+				if(lastEntryID gt cookie.lastbugread)
 					setValue("pageTitle", "Summary (#lastEntryID-cookie.lastbugread#)");
 				else
 					setValue("pageTitle", "Summary");
-					
+
 				// perform grouping for summary display
 				qryEntries = appService.applyGroupings(qryEntries, criteria.groupByApp, criteria.groupByHost);
-	
+
 				setValue("qryEntries", qryEntries);
 				setValue("refreshSeconds",refreshSeconds);
 				setValue("rowsPerPage",rowsPerPage);
@@ -191,19 +191,19 @@
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
 			}
-		</cfscript>				
+		</cfscript>
 	</cffunction>
-	
+
 	<cffunction name="log" access="public" returntype="void">
 		<cfscript>
 			var refreshSeconds = 60;
 			var rowsPerPage = 20;
-			var appService = getService("app"); 
+			var appService = getService("app");
 
 			try {
 				// prepare filters panel
 				prepareFilter("log");
-				
+
 				// get current filters selected
 				var criteria = getValue("criteria");
 
@@ -219,23 +219,23 @@
 				} else {
 					setValue("msgFromEntryID", "");
 				}
-				
-				// perform search				
+
+				// perform search
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
-	
+
 				// save the last entryID on a cookie, this allows to detect unread entries
 				var lastEntryID = getHighestEntryID(qryEntries);
 				if(not structKeyExists(cookie,"lastbugread")) {
 					writeCookie("lastbugread",lastEntryID,30);
 				}
 				setValue("lastbugread", cookie.lastbugread);
-	
+
 				// set the page title to reflect any recenly received messages
-				if(lastEntryID gt cookie.lastbugread) 
+				if(lastEntryID gt cookie.lastbugread)
 					setValue("pageTitle", "Details View (#lastEntryID-cookie.lastbugread#)");
 				else
 					setValue("pageTitle", "Details View");
-					
+
 				setValue("qryEntries", qryEntries);
 				setValue("refreshSeconds",refreshSeconds);
 				setValue("rowsPerPage",rowsPerPage);
@@ -251,7 +251,7 @@
 	<cffunction name="entry" access="public" returntype="void">
 		<cfscript>
 			try {
-				var appService = getService("app"); 
+				var appService = getService("app");
 				var entryID = getValue("entryID");
 				var argsSearch = {};
 				var qryEntriesUA = queryNew("");
@@ -260,11 +260,11 @@
 				if(val(entryID) eq 0) {
 					setMessage("warning","Please select an entry to view");
 					setNextEvent("main");
-				}		
-				
+				}
+
 				// get requested entry object
 				oEntry = appService.getEntry(entryID, currentUser);
-				
+
 				// search for recent ocurrences (last 24 hours)
 				args.message = "__EMPTY__";
 				args.startDate = dateAdd("d", -1, now());
@@ -273,7 +273,7 @@
 				if(oEntry.getMessage() neq "")
 					args.message = oEntry.getMessage();
 				var qryEntriesLast24 = appService.searchEntries(argumentCollection = args);
-				var qryEntriesAll = appService.searchEntries(message = args.message, 
+				var qryEntriesAll = appService.searchEntries(message = args.message,
 															 searchTerm = "",
 															 applicationID = args.applicationID,
 															 user = currentUser);
@@ -283,13 +283,13 @@
 															searchTerm = "",
 															 user = currentUser);
 				}
-				
-				
+
+
 				// update lastread setting
 				if(structKeyExists(cookie, "lastbugread") and entryID gte cookie.lastbugread) {
 					cookie.lastbugread = entryID;
 				}
-				
+
 				// set values
 				setValue("ruleTypes", getService("app").getRules());
 				setValue("jiraEnabled", getService("jira").getSetting("enabled"));
@@ -310,15 +310,15 @@
 				setNextEvent("main");
 			}
 		</cfscript>
-	</cffunction>	
-	
+	</cffunction>
+
 	<cffunction name="rss" access="public" returntype="void">
 		<cfscript>
 			try {
 				var appService = getService("app");
 				var rssService = getService("rss");
 				var summary = getValue("summary",false);
-				
+
 				// check if we allow public/unauthenticated access to the RSS feeds
 				var isPublicAccessAllowed = appService.getConfig().getSetting("rss.allowPublicAccess",false);
 
@@ -343,7 +343,7 @@
 
 				var criteria = normalizeCriteria();
 				var rssXML = appService.buildRSSFeed(criteria, summary, rssService);
-				
+
 				setValue("rssXML", rssXML);
 				setView("feed");
 				setLayout("xml");
@@ -360,13 +360,13 @@
 				setView("");
 				setLayout("clean");
 			}
-		</cfscript>	
+		</cfscript>
 	</cffunction>
 
 	<cffunction name="updatePassword" access="public" returntype="void">
 		<cfset setView("updatePassword")>
 	</cffunction>
-	
+
 	<cffunction name="doStart" access="public" returnType="void">
 		<cfscript>
 			var nextEvent = getValue("nextEvent");
@@ -382,9 +382,9 @@
 			}
 
 			setNextEvent(nextEvent);
-		</cfscript>	
+		</cfscript>
 	</cffunction>
-	
+
 	<cffunction name="doStop" access="public" returnType="void">
 		<cfscript>
 			var nextEvent = getValue("nextEvent");
@@ -392,7 +392,7 @@
 				// stop service
 				getService("app").stopService();
 				setMessage("info","BugLogListener has been stopped!");
-				
+
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
@@ -409,15 +409,15 @@
 				sender = getService("app").getConfig().getSetting("general.adminEmail");
 				recipient = getValue("to","");
 				comment = getValue("comment","");
-				
-				if(val(entryID) eq 0) throw(type="validation", message="Please select an entry to send");		
+
+				if(val(entryID) eq 0) throw(type="validation", message="Please select an entry to send");
 				if(recipient eq "") throw(type="validation", message="Please enter the email address of the recipient");
 				if(sender eq "") throw(type="validation", message="The sender email address has not been configured.");
-				
+
 				oEntry = getService("app").sendEntry(entryID, sender, recipient, comment);
-				
+
 				setMessage("info","Email has been sent!");
-			
+
 			} catch(validation e) {
 				setMessage("warning",e.message);
 
@@ -427,9 +427,9 @@
 			}
 
 			setNextEvent("entry","entryID=#entryID#");
-		</cfscript>		
+		</cfscript>
 	</cffunction>
-	
+
 	<cffunction name="doLogin" access="public" returnType="void">
 		<cfscript>
 			var username = "";
@@ -441,11 +441,11 @@
 			try {
 				username = getValue("username","");
 				password = getValue("password","");
-				
-				if(username eq "") throw(type="validation", message="Please enter your username");		
+
+				if(username eq "") throw(type="validation", message="Please enter your username");
 				if(password eq "") throw(type="validation", message="Please enter your password");
 				if(nextEvent eq "") nextEvent = "";
-				
+
 				userID = getService("app").checkLogin(username, password);
 				if(userID eq 0) throw(type="validation", message="Invalid username/password combination");
 				session.userID = abs(userID);
@@ -469,7 +469,7 @@
 				}
 
 				setNextEvent(nextEvent,qs);
-				
+
 			} catch(validation e) {
 				setMessage("warning",e.message);
 				setNextEvent("login");
@@ -479,15 +479,15 @@
 				getService("bugTracker").notifyService(e.message, e);
 				setNextEvent("login");
 			}
-		</cfscript>		
+		</cfscript>
 	</cffunction>
-	
+
 	<cffunction name="doUpdatePassword" access="public" returnType="void">
 		<cfscript>
 			var newPassword = getValue("newPassword");
 			var newPassword2 = getValue("newPassword2");
 			var user = session.user;
-			
+
 			try {
 				if(!structKeyExists(session,"requirePasswordChange")) setNextEvent("main");
 				if(newPassword eq "") {setMessage("warning","Your password cannot be empty"); setNextEvent("updatePassword");}
@@ -496,11 +496,11 @@
 				structDelete(session,"requirePasswordChange");
 				setMessage("info","Your password has been updated");
 				setNextEvent("main");
-							
+
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("admin.main","panel=changePassword");				
+				setNextEvent("admin.main","panel=changePassword");
 			}
 		</cfscript>
 	</cffunction>
@@ -511,20 +511,20 @@
 		<cfset setMessage("information","Thank you for using BugLogHQ")>
 		<cfset setNextEvent("login")>
 	</cffunction>
-				
+
 	<cffunction name="doDelete" access="public" returnType="void">
 		<cfscript>
 			var appService = getService("app");
 			var entryID = val(getValue("entryID"));
 			var deleteScope = getValue("deleteScope");
-			
+
 			try {
 				if(entryID eq 0)
 					setNextEvent("");
 				var numDeleted = appService.deleteEntry(entryID, deleteScope);
 				setMessage("info","#numDeleted# Report(s) deleted");
 				setNextEvent("");
-			
+
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
@@ -534,33 +534,33 @@
 					setNextEvent("");
 			}
 		</cfscript>
-	</cffunction>			
-				
-				
+	</cffunction>
+
+
 	<cffunction name="writeCookie" access="private">
 		<cfargument name="name" type="string">
 		<cfargument name="value" type="string">
 		<cfargument name="expires" type="string">
 		<cfcookie name="#arguments.name#" value="#arguments.value#" expires="#arguments.expires#">
 	</cffunction>
-	
+
 	<cffunction name="prepareFilter" access="private">
 		<cfargument name="criteriaName" type="string" default="criteria">
 		<cfscript>
 			var criteria = structNew();
 			var resetCriteria = getValue("resetCriteria", false);
-			var appService = getService("app"); 
+			var appService = getService("app");
 			var currentUser = getValue("currentUser");
 
 			if(resetCriteria) {
 				structDelete(cookie,criteriaName);
 				writeCookie(criteriaName,"","now");
 			}
-			
+
 			if(structKeyExists(cookie,criteriaName) and isJSON(cookie[criteriaName])) {
 				criteria = deserializeJSON(cookie[criteriaName]);
 			}
-			
+
 			// make sure we have a complete criteria struct w/ default values
 			criteria = normalizeCriteria(criteria);
 
@@ -568,15 +568,15 @@
 			writeCookie(criteriaName,serializeJSON(criteria),30);
 
 			qrySeverities = appService.getSeverities();
-			
+
 			// set current user (do it now, because we don't want to save that to the cookie)
 			criteria.user = currentUser;
-			
+
 			setValue("criteria", criteria);
 			setValue("qrySeverities", qrySeverities);
 		</cfscript>
 	</cffunction>
-	
+
 	<cffunction name="loadFilter" access="private" returntype="void">
 		<cfargument name="criteriaName" type="string" default="criteria">
 		<cfscript>
@@ -588,9 +588,9 @@
 			} else {
 				prepareFilter(criteriaName);
 			}
-		</cfscript>		
+		</cfscript>
 	</cffunction>
-	
+
 	<cffunction name="normalizeCriteria" access="private" returntype="struct">
 		<cfargument name="criteria" type="struct" required="false" default="#structNew()#">
 		<cfscript>
@@ -612,7 +612,7 @@
 			if(not structKeyExists(criteria,"sortBy")) criteria.sortBy = "";
 			if(not structKeyExists(criteria,"sortDir")) criteria.sortDir = "asc";
 			if(not structKeyExists(criteria,"rows")) criteria.rows = 5;
-			
+
 			criteria = {
 				numDays = getValue("numDays", criteria.numDays),
 				searchTerm = getValue("searchTerm", criteria.searchTerm),
@@ -630,13 +630,13 @@
 				sortDir = getValue("sortDir", criteria.sortDir),
 				rows = getValue("rows", criteria.rows)
 			};
-			
+
 			// calculate how far back to query the data
 			if(isNumeric(criteria.numdays)) {
-				if(criteria.numdays lt 1) 
+				if(criteria.numdays lt 1)
 					criteria.startDate = dateAdd("h", criteria.numDays * 24 * -1, now());
 				else
-					criteria.startDate = dateAdd("d", val(criteria.numDays) * -1, now());
+					criteria.startDate = dateAdd("d", val(criteria.numDays) * -1, now())
 			}
 
 			// build a url to tihs page with the full criteria
@@ -648,11 +648,11 @@
 			}
 			criteria.url = "index.cfm?event=#thisEvent#" & href;
 			criteria.rssurl = "index.cfm?event=rss" & href;
-			
+
 			return criteria;
 		</cfscript>
 	</cffunction>
-	
+
 	<cffunction name="getHighestEntryID" access="private" returntype="numeric">
 		<cfargument name="qryEntries" type="query" required="true">
 		<cfset var qry = 0>
