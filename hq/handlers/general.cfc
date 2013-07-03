@@ -636,7 +636,7 @@
 				if(criteria.numdays lt 1)
 					criteria.startDate = dateAdd("h", criteria.numDays * 24 * -1, now());
 				else
-					criteria.startDate = dateAdd("d", val(criteria.numDays) * -1, now())
+					criteria.startDate = dateAdd("d", val(criteria.numDays) * -1, now());
 			}
 
 			// build a url to tihs page with the full criteria
