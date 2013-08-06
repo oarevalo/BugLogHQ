@@ -86,10 +86,5 @@ class BugLogClient:
             html += x + "<br />"
         return html
     
-    def _appendCGIStack(self, content):
-        html = ("<h1>Traceback</h1>"
-                    + cgitb.html(i18n=self.translator)
-                    + ("<h1>Environment Variables</h1><table>%s</table>"
-                       % cgitb.niceDict("", self.env)))
 
         
