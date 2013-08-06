@@ -135,6 +135,7 @@
 		.rickshaw_graph .detail .x_label { display: none }
 		</style>
 		
+		<b>Timeline (#subtitle#)</b><br />
 		<div id="chart_container">
 			<div id="y_axis"></div>
 		    <div id="chart"></div>
