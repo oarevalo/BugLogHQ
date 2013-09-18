@@ -440,7 +440,7 @@
 										startTime,
 										interval*3600) />
 		<cfelse>
-			<cfset scheduler.removeTask("bugLogPurgeHistory") />
+			<cfset scheduler.removeTask("bugLogSendDigest") />
 		</cfif>
 	</cffunction>
 
