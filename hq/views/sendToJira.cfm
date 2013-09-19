@@ -15,14 +15,15 @@
 <cfset tmpSeverity = oSeverity.getCode()>
 <cfset tmpMessage = oEntry.getMessage()>
 
+<cfset dateTimeStr = showDateTime(oEntry.getCreatedOn())>
+
 <cfsavecontent variable="defaultDescription">
 <cfoutput>
-[Bug ###entryID#|#rs.bugLogEntryHREF#]
-
-* *Date/Time:* #showDateTime(oEntry.getCreatedOn())#
-* *Application:* #oApp.getCode()#
-* *Host:* #oHost.getHostname()#
-* *Severity:* #tmpSeverity#
+*BugLog URL:* [#rs.bugLogEntryHREF#]
+*Date/Time:* #dateTimeStr#
+*Application:* #oApp.getCode()#
+*Host:* #oHost.getHostname()#
+*Severity:* #tmpSeverity#
 
 *User Agent:*
 #oEntry.getUserAgent()#
@@ -31,25 +32,23 @@
 *Template Path:*
 #oEntry.getTemplate_Path()#
 
-
+<cfif oEntry.getExceptionMessage() neq "">
 *Exception Message:*
 #oEntry.getExceptionMessage()#
+</cfif>
 
-
+<cfif oEntry.getExceptionDetails() neq "">
 *Exception Detail:*
 #oEntry.getExceptionDetails()#
+</cfif>
 
-
-*CFID / CFTOKEN:* 
-#oEntry.getCFID()# &nbsp;&nbsp;/&nbsp;&nbsp; #oEntry.getCFTOKEN()#
-
-
-* Issue submitted via BugLogHQ
+_Issue submitted via BugLogHQ_
 </cfoutput>
 </cfsavecontent>
 
 <cfparam name="summary" default="Bug ###entryID#: #tmpMessage#">
 <cfparam name="description" default="#defaultDescription#">
+<cfparam name="project" default="">
 
 <cfoutput>
 <h2>Bug ###oEntry.getEntryID()# : <span style="color:##cc0000;">#oEntry.getMessage()#</span></h2>
@@ -90,9 +89,10 @@
 			<tr>
 				<td style="width:100px;"><b>Project:</b></td>
 				<td>
-					<select name="project" class="formField" style="padding:2px;">
-						<cfloop array="#projects#" index="project">
-							<option value="#project.getKey()#">#project.getName()# (#project.getKey()#)</option>
+					<select name="project" id="project" class="formField" style="padding:2px;">
+						<option value="">-- Select Project --</option>
+						<cfloop array="#projects#" index="item">
+							<option value="#item.key#" <cfif project eq item.key>selected</cfif>>#item.name# (#item.key#)</option>
 						</cfloop>
 					</select>
 				</td>
@@ -100,11 +100,10 @@
 			<tr>
 				<td style="width:100px;"><b>Issue Type:</b></td>
 				<td>
-					<select name="issueType" class="formField" style="padding:2px;">
-						<cfloop array="#issueTypes#" index="issueType">
-							<option value="#issueType.getID()#">#issueType.getName()#</option>
-						</cfloop>
-					</select>
+					<cfif arrayLen(issueTypes) gt 0>
+						<select name="issueType" id="issueType" class="formField" style="padding:2px;">
+						</select>
+					</cfif>
 				</td>
 			</tr>
 			<tr>
@@ -124,6 +123,23 @@
 	</form>
 </div>
 </div>
-
-
 </cfoutput>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$('#project').change(function(){
+		var $this = $(this);
+		var $target = $('select#issueType');
+		$.getJSON('index.cfm?event=jira.getIssueTypes&projectKey='+$this.val(), function(data){
+		    var html = '';
+		    $target.empty();
+		    for (var i = 0; i< data.length; i++) {
+		    	if(!data[i].subtask)
+			        html += '<option value="' + data[i].id + '">' + data[i].name + '</option>';
+		    }
+		    $target.append(html);
+		});
+	});
+})	
+</script>
+

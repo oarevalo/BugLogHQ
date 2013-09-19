@@ -72,7 +72,7 @@
 					case "jira":
 						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
 						jiraConfig.enabled = jira.getSetting("enabled",false);
-						jiraConfig.wsdl = jira.getSetting("wsdl");
+						jiraConfig.endpoint = jira.getSetting("endpoint");
 						jiraConfig.username = jira.getSetting("username");
 						jiraConfig.password = jira.getSetting("password");
 						setValue("jiraConfig",jiraConfig);				
@@ -302,7 +302,7 @@
 		<cfscript>
 			var user = getValue("currentUser");
 			var enabled = getValue("enabled",false);
-			var wsdl = getValue("wsdl");
+			var endpoint = getValue("endpoint");
 			var username = getValue("username");
 			var password = getValue("password");
 			
@@ -310,7 +310,7 @@
 				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main","panel=jira");}
 				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("admin.main","panel=jira");}
 				getService("jira").setSetting("enabled", enabled)
-									.setSetting("wsdl", wsdl)
+									.setSetting("endpoint", endpoint)
 									.setSetting("username", username)
 									.setSetting("password", password)
 									.reinit();

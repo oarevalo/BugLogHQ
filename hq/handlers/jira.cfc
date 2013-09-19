@@ -39,14 +39,15 @@
 			var issueType = getValue("issueType");
 			var summary = getValue("summary");
 			var description = getValue("description");
+			var issue = {};
 			
 			try {
 				if(val(entryID) eq 0) throw(type="validation", message="Please select an entry to send");		
 				if(summary eq "") throw(type="validation", message="Please enter a summary for this issue");
 				
-				oJira.createIssue(project,issueType,summary,description);
+				issue = oJira.createIssue(project,issueType,summary,description);
 				
-				setMessage("info","Bug report sent to JIRA!");
+				setMessage("info","Issue ###issue.key# has been added to Jira.");
 			
 			} catch(validation e) {
 				setMessage("warning",e.message);
@@ -59,6 +60,24 @@
 			setNextEvent("entry","entryID=#entryID#");
 			
 		</cfscript>
+	</cffunction>
+	
+	<cffunction name="getIssueTypes" access="public" returntype="void">
+		<cfscript>
+			var oJIRA = getService("jira");
+			var projectKey = getValue("projectKey");
+
+			try {
+				issueTypes = oJIRA.getIssueTypes(projectKey);
+				setValue("data", issueTypes);
+
+			} catch(any e) {
+				setValue("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+			}
+			
+			setLayout("json");
+		</cfscript>			
 	</cffunction>
 	
 </cfcomponent>

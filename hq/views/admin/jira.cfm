@@ -5,6 +5,16 @@
 	
 	<div style="margin-left:30px;line-height:24px;">
 		<cfif !allowConfigEditing><div style="color:##990000;line-height:18px;font-weight:bold;margin-bottom:10px;">#editingSettingsNotAllowedMsg#</div></cfif>
+		
+		<br />
+		<div class="alert alert-info">
+			<p>
+			<b>IMPORTANT!</b><br>
+			As of BugLogHQ 1.8.2 Jira integration requires the use of the REST endpoint. Atlassian has indicated that the SOAP implementation
+			will be retired and only recommends using REST for external integrations. 
+			</p>
+		</div>
+		
 		<form name="jira" action="index.cfm" method="post">
 			<input type="hidden" name="event" value="admin.doSaveJiraSettings">
 			<table>
@@ -17,8 +27,8 @@
 					</td>
 				</tr>
 				<tr>
-					<td>WSDL:</td>
-					<td><input type="text" name="wsdl" value="#jiraConfig.wsdl#" class="formField" <cfif !allowConfigEditing>disabled</cfif>></td>
+					<td>Endpoint:</td>
+					<td><input type="text" name="endpoint" value="#jiraConfig.endpoint#" class="formField" <cfif !allowConfigEditing>disabled</cfif>></td>
 				</tr>
 				<tr>
 					<td>Username:</td>
