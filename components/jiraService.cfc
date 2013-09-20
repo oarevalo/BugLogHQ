@@ -28,7 +28,7 @@
 
 	<cffunction name="getProjects" access="public" returntype="array">
 		<cfset var response  = {}>
-		<cfhttp url="#variables.instance.endpoint#/project" 
+		<cfhttp url="#variables.instance.endpoint#/project/" 
 					result="response"
 					method="get" 
 					throwonerror="true"
@@ -41,7 +41,7 @@
 	<cffunction name="getProject" access="public" returntype="struct">
 		<cfargument name="projectKey" type="string" required="true">
 		<cfset var response  = {}>
-		<cfhttp url="#variables.instance.endpoint#/project/#projectKey#" 
+		<cfhttp url="#variables.instance.endpoint#/project/#projectKey#/" 
 					result="response"
 					method="get" 
 					throwonerror="true"
@@ -58,7 +58,7 @@
 		<cfif arguments.projectKey neq "">
 			<cfset data = getProject(arguments.projectKey).issueTypes>
 		<cfelse>
-			<cfhttp url="#variables.instance.endpoint#/issuetype" 
+			<cfhttp url="#variables.instance.endpoint#/issuetype/" 
 						result="response"
 						method="get" 
 						throwonerror="true"
@@ -88,7 +88,7 @@
 						}
 					}>
 
-		<cfhttp url="#variables.instance.endpoint#/issue" 
+		<cfhttp url="#variables.instance.endpoint#/issue/" 
 					result="response"
 					method="post" 
 					throwonerror="false"
