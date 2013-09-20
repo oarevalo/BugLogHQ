@@ -44,7 +44,9 @@
 			var xmlDoc = xmlParse(expandPath(variables.configDoc));
 			var xmlNode = 0;
 			var xmlNodes = 0;
+			var xmlChildNode = 0;
 			var i = 0;
+			var j = 0;
 			
 			// load general settings
 			for(i=1;i lte arrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
@@ -58,12 +60,16 @@
 			
 			// if there is a configkey defined, override general settings with then environment-specific settings
 			if(variables.configKey neq "") {
-				xmlNodes = xmlSearch(xmlDoc,"//envSettings[@name='#variables.configKey#']/setting");
-				for(i=1;i lte arrayLen(xmlNodes);i=i+1) {
-					xmlNode = xmlNodes[i];
-					cfg[xmlNode.xmlAttributes.name] = structNew();
-					cfg[xmlNode.xmlAttributes.name].name = xmlNode.xmlAttributes.name;
-					cfg[xmlNode.xmlAttributes.name].value = xmlNode.xmlText;
+				for(i=1;i lte arrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
+					xmlNode = xmlDoc.xmlRoot.xmlChildren[i];
+					if(xmlNode.xmlName eq "envSettings") {
+						for(j=1;j lte arrayLen(xmlNode.xmlChildren);j=j+1) {
+							xmlChildNode = xmlNode.xmlChildren[j];
+							cfg[xmlChildNode.xmlAttributes.name] = structNew();
+							cfg[xmlChildNode.xmlAttributes.name].name = xmlChildNode.xmlAttributes.name;
+							cfg[xmlChildNode.xmlAttributes.name].value = xmlChildNode.xmlText;
+						}
+					}
 				}
 			}
 
