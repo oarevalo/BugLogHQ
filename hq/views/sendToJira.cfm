@@ -46,7 +46,7 @@ _Issue submitted via BugLogHQ_
 </cfoutput>
 </cfsavecontent>
 
-<cfparam name="summary" default="Bug ###entryID#: #tmpMessage#">
+<cfparam name="form.summary" default="Bug ###entryID#: #tmpMessage#">
 <cfparam name="description" default="#defaultDescription#">
 <cfparam name="project" default="">
 
@@ -108,7 +108,7 @@ _Issue submitted via BugLogHQ_
 			</tr>
 			<tr>
 				<td><b>Summary:</b></td>
-				<td><input type="text" name="summary" value="#summary#" class="formField" style="width:90%;padding:2px;"></td>
+				<td><input type="text" name="summary" value="#form.summary#" class="formField" style="width:90%;padding:2px;"></td>
 			</tr>
 			<tr valign="top">
 				<td><b>Description:</b></td>
