@@ -14,7 +14,7 @@
 		<cfset var tempKey = "">
 		<cfset variables.configDoc = arguments.configDoc>
 		<cfset variables.configKey = arguments.configKey>
-		
+
 		<cfif variables.configKey neq "">
 			<!--- check if the given key points to an existing file, if so then the file contents will be used as the key --->
 			<cfif fileExists(variables.configKey)>
@@ -22,9 +22,9 @@
 			<cfelseif fileExists(expandPath(variables.configKey))>
 				<cfset variables.configKey = fileRead(expandPath(variables.configKey),"utf-8")>
 			</cfif>
-		<cfelseif fileExists(expandPath(replace(variables.configDoc,getFileFromPath(variables.configDoc),variables.configKeyFilename)))>
+		<cfelseif fileExists(expandPath(getDirectoryfrompath(variables.configDoc) & variables.configKeyFilename))>
 			<!--- this line checks the existence of a default text file containing the config key (must be on same directory as config file) --->
-			<cfset variables.configKey = fileRead(expandPath(replace(variables.configDoc,getFileFromPath(variables.configDoc),variables.configKeyFilename)),"utf-8")>
+			<cfset variables.configKey = fileRead(expandPath(expandPath(getDirectoryfrompath(variables.configDoc) & variables.configKeyFilename)),"utf-8")>
 		<cfelse>
 			<!--- we will try also to see if the server key has been provided by the servlet context (yes, we are getting funky!) --->
 		 	<cftry>
@@ -35,7 +35,6 @@
 				<cfcatch type="any"><!--- key not defined ---></cfcatch>
 			</cftry>
 		</cfif>
-		
 		<cfreturn this>
 	</cffunction>
 	
