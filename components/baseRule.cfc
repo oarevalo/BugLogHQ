@@ -39,11 +39,13 @@
 		<cfargument name="recipient" type="string" required="true">
 		<cfargument name="subject" type="string" required="false" default="BugLog: bug received">
 		<cfargument name="comment" type="string" required="false" default="">
+		<cfargument name="entryId" type="string" required="false" default="">
+
 		<cfscript>
 			var stEntry = {};
 			var buglogHref = getBaseBugLogHREF();
 			var sender = getListener().getConfig().getSetting("general.adminEmail");
-
+			var bugReportURL = getBugEntryHREF(arguments.EntryID);
 
 			if(structKeyExists(arguments,"rawEntryBean")) {
 				stEntry = arguments.rawEntryBean.getMemento();
@@ -63,9 +65,12 @@
 				</div>
 				<hr />
 			</cfif>
-				
 			<cfif structKeyExists(arguments,"rawEntryBean")>
 				<table style="font-family:arial;font-size:12px;">
+					<tr>
+						<td><b>BugLog Link:</b></td>
+						<td><strong>#bugReportURL#</strong></td>
+					</tr>
 					<tr>
 						<td><b>Message:</b></td>
 						<td><strong>#stEntry.message#</strong></td>
