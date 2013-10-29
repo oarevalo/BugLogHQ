@@ -133,6 +133,7 @@
 		<cfset var longMessage = "">
 		<cfset var tmpCFID = "">
 		<cfset var tmpCFTOKEN = "">
+		<cfset var key = "">
 		<cfset var data = {}>
 
 		<!--- make sure we have required members --->
@@ -152,11 +153,11 @@
 			<cfif arrayLen(getCheckpoints())>
 				<cfset checkpoint("bugLog.notifyService() called")>
 			</cfif>
-	
+
 			<!--- compose short and full messages --->
 			<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
 			<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth, arguments.AppName)>
-	
+
 			<!--- submit error --->
 			<cfset data = {
 						"dateTime" = Now(),
@@ -275,6 +276,7 @@
 			var aTags = arrayNew(1);
 			var qryTagContext = queryNew("template,line");
 			var tmpURL = "";
+			var key = "";
 
 			if(structKeyExists(arguments.exception,"tagContext")) {
 				aTags = duplicate(arguments.exception.tagContext);
