@@ -8,6 +8,9 @@
 	<cfproperty name="host" type="string" buglogType="host" displayName="Host Name" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
 	<cfproperty name="severity" type="string" buglogType="severity" displayName="Severity Code" hint="The severity that will trigger the rule. Leave empty to look for all severities">
 
+	<cfset variables.ID_NOT_SET = -9999999 />
+	<cfset variables.ID_NOT_FOUND = -9999990 />
+
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
 		<cfargument name="timespan" type="string" required="true">
@@ -19,9 +22,9 @@
 		<cfset variables.config.application = arguments.application>
 		<cfset variables.config.host = arguments.host>
 		<cfset variables.config.severity = arguments.severity>
-		<cfset variables.applicationID = -1>
-		<cfset variables.hostID = -1>
-		<cfset variables.severityID = -1>
+		<cfset variables.applicationID = variables.ID_NOT_SET>
+		<cfset variables.hostID = variables.ID_NOT_SET>
+		<cfset variables.severityID = variables.ID_NOT_SET>
 		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 		<cfreturn this>
 	</cffunction>
@@ -41,13 +44,13 @@
 			if(variables.config.severity neq "" and arguments.rawEntry.getSeverityCode() neq variables.config.severity) return true;
 
 			// get necessary IDs
-			if(variables.config.application neq "" and variables.applicationID eq -1) {
+			if(variables.config.application neq "" and (variables.applicationID eq ID_NOT_SET or variables.applicationID eq ID_NOT_FOUND)) {
 				variables.applicationID = getApplicationID();
 			}
-			if(variables.config.host neq "" and variables.hostID eq -1) {
+			if(variables.config.host neq "" and (variables.hostID eq ID_NOT_SET or variables.hostID eq ID_NOT_FOUND)) {
 				variables.hostID = getHostID();
 			}
-			if(variables.config.severity neq "" and variables.severityID eq -1) {
+			if(variables.config.severity neq "" and (variables.severityID eq ID_NOT_SET or variables.severityID eq ID_NOT_FOUND)) {
 				variables.severityID = getSeverityID();
 			}
 
@@ -61,9 +64,9 @@
 			args.message = arguments.rawEntry.getMessage();
 			args.startDate = dateAdd("n", variables.config.timespan * (-1), now() );
 			args.endDate = now();
-			if(variables.applicationID gt 0) args.applicationID = variables.applicationID;
-			if(variables.hostID gt 0) args.hostID = variables.hostID;
-			if(variables.severityID gt 0) args.severityID = variables.severityID;
+			if(variables.applicationID neq ID_NOT_SET) args.applicationID = variables.applicationID;
+			if(variables.hostID neq ID_NOT_SET) args.hostID = variables.hostID;
+			if(variables.severityID neq ID_NOT_SET) args.severityID = variables.severityID;
 
 			qry = oEntryFinder.search(argumentCollection = args);
 			
