@@ -87,7 +87,7 @@
 		<cfset var q = arguments.data>
 		<cfset var numHours = int(variables.config.timespan / 60)>
 		<cfset var numMinutes = variables.config.timespan mod 60>
-		<cfset var bugReportURL = getBugEntryHREF(q.EntryID) />
+		<cfset var intro = "">
 
 		<cfsavecontent variable="intro">
 			<cfoutput>
@@ -106,16 +106,14 @@
 					<cfif numHours gt 0> #numHours# hour<cfif numHours gt 1>s</cfif> <cfif numMinutes gt 0> and </cfif></cfif>
 					<cfif numMinutes gt 0> #numMinutes# minute<cfif numMinutes gt 1>s</cfif></cfif>
 				</b>
-				<br /><br />
-				Bug Report URL: <a href="#bugReportURL#">#bugReportURL#</a>
-				<br />
 			</cfoutput>
 		</cfsavecontent>			
 		
 		<cfset sendToEmail(rawEntryBean = arguments.rawEntry,
 							recipient = variables.config.recipientEmail,
 							subject= "BugLog: [First Message Alert][#q.ApplicationCode#][#q.hostName#] #q.message#", 
-							comment = intro)>
+							comment = intro,
+							entryID = q.EntryID)>
 		
 		<cfset writeToCFLog("'firstMessageAlert' rule fired. Email sent. Msg: '#q.message#'")>
 	</cffunction>
