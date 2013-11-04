@@ -50,11 +50,14 @@
 
 		<!--- there can be many ids... So split them into handy lists and delte them each! --->
 		<cfscript>
-		    delList = arguments.id;
-		    maxChunkLength = 1000;
-		    numOfChunks = ceiling(listLen(delList)/maxChunkLength);
-		    listAsArray = listToArray(delList);
-		    numOfItems = arraylen(listAsArray);
+			var delList = arguments.id;
+			var maxChunkLength = 1000;
+			var numOfChunks = ceiling(listLen(delList)/maxChunkLength);
+			var listAsArray = listToArray(delList);
+			var numOfItems = arraylen(listAsArray);
+			var startItem = '';
+			var endItem = '';
+			var k = '';
 		    for (k=1;k lte numOfChunks; k=k+1){
 		        startItem = (k - 1) * maxChunkLength;
 		        endItem = startItem + maxChunkLength;
