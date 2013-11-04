@@ -109,6 +109,7 @@
 		<cfset var password = variables.oConfigBean.getPassword()>
 		<cfset var tableName = arguments._mapTableInfo.tableName>
 		<cfset var stColumns = arguments._mapColumns>
+		<cfset var tmpMessage = ''>
 	
 		<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#">
 			SELECT *
@@ -116,15 +117,16 @@
 			WHERE (1=1)
 				<cfloop collection="#arguments#" item="key">
 					<cfif structKeyExists(stColumns,key)>
+						<cfset tmpMessage = arguments[key]>
+						<cfset tmpMessage = replace(replace(tmpMessage,"[","[[]",'one'),"''","'")>
 						<cfif stColumns[key].cfsqltype eq "cf_sql_varchar">
-							and #key# LIKE <cfqueryparam cfsqltype="#stColumns[key].cfsqltype#" value="#arguments[key]#">
+							and #key# LIKE <cfqueryparam cfsqltype="#stColumns[key].cfsqltype#" value="#tmpMessage#">
 						<cfelse>
-							and #key# = <cfqueryparam cfsqltype="#stColumns[key].cfsqltype#" value="#arguments[key]#">
+							and #key# = <cfqueryparam cfsqltype="#stColumns[key].cfsqltype#" value="#tmpMessage#">
 						</cfif>
 					</cfif>
 				</cfloop>
 		</cfquery>
-
 		<cfreturn qry>
 	</cffunction>
 

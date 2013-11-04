@@ -46,11 +46,11 @@
 		<cfargument name="severityCode" type="string" required="false" default="">
 		<cfargument name="userAgent" type="string" required="false" default="">
 		<cfargument name="userID" type="numeric" required="false" default="0">
-
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var dbType = oDataProvider.getConfig().getDBType()>
 		<cfset var qry = 0>
 		<cfset var dsn = oDataProvider.getConfig().getDSN()>
+		<cfset var tmpMessage = ''>
 
 		<cfif arguments.searchTerm neq "">
 			<cfif dbType eq "mysql">
@@ -120,7 +120,9 @@
 						<cfif arguments.message eq "__EMPTY__">
 							AND NULLIF(message,'') IS NULL
 						<cfelse>
-							AND message LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.message#">
+							<cfset tmpMessage = arguments.message>
+							<cfset tmpMessage = replace(replace(tmpMessage,"[","[[]",'one'),"''","'")>
+							AND message LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#tmpMessage#">
 						</cfif>
 					</cfif>
 					<cfif arguments.applicationID neq "" and arguments.applicationID neq 0 and arguments.applicationID neq "_ALL_">
