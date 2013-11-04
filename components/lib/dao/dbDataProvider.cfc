@@ -47,6 +47,29 @@
 		<cfargument name="id" type="any" required="true">
 		<cfargument name="_mapTableInfo" type="struct" required="true">
 		<cfargument name="_mapColumns" type="struct" required="true">
+
+		<!--- there can be many ids... So split them into handy lists and delte them each! --->
+		<cfscript>
+		    delList = arguments.id;
+		    maxChunkLength = 1000;
+		    numOfChunks = ceiling(listLen(delList)/maxChunkLength);
+		    listAsArray = listToArray(delList);
+		    numOfItems = arraylen(listAsArray);
+		    for (k=1;k lte numOfChunks; k=k+1){
+		        startItem = (k - 1) * maxChunkLength;
+		        endItem = startItem + maxChunkLength;
+		        if (endItem gt numOfItems){
+		            endItem = numOfItems;
+		        }
+				deleteChunks(arrayToList(listAsArray.subList(startItem, endItem)),arguments._mapTableInfo,arguments._mapColumns); 
+		    }
+		</cfscript>
+	</cffunction>
+	
+	<cffunction name="deleteChunks" access="private"  returntype="void">
+		<cfargument name="id" type="any" required="true">
+		<cfargument name="_mapTableInfo" type="struct" required="true">
+		<cfargument name="_mapColumns" type="struct" required="true">		
 		<cfset var qry = 0>
 		<cfset var dsn = variables.oConfigBean.getDSN()>
 		<cfset var username = variables.oConfigBean.getUsername()>
