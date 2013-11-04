@@ -100,8 +100,7 @@
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
 		<cfset var qryEntries = 0>
 		<cfset var bugReportURL = "">
-		<cfset var buglogHref = getBaseBugLogHREF()>
-		<cfset var sender = getListener().getConfig().getSetting("general.adminEmail")>
+		<cfset var intro = "">
 		
 		<cfquery name="qryEntries" dbtype="query">
 			SELECT ApplicationCode, ApplicationID, 
@@ -115,11 +114,8 @@
 				ORDER BY createdOn DESC
 		</cfquery>
 		
-		<cfif variables.config.recipientEmail neq "">
-			<cfmail from="#sender#" 
-					to="#variables.config.recipientEmail#"
-					subject="BugLog: bug frequency alert!" 
-					type="text/html">
+		<cfsavecontent variable="intro">
+			<cfoutput>
 				BugLog has received more than <strong>#variables.config.count#</strong> bug reports 
 				<cfif variables.sameMessage>
 					<strong>with the same message</strong>
@@ -139,11 +135,12 @@
 					<cfset bugReportURL = getBugEntryHREF(qryEntries.EntryID) />
 					&bull; <a href="#bugReportURL#">[#qryEntries.severityCode#][#qryEntries.applicationCode#][#qryEntries.hostName#] #qryEntries.message# <cfif !variables.sameMessage>(#qryEntries.bugCount#)</cfif></a><br />
 				</cfloop>
-				<br /><br /><br />
-				** This email has been sent from the BugLog server at 
-				<a href="#buglogHref#">#buglogHref#</a>
-			</cfmail>
-		</cfif>
+			</cfoutput>
+		</cfsavecontent>
+
+		<cfset sendToEmail(recipient = variables.config.recipientEmail,
+							subject= "BugLog: bug frequency alert!", 
+							comment = intro)>
 
 		<cfset variables.lastEmailTimestamp = now()>
 		
@@ -222,9 +219,7 @@
 
 	<cffunction name="sendAlert" access="private" returntype="void" output="true">
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
-		<cfset var qryEntries = 0>
 		<cfset var msg = "">
-		<cfset var sender = getListener().getConfig().getSetting("general.adminEmail")>
 		
 		<cfif variables.config.oneTimeAlertRecipient neq "" 
 				and dateDiff("n", variables.lastOneTimeEmailTimestamp, now()) gt 60*24>
@@ -241,10 +236,10 @@
 			</cfif>
 			<cfset msg = msg & "on the last #variables.config.timespan# minutes.">
 		
-			<cfmail from="#sender#" 
-					to="#variables.config.oneTimeAlertRecipient#"
-					subject="BugLog: Frequency alert" 
-					type="text">#msg#</cfmail>
+			<cfset sendToEmail(recipient = variables.config.oneTimeAlertRecipient,
+								subject= "BugLog: Frequency alert", 
+								comment = msg)>
+		
 			<cfset variables.lastOneTimeEmailTimestamp = now()>
 			
 			<cfset writeToCFLog("'frequencyAlert' rule fired. One-time alert sent.")>
