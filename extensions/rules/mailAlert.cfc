@@ -26,7 +26,6 @@
 			var evalCond1 = true;
 			var evalCond2 = true;
 			var evalCond3 = true;
-			var i = 0;
 
 			// evaluate conditions
 			evalCond1 = (variables.config.application eq "")
@@ -35,7 +34,7 @@
 			evalCond2 = (variables.config.severityCode eq "")
 						or (variables.config.severityCode neq "" and stEntry.severityCode eq variables.config.severityCode);
 
-			for(i=1;i lte listLen(variables.config.keywords);i=i+1) {
+			for(var i=1;i lte listLen(variables.config.keywords);i=i+1) {
 				evalCond3 = evalCond3 and findNoCase(listGetAt(variables.config.keywords,i), stEntry.message);
 				if(not evalCond3) break;
 			}
@@ -46,7 +45,8 @@
 				sendToEmail(rawEntryBean = arguments.rawEntry, 
 							recipient = variables.config.recipientEmail,
 							subject = "BugLog: #arguments.rawEntry.getMessage()#",
-							comment = "This message has been sent because the following bug report matched the given criteria. To review or modify the criteria please log into the bugLog server and go into the Rules section.");
+							comment = getAlertMessage(),
+							entryID = arguments.entry.getEntryID());
 				
 				writeToCFLog("'MailAlertRule' rule fired. Email sent. Msg: '#arguments.rawEntry.getMessage()#'");
 			}
@@ -68,9 +68,25 @@
 			<cfset rtn &= " with a severity of <b>#variables.config.severityCode#</b>">
 		</cfif>
 		<cfif variables.config.keywords  neq "">
-			<cfset rtn &= " containing any of the following keywords <b>#listQualify(variables.config.keywords,"'")#</b>">
+			<cfset var tmpKeywordsList = listQualify(variables.config.keywords,"'")>
+			<cfset rtn &= " containing any of the following keywords <b>#tmpKeywordsList#</b>">
 		</cfif>
 		<cfreturn rtn>
 	</cffunction>	
+
+	<cffunction name="getAlertMessage" type="string" access="private">
+		<cfset var msg = "BugLog has received a bug report">
+		<cfif variables.config.application neq "">
+			<cfset rtn &= " from application <b>#variables.config.application#</b>">
+		</cfif>
+		<cfif variables.config.severityCode neq "">
+			<cfset msg &= " with severity code <b>#variables.config.severityCode#</b>">
+		</cfif>
+		<cfif variables.config.keywords  neq "">
+			<cfset var tmpKeywordsList = listQualify(variables.config.keywords,"'")>
+			<cfset rtn &= " containing any of the following keywords <b>#tmpKeywordsList#</b>">
+		</cfif>
+		<cfreturn msg>
+	</cffunction>
 	
 </cfcomponent>
