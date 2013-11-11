@@ -184,9 +184,7 @@
 							<cfhttpparam type="body" value="#serializeJson(data)#">
 						<cfelse>
 							<cfloop list="#structKeyList(data)#" index="key">
-								<cfif isNull(data[key])>
-									<cfhttpparam type="formfield" name="#key#" value="null">
-								<cfelse>
+								<cfif !isNull(data[key])>
 									<cfhttpparam type="formfield" name="#key#" value="#data[key]#">
 								</cfif>
 							</cfloop>
