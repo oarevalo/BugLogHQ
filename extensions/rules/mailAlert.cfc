@@ -77,14 +77,14 @@
 	<cffunction name="getAlertMessage" type="string" access="private">
 		<cfset var msg = "BugLog has received a bug report">
 		<cfif variables.config.application neq "">
-			<cfset rtn &= " from application <b>#variables.config.application#</b>">
+			<cfset msg &= " from application <b>#variables.config.application#</b>">
 		</cfif>
 		<cfif variables.config.severityCode neq "">
 			<cfset msg &= " with severity code <b>#variables.config.severityCode#</b>">
 		</cfif>
 		<cfif variables.config.keywords  neq "">
 			<cfset var tmpKeywordsList = listQualify(variables.config.keywords,"'")>
-			<cfset rtn &= " containing any of the following keywords <b>#tmpKeywordsList#</b>">
+			<cfset msg &= " containing any of the following keywords <b>#tmpKeywordsList#</b>">
 		</cfif>
 		<cfreturn msg>
 	</cffunction>
