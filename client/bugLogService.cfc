@@ -354,7 +354,7 @@
 				</tr>
 				<tr>
 					<td><b>Referrer:</b></td>
-					<td>#HtmlEditFormat(cgi.HTTP_REFERER)#</td>
+					<td><cfif cgi.HTTP_REFERER neq ""><a href="#cgi.HTTP_REFERER#">#HtmlEditFormat(cgi.HTTP_REFERER)#</a></cfif></td>
 				</tr>
 				<tr>
 					<td><b>Query String:</b></td>
