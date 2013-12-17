@@ -61,7 +61,7 @@
 					<cfif listLen(arguments.id) gt 1>
 						#PKName# IN (<cfqueryparam cfsqltype="#PKType#" value="#arguments.id#" list="true">)
 					<cfelse>
-						#PKName# = <cfqueryparam cfsqltype="#PKType#" value="#arguments.id#">
+						#PKName# = <cfqueryparam cfsqltype="#PKType#" value="#arguments.id#" null="#len(trim(arguments.id))#">
 					</cfif>
 		</cfquery>
 	</cffunction>
