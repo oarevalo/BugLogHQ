@@ -225,7 +225,7 @@
 		<cfargument name="subject" type="string" required="true">
 		<cfargument name="body" type="string" required="true">
 		<cfargument name="type" type="string" required="false" default="html">
-		<cfset var debug = getListener().getConfig().getSetting("debug.email")>
+		<cfset var debug = getListener().getConfig().getSetting("debug.email", false)>
 		<cfif isBoolean(debug) and debug>
 			<cfset var path = getListener().getConfig().getSetting("debug.emailPath","/bugLog/emails/")>
 			<cfset var txt = "From: #arguments.from#" & chr(10)
