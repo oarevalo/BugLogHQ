@@ -421,7 +421,15 @@
 
 			<cfif not isSimpleValue(arguments.ExtraInfo) or arguments.ExtraInfo neq "">
 				<h3>Additional Info</h3>
-				#sanitizeDump(arguments.ExtraInfo, arguments.maxDumpDepth)#
+				<cftry>
+					#sanitizeDump(arguments.ExtraInfo, arguments.maxDumpDepth)#
+					<cfcatch>
+						<div style="margin-left:80px;">
+							<h4 style="color:red;">Failed to convert <strong>ExtraInfo</strong> into a HTML representation!</h4>
+							#sanitizeDump(CFCATCH, arguments.maxDumpDepth)#
+						</div>
+					</cfcatch>
+				</cftry>
 			</cfif>
 
 			<cfset var checkpoints = getCheckpoints()>
