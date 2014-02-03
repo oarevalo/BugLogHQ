@@ -47,6 +47,32 @@
 		<cfargument name="id" type="any" required="true">
 		<cfargument name="_mapTableInfo" type="struct" required="true">
 		<cfargument name="_mapColumns" type="struct" required="true">
+
+		<!--- there can be many ids... So split them into handy lists and delte them each! --->
+		<cfscript>
+			var delList = arguments.id;
+			var maxChunkLength = 1000;
+			var numOfChunks = ceiling(listLen(delList)/maxChunkLength);
+			var listAsArray = listToArray(delList);
+			var numOfItems = arraylen(listAsArray);
+			var startItem = '';
+			var endItem = '';
+			var k = '';
+		    for (k=1;k lte numOfChunks; k=k+1){
+		        startItem = (k - 1) * maxChunkLength;
+		        endItem = startItem + maxChunkLength;
+		        if (endItem gt numOfItems){
+		            endItem = numOfItems;
+		        }
+				deleteChunks(arrayToList(listAsArray.subList(startItem, endItem)),arguments._mapTableInfo,arguments._mapColumns); 
+		    }
+		</cfscript>
+	</cffunction>
+	
+	<cffunction name="deleteChunks" access="private"  returntype="void">
+		<cfargument name="id" type="any" required="true">
+		<cfargument name="_mapTableInfo" type="struct" required="true">
+		<cfargument name="_mapColumns" type="struct" required="true">		
 		<cfset var qry = 0>
 		<cfset var dsn = variables.oConfigBean.getDSN()>
 		<cfset var username = variables.oConfigBean.getUsername()>
@@ -109,6 +135,7 @@
 		<cfset var password = variables.oConfigBean.getPassword()>
 		<cfset var tableName = arguments._mapTableInfo.tableName>
 		<cfset var stColumns = arguments._mapColumns>
+		<cfset var tmpMessage = ''>
 	
 		<cfquery name="qry" datasource="#DSN#" username="#username#" password="#password#">
 			SELECT *
@@ -116,15 +143,16 @@
 			WHERE (1=1)
 				<cfloop collection="#arguments#" item="key">
 					<cfif structKeyExists(stColumns,key)>
+						<cfset tmpMessage = arguments[key]>
+						<cfset tmpMessage = replace(replace(tmpMessage,"[","[[]",'one'),"''","'")>
 						<cfif stColumns[key].cfsqltype eq "cf_sql_varchar">
-							and #key# LIKE <cfqueryparam cfsqltype="#stColumns[key].cfsqltype#" value="#arguments[key]#">
+							and #key# LIKE <cfqueryparam cfsqltype="#stColumns[key].cfsqltype#" value="#tmpMessage#">
 						<cfelse>
-							and #key# = <cfqueryparam cfsqltype="#stColumns[key].cfsqltype#" value="#arguments[key]#">
+							and #key# = <cfqueryparam cfsqltype="#stColumns[key].cfsqltype#" value="#tmpMessage#">
 						</cfif>
 					</cfif>
 				</cfloop>
 		</cfquery>
-
 		<cfreturn qry>
 	</cffunction>
 
