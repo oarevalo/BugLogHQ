@@ -50,6 +50,7 @@
 		</cfif>
 		<a href="index.cfm?event=extensions.main&panel=history">More...</a>
 	</div>
+	<br />
 </cfoutput>
 
 <script type="text/javascript">

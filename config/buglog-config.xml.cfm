@@ -25,7 +25,7 @@
 	<setting name="service.schedulerIntervalSecs">120</setting>
 
 	<setting name="jira.enabled">false</setting>
-	<setting name="jira.wsdl"></setting>
+	<setting name="jira.endpoint"></setting>
 	<setting name="jira.username"></setting>
 	<setting name="jira.password"></setting>
 

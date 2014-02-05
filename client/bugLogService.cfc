@@ -1,5 +1,5 @@
 <cfcomponent>
-	<cfset variables.bugLogClientVersion = "1.8-c2">	<!--- bugloghq client version --->
+	<cfset variables.bugLogClientVersion = "1.8-c3">	<!--- bugloghq client version --->
 	<cfset variables.bugEmailSender = "">
 	<cfset variables.bugEmailRecipients = "">
 	<cfset variables.bugLogListener = "">
@@ -133,20 +133,12 @@
 		<cfset var longMessage = "">
 		<cfset var tmpCFID = "">
 		<cfset var tmpCFTOKEN = "">
+		<cfset var key = "">
 		<cfset var data = {}>
 
 		<!--- make sure we have required members --->
 		<cfparam name="arguments.exception.message" default="">
 		<cfparam name="arguments.exception.detail" default="">
-
-		<!--- if we are tracking checkpoints, then add the buglog call as the last checkpoint --->
-		<cfif arrayLen(getCheckpoints())>
-			<cfset checkpoint("bugLog.notifyService() called")>
-		</cfif>
-
-		<!--- compose short and full messages --->
-		<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
-		<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth, arguments.AppName)>
 
 		<!--- check if there are valid CFID/CFTOKEN values available --->
 		<cfif isDefined("cfid")>
@@ -156,8 +148,17 @@
 			<cfset tmpCFTOKEN = cftoken>
 		</cfif>
 
-		<!--- submit error --->
 		<cftry>
+			<!--- if we are tracking checkpoints, then add the buglog call as the last checkpoint --->
+			<cfif arrayLen(getCheckpoints())>
+				<cfset checkpoint("bugLog.notifyService() called")>
+			</cfif>
+
+			<!--- compose short and full messages --->
+			<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
+			<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth, arguments.AppName)>
+
+			<!--- submit error --->
 			<cfset data = {
 						"dateTime" = Now(),
 						"message" = arguments.message,
@@ -177,19 +178,18 @@
 			<cfif variables.useListener>
 				<cfif variables.protocol eq "REST">
 					<!--- send bug via a REST interface --->
-					<cfhttp method="post" throwonerror="false" timeout="10" url="#variables.bugLogListener#" charset="UTF-8" useragent="#variables.userAgent#">
+					<cfhttp method="post" throwonerror="true" timeout="10" url="#variables.bugLogListener#" charset="UTF-8" useragent="#variables.userAgent#">
 						<cfif variables.postToRESTasJSON>
 							<cfhttpparam type="header" name="Content-Type" value="application/json">
 							<cfhttpparam type="body" value="#serializeJson(data)#">
 						<cfelse>
 							<cfloop list="#structKeyList(data)#" index="key">
-								<cfhttpparam type="formfield" name="#key#" value="#data[key]#">
+								<cfif !isNull(data[key])>
+									<cfhttpparam type="formfield" name="#key#" value="#data[key]#">
+								</cfif>
 							</cfloop>
 						</cfif>
 					</cfhttp>
-					<cfif NOT find( 200 , cfhttp.StatusCode )>
-						<cfthrow message="Invalid HTTP Response Received" detail="#cfhttp.FileContent#" />
-					</cfif>
 				<cfelse>
 					<!--- send bug via a webservice (SOAP) --->
 					<cfset variables.oBugLogListener.logEntry(data.dateTime,
@@ -278,6 +278,7 @@
 			var aTags = arrayNew(1);
 			var qryTagContext = queryNew("template,line");
 			var tmpURL = "";
+			var key = "";
 
 			if(structKeyExists(arguments.exception,"tagContext")) {
 				aTags = duplicate(arguments.exception.tagContext);
@@ -348,8 +349,12 @@
 					<td>#HtmlEditFormat(cgi.HTTP_USER_AGENT)#</td>
 				</tr>
 				<tr>
+					<td><b>Remote Address:</b></td>
+					<td>#HtmlEditFormat(cgi.REMOTE_ADDR)#</td>
+				</tr>
+				<tr>
 					<td><b>Referrer:</b></td>
-					<td>#HtmlEditFormat(cgi.HTTP_REFERER)#</td>
+					<td><cfif cgi.HTTP_REFERER neq ""><a href="#cgi.HTTP_REFERER#">#HtmlEditFormat(cgi.HTTP_REFERER)#</a></cfif></td>
 				</tr>
 				<tr>
 					<td><b>Query String:</b></td>
@@ -416,7 +421,15 @@
 
 			<cfif not isSimpleValue(arguments.ExtraInfo) or arguments.ExtraInfo neq "">
 				<h3>Additional Info</h3>
-				#sanitizeDump(arguments.ExtraInfo, arguments.maxDumpDepth)#
+				<cftry>
+					#sanitizeDump(arguments.ExtraInfo, arguments.maxDumpDepth)#
+					<cfcatch>
+						<div style="margin-left:80px;">
+							<h4 style="color:red;">Failed to convert <strong>ExtraInfo</strong> into a HTML representation!</h4>
+							#sanitizeDump(CFCATCH, arguments.maxDumpDepth)#
+						</div>
+					</cfcatch>
+				</cftry>
 			</cfif>
 
 			<cfset var checkpoints = getCheckpoints()>

@@ -1,6 +1,7 @@
 <cfcomponent extends="bugLogListener" hint="This listener modifies the standard listener so that it processes all bug in an asynchronous manner">
 	
-	<cfset variables.queue = arrayNew(1)>
+	<!---<cfset variables.queue = arrayNew(1)>--->
+	<cfset variables.queue = CreateObject("java","java.util.ArrayList").Init()>	
 	<cfset variables.maxQueueSize = 0>
 	<cfset variables.schedulerIntervalSecs = 0>
 	<cfset variables.key = "123456knowthybugs654321"> <!--- this is a simple protection to avoid calling processqueue() too easily. This is NOT the apiKey setting --->
@@ -10,7 +11,8 @@
 		<cfargument name="instanceName" type="string" required="true">
 		<cfscript>
 			// initialize variables and read settings
-			variables.queue = arrayNew(1);
+			//variables.queue = arrayNew(1);
+			variables.queue = CreateObject("java","java.util.ArrayList").Init();	
 			variables.msgLog = arrayNew(1);
 			variables.maxQueueSize = arguments.config.getSetting("service.maxQueueSize");
 			variables.schedulerIntervalSecs = arguments.config.getSetting("service.schedulerIntervalSecs");
@@ -51,7 +53,8 @@
 		
 		<cflock name="bugLogListenerAsync_processQueue_#variables.instanceName#" type="exclusive" timeout="10">
 			<cfset myQueue = duplicate(variables.queue)> <!--- get a snapshot of the queue as of right now --->
-			<cfset variables.queue = arrayNew(1)>	<!--- clear the queue now --->
+			<!---<cfset variables.queue = arrayNew(1)>	<!--- clear the queue now --->--->
+			<cfset variables.queue = CreateObject("java","java.util.ArrayList").Init()>	
 			<cfset variables.oRuleProcessor.processQueueStart(myQueue, dp, variables.oConfig )>
 			<cfif arrayLen(myQueue) gt 0>
 				<cfset logMessage("Processing queue. Queue size: #arrayLen(myQueue)#")>

@@ -754,11 +754,11 @@
 	<cffunction name="deleteHost" access="public" returntype="void">
 		<cfargument name="id" type="numeric" required="true">
 		<cfargument name="entryAction" type="string" required="true">
-		<cfargument name="moveToAppID" type="numeric" required="false" default="0">
+		<cfargument name="moveToHostID" type="numeric" required="false" default="0">
 		<cfif arguments.entryAction eq "delete">
 			<cfset variables.oEntryDAO.deleteByHostID(arguments.id)>
-		<cfelseif arguments.entryAction eq "move" and arguments.moveToID gt 0>
-			<cfset variables.oEntryDAO.updateHostID(arguments.id, arguments.moveToID)>
+		<cfelseif arguments.entryAction eq "move" and arguments.moveToHostID gt 0>
+			<cfset variables.oEntryDAO.updateHostID(arguments.id, arguments.moveToHostID)>
 		</cfif>
 		<cfset variables.oHostDAO.delete(arguments.id)>
 	</cffunction>
@@ -766,11 +766,11 @@
 	<cffunction name="deleteSeverity" access="public" returntype="void">
 		<cfargument name="id" type="numeric" required="true">
 		<cfargument name="entryAction" type="string" required="true">
-		<cfargument name="moveToAppID" type="numeric" required="false" default="0">
+		<cfargument name="moveToSeverityID" type="numeric" required="false" default="0">
 		<cfif arguments.entryAction eq "delete">
 			<cfset variables.oEntryDAO.deleteBySeverityID(arguments.id)>
-		<cfelseif arguments.entryAction eq "move" and arguments.moveToID gt 0>
-			<cfset variables.oEntryDAO.updateSeverityID(arguments.id, arguments.moveToID)>
+		<cfelseif arguments.entryAction eq "move" and arguments.moveToSeverityID gt 0>
+			<cfset variables.oEntryDAO.updateSeverityID(arguments.id, arguments.moveToSeverityID)>
 		</cfif>
 		<cfset variables.oSeverityDAO.delete(arguments.id)>
 	</cffunction>

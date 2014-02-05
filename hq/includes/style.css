@@ -100,20 +100,6 @@ label.inline {
 	line-height:24px;
 }
 
-/**** dashboard ****/
-#dashboard-content {
-	width:100%;
-	clear:both;
-}
-#dashboard-left {
-	width:49%;
-	float:left;
-}
-#dashboard-right {
-	width:49%;
-	float:right;
-}
-
 /***** data tables ******/
 .browseTable {
 	border-bottom:1px solid #333;
@@ -170,6 +156,7 @@ label.inline {
 }
 .cell_message {
 	cursor:pointer;
+	text-overflow:ellipsis;
 }
 #exceptiondetail pre {
 	border:none;
@@ -184,6 +171,19 @@ label.inline {
 }
 #entry-stats {
 	width:300px;
+}
+.breakable {
+	-ms-word-break: break-all;
+	word-break: break-all;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	hyphens: auto;    	
+}
+
+.searchSelector {
+	width:100%;
+	min-width:100px;
+	max-width:200px;
 }
 
 /***** Extensions & Rules *******/
@@ -226,6 +226,65 @@ label.inline {
 	border:1px dashed silver;
 	background-color:#FFFFE0;
 }
+
+
+/**** dashboard ****/
+#dashboard-content {
+	width:100%;
+	clear:both;
+}
+#dashboard-left {
+	width:49%;
+	float:left;
+}
+#dashboard-right {
+	width:49%;
+	float:right;
+}
+
+
+/****** Table Views *****/
+.cell_severity {text-align:center;}
+.cell_entry {width:30px;}
+.cell_application {}
+.cell_hostname {}
+/*.cell_message {word-wrap:break-word;}*/
+.cell_message {
+	-ms-word-break: break-all;
+	word-break: break-all;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	hyphens: auto;    
+}
+.cell_message_content {max-width:700px;}
+.cell_count {text-align:right;}
+.cell_mostrecent {text-align:center;white-space: nowrap;}
+.cell_datetime {text-align:center;white-space: nowrap;}
+.cell_details {text-align:center;}
+
+
+.summaryTable {
+	width:100%;
+}
+.summaryTable .header_severity {width:20px;}
+.summaryTable .header_application {max-width:120px;}
+.summaryTable .header_hostname {max-width:120px;}
+.summaryTable .header_message {}
+.summaryTable .header_count {width:60px;}
+.summaryTable .header_mostrecent {width:110px;}
+.summaryTable .header_details {width:22px;}
+
+.detailTable {
+	width:100%;
+}
+.detailTable .header_severity {width:20px;}
+.detailTable .header_entry {width:20px;}
+.detailTable .header_datetime {width:100px;}
+.detailTable .header_application {max-width:120px;}
+.detailTable .header_hostname {max-width:120px;}
+.detailTable .header_message {}
+.detailTable .header_details {width:22px;}
+
 
 /****** User Defined Rules **********/
 /*

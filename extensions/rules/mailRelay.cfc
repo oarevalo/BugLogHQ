@@ -15,7 +15,9 @@
 		<cfset logTrigger(entry)>
 		<cfset sendToEmail(rawEntryBean = arguments.rawEntry, 
 							recipient = variables.config.recipientEmail,
-							subject = "BugLog: #arguments.rawEntry.getMessage()#")>
+							subject = "BugLog: #arguments.rawEntry.getMessage()#",
+							entryId = arguments.entry.getEntryId())>
+							
 		<cfset writeToCFLog("'mailRelay' rule fired. Email sent. Msg: '#arguments.rawEntry.getMessage()#'")>
 		<cfreturn true>
 	</cffunction>

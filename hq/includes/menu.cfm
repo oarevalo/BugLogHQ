@@ -8,7 +8,7 @@
 	<table width="100%">
 		<tr>	
 			<td>
-				<h2 class="pageTitle">#rs.pageTitle#</h2>
+				<h2 class="pageTitle breakable">#rs.pageTitle#</h2>
 				<div style="font-size:12px;">
 					[ <a href="index.cfm?event=dashboard" <cfif rs.event eq "dashboard" or rs.event eq "dashboard">style="font-weight:bold;"</cfif>>Dashboard</a> ]
 					&nbsp;&nbsp;&nbsp;

@@ -2,8 +2,8 @@
 	
 	<cffunction name="initTableParams" access="package" returntype="void" hint="setup table specific settings">
 		<cfset setTableName("bl_Entry")>
-		<cfset setPrimaryKey("entryID","cf_sql_varchar")>
-		<cfset setLabelField("entryID","cf_sql_varchar")>
+		<cfset setPrimaryKey("entryID","cf_sql_numeric")>
+		<cfset setLabelField("entryID","cf_sql_numeric")>
 		
 		<cfset addColumn("mydateTime", "cf_sql_timestamp")>
 		<cfset addColumn("message", "cf_sql_varchar")>

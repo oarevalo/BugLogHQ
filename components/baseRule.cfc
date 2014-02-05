@@ -39,11 +39,15 @@
 		<cfargument name="recipient" type="string" required="true">
 		<cfargument name="subject" type="string" required="false" default="BugLog: bug received">
 		<cfargument name="comment" type="string" required="false" default="">
+		<cfargument name="entryId" type="numeric" required="false" default="0">
+		<cfargument name="includeHTMLReport" type="boolean" required="false" default="true">
+
 		<cfscript>
 			var stEntry = {};
 			var buglogHref = getBaseBugLogHREF();
 			var sender = getListener().getConfig().getSetting("general.adminEmail");
-
+			var bugReportURL = "";
+			var body = "";
 
 			if(structKeyExists(arguments,"rawEntryBean")) {
 				stEntry = arguments.rawEntryBean.getMemento();
@@ -52,18 +56,22 @@
 			if(arguments.recipient eq "") {writeToCFLog("Missing 'recipient' email address. Cannot send alert email!"); return;}
 		</cfscript>
 
-		<cfmail from="#sender#" 
-				to="#arguments.recipient#" 
-				type="html" 
-				subject="#arguments.subject#">
-					
+		<!--- build contents of email --->
+		<cfsavecontent variable="body">
+			<cfoutput>
 			<cfif arguments.comment neq "">
 				<div style="font-family:arial;font-size:12px;">
 				#arguments.comment#
 				</div>
 				<hr />
 			</cfif>
-				
+
+			<cfif arguments.entryID gt 0>
+				<cfset bugReportURL = getBugEntryHREF(arguments.entryID)>
+				<b>Bug Report URL:</b> <a href="#bugReportURL#">#bugReportURL#</a><br />
+				<hr />
+			</cfif>
+
 			<cfif structKeyExists(arguments,"rawEntryBean")>
 				<table style="font-family:arial;font-size:12px;">
 					<tr>
@@ -100,7 +108,7 @@
 					</tr>
 				</table>			
 				
-				<cfif stEntry.HTMLReport neq "">
+				<cfif stEntry.HTMLReport neq "" and arguments.includeHTMLReport>
 					<hr />
 					<b>HTML Report:</b><br />
 					#stEntry.HTMLReport#
@@ -113,8 +121,10 @@
 				<a href="#buglogHref#">#buglogHref#</a><br />
 				<em>To disable automatic notifications log into the bugLog server and disable the corresponding rule.</em>
 			</div>
-		</cfmail>
+			</cfoutput>
+		</cfsavecontent>
 		
+		<cfset _sendToEmail(sender, arguments.recipient, arguments.subject, body, "html")>
 	</cffunction>
 
 	<cffunction name="writeToCFLog" access="private" returntype="void" hint="writes a message to the internal cf logs">
@@ -207,6 +217,32 @@
 		</cfif>
 		<cfset rtn = dateFormat(theDateTime, dateMask) & " " & lsTimeFormat(theDateTime)>
 		<cfreturn rtn>
+	</cffunction>
+	
+	<cffunction name="_sendToEmail" access="private" returntype="void" hint="actual cfmail interaction">
+		<cfargument name="from" type="string" required="true">
+		<cfargument name="to" type="string" required="true">
+		<cfargument name="subject" type="string" required="true">
+		<cfargument name="body" type="string" required="true">
+		<cfargument name="type" type="string" required="false" default="html">
+		<cfset var debug = getListener().getConfig().getSetting("debug.email", false)>
+		<cfif isBoolean(debug) and debug>
+			<cfset var path = getListener().getConfig().getSetting("debug.emailPath","/bugLog/emails/")>
+			<cfset var txt = "From: #arguments.from#" & chr(10)
+									& "To: #arguments.to#" & chr(10)
+									& "Type: #arguments.type#" & chr(10)
+									& "Subject: #arguments.subject#" & chr(10)
+									& "-----------------------------------" & chr(10)
+									& arguments.body>
+			<cfset var ext = arguments.type eq "html" ? "html" : "txt">
+			<cfset fileWrite(expandPath(path & getTickCount() & "." & ext),txt,"UTF-8")>
+		<cfelse>
+			<cfmail from="#arguments.from#" 
+					to="#arguments.to#" 
+					type="#arguments.type#" 
+					subject="#arguments.subject#"
+					>#arguments.body#</cfmail>
+		</cfif>
 	</cffunction>
 	
 </cfcomponent>

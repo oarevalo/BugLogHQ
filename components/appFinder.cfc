@@ -39,10 +39,16 @@
 	<cffunction name="findByIDList" returnType="array" access="public">
 		<cfargument name="ids" type="string" required="true">
 		<cfscript>
-			var qry = variables.oDAO.get(arguments.ids);
+			var qry = 0;
 			var o = 0;
 			var rtn = [];
-			
+
+			// this is required in case the ids argument is empty, in which we return an empty set
+			if(!listLen(arguments.ids) or !len(arguments.ids))
+				return rtn;
+
+			qry = variables.oDAO.get(arguments.ids);
+
 			for(var i=1;i lte qry.recordCount;i++) {
 				o = createObject("component","bugLog.components.app").init( variables.oDAO );
 				o.setApplicationID(qry.applicationID[i]);

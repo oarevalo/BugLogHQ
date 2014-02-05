@@ -182,7 +182,7 @@
 				</cfif>
 				<tr>
 					<td><b>Exception Message:</b></td>
-					<td>#HtmlEditFormat(oEntry.getExceptionMessage())#</td>
+					<td class="breakable">#HtmlEditFormat(oEntry.getExceptionMessage())#</td>
 				</tr>
 				<tr>
 					<td><b>Exception Detail:</b></td>
