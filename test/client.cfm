@@ -75,7 +75,7 @@
 			<cfcatch type="any">
 				<!--- notify bugLog of error --->
 				Notify service via  <strong>[#protocol#]</strong> using severity <strong>[#severity#]</strong>....<br>
-				<cfset oBugLogService.notifyService(cfcatch.message, cfcatch, "", severity)>
+				<cfset oBugLogService.notifyService(cfcatch.message, cfcatch, cgi, severity)>
 			</cfcatch>
 		</cftry>
 		
