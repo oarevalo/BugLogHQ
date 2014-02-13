@@ -16,6 +16,7 @@
 	<cffunction name="getBaseBugLogHREF" access="public" returntype="string" hint="Returns a web accessible URL to buglog">
 		<cfargument name="config" type="any" required="true" hint="the main config object">
 		<cfargument name="instanceName" type="string" required="false" default="default" hint="the current buglog instance name">
+		<cfargument name="server" type="boolean" required="false" hint="use the serverURL instead if defined" />
 		<cfscript>
 			var buglogPath = "";
 			var externalURL = config.getSetting("general.externalURL");
@@ -26,6 +27,10 @@
 			// normalize instance name
 			if(instanceName eq "" or instanceName eq "default")
 				instanceName = "bugLog";
+
+			// check if we want to use the serverURL instead of the externalURL
+			if(server && len(config.getSetting("general.serverURL","")))
+				externalURL = config.getSetting("general.serverURL");
 
 			// check if the externalURL setting points to a full URL
 			// if this is the case, then that will be assumed to be the location
