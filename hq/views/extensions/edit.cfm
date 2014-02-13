@@ -135,8 +135,8 @@
 							<cfdefaultcase>
 								<cfswitch expression="#tmpType#">
 									<cfcase value="boolean">
-										<input type="radio" name="#tmpName#" value="true" <cfif isBoolean(tmpValue) and tmpValue>checked</cfif>> True &nbsp;&nbsp;
-										<input type="radio" name="#tmpName#" value="false" <cfif !isBoolean(tmpValue) or isBoolean(tmpValue) and !tmpValue>checked</cfif>> False &nbsp;&nbsp;
+										<input type="radio" name="#tmpName#" value="true" <cfif isBoolean(tmpValue) and tmpValue>checked</cfif>> Yes &nbsp;&nbsp;
+										<input type="radio" name="#tmpName#" value="false" <cfif !isBoolean(tmpValue) or isBoolean(tmpValue) and !tmpValue>checked</cfif>> No &nbsp;&nbsp;
 									</cfcase>
 									<cfdefaultcase>
 										<input type="text" name="#tmpName#" value="#tmpValue#" class="formField">			

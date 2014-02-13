@@ -6,6 +6,7 @@
 	<cfproperty name="application" type="string" buglogType="application" displayName="Application" hint="The application name that will trigger the rule. Leave empty to look for all applications">
 	<cfproperty name="host" type="string" displayName="Host Name" buglogType="host" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
 	<cfproperty name="keywords" type="string" displayName="Keywords" hint="A list of keywords that will trigger the rule. The keywords are searched within the bug message text">
+	<cfproperty name="includeHTMLReport" type="boolean" displayName="Include HTML Report?" hint="When enabled, the HTML Report section of the bug report is included in the email body">
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
@@ -13,11 +14,13 @@
 		<cfargument name="application" type="string" required="false" default="">
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="keywords" type="string" required="false" default="">
+		<cfargument name="includeHTMLReport" type="string" required="false" default="">
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.severityCode = trim(arguments.severityCode)>
 		<cfset variables.config.application = trim(arguments.application)>
 		<cfset variables.config.host = trim(arguments.host)>
 		<cfset variables.config.keywords = trim(arguments.keywords)>
+		<cfset variables.config.includeHTMLReport = (isBoolean(arguments.includeHTMLReport) and arguments.includeHTMLReport)>
 		<cfreturn this>
 	</cffunction>
 	
@@ -53,7 +56,8 @@
 							recipient = variables.config.recipientEmail,
 							subject = "BugLog: #arguments.rawEntry.getMessage()#",
 							comment = getAlertMessage(),
-							entryID = arguments.entry.getEntryID());
+							entryID = arguments.entry.getEntryID(),
+							includeHTMLReport = variables.config.includeHTMLReport);
 				
 				writeToCFLog("'MailAlertRule' rule fired. Email sent. Msg: '#arguments.rawEntry.getMessage()#'");
 			}

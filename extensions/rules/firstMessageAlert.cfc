@@ -7,6 +7,7 @@
 	<cfproperty name="application" type="string" buglogType="application" displayName="Application" hint="The application name that will trigger the rule. Leave empty to look for all applications">
 	<cfproperty name="host" type="string" buglogType="host" displayName="Host Name" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
 	<cfproperty name="severity" type="string" buglogType="severity" displayName="Severity Code" hint="The severity that will trigger the rule. Leave empty to look for all severities">
+	<cfproperty name="includeHTMLReport" type="boolean" displayName="Include HTML Report?" hint="When enabled, the HTML Report section of the bug report is included in the email body">
 
 	<cfset variables.ID_NOT_SET = -9999999 />
 	<cfset variables.ID_NOT_FOUND = -9999990 />
@@ -17,11 +18,13 @@
 		<cfargument name="application" type="string" required="false" default="">
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="severity" type="string" required="false" default="">
+		<cfargument name="includeHTMLReport" type="string" required="false" default="">
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.timespan = val(arguments.timespan)>
 		<cfset variables.config.application = arguments.application>
 		<cfset variables.config.host = arguments.host>
 		<cfset variables.config.severity = arguments.severity>
+		<cfset variables.config.includeHTMLReport = (isBoolean(arguments.includeHTMLReport) and arguments.includeHTMLReport)>
 		<cfset variables.applicationID = variables.ID_NOT_SET>
 		<cfset variables.hostID = variables.ID_NOT_SET>
 		<cfset variables.severityID = variables.ID_NOT_SET>
@@ -113,7 +116,8 @@
 							recipient = variables.config.recipientEmail,
 							subject= "BugLog: [First Message Alert][#q.ApplicationCode#][#q.hostName#] #q.message#", 
 							comment = intro,
-							entryID = q.EntryID)>
+							entryID = q.EntryID,
+							includeHTMLReport = variables.config.includeHTMLReport)>
 		
 		<cfset writeToCFLog("'firstMessageAlert' rule fired. Email sent. Msg: '#q.message#'")>
 	</cffunction>
