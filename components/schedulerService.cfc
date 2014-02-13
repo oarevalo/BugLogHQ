@@ -19,7 +19,7 @@
 		<cfscript>
 			var utils = createObject("component","bugLog.components.util").init();
 			
-			var href = utils.getBaseBugLogHREF(config, "default") 
+			var href = utils.getBaseBugLogHREF(config, "default", true) 
 						& arguments.taskPath 
 						& "?instance=" & instanceName;
 						
