@@ -24,7 +24,7 @@
 			</cfif>
 		<cfelseif fileExists(expandPath(getDirectoryfrompath(variables.configDoc) & variables.configKeyFilename))>
 			<!--- this line checks the existence of a default text file containing the config key (must be on same directory as config file) --->
-			<cfset variables.configKey = fileRead(expandPath(expandPath(getDirectoryfrompath(variables.configDoc) & variables.configKeyFilename)),"utf-8")>
+			<cfset variables.configKey = fileRead(expandPath(getDirectoryfrompath(variables.configDoc) & variables.configKeyFilename),"utf-8")>
 		<cfelse>
 			<!--- we will try also to see if the server key has been provided by the servlet context (yes, we are getting funky!) --->
 		 	<cftry>
