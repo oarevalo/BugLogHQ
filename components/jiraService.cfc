@@ -20,8 +20,6 @@
 				if(cgi.server_port neq 80) thisHost = thisHost & ":" & cgi.server_port;
 				variables.instance.endpoint = thisHost & variables.instance.endpoint;
 			}
-			if(right(variables.instance.endpoint,1) neq "/")
-				variables.instance.endpoint = variables.instance.endpoint & "/";
 		</cfscript>
 		<cfreturn this>
 	</cffunction>
