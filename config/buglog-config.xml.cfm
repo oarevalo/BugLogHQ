@@ -4,6 +4,12 @@
 	<setting name="general.externalURL"></setting>
 	<setting name="general.dateFormat">mm/dd/yy</setting>
 
+	<!-- The URL that identifies the individual server.
+		Defaults to externalURL (which defaults to current URL),
+		but might need to be overriden when BugLogHQ is deployed
+		as a cluster behind a load balancer. -->
+	<setting name="general.serverURL"></setting>
+
 	<!-- all dates/times are based on the current server time,
 		but you can use the following setting to display times
 		on a different time zone. Keep in mind that this is a basic

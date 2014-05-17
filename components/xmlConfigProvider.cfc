@@ -24,7 +24,7 @@
 			</cfif>
 		<cfelseif fileExists(expandPath(getDirectoryfrompath(variables.configDoc) & variables.configKeyFilename))>
 			<!--- this line checks the existence of a default text file containing the config key (must be on same directory as config file) --->
-			<cfset variables.configKey = fileRead(expandPath(expandPath(getDirectoryfrompath(variables.configDoc) & variables.configKeyFilename)),"utf-8")>
+			<cfset variables.configKey = fileRead(expandPath(getDirectoryfrompath(variables.configDoc) & variables.configKeyFilename),"utf-8")>
 		<cfelse>
 			<!--- we will try also to see if the server key has been provided by the servlet context (yes, we are getting funky!) --->
 		 	<cftry>
@@ -62,7 +62,7 @@
 			if(variables.configKey neq "") {
 				for(i=1;i lte arrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
 					xmlNode = xmlDoc.xmlRoot.xmlChildren[i];
-					if(xmlNode.xmlName eq "envSettings") {
+					if(xmlNode.xmlName eq "envSettings" && xmlNode.xmlAttributes.name eq variables.configKey) {
 						for(j=1;j lte arrayLen(xmlNode.xmlChildren);j=j+1) {
 							xmlChildNode = xmlNode.xmlChildren[j];
 							cfg[xmlChildNode.xmlAttributes.name] = structNew();

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<setting name="db.dsn">bugLog</setting>
+	<setting name="general.adminEmail">info@somedomain.org</setting>
+			
+	<envSettings name="dev">
+		<setting name="db.dsn">bugLog_dev</setting>
+	</envSettings>
+
+	<envSettings name="qa">
+		<setting name="db.dsn">bugLog_qa</setting>
+	</envSettings>
+
+</config>

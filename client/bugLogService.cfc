@@ -508,6 +508,7 @@
 		<cfelse>
 			<cfsavecontent variable="out"><cfoutput><cfdump var="#arguments.data#" top="#arguments.maxDumpDepth#"></cfoutput></cfsavecontent>
 			<cfset out = reReplaceNoCase(out, "<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>", "<em>JavaScript code removed for security</em>","all")>
+			<cfset out = replace(out, "</td>", "</td>" & Chr(10) & Chr(13), "all")>
 		</cfif>
 		<cfreturn out>
 	</cffunction>
