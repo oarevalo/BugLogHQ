@@ -100,5 +100,29 @@
 	}];
 	writeOutput(testDriver.evaluateScenario(scenario,tests).html);
 
+	// Scenario: xmlConfigProvider (unknown custom environment)
+	scenario = "xml config provider (unknown custom environment)";
+	target = createObject("component","bugLog.components.config")
+					.init(configProviderType = "xml", 
+							configDoc = "/bugLog/test/lib/test-config.xml",
+							configKey = "live");
+
+	tests = [{
+		name = "getSetting()",
+		actual = target.getSetting("db.dsn"),
+		expected = "bugLog"
+	},
+	{
+		name = "getSetting() (with default to global)",
+		actual = target.getSetting("general.adminEmail"),
+		expected = "info@somedomain.org"
+	},
+	{
+		name = "getConfigKey()",
+		actual = target.getConfigKey(),
+		expected = "live"
+	}];
+	writeOutput(testDriver.evaluateScenario(scenario,tests).html);
+
 
 </cfscript>
