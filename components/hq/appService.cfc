@@ -750,7 +750,7 @@
 	<cffunction name="saveDomain" access="public" returntype="numeric">
 		<cfargument name="id" type="numeric" required="true">
 		<cfargument name="domain" type="string" required="true">
-		<cfset var newID = variables.oHostDAO.save(id=arguments.id, 
+		<cfset var newID = variables.oDomainDAO.save(id=arguments.id, 
 															domain=arguments.domain)>
 		<cfreturn newID>
 	</cffunction>

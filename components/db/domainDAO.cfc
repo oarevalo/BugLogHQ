@@ -5,7 +5,6 @@
 		<cfset setPrimaryKey("DomainID","cf_sql_numeric")>
 		<cfset setLabelField("domain","cf_sql_varchar")>
 		<cfset addColumn("domain", "cf_sql_varchar")>
-		<cfset addColumn("CreatedOn", "cf_sql_timestamp")>
 	</cffunction>
 	
 </cfcomponent>
