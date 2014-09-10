@@ -41,6 +41,7 @@
 			variables.oHostFinder = createObject("component","bugLog.components.hostFinder").init( variables.oDAOFactory.getDAO("host") );
 			variables.oSeverityFinder = createObject("component","bugLog.components.severityFinder").init( variables.oDAOFactory.getDAO("severity") );
 			variables.oSourceFinder = createObject("component","bugLog.components.sourceFinder").init( variables.oDAOFactory.getDAO("source") );
+			variables.oDomainFinder = createObject("component","bugLog.components.domainFinder").init( variables.oDAOFactory.getDAO("domain") );
 			variables.oUserFinder = createObject("component","bugLog.components.userFinder").init( variables.oDAOFactory.getDAO("user") );
 
 			// load the rule processor
@@ -54,6 +55,7 @@
 			variables.oHostCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
 			variables.oSeverityCache = createObject("component","bugLog.components.lib.cache.cacheService").init(10, cacheTTL, false);
 			variables.oSourceCache = createObject("component","bugLog.components.lib.cache.cacheService").init(5, cacheTTL, false);
+			variables.oDomainCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
 			variables.oUserCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
 
 			// load scheduler
@@ -91,12 +93,15 @@
 			var autoCreateHost = allowAutoCreate("host");
 			var autoCreateSeverity = allowAutoCreate("severity");
 			var autoCreateSource = allowAutoCreate("source");
-
+			var autoCreateDomain = true; //TODO change this to a setting
+			
 			// extract related objects from bean
 			oApp = getApplicationFromBean( bean, autoCreateApp );
 			oHost = getHostFromBean( bean, autoCreateHost );
 			oSeverity = getSeverityFromBean( bean, autoCreateSeverity );
 			oSource = getSourceFromBean( bean, autoCreateSource );
+			oDomain = getDomainFromBean( bean, autoCreateDomain );
+			
 
 			// create entry
 			oEntry = createObject("component","bugLog.components.entry").init( oDF.getDAO("entry") );
@@ -108,6 +113,7 @@
 			oEntry.setHostID(oHost.getHostID());
 			oEntry.setExceptionMessage(bean.getexceptionMessage());
 			oEntry.setExceptionDetails(bean.getexceptionDetails());
+			oEntry.setDomainId(oDomain.getDomainID());
 			oEntry.setCFID(bean.getcfid());
 			oEntry.setCFTOKEN(bean.getcftoken());
 			oEntry.setUserAgent(bean.getuserAgent());
@@ -381,6 +387,41 @@
 			}
 		</cfscript>
 		<cfreturn oSource>
+	</cffunction>
+
+	<cffunction name="getDomainFromBean" access="private" returntype="source" hint="Uses the information on the rawEntryBean to retrieve the corresponding Domain object">
+		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cfargument name="createIfNeeded" type="boolean" default="false">
+		<cfscript>
+			var key = "";
+			var bean = arguments.entryBean;
+			var oSource = 0;
+			var oDF = variables.oDAOFactory;
+
+			key = bean.getDomain();
+
+			try {
+				// first we try to get it from the cache
+				oDomain = variables.oDomainCache.retrieve( key );
+
+			} catch(cacheService.itemNotFound e) {
+				// entry not in cache, so we get it from DB
+				try {
+					oDomain = variables.oDomainFinder.findByName( key );
+
+				} catch(domainFinderException.codeNotFound e) {
+					// code does not exist, so we need to create it (if autocreate enabled)
+					if(!arguments.createIfNeeded) throw(message="Invalid Domain",type="invalidDomain");
+					oDomain = createObject("component","bugLog.components.domain").init( oDF.getDAO("domain") );
+					oDomain.setDomain( key );
+					oDomain.save();
+				}
+
+				// store entry in cache
+				variables.oDomainCache.store( key, oDomain );
+			}
+		</cfscript>
+		<cfreturn oDomain>
 	</cffunction>
 
 	<cffunction name="loadRules" access="private" returntype="void" hint="this method loads the rules into the rule processor">

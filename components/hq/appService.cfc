@@ -42,6 +42,7 @@
 		<cfset variables.oSourceDAO = variables.oDAOFactory.getDAO("source")>
 		<cfset variables.oUserDAO = variables.oDAOFactory.getDAO("user")>
 		<cfset variables.oUserApplicationDAO = variables.oDAOFactory.getDAO("userApplication")>
+		<cfset variables.oDomainDAO = variables.oDAOFactory.getDAO("domain")>
 
 		<!--- setup extensions --->
 		<cfset variables.extensionsPath = variables.cfcPath & ".extensions.">
@@ -113,6 +114,7 @@
 		<cfargument name="searchTerm" type="string" required="true">
 		<cfargument name="applicationID" type="string" required="false" default="0">
 		<cfargument name="hostID" type="string" required="false" default="0">
+		<cfargument name="domainID"   type="string" required="false" default="0">
 		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
@@ -138,6 +140,12 @@
 			if(Not isNumeric(arguments.hostID)) {
 				args.hostID = 0;
 				args.hostName = trim(arguments.hostID);
+			}
+			
+			// if domainId is not numeric, assume it is the domain
+			if(Not isNumeric(arguments.domainId)) {
+				args.domainId = 0;
+				args.domain = trim(arguments.domainId);
 			}
 
 			// if severityID is not numeric and is not a list and is not _ALL_, assume it is the severityCode
@@ -227,6 +235,16 @@
 		</cfquery>
 		<cfreturn qry>
 	</cffunction>	
+	
+	<cffunction name="getDomains" access="public" returntype="query">
+		<cfset var qry = variables.oDomainDAO.getAll()>
+		<cfquery name="qry" dbtype="query">
+			SELECT *
+				FROM qry
+				ORDER BY domain
+		</cfquery>
+		<cfreturn qry>
+	</cffunction>
 	
 	<cffunction name="sendEntry" access="public" returntype="void">
 		<cfargument name="entryID" type="numeric" required="true">

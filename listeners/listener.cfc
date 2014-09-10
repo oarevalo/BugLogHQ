@@ -22,6 +22,7 @@
 		<cfargument name="HTMLReport" type="string" required="false" default="">
 		<cfargument name="APIKey" type="string" required="false" default="">
 		<cfargument name="source" type="string" required="false" default="Unknown">
+		<cfargument name="domain" required="false" default="">
 		<cfscript>
 			// get listener service wrapper
 			var serviceLoader = createObject("component", "bugLog.components.service").init( instanceName = variables.instanceName );
@@ -40,6 +41,7 @@
 								.setHostName(arguments.hostName)
 								.setExceptionMessage(arguments.exceptionMessage)
 								.setExceptionDetails(arguments.exceptionDetails)
+								.setDomain(arguments.domain)
 								.setCFID(arguments.cfid)
 								.setCFTOKEN(arguments.cftoken)
 								.setUserAgent(arguments.userAgent)

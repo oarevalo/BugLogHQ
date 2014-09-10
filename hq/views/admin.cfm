@@ -19,7 +19,9 @@
 				{ id = "userManagement", label = "Users", display = isAdmin, href="admin/userManagement.cfm" },
 				{ id = "appManagement", label = "Applications", display = isAdmin, href="admin/appManagement.cfm" },
 				{ id = "hostManagement", label = "Hosts", display = isAdmin, href="admin/hostManagement.cfm" },
-				{ id = "severityManagement", label = "Severities", display = isAdmin, href="admin/severityManagement.cfm" }
+				{ id = "severityManagement", label = "Severities", display = isAdmin, href="admin/severityManagement.cfm" },
+				{ id = "domainManagement", label = "Domains", display = isAdmin, href="admin/domainManagement.cfm" }	
+				
 			]>
 
 <cfset currentPanelHREF = "">

@@ -8,6 +8,7 @@
 		<cfargument name="hostName" type="string" required="true">
 		<cfargument name="exceptionMessage" required="false" default="">
 		<cfargument name="exceptionDetails" required="false" default="">
+		<cfargument name="domain" required="false" default="">
 		<cfargument name="CFID" type="string" required="false" default="">
 		<cfargument name="CFTOKEN" type="string" required="false" default="">
 		<cfargument name="userAgent" type="string" required="false" default="">

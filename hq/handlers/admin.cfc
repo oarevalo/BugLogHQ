@@ -51,6 +51,11 @@
 						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
 						setValue("qryData", app.getHosts() );
 						break;
+					
+					case "domainManagement":
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
+						setValue("qryData", app.getDomains() );
+						break;
 
 					case "severityManagement":
 						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);

@@ -12,7 +12,9 @@
 	<cfset variables.postToRESTasJSON = false>
 	<cfset variables.userAgent = "bugloghq-coldfusion-client">
 	<cfset variables.checkpointsKey = "__buglog_checkpoints__">
-	<cfset variables.writeToCFLog = true>	<!--- indicates whether to write to the local log or not ---->
+	<cfset variables.writeToCFLog = false>	<!--- indicates whether to write to the local log or not ---->
+	<cfset variables.hostname = "">
+	<cfset variables.sensitiveFieldNames = "">
 
 	<!--- Handle cases in which the application scope is not defined (Fix contributed by Morgan Dennithorne) --->
 	<cfif isDefined("application.applicationName")>
@@ -33,6 +35,7 @@
 		<cfargument name="appName" type="string" required="false" default="#variables.appName#">
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
+		<cfargument name="sensitiveFieldNames" type="string" required="false" default="#variables.sensitiveFieldNames#">
 
 		<cfscript>
 			var wsParams = structNew();
@@ -60,12 +63,13 @@
 				variables.protocol = "CFC";
 
 			// store settings
-			variables.bugLogListener = arguments.bugLogListener;
-			variables.bugEmailSender = arguments.bugEmailSender;
-			variables.bugEmailRecipients = arguments.bugEmailRecipients;
-			variables.apikey = arguments.apikey;
-			variables.maxDumpDepth = arguments.maxDumpDepth;
-			variables.writeToCFLog = arguments.writeToCFLog;
+			variables.bugLogListener		= arguments.bugLogListener;
+			variables.bugEmailSender		= arguments.bugEmailSender;
+			variables.bugEmailRecipients	= arguments.bugEmailRecipients;
+			variables.apikey				= arguments.apikey;
+			variables.maxDumpDepth			= arguments.maxDumpDepth;
+			variables.writeToCFLog			= arguments.writeToCFLog;
+			variables.sensitiveFieldNames	= arguments.sensitiveFieldNames;
 			if(arguments.appName neq "")
 				variables.appName = arguments.appName;
 
@@ -128,7 +132,8 @@
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
 		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
-
+		<cfargument name="domain" type="string" required="false" default="">
+		
 		<cfset var shortMessage = "">
 		<cfset var longMessage = "">
 		<cfset var tmpCFID = "">
@@ -148,6 +153,12 @@
 			<cfset tmpCFTOKEN = cftoken>
 		</cfif>
 
+		<cfif isSimpleValue(arguments.extraInfo)>
+			<cfset arguments.extraInfo = sanitizeSensitiveData(arguments.extraInfo)>
+		<cfelseif isStruct(arguments.extraInfo)>
+			<cfset arguments.extraInfo = sanitizeKeyData(arguments.extraInfo)>
+		</cfif>
+		
 		<cftry>
 			<!--- if we are tracking checkpoints, then add the buglog call as the last checkpoint --->
 			<cfif arrayLen(getCheckpoints())>
@@ -167,6 +178,7 @@
 						"hostName" = variables.hostName,
 						"exceptionMessage" = arguments.exception.message,
 						"exceptionDetails" = arguments.exception.detail,
+						"domain" = arguments.domain,
 						"CFID" = tmpCFID,
 						"CFTOKEN" = tmpCFTOKEN,
 						"userAgent" = cgi.HTTP_USER_AGENT,
@@ -511,6 +523,30 @@
 			<cfset out = replace(out, "</td>", "</td>" & Chr(10) & Chr(13), "all")>
 		</cfif>
 		<cfreturn out>
+	</cffunction>
+
+	<cffunction name="sanitizeKeyData" access="private" returntype="struct" hint="removes values from structures for known fields that hold sensitive data">
+		<cfargument name="data" type="struct">
+		<cfset var local = {}>
+		<cfloop list="#structKeyList(arguments.data)#" index="local.i">
+			<cfif isStruct(arguments.data[local.i])>
+				<cfset arguments.data[local.i] = sanitizeKeyData(arguments.data[local.i])>
+			<cfelse>
+				<cfif listFindNoCase(variables.sensitiveFieldNames,local.i)>
+					<cfset arguments.data[local.i] = "***POTENTIAL_SENSITIVE_VALUE_REMOVED***">
+				</cfif>
+			</cfif>
+		</cfloop>
+		<cfreturn arguments.data>
+	</cffunction>
+	
+
+	<cffunction name="sanitizeSensitiveData" access="private" returntype="string" hint="Removes known formats for credit card and S3 passwords">
+		<cfargument name="data" type="string" required="true">
+		<cfset arguments.data = ReReplace(arguments.data, '[45][0-9]{3}-?[0-9]{4}-?[0-9]{4}-?([0-9]{4})', '***VISA/MASTERCARD_REMOVED*** (\1)', 'ALL')>
+		<cfset arguments.data = ReReplace(arguments.data, '3[47][0-9]{2}-?[0-9]{6}-?([0-9]{5})', '***AMEX_REMOVED*** (\1)', 'ALL')>
+		<cfset arguments.data = ReReplace(arguments.data, 's3:\/\/[^@]+@', 's3://***S3_PASSWORD_REMOVED***@', 'ALL')>
+		<cfreturn arguments.data>
 	</cffunction>
 
 </cfcomponent>

@@ -11,6 +11,7 @@
 		<cfset addColumn("sourceID", "cf_sql_numeric")>
 		<cfset addColumn("severityID", "cf_sql_numeric")>
 		<cfset addColumn("hostID", "cf_sql_numeric")>
+		<cfset addColumn("domainID", "cf_sql_numeric")>
 		<cfset addColumn("exceptionMessage", "cf_sql_varchar")>
 		<cfset addColumn("CFID", "cf_sql_varchar")>
 		<cfset addColumn("CFTOKEN", "cf_sql_varchar")>
