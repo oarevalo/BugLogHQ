@@ -16,7 +16,7 @@
 				<table>
 					<tr>
 						<td><b>Name:</b></td>
-						<td><input type="text" name="name" value="#qryItem.domainname#"></td>
+						<td><input type="text" name="domain" value="#qryItem.domain#"></td>
 					</tr>
 				</table>
 				<input type="submit" value="Apply Changes">
@@ -39,14 +39,14 @@
 				<table>
 					<tr>
 						<td><b>Name:</b></td>
-						<td><input type="text" name="name" value="#qryItem.domainname#" disabled="true"></td>
+						<td><input type="text" name="name" value="#qryItem.domain#" disabled="true"></td>
 					</tr>
 					<tr valign="top">
 						<td><b>Existing Bug Reports...</b></td>
 						<td>
 							<label><input type="radio" name="entryAction" value="delete"> Delete all reports for this Domainname</label>
 							<label><input type="radio" name="entryAction" value="move"> Move all reports to a different Domainname:
-							<select name="moveTodomainID">
+							<select name="moveToDomainID">
 								<cfloop query="qryData">
 									<cfif qryData.domainID neq theID>
 										<option value="#qryData.domainID#">#qryData.domainname#</option>
@@ -80,7 +80,7 @@
 				<cfloop query="qryData">
 					<tr>
 						<td width="15" align="right">#qryData.currentRow#.</td>
-						<td><a href="index.cfm?event=admin.main&panel=domainManagement&id=#qryData.domainID#">#qryData.domainname#</a></td>
+						<td><a href="index.cfm?event=admin.main&panel=domainManagement&id=#qryData.domainID#">#qryData.domain#</a></td>
 						<td align="center" style="width:110px;">
 							<a href="index.cfm?event=admin.main&panel=domainManagement&id=#qryData.domainID#">[ Edit ]</a>
 							&nbsp;

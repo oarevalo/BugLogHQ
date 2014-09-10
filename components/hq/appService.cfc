@@ -240,8 +240,8 @@
 		<cfset var qry = variables.oDomainDAO.getAll()>
 		<cfquery name="qry" dbtype="query">
 			SELECT *
-				FROM qry
-				ORDER BY domain
+			FROM qry
+			ORDER BY [DOMAIN]
 		</cfquery>
 		<cfreturn qry>
 	</cffunction>
@@ -747,6 +747,14 @@
 		<cfreturn newID>
 	</cffunction>
 
+	<cffunction name="saveDomain" access="public" returntype="numeric">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="domain" type="string" required="true">
+		<cfset var newID = variables.oHostDAO.save(id=arguments.id, 
+															domain=arguments.domain)>
+		<cfreturn newID>
+	</cffunction>
+
 	<cffunction name="saveSeverity" access="public" returntype="numeric">
 		<cfargument name="id" type="numeric" required="true">
 		<cfargument name="code" type="string" required="true">
@@ -780,7 +788,18 @@
 		</cfif>
 		<cfset variables.oHostDAO.delete(arguments.id)>
 	</cffunction>
-	
+
+	<cffunction name="deleteDomain" access="public" returntype="void">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="entryAction" type="string" required="true">
+		<cfargument name="moveToDomainID" type="numeric" required="false" default="0">
+		<cfif arguments.entryAction eq "delete">
+			<cfset variables.oEntryDAO.deleteByDomainID(arguments.id)>
+		<cfelseif arguments.entryAction eq "move" and arguments.moveToDomainID gt 0>
+			<cfset variables.oEntryDAO.updateDomainID(arguments.id, arguments.moveToDomainID)>
+		</cfif>
+		<cfset variables.oDomainDAO.delete(arguments.id)>
+	</cffunction>	
 	<cffunction name="deleteSeverity" access="public" returntype="void">
 		<cfargument name="id" type="numeric" required="true">
 		<cfargument name="entryAction" type="string" required="true">

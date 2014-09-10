@@ -22,7 +22,7 @@
 					panel = "changePassword";	
 			}
 						
-			try {
+			// try {
 				switch(panel) {
 					case "general":
 						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
@@ -106,7 +106,7 @@
 				setValue("allowConfigEditing", isConfigEditingAllowed());
 				setValue("pageTitle", "BugLog Settings & Management");
 				setView("admin");
-				
+			/*	
 			} catch(validation e) {
 				setMessage("warning",e.message);
 				setNextEvent("main");				
@@ -115,7 +115,7 @@
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
 				setNextEvent("main");				
-			}
+			}*/
 		</cfscript>
 	</cffunction>
 
@@ -559,7 +559,62 @@
 			}		
 		</cfscript>
 	</cffunction>	
-						
+	
+	<cffunction name="doSaveDomain" access="public" returntype="void">
+		<cfscript>
+			var id = getValue("id");
+			var domain = getValue("domain");
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main");}
+				if(domain eq "") throw(type="validation", message="Domain cannot be empty");
+
+				getService("app").saveDomain(id,domain);
+				
+				setMessage("info","Domain has been saved");
+				setNextEvent("admin.main","panel=domainManagement");
+							
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("admin.main","panel=domainManagement&id=#id#&domain=#domain#");
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("admin.main","panel=domainManagement&id=#id#&domain=#domain#");
+			}		
+		</cfscript>
+	</cffunction>	
+		
+	<cffunction name="doDeleteDomain" access="public" returntype="void">
+		<cfscript>
+			var id = val(getValue("id"));
+			var entryAction = getValue("entryAction");
+			var moveToDomainID = val(getValue("moveToDomainID"));
+			var user = getValue("currentUser");
+			
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main");}
+				if(id eq 0) setNextEvent("admin.main");
+				if(entryAction eq "") throw(type="validation", message="Select what action to take with existing bug reports that link to this domain");
+				if(entryAction eq "move" and moveToHostID eq 0)  throw(type="validation", message="Select the domain name to migrate existing bug reports that link to this domain");
+
+				getService("app").deleteDomain(id,entryAction,moveToDomainID);
+				
+				setMessage("info","Domain has been deleted");
+				setNextEvent("admin.main","panel=domainManagement");
+							
+			} catch(validation e) {
+				setMessage("warning",e.message);
+				setNextEvent("admin.main","panel=domainManagement&id=DELETE:#id#");
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("admin.main","panel=domainManagement&id=DELETE:#id#");
+			}		
+		</cfscript>
+	</cffunction>	
+		
 	<cffunction name="isConfigEditingAllowed" access="private" returntype="boolean">
 		<cfset var rtn = false>
 		<cfset var allowConfigEditing = getSetting("allowConfigEditing")>
