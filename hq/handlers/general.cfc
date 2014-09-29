@@ -180,7 +180,7 @@
 					setValue("pageTitle", "Summary");
 
 				// perform grouping for summary display
-				qryEntries = appService.applyGroupings(qryEntries, criteria.groupByApp, criteria.groupByHost);
+				qryEntries = appService.applyGroupings(qryEntries, criteria.groupByApp, criteria.groupByHost, criteria.groupByDomain);
 
 				setValue("qryEntries", qryEntries);
 				setValue("refreshSeconds",refreshSeconds);
@@ -608,6 +608,8 @@
 			if(not structKeyExists(criteria,"enddate")) criteria.enddate = "1/1/3000";
 			if(not structKeyExists(criteria,"groupByApp")) criteria.groupByApp = true;
 			if(not structKeyExists(criteria,"groupByHost")) criteria.groupByHost = true;
+			if(not structKeyExists(criteria,"groupByDomain")) criteria.groupByDomain = true;
+			if(not structKeyExists(criteria,"domainID")) criteria.domainID = 0;
 			if(not structKeyExists(criteria,"searchHTMLReport")) criteria.searchHTMLReport = false;
 			if(not structKeyExists(criteria,"sortBy")) criteria.sortBy = "";
 			if(not structKeyExists(criteria,"sortDir")) criteria.sortDir = "asc";
@@ -625,6 +627,8 @@
 				enddate = getValue("endDate", criteria.enddate),
 				groupByApp = getValue("groupByApp", criteria.groupByApp),
 				groupByHost = getValue("groupByHost", criteria.groupByHost),
+				groupByDomain = getValue("groupByDomain", criteria.groupByDomain),
+				domainID = getValue("domainID", criteria.domainID),
 				searchHTMLReport = getValue("searchHTMLReport", criteria.searchHTMLReport),
 				sortBy = getValue("sortBy", criteria.sortBy),
 				sortDir = getValue("sortDir", criteria.sortDir),

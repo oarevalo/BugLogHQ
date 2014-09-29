@@ -22,7 +22,7 @@
 					panel = "changePassword";	
 			}
 						
-			// try {
+			try {
 				switch(panel) {
 					case "general":
 						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
@@ -106,7 +106,6 @@
 				setValue("allowConfigEditing", isConfigEditingAllowed());
 				setValue("pageTitle", "BugLog Settings & Management");
 				setView("admin");
-			/*	
 			} catch(validation e) {
 				setMessage("warning",e.message);
 				setNextEvent("main");				
@@ -115,7 +114,7 @@
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
 				setNextEvent("main");				
-			}*/
+			}
 		</cfscript>
 	</cffunction>
 
@@ -574,7 +573,6 @@
 				
 				setMessage("info","Domain has been saved");
 				setNextEvent("admin.main","panel=domainManagement");
-							
 			} catch(validation e) {
 				setMessage("warning",e.message);
 				setNextEvent("admin.main","panel=domainManagement&id=#id#&domain=#domain#");
@@ -582,7 +580,7 @@
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
 				setNextEvent("admin.main","panel=domainManagement&id=#id#&domain=#domain#");
-			}		
+			}
 		</cfscript>
 	</cffunction>	
 		

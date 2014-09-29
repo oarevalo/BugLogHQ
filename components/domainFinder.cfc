@@ -10,7 +10,6 @@
 				o = createObject("component","bugLog.components.domain").init( variables.oDAO );
 				o.setDomainID(qry.domainID);
 				o.setDomain(qry.domain);
-				o.setCreatedOn(qry.createdOn);
 				return o;
 			} else {
 				throw("ID not found","domainFinderException.IDNotFound");
@@ -28,7 +27,6 @@
 				o = createObject("component","bugLog.components.domain").init( variables.oDAO );
 				o.setDomainID(qry.domainID);
 				o.setDomain(qry.domain);
-				o.setCreatedOn(qry.createdOn);
 				return o;
 			} else {
 				throw("domain not found","domainFinderException.domainNotFound");

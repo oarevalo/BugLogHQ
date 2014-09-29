@@ -14,8 +14,8 @@
 		function getID() {return getDomainId();}
 	</cfscript>
 	
-	<cffunction name="init" access="public" returnType="host">
-		<cfargument name="dao" type="bugLog.components.db.hostDAO" required="true">
+	<cffunction name="init" access="public" returnType="domain">
+		<cfargument name="dao" type="bugLog.components.db.domainDAO" required="true">
 		<cfset variables.oDAO = arguments.dao>
 		<cfreturn this>
 	</cffunction>

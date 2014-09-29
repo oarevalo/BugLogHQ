@@ -389,13 +389,13 @@
 		<cfreturn oSource>
 	</cffunction>
 
-	<cffunction name="getDomainFromBean" access="private" returntype="source" hint="Uses the information on the rawEntryBean to retrieve the corresponding Domain object">
+	<cffunction name="getDomainFromBean" access="private" returntype="domain" hint="Uses the information on the rawEntryBean to retrieve the corresponding Domain object">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
 		<cfargument name="createIfNeeded" type="boolean" default="false">
 		<cfscript>
 			var key = "";
 			var bean = arguments.entryBean;
-			var oSource = 0;
+			var oDomain = 0;
 			var oDF = variables.oDAOFactory;
 
 			key = bean.getDomain();
@@ -408,10 +408,11 @@
 				// entry not in cache, so we get it from DB
 				try {
 					oDomain = variables.oDomainFinder.findByName( key );
-
-				} catch(domainFinderException.codeNotFound e) {
+				} catch(domainFinderException.domainNotFound e) {
 					// code does not exist, so we need to create it (if autocreate enabled)
-					if(!arguments.createIfNeeded) throw(message="Invalid Domain",type="invalidDomain");
+					if(!arguments.createIfNeeded){
+						throw(message="Invalid Domain",type="invalidDomain");
+					}
 					oDomain = createObject("component","bugLog.components.domain").init( oDF.getDAO("domain") );
 					oDomain.setDomain( key );
 					oDomain.save();

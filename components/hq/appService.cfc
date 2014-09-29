@@ -447,6 +447,7 @@
 		<cfargument name="qryEntries" required="true" type="query">
 		<cfargument name="groupByApp" required="true" type="boolean">
 		<cfargument name="groupByHost" required="true" type="boolean">
+		<cfargument name="groupByDomain" required="true" type="boolean">
 		<cfset var qry = 0>
 		<cfquery name="qry" dbtype="query">
 			SELECT <cfif arguments.groupByApp>
@@ -454,6 +455,9 @@
 					</cfif>
 					<cfif arguments.groupByHost>
 						HostName, HostID, 
+					</cfif>
+					<cfif arguments.groupByDomain>
+						[Domain], DomainID, 
 					</cfif>
 					Message, 
 					COUNT(entryID) AS bugCount, 
@@ -467,6 +471,9 @@
 					</cfif>
 					<cfif arguments.groupByHost>
 						HostName, HostID, 
+					</cfif>
+					<cfif arguments.groupByDomain>
+						[Domain], DomainID, 
 					</cfif>
 					Message
 				ORDER BY createdOn DESC

@@ -216,7 +216,8 @@
 																data.userAgent,
 																data.templatePath,
 																sanitizeForXML(data.HTMLReport),
-																data.apikey)>
+																data.apikey,
+																cgi.server_name)>
 				</cfif>
 			<cfelse>
 				<cfif variables.bugEmailRecipients neq "">

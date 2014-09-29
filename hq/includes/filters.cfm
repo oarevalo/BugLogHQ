@@ -1,6 +1,7 @@
 <cfparam name="rs.qryApplications" default="#queryNew('')#">
 <cfparam name="rs.qryHosts" default="#queryNew('')#">
 <cfparam name="rs.qrySeverities" default="#queryNew('')#">
+<cfparam name="rs.qryDomains" default="#queryNew('')#">
 <cfparam name="rs.criteria" default="#structNew()#">
 
 <cfset times = [
@@ -31,6 +32,16 @@
 		SELECT DISTINCT hostID, hostName
 			FROM rs.qryEntries
 			ORDER BY hostName
+	</cfquery>
+<cfelse>
+	<cfset qryHostsCurrent = queryNew("")>
+</cfif>
+
+<cfif rs.criteria.groupByDomain>
+	<cfquery name="qryDomainsCurrent" dbtype="query">
+		SELECT DISTINCT domainID, [domain]
+		FROM rs.qryEntries
+		ORDER BY [domain]
 	</cfquery>
 <cfelse>
 	<cfset qryHostsCurrent = queryNew("")>
@@ -87,6 +98,23 @@
 							</cfif>
 						</cfloop>
 						<cfif rs.criteria.hostID gt 0 and not found>
+							<option value="0" selected>No Match Found</option>
+						</cfif>
+					</select>
+				</td>
+				<td style="padding-top:5px;">
+					<span <cfif rs.criteria.domainID gt 0>style="color:red;"</cfif>>Domain:</span> 
+					<select name="domainID"  class="searchSelector">
+						<option value="0">All</option>
+						<cfset found = false>
+						<cfloop query="qryDomainsCurrent">
+							<cfset isSelected = (qryDomainsCurrent.domainID eq rs.criteria.domainID or qryDomainsCurrent.domain eq rs.criteria.domainID)>
+							<option value="#qryDomainsCurrent.domainID#"  <cfif isSelected>selected</cfif>>#qryDomainsCurrent.domain#</option>
+							<cfif isSelected>
+								<cfset found = true>
+							</cfif>
+						</cfloop>
+						<cfif rs.criteria.domainID gt 0 and not found>
 							<option value="0" selected>No Match Found</option>
 						</cfif>
 					</select>

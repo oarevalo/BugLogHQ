@@ -6,6 +6,7 @@
 <cfset oHost = oEntry.getHost()>
 <cfset oSource = oEntry.getSource()>
 <cfset oSeverity = oEntry.getSeverity()>
+<cfset oDomain = oEntry.getDomain()>
 
 <cfset entryID = oEntry.getEntryID()>
 
@@ -192,6 +193,12 @@
 					<tr>
 						<td><b>CFID / CFTOKEN:</b></td>
 						<td>#oEntry.getCFID()# &nbsp;&nbsp;/&nbsp;&nbsp; #oEntry.getCFTOKEN()#</td>
+					</tr>
+				</cfif>
+				<cfif oEntry.getDomainID() neq "">
+					<tr>
+						<td><b>Domain:</b></td>
+						<td>#oDomain.getDomain()#</td>
 					</tr>
 				</cfif>
 			</tbody>
