@@ -23,7 +23,9 @@
 				o.setTemplatePath(qry.templatePath);
 				o.setHTMLReport(qry.HTMLReport);
 				o.setCreatedOn(qry.createdOn);
-				o.setDomainID(qry.domainID);
+				if(len(qry.domainId)){
+					o.setDomainID(qry.domainID);
+				}
 				return o;
 			} else {
 				throw("ID not found","entryFinderException.IDNotFound");
