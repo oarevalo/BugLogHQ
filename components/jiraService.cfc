@@ -95,7 +95,7 @@
 			<cfhttpparam type="header" name="Content-Type" value="application/json">
 			<cfhttpparam type="body"  value="#serializeJson(issue)#">
 		</cfhttp>
-		<cfif !structKeyExists(response,"status_code") or left(response.status_code,1) neq "2">
+		<cfif !structKeyExists(response,"Statuscode") or left(response.Statuscode,1) neq "2">
 			<cfthrow message="Issue could not be created" detail="#response.fileContent#">
 		</cfif>
 		<cfreturn deserializejson(response.fileContent)>
