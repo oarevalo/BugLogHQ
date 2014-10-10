@@ -16,6 +16,16 @@
 	<cfset variables.hostname = "">
 	<cfset variables.sensitiveFieldNames = "">
 
+	<!--- sanitizeMap is an array of regular expressions which will be removed/replaced
+		from the generated output. Each item can be either a simple value or a struct
+		with the elements 'expr' and 'replace' --->
+	<cfset variables.sanitizeMap = [
+			{expr = "<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>", replace = "<em>JavaScript code removed for security</em>"},
+			{expr = "[45][0-9]{3}-?[0-9]{4}-?[0-9]{4}-?([0-9]{4})", replace = "***VISA/MASTERCARD_REMOVED*** (\1)"},
+			{expr = "3[47][0-9]{2}-?[0-9]{6}-?([0-9]{5})", replace = "***AMEX_REMOVED*** (\1)"},
+			{expr = "s3:\/\/[^@]+@", replace = "s3://***S3_PASSWORD_REMOVED***@"}
+		] />
+
 	<!--- Handle cases in which the application scope is not defined (Fix contributed by Morgan Dennithorne) --->
 	<cfif isDefined("application.applicationName")>
 		<cfset variables.appName = replace(application.applicationName," ","","all") />
@@ -36,6 +46,7 @@
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
 		<cfargument name="sensitiveFieldNames" type="string" required="false" default="#variables.sensitiveFieldNames#">
+		<cfargument name="sanitizeExpressions" type="array" required="false" default="#arrayNew(1)#">
 
 		<cfscript>
 			var wsParams = structNew();
@@ -70,6 +81,9 @@
 			variables.maxDumpDepth			= arguments.maxDumpDepth;
 			variables.writeToCFLog			= arguments.writeToCFLog;
 			variables.sensitiveFieldNames	= arguments.sensitiveFieldNames;
+
+			if(arrayLen(arguments.sanitizeExpressions))
+				variables.sanitizeMap.addAll( arguments.sanitizeExpressions );
 
 			if(arguments.appName neq "")
 				variables.appName = arguments.appName;
@@ -152,13 +166,7 @@
 		<cfif isDefined("cftoken")>
 			<cfset tmpCFTOKEN = cftoken>
 		</cfif>
-
-		<cfif isSimpleValue(arguments.extraInfo)>
-			<cfset arguments.extraInfo = sanitizeSensitiveData(arguments.extraInfo)>
-		<cfelseif isStruct(arguments.extraInfo)>
-			<cfset arguments.extraInfo = sanitizeKeyData(arguments.extraInfo)>
-		</cfif>
-		
+	
 		<cftry>
 			<!--- compose the full report --->
 			<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth, arguments.AppName)>
@@ -512,10 +520,11 @@
 		<cfreturn request[checkpointsKey]>
 	</cffunction>
 
-	<cffunction name="sanitizeDump" access="private" returntype="string" hint="Performs a sanitized dump, where JavaScript has been removed to minimize XSS risks">
+	<cffunction name="sanitizeDump" access="private" returntype="string" hint="Performs a sanitized dump, where JavaScript has been removed to minimize XSS risks as well as any required exclusions">
 		<cfargument name="data" type="any" required="true">
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 		<cfset var out = "">
+	
 		<cfif isSimpleValue(arguments.data)>
 			<cfset out = arguments.data>
 		<cfelseif isStruct(arguments.data) and structisempty(arguments.data)>
@@ -523,10 +532,25 @@
 		<cfelseif isArray(arguments.data) and not arrayLen(arguments.data)>
 			<cfset out = "<em>Empty array</em>">
 		<cfelse>
+			<!--- If this is a struct, then we may need to sanitize the keys --->
+			<cfif isStruct(arguments.data) and len(variables.sensitiveFieldNames)>
+				<cfset arguments.data = sanitizeKeyData(arguments.data) />
+			</cfif>
+
+			<!--- Now we can generate the dump --->
 			<cfsavecontent variable="out"><cfoutput><cfdump var="#arguments.data#" top="#arguments.maxDumpDepth#"></cfoutput></cfsavecontent>
-			<cfset out = reReplaceNoCase(out, "<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>", "<em>JavaScript code removed for security</em>","all")>
 			<cfset out = replace(out, "</td>", "</td>" & Chr(10) & Chr(13), "all")>
 		</cfif>
+
+		<!--- Apply any sanitization regexes --->
+		<cfloop array="#variables.sanitizeMap#" index="item">
+			<cfif isSimpleValue(item)>
+				<cfset out = reReplaceNoCase(out, item, "*** REMOVED ***", "all") />
+			<cfelse>
+				<cfset out = reReplaceNoCase(out, item.expr, item.replace, "all") />
+			</cfif>
+		</cfloop>
+
 		<cfreturn out>
 	</cffunction>
 
@@ -538,19 +562,10 @@
 				<cfset arguments.data[local.i] = sanitizeKeyData(arguments.data[local.i])>
 			<cfelse>
 				<cfif listFindNoCase(variables.sensitiveFieldNames,local.i)>
-					<cfset arguments.data[local.i] = "***POTENTIAL_SENSITIVE_VALUE_REMOVED***">
+					<cfset arguments.data[local.i] = "*** SENSITIVE DATA REMOVED ***">
 				</cfif>
 			</cfif>
 		</cfloop>
-		<cfreturn arguments.data>
-	</cffunction>
-	
-
-	<cffunction name="sanitizeSensitiveData" access="private" returntype="string" hint="Removes known formats for credit card and S3 passwords">
-		<cfargument name="data" type="string" required="true">
-		<cfset arguments.data = ReReplace(arguments.data, '[45][0-9]{3}-?[0-9]{4}-?[0-9]{4}-?([0-9]{4})', '***VISA/MASTERCARD_REMOVED*** (\1)', 'ALL')>
-		<cfset arguments.data = ReReplace(arguments.data, '3[47][0-9]{2}-?[0-9]{6}-?([0-9]{5})', '***AMEX_REMOVED*** (\1)', 'ALL')>
-		<cfset arguments.data = ReReplace(arguments.data, 's3:\/\/[^@]+@', 's3://***S3_PASSWORD_REMOVED***@', 'ALL')>
 		<cfreturn arguments.data>
 	</cffunction>
 
