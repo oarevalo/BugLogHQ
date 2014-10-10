@@ -42,6 +42,7 @@
 		<cfset variables.oSourceDAO = variables.oDAOFactory.getDAO("source")>
 		<cfset variables.oUserDAO = variables.oDAOFactory.getDAO("user")>
 		<cfset variables.oUserApplicationDAO = variables.oDAOFactory.getDAO("userApplication")>
+		<cfset variables.oDomainDAO = variables.oDAOFactory.getDAO("domain")>
 
 		<!--- setup extensions --->
 		<cfset variables.extensionsPath = variables.cfcPath & ".extensions.">
@@ -113,6 +114,7 @@
 		<cfargument name="searchTerm" type="string" required="true">
 		<cfargument name="applicationID" type="string" required="false" default="0">
 		<cfargument name="hostID" type="string" required="false" default="0">
+		<cfargument name="domainID"   type="string" required="false" default="0">
 		<cfargument name="severityID" type="string" required="false" default="0">
 		<cfargument name="startDate" type="date" required="false" default="1/1/1800">
 		<cfargument name="endDate" type="date" required="false" default="1/1/3000">
@@ -138,6 +140,12 @@
 			if(Not isNumeric(arguments.hostID)) {
 				args.hostID = 0;
 				args.hostName = trim(arguments.hostID);
+			}
+			
+			// if domainId is not numeric, assume it is the domain
+			if(Not isNumeric(arguments.domainId)) {
+				args.domainId = 0;
+				args.domain = trim(arguments.domainId);
 			}
 
 			// if severityID is not numeric and is not a list and is not _ALL_, assume it is the severityCode
@@ -227,6 +235,16 @@
 		</cfquery>
 		<cfreturn qry>
 	</cffunction>	
+	
+	<cffunction name="getDomains" access="public" returntype="query">
+		<cfset var qry = variables.oDomainDAO.getAll()>
+		<cfquery name="qry" dbtype="query">
+			SELECT *
+			FROM qry
+			ORDER BY [DOMAIN]
+		</cfquery>
+		<cfreturn qry>
+	</cffunction>
 	
 	<cffunction name="sendEntry" access="public" returntype="void">
 		<cfargument name="entryID" type="numeric" required="true">
@@ -429,6 +447,7 @@
 		<cfargument name="qryEntries" required="true" type="query">
 		<cfargument name="groupByApp" required="true" type="boolean">
 		<cfargument name="groupByHost" required="true" type="boolean">
+		<cfargument name="groupByDomain" required="true" type="boolean">
 		<cfset var qry = 0>
 		<cfquery name="qry" dbtype="query">
 			SELECT <cfif arguments.groupByApp>
@@ -436,6 +455,9 @@
 					</cfif>
 					<cfif arguments.groupByHost>
 						HostName, HostID, 
+					</cfif>
+					<cfif arguments.groupByDomain>
+						[Domain], DomainID, 
 					</cfif>
 					Message, 
 					COUNT(entryID) AS bugCount, 
@@ -449,6 +471,9 @@
 					</cfif>
 					<cfif arguments.groupByHost>
 						HostName, HostID, 
+					</cfif>
+					<cfif arguments.groupByDomain>
+						[Domain], DomainID, 
 					</cfif>
 					Message
 				ORDER BY createdOn DESC
@@ -729,6 +754,14 @@
 		<cfreturn newID>
 	</cffunction>
 
+	<cffunction name="saveDomain" access="public" returntype="numeric">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="domain" type="string" required="true">
+		<cfset var newID = variables.oDomainDAO.save(id=arguments.id, 
+															domain=arguments.domain)>
+		<cfreturn newID>
+	</cffunction>
+
 	<cffunction name="saveSeverity" access="public" returntype="numeric">
 		<cfargument name="id" type="numeric" required="true">
 		<cfargument name="code" type="string" required="true">
@@ -762,7 +795,18 @@
 		</cfif>
 		<cfset variables.oHostDAO.delete(arguments.id)>
 	</cffunction>
-	
+
+	<cffunction name="deleteDomain" access="public" returntype="void">
+		<cfargument name="id" type="numeric" required="true">
+		<cfargument name="entryAction" type="string" required="true">
+		<cfargument name="moveToDomainID" type="numeric" required="false" default="0">
+		<cfif arguments.entryAction eq "delete">
+			<cfset variables.oEntryDAO.deleteByDomainID(arguments.id)>
+		<cfelseif arguments.entryAction eq "move" and arguments.moveToDomainID gt 0>
+			<cfset variables.oEntryDAO.updateDomainID(arguments.id, arguments.moveToDomainID)>
+		</cfif>
+		<cfset variables.oDomainDAO.delete(arguments.id)>
+	</cffunction>	
 	<cffunction name="deleteSeverity" access="public" returntype="void">
 		<cfargument name="id" type="numeric" required="true">
 		<cfargument name="entryAction" type="string" required="true">

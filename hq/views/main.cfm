@@ -11,6 +11,8 @@
 
 <cfset groupByApp = rs.criteria.groupByApp>
 <cfset groupByHost = rs.criteria.groupByHost>
+<cfset groupByDomain = rs.criteria.groupByDomain>
+
 <cfset sortBy = rs.criteria.sortBy>
 <cfset sortDir = rs.criteria.sortDir>
 

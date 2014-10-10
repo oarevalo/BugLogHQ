@@ -11,6 +11,7 @@
 		<cfset addColumn("sourceID", "cf_sql_numeric")>
 		<cfset addColumn("severityID", "cf_sql_numeric")>
 		<cfset addColumn("hostID", "cf_sql_numeric")>
+		<cfset addColumn("domainID", "cf_sql_numeric")>
 		<cfset addColumn("exceptionMessage", "cf_sql_varchar")>
 		<cfset addColumn("CFID", "cf_sql_varchar")>
 		<cfset addColumn("CFTOKEN", "cf_sql_varchar")>
@@ -100,6 +101,31 @@
 			UPDATE #getTableName()#
 				SET severityID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.toSeverityID#">
 				WHERE severityID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.fromSeverityID#">
+		</cfquery>	
+	</cffunction>
+	
+	<cffunction name="deleteByDomainID" access="public" returntype="void" hint="Deletes all entries that belong to the given DomainId">
+		<cfargument name="domainId" type="numeric" required="true">
+		<cfset var dsn = getDataProvider().getConfig().getDSN()>
+		<cfset var username = getDataProvider().getConfig().getUsername()>
+		<cfset var password = getDataProvider().getConfig().getPassword()>
+		<cfquery name="qry" datasource="#dsn#" username="#username#" password="#password#">
+			DELETE
+				FROM #getTableName()#
+				WHERE domainId = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.domainId#">
+		</cfquery>	
+	</cffunction>
+
+	<cffunction name="updateDomainID" access="public" returntype="void" hint="Updates all entries that belong to the given DomainId to a new DomainId">
+		<cfargument name="fromDomainId" type="numeric" required="true">
+		<cfargument name="toDomainId" type="numeric" required="true">
+		<cfset var dsn = getDataProvider().getConfig().getDSN()>
+		<cfset var username = getDataProvider().getConfig().getUsername()>
+		<cfset var password = getDataProvider().getConfig().getPassword()>
+		<cfquery name="qry" datasource="#dsn#" username="#username#" password="#password#">
+			UPDATE #getTableName()#
+				SET domainId = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.toDomainId#">
+				WHERE domainId = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.fromDomainId#">
 		</cfquery>	
 	</cffunction>
 

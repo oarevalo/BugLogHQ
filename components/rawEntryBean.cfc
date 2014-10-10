@@ -6,6 +6,8 @@
 		variables.instance.message = "";
 		variables.instance.applicationCode = "";
 		variables.instance.sourceID = 0;
+		variables.instance.domainId = 0;
+		variables.instance.domain = "";
 		variables.instance.severityCode = "";
 		variables.instance.hostName = "";
 		variables.instance.exceptionMessage = "";
@@ -22,6 +24,8 @@
 		function setMessage(data) {variables.instance.message = arguments.data; return this;}
 		function setApplicationCode(data) {variables.instance.applicationCode = arguments.data; return this;}
 		function setSourceID(data) {variables.instance.sourceID = arguments.data; return this;}
+		function setDomainId(data) {variables.instance.domainId = arguments.data; return this;}
+		function setDomain(data)   {variables.instance.domain = arguments.data; return this;}
 		function setSeverityCode(data) {variables.instance.severityCode = arguments.data; return this;}
 		function setHostName(data) {variables.instance.hostName = arguments.data; return this;}
 		function setExceptionMessage(data) {variables.instance.exceptionMessage = arguments.data; return this;}
@@ -38,6 +42,8 @@
 		function getMessage() {return variables.instance.message;}
 		function getApplicationCode() {return variables.instance.applicationCode;}
 		function getSourceID() {return variables.instance.sourceID;}
+		function getDomainID() {return variables.instance.domainID;}
+		function getDomain() {return variables.instance.domain;}
 		function getSeverityCode() {return variables.instance.severityCode;}
 		function getHostName() {return variables.instance.hostName;}
 		function getExceptionMessage() {return variables.instance.exceptionMessage;}

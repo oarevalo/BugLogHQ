@@ -23,6 +23,9 @@
 				o.setTemplatePath(qry.templatePath);
 				o.setHTMLReport(qry.HTMLReport);
 				o.setCreatedOn(qry.createdOn);
+				if(len(qry.domainId)){
+					o.setDomainID(qry.domainID);
+				}
 				return o;
 			} else {
 				throw("ID not found","entryFinderException.IDNotFound");
@@ -46,6 +49,9 @@
 		<cfargument name="severityCode" type="string" required="false" default="">
 		<cfargument name="userAgent" type="string" required="false" default="">
 		<cfargument name="userID" type="numeric" required="false" default="0">
+		<cfargument name="domainID" type="string" required="false" default="0">
+		<cfargument name="domain" type="string" required="false" default="">
+		
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var dbType = oDataProvider.getConfig().getDBType()>
 		<cfset var qry = 0>
@@ -64,6 +70,7 @@
 			SELECT e.entryID, e.message, e.cfid, e.cftoken, e.mydateTime, e.exceptionMessage, e.exceptionDetails, 
 					e.templatePath, e.userAgent, a.code as ApplicationCode, h.hostName, s.code AS SeverityCode,
 					src.name AS SourceName, e.applicationID, e.hostID, e.severityID, e.sourceID, e.createdOn,
+					e.domainID, d.domain,
 					<cfswitch expression="#dbType#">
 						<cfcase value="mssql">
 							datePart(year, e.createdOn) as entry_year, 
@@ -99,6 +106,7 @@
 					INNER JOIN bl_Host h ON e.hostID = h.hostID
 					INNER JOIN bl_Severity s ON e.severityID = s.severityID
 					INNER JOIN bl_Source src ON e.sourceID = src.SourceID
+					LEFT JOIN bl_Domain d ON e.domainID = d.domainID
 				WHERE (1=1)
 					<cfif arguments.searchTerm neq "">
 						AND (
@@ -139,6 +147,15 @@
 					<cfif arguments.hostName neq "">
 						AND h.hostName = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.hostName#">
 					</cfif>
+					
+					<cfif arguments.domainID neq "" and arguments.domainID neq 0 and arguments.domainID neq "_ALL_">
+						AND e.domainID <cfif left(arguments.domainID,1) eq "-"><cfset arguments.domainID = removechars(arguments.domainID,1,1)>NOT</cfif> IN
+                            (<cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.domainID#" list="true">)
+					</cfif>
+					<cfif arguments.domain neq "">
+						AND d.domain = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.domain#">
+					</cfif>
+					
 					<cfif arguments.severityID neq "" and arguments.severityID neq 0 and arguments.severityID neq "_ALL_">
 						AND e.severityID <cfif left(arguments.severityID,1) eq "-"><cfset arguments.severityID = removechars(arguments.severityID,1,1)>NOT</cfif> IN
                             (<cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.severityID#" list="true">)

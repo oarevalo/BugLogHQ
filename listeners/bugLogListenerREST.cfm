@@ -21,6 +21,7 @@
 <cfparam name="args.hostName" type="string" default="#cgi.REMOTE_ADDR#">
 <cfparam name="args.exceptionMessage" default="">
 <cfparam name="args.exceptionDetails" default="">
+<cfparam name="args.domain" default="">
 <cfparam name="args.CFID" type="string" default="">
 <cfparam name="args.CFTOKEN" type="string" default="">
 <cfparam name="args.userAgent" type="string" default="">

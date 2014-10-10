@@ -14,7 +14,8 @@
 		<cfargument name="templatePath" type="string" required="false" default="">
 		<cfargument name="HTMLReport" type="string" required="false" default="">
 		<cfargument name="APIKey" type="string" required="false" default="">
-
+		<cfargument name="domain" required="false" default="">
+		
 		<!--- log how we got this report --->
 		<cfset arguments.source = "SOAP">
 

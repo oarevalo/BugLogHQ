@@ -17,6 +17,7 @@
 		variables.instance.templatePath = "";
 		variables.instance.HTMLReport = "";
 		variables.instance.createdOn = now();
+		variables.instance.domainId = 0;
 		
 		function setEntryID(data) {variables.instance.ID = arguments.data;}
 		function setDateTime(data) {variables.instance.mydateTime = arguments.data;}
@@ -33,6 +34,7 @@
 		function setTemplatePath(data) {variables.instance.templatePath = left(arguments.data,500);}
 		function setHTMLReport(data) {variables.instance.HTMLReport = arguments.data;}
 		function setCreatedOn(data) {variables.instance.createdOn = arguments.data;}
+		function setDomainId(data) {variables.instance.domainId = arguments.data;}
 		
 		function getEntryID() {return variables.instance.ID;}
 		function getDateTime() {return variables.instance.mydateTime;}
@@ -49,6 +51,7 @@
 		function getTemplate_Path() {return variables.instance.templatePath;}
 		function getHTMLReport() {return variables.instance.HTMLReport;}
 		function getCreatedOn() {return variables.instance.createdOn;}
+		function getDomainId() {return variables.instance.domainId;}
 
 		function getID() {return variables.instance.ID;}
 	</cfscript>
@@ -87,6 +90,12 @@
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var oSeverityDAO = createObject("component","bugLog.components.db.severityDAO").init( oDataProvider )>
 		<cfreturn createObject("component","bugLog.components.severityFinder").init( oSeverityDAO ).findByID(variables.instance.severityID)>
+	</cffunction>
+	
+	<cffunction name="getDomain" access="public" returntype="domain" hint="Returns the domain object">
+		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
+		<cfset var oDomainDAO = createObject("component","bugLog.components.db.domainDAO").init( oDataProvider )>
+		<cfreturn createObject("component","bugLog.components.domainFinder").init( oDomainDAO ).findByID(variables.instance.domainId)>
 	</cffunction>
 	
 </cfcomponent>
