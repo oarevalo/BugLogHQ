@@ -64,12 +64,14 @@
 		</cfif>
 		<cfset oBugLogService = createObject("component",pathToService).init(bugLogListener = bugLogListener[protocol],
 																			 apiKey = apiKey)>
-		
+		... Adding a checkpoint
+		<cfset oBugLogService.checkpoint("BugLogHQ client created") />
 		<br />
 
 		<cftry>
 			<!--- throw an error --->
 			Throwing sample error message...<br>
+			<cfset oBugLogService.checkpoint("About to throw an error...") />
 			<cfthrow message="Test message via #protocol#">	
 			
 			<cfcatch type="any">

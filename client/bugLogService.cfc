@@ -160,13 +160,7 @@
 		</cfif>
 		
 		<cftry>
-			<!--- if we are tracking checkpoints, then add the buglog call as the last checkpoint --->
-			<cfif arrayLen(getCheckpoints())>
-				<cfset checkpoint("bugLog.notifyService() called")>
-			</cfif>
-
-			<!--- compose short and full messages --->
-			<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
+			<!--- compose the full report --->
 			<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth, arguments.AppName)>
 
 			<!--- submit error --->
@@ -235,7 +229,8 @@
 
 		<!--- add entry to coldfusion log --->
 		<cfif arguments.writeToCFLog>
-			<cflog type="error"
+			<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception)>
+			<cflog type="#arguments.severityCode#"
 				   text="#shortMessage#"
 				   file="#arguments.AppName#_BugTrackingErrors">
 		</cfif>
@@ -263,7 +258,6 @@
 	<cffunction name="composeShortMessage" access="private" returntype="string" output="false">
 		<cfargument name="message" type="string" required="true">
 		<cfargument name="exception" type="any" required="false" default="#structNew()#">
-		<cfargument name="ExtraInfo" type="any" required="no" default="">
 		<cfscript>
 			var aBuffer = arrayNew(1);
 			var e = arguments.exception;
@@ -329,7 +323,7 @@
 				</tr>
 				<tr>
 					<td><b>Message:</b></td>
-							<td>#HtmlEditFormat(arguments.exception.message)#</td>
+					<td>#HtmlEditFormat(arguments.exception.message)#</td>
 				</tr>
 				<cfif structKeyExists(arguments.exception,"type")>
 					<tr>
@@ -339,7 +333,7 @@
 				</cfif>
 				<tr>
 					<td><b>Detail:</b></td>
-							<td>#HtmlEditFormat(arguments.exception.detail)#</td>
+					<td>#HtmlEditFormat(arguments.exception.detail)#</td>
 				</tr>
 				<cfif arrayLen(aTags) gt 0>
 					<tr valign="top">
@@ -430,44 +424,56 @@
 			</table>
 			<br />
 
+			<!--- Render Extra Info --->
 			<cfif not isSimpleValue(arguments.ExtraInfo) or arguments.ExtraInfo neq "">
 				<h3>Additional Info</h3>
 				<cftry>
 					#sanitizeDump(arguments.ExtraInfo, arguments.maxDumpDepth)#
 					<cfcatch>
-						<div style="margin-left:80px;">
-							<h4 style="color:red;">Failed to convert <strong>ExtraInfo</strong> into a HTML representation!</h4>
-							#sanitizeDump(CFCATCH, arguments.maxDumpDepth)#
+						<div style="margin-top:20px;">
+							<h4 style="color:red;">An error ocurred while rendering ExtraInfo!</h4>
+							<b>#cfcatch.message#</b>
+							#cfcatch.detail#
 						</div>
 					</cfcatch>
 				</cftry>
 			</cfif>
 
-			<cfset var checkpoints = getCheckpoints()>
-			<cfif arrayLen(checkpoints)>
-				<br />
-				<h3>Checkpoints</h3>
-				<table border="1" cellspacing="0" cellpadding="3">
-					<tr>
-						<th>##</th>
-						<th>Checkpoint</th>
-						<th>Delta (ms)</th>
-						<th>Elapsed (ms)</th>
-					</tr>
-					<cfset var prevTs = 0>
-					<cfloop from="1" to="#arrayLen(checkpoints)#" index="i">
-						<tr <cfif i mod 2>style="background-color:##ebebeb;"</cfif>>
-							<td style="text-align:right;">#i#.</td>
-							<td>#checkpoints[i].cp#</td>
-							<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-prevTs#<cfelse>-</cfif></td>
-							<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-checkpoints[1].ts#<cfelse>-</cfif></td>
+			<!--- Render Checkpoints --->
+			<cftry>
+				<cfif structKeyExists(request,checkpointsKey)>
+					<br />
+					<h3>Checkpoints</h3>
+					<cfset checkpoint("bugLog.notifyService() called")>
+					<cfset var checkpoints = getCheckpoints()>
+					<table border="1" cellspacing="0" cellpadding="3">
+						<tr>
+							<th>##</th>
+							<th>Checkpoint</th>
+							<th>Elapsed (ms)</th>
+							<th>Delta (ms)</th>
 						</tr>
-						<cfset prevTs = checkpoints[i].ts>
-					</cfloop>
-				</table>
-			</cfif>
+						<cfset var prevTs = 0>
+						<cfloop from="1" to="#arrayLen(checkpoints)#" index="i">
+							<tr <cfif i mod 2>style="background-color:##ebebeb;"</cfif>>
+								<td style="text-align:right;">#i#.</td>
+								<td>#checkpoints[i].cp#</td>
+								<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-checkpoints[1].ts#<cfelse>-</cfif></td>
+								<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-prevTs#<cfelse>-</cfif></td>
+							</tr>
+							<cfset prevTs = checkpoints[i].ts>
+						</cfloop>
+					</table>
+				</cfif>
+				<cfcatch>
+					<h4 style="color:red;">An error ocurred while rendering Checkpoints!</h4>
+					<b>#cfcatch.message#</b>
+					#cfcatch.detail#
+				</cfcatch>
+			</cftry>
 			</cfoutput>
 		</cfsavecontent>
+
 		<cfreturn tmpHTML>
 	</cffunction>
 
