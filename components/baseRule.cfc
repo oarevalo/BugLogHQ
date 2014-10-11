@@ -124,7 +124,14 @@
 			</cfoutput>
 		</cfsavecontent>
 		
-		<cfset _sendToEmail(sender, arguments.recipient, arguments.subject, body, "html")>
+		<cfset mailerService.send(
+				from = sender, 
+				to = arguments.recipient,
+				subject = arguments.subject,
+				body = body,
+				type = "html"
+			) />
+
 	</cffunction>
 
 	<cffunction name="writeToCFLog" access="private" returntype="void" hint="writes a message to the internal cf logs">
@@ -154,7 +161,13 @@
 	<cffunction name="getDAOFactory" access="public" returntype="bugLog.components.lib.dao.DAOFactory" hint="Returns a reference to the current DAOFactory instance">
 		<cfreturn variables.daoFactory />
 	</cffunction>
-	
+
+	<cffunction name="setMailerService" access="public" returntype="baseRule" hint="Adds a reference to the mailer service">
+		<cfargument name="mailerService" type="any" required="true">
+		<cfset variables.mailerService = arguments.mailerService>
+		<cfreturn this />
+	</cffunction>
+
 	<cffunction name="setExtensionID" access="public" returntype="baseRule" hint="Sets the ID of this extension instance">
 		<cfargument name="id" type="numeric" required="true">
 		<cfset variables._id_ = arguments.id>
@@ -217,32 +230,6 @@
 		</cfif>
 		<cfset rtn = dateFormat(theDateTime, dateMask) & " " & lsTimeFormat(theDateTime)>
 		<cfreturn rtn>
-	</cffunction>
-	
-	<cffunction name="_sendToEmail" access="private" returntype="void" hint="actual cfmail interaction">
-		<cfargument name="from" type="string" required="true">
-		<cfargument name="to" type="string" required="true">
-		<cfargument name="subject" type="string" required="true">
-		<cfargument name="body" type="string" required="true">
-		<cfargument name="type" type="string" required="false" default="html">
-		<cfset var debug = getListener().getConfig().getSetting("debug.email", false)>
-		<cfif isBoolean(debug) and debug>
-			<cfset var path = getListener().getConfig().getSetting("debug.emailPath","/bugLog/emails/")>
-			<cfset var txt = "From: #arguments.from#" & chr(10)
-									& "To: #arguments.to#" & chr(10)
-									& "Type: #arguments.type#" & chr(10)
-									& "Subject: #arguments.subject#" & chr(10)
-									& "-----------------------------------" & chr(10)
-									& arguments.body>
-			<cfset var ext = arguments.type eq "html" ? "html" : "txt">
-			<cfset fileWrite(expandPath(path & getTickCount() & "." & ext),txt,"UTF-8")>
-		<cfelse>
-			<cfmail from="#arguments.from#" 
-					to="#arguments.to#" 
-					type="#arguments.type#" 
-					subject="#arguments.subject#"
-					>#arguments.body#</cfmail>
-		</cfif>
 	</cffunction>
 	
 </cfcomponent>
