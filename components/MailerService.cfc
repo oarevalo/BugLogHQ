@@ -40,19 +40,29 @@
             <cfset var ext = arguments.type eq "html" ? "html" : "txt">
             <cfset fileWrite(expandPath(variables.debug_path & getTickCount() & "." & ext),txt,"UTF-8")>
         <cfelse>
-            <cfmail  
-                    from = arguments.from
-                    to = arguments.to
-                    type = arguments.type
-                    subject = arguments.subject
-                    server = variables.mail_server
-                    port = variables.mail_port
-                    username = variables.mail_username
-                    password = variables.mail_password
-                    useTLS = variables.mail_useTLS
-                    useSSL = variables.mail_useSSL
-                    >#arguments.body#  
-            </cfmail>
+            <cfif len(variables.mail_server)>
+                <cfmail  
+                        from = "#arguments.from#"
+                        to = "#arguments.to#"
+                        type = "#arguments.type#"
+                        subject = "#arguments.subject#"
+                        server = "#variables.mail_server#"
+                        port = "#variables.mail_port#"
+                        username = "#variables.mail_username#"
+                        password = "#variables.mail_password#"
+                        useTLS = "#variables.mail_useTLS#"
+                        useSSL = "#variables.mail_useSSL#"
+                        >#arguments.body#  
+                </cfmail>
+            <cfelse>
+                <cfmail  
+                        from = "#arguments.from#"
+                        to = "#arguments.to#"
+                        type = "#arguments.type#"
+                        subject = "#arguments.subject#"
+                        >#arguments.body#  
+                </cfmail>
+            </cfif>
         </cfif>
     </cffunction>
 
