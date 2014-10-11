@@ -24,7 +24,7 @@
         </cfscript>
 	</cffunction>
 
-    <cffunction name="send" access="private" returntype="void" hint="Sends an email">
+    <cffunction name="send" access="public" returntype="void" hint="Sends an email">
         <cfargument name="from" type="string" required="true">
         <cfargument name="to" type="string" required="true">
         <cfargument name="subject" type="string" required="true">
