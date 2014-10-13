@@ -117,6 +117,7 @@
 			oEntry.setTemplatePath(bean.gettemplate_Path());
 			oEntry.setHTMLReport(bean.getHTMLReport());
 			oEntry.setCreatedOn(bean.getReceivedOn());
+			oEntry.setUUID(bean.getUUID());
 
 			// save entry
 			oEntry.save();

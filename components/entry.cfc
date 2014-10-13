@@ -17,6 +17,7 @@
 		variables.instance.templatePath = "";
 		variables.instance.HTMLReport = "";
 		variables.instance.createdOn = now();
+		variables.instance.UUID = "";
 		
 		function setEntryID(data) {variables.instance.ID = arguments.data;}
 		function setDateTime(data) {variables.instance.mydateTime = arguments.data;}
@@ -33,7 +34,8 @@
 		function setTemplatePath(data) {variables.instance.templatePath = left(arguments.data,500);}
 		function setHTMLReport(data) {variables.instance.HTMLReport = arguments.data;}
 		function setCreatedOn(data) {variables.instance.createdOn = arguments.data;}
-		
+		function setUUID(data) {variables.instance.UUID = arguments.data;}
+
 		function getEntryID() {return variables.instance.ID;}
 		function getDateTime() {return variables.instance.mydateTime;}
 		function getMessage() {return variables.instance.message;}
@@ -49,6 +51,7 @@
 		function getTemplate_Path() {return variables.instance.templatePath;}
 		function getHTMLReport() {return variables.instance.HTMLReport;}
 		function getCreatedOn() {return variables.instance.createdOn;}
+		function getUUID() {return variables.instance.UUID;}
 
 		function getID() {return variables.instance.ID;}
 	</cfscript>

@@ -17,6 +17,7 @@
 		variables.instance.HTMLReport = "";
 		variables.instance.sourceName = "";
 		variables.instance.receivedOn = now();
+		variables.instance.UUID = createUUID();
 		
 		function setDateTime(data) {variables.instance.dateTime = arguments.data; return this;}
 		function setMessage(data) {variables.instance.message = arguments.data; return this;}
@@ -49,6 +50,7 @@
 		function getHTMLReport() {return variables.instance.HTMLReport;}
 		function getSourceName() {return variables.instance.sourceName;}
 		function getReceivedOn() {return variables.instance.receivedOn;}
+		function getUUID() {return variables.instance.UUID;}
 	</cfscript>
 	
 	<cffunction name="init" access="public" returnType="rawEntryBean">

@@ -17,6 +17,7 @@
 		<cfset addColumn("UserAgent", "cf_sql_varchar")>
 		<cfset addColumn("TemplatePath", "cf_sql_varchar")>
 		<cfset addColumn("CreatedOn", "cf_sql_timestamp")>
+		<cfset addColumn("UUID", "cf_sql_varchar")>
 		
 		<cfif variables.oDataProvider.getConfig().getDBType() EQ "oracle">
 			<cfset addColumn("exceptionDetails", "cf_sql_clob")>

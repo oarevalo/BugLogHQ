@@ -23,6 +23,7 @@
 				o.setTemplatePath(qry.templatePath);
 				o.setHTMLReport(qry.HTMLReport);
 				o.setCreatedOn(qry.createdOn);
+				o.setUUID(qry.UUID);
 				return o;
 			} else {
 				throw("ID not found","entryFinderException.IDNotFound");
@@ -46,6 +47,7 @@
 		<cfargument name="severityCode" type="string" required="false" default="">
 		<cfargument name="userAgent" type="string" required="false" default="">
 		<cfargument name="userID" type="numeric" required="false" default="0">
+		<cfargument name="UUID" type="string" required="false" default="">
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var dbType = oDataProvider.getConfig().getDBType()>
 		<cfset var qry = 0>
@@ -63,7 +65,7 @@
 		<cfquery name="qry" datasource="#dsn#">
 			SELECT e.entryID, e.message, e.cfid, e.cftoken, e.mydateTime, e.exceptionMessage, e.exceptionDetails, 
 					e.templatePath, e.userAgent, a.code as ApplicationCode, h.hostName, s.code AS SeverityCode,
-					src.name AS SourceName, e.applicationID, e.hostID, e.severityID, e.sourceID, e.createdOn,
+					src.name AS SourceName, e.applicationID, e.hostID, e.severityID, e.sourceID, e.createdOn, e.UUID,
 					<cfswitch expression="#dbType#">
 						<cfcase value="mssql">
 							datePart(year, e.createdOn) as entry_year, 
@@ -167,6 +169,9 @@
 								FROM bl_UserApplication
 								WHERE userID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.userID#">
 						)
+					</cfif>
+					<cfif arguments.UUID neq "">
+						AND e.UUID = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.UUID#">
 					</cfif>
 				ORDER BY e.createdOn DESC, entryID DESC
 		</cfquery>
