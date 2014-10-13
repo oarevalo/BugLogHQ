@@ -50,6 +50,9 @@
 		<!--- other settings --->
 		<cfset variables.autoApplyRuleChanges = variables.config.getSetting("hq.autoApplyRuleChanges", true)>
 
+		<!--- Mailer service --->
+		<cfset variables.oMailerService = createObject("component", "bugLog.components.MailerService").init( variables.config ) />
+
 		<cfreturn this>		
 	</cffunction>
 
@@ -239,12 +242,11 @@
 			var thisHost = "";
 			var bugURL = getBugEntryHREF(arguments.EntryID);
 			var buglogHref = getBaseBugLogHREF();
+			var body = "";
 		</cfscript>
 		
-		<cfmail from="#arguments.sender#" 
-				to="#arguments.recipient#" 
-				type="html" 
-				subject="Bug ###arguments.entryID#: #oEntry.getMessage()#">
+		<cfsavecontent variable="body">
+			<cfoutput>
 			<cfif arguments.comment neq "">
 				#arguments.comment#
 				<hr>
@@ -283,8 +285,17 @@
 			<br><br><br>
 			** This email has been sent from the BugLog server at 
 			<a href="#buglogHref#">#buglogHref#</a>
-		</cfmail>
-		
+			</cfoutput>
+		</cfsavecontent>
+
+		<cfset variables.oMailerService.send(
+				from = arguments.sender, 
+				to = arguments.recipient,
+				subject = "Bug ###arguments.entryID#: #oEntry.getMessage()#",
+				body = body,
+				type="html"
+			) />		
+
 	</cffunction>
 	
 	<cffunction name="deleteEntry" access="public" returntype="numeric" hint="deletes one or more entries from the database">

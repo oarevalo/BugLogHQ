@@ -56,6 +56,16 @@
 	<setting name="autoCreate.host">true</setting>	
 	<setting name="autoCreate.severity">true</setting>	
 		
+	<!-- (Optional) Mail server configuration. -->
+	<!--
+		<setting name="mail.server"></setting>
+		<setting name="mail.port"></setting>
+		<setting name="mail.username"></setting>
+		<setting name="mail.password"></setting>
+		<setting name="mail.useTSL"></setting>
+		<setting name="mail.useSSL"></setting>
+	-->
+
 	<!-- Environment-specific Settings: 
 		
 		You can override any of the above settings for specific environments. 

@@ -63,19 +63,31 @@
 		... Listener API Key is: <b>#apikey#</b><br />
 		</cfif>
 		<cfset oBugLogService = createObject("component",pathToService).init(bugLogListener = bugLogListener[protocol],
-																			 apiKey = apiKey)>
-		
+																			 apiKey = apiKey,
+																			 sensitiveFieldNames = "password")>
+		... Adding a checkpoint
+		<cfset oBugLogService.checkpoint("BugLogHQ client created") />
 		<br />
 
 		<cftry>
 			<!--- throw an error --->
 			Throwing sample error message...<br>
+			<cfset oBugLogService.checkpoint("About to throw an error...") />
 			<cfthrow message="Test message via #protocol#">	
 			
 			<cfcatch type="any">
 				<!--- notify bugLog of error --->
 				Notify service via  <strong>[#protocol#]</strong> using severity <strong>[#severity#]</strong>....<br>
-				<cfset oBugLogService.notifyService(cfcatch.message, cfcatch, cgi, severity)>
+
+				<!--- create some sample additional info to include on the bug report --->
+				<cfset extraInfo = { 
+						username = "someone@testing.org",
+						password = "1234568",
+						credit_card = "4111111111111111",
+						user_level = "visitor"
+					} />
+					
+				<cfset oBugLogService.notifyService(cfcatch.message, cfcatch, extraInfo, severity)>
 			</cfcatch>
 		</cftry>
 		

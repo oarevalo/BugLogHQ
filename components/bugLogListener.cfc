@@ -59,6 +59,9 @@
 			// load scheduler
 			variables.scheduler = createObject("component","bugLog.components.schedulerService").init( variables.oConfig, variables.instanceName );
 
+			// load the mailer service
+			variables.mailerService = createObject("component","bugLog.components.MailerService").init( variables.oConfig );
+
 			// configure history purging
 			configureHistoryPurging();
 
@@ -405,9 +408,11 @@
 				thisRule = aRules[i];
 
 				if(thisRule.enabled) {
-					oRule = thisRule.instance;
-					oRule.setListener(this);
-					oRule.setDAOFactory( variables.oDAOFactory );
+					oRule =
+						thisRule.instance
+						.setListener(this)
+						.setDAOFactory( variables.oDAOFactory )
+						.setMailerService( variables.mailerService );
 
 					// add rule to processor
 					variables.oRuleProcessor.addRule(oRule);

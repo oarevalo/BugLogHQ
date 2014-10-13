@@ -1,5 +1,5 @@
 <cfcomponent>
-	<cfset variables.bugLogClientVersion = "1.8-c3">	<!--- bugloghq client version --->
+	<cfset variables.bugLogClientVersion = "1.8-c5">	<!--- bugloghq client version --->
 	<cfset variables.bugEmailSender = "">
 	<cfset variables.bugEmailRecipients = "">
 	<cfset variables.bugLogListener = "">
@@ -12,7 +12,19 @@
 	<cfset variables.postToRESTasJSON = false>
 	<cfset variables.userAgent = "bugloghq-coldfusion-client">
 	<cfset variables.checkpointsKey = "__buglog_checkpoints__">
-	<cfset variables.writeToCFLog = true>	<!--- indicates whether to write to the local log or not ---->
+	<cfset variables.writeToCFLog = false>	<!--- indicates whether to write to the local log or not ---->
+	<cfset variables.hostname = "">
+	<cfset variables.sensitiveFieldNames = "">
+
+	<!--- sanitizeMap is an array of regular expressions which will be removed/replaced
+		from the generated output. Each item can be either a simple value or a struct
+		with the elements 'expr' and 'replace' --->
+	<cfset variables.sanitizeMap = [
+			{expr = "<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>", replace = "<em>JavaScript code removed for security</em>"},
+			{expr = "[45][0-9]{3}-?[0-9]{4}-?[0-9]{4}-?([0-9]{4})", replace = "***VISA/MASTERCARD_REMOVED*** (\1)"},
+			{expr = "3[47][0-9]{2}-?[0-9]{6}-?([0-9]{5})", replace = "***AMEX_REMOVED*** (\1)"},
+			{expr = "s3:\/\/[^@]+@", replace = "s3://***S3_PASSWORD_REMOVED***@"}
+		] />
 
 	<!--- Handle cases in which the application scope is not defined (Fix contributed by Morgan Dennithorne) --->
 	<cfif isDefined("application.applicationName")>
@@ -33,6 +45,8 @@
 		<cfargument name="appName" type="string" required="false" default="#variables.appName#">
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
+		<cfargument name="sensitiveFieldNames" type="string" required="false" default="#variables.sensitiveFieldNames#">
+		<cfargument name="sanitizeExpressions" type="array" required="false" default="#arrayNew(1)#">
 
 		<cfscript>
 			var wsParams = structNew();
@@ -60,12 +74,17 @@
 				variables.protocol = "CFC";
 
 			// store settings
-			variables.bugLogListener = arguments.bugLogListener;
-			variables.bugEmailSender = arguments.bugEmailSender;
-			variables.bugEmailRecipients = arguments.bugEmailRecipients;
-			variables.apikey = arguments.apikey;
-			variables.maxDumpDepth = arguments.maxDumpDepth;
-			variables.writeToCFLog = arguments.writeToCFLog;
+			variables.bugLogListener		= arguments.bugLogListener;
+			variables.bugEmailSender		= arguments.bugEmailSender;
+			variables.bugEmailRecipients	= arguments.bugEmailRecipients;
+			variables.apikey				= arguments.apikey;
+			variables.maxDumpDepth			= arguments.maxDumpDepth;
+			variables.writeToCFLog			= arguments.writeToCFLog;
+			variables.sensitiveFieldNames	= arguments.sensitiveFieldNames;
+
+			if(arrayLen(arguments.sanitizeExpressions))
+				variables.sanitizeMap.addAll( arguments.sanitizeExpressions );
+
 			if(arguments.appName neq "")
 				variables.appName = arguments.appName;
 
@@ -128,7 +147,7 @@
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
 		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
-
+		
 		<cfset var shortMessage = "">
 		<cfset var longMessage = "">
 		<cfset var tmpCFID = "">
@@ -147,15 +166,9 @@
 		<cfif isDefined("cftoken")>
 			<cfset tmpCFTOKEN = cftoken>
 		</cfif>
-
+	
 		<cftry>
-			<!--- if we are tracking checkpoints, then add the buglog call as the last checkpoint --->
-			<cfif arrayLen(getCheckpoints())>
-				<cfset checkpoint("bugLog.notifyService() called")>
-			</cfif>
-
-			<!--- compose short and full messages --->
-			<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception, arguments.extraInfo)>
+			<!--- compose the full report --->
 			<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth, arguments.AppName)>
 
 			<!--- submit error --->
@@ -224,7 +237,8 @@
 
 		<!--- add entry to coldfusion log --->
 		<cfif arguments.writeToCFLog>
-			<cflog type="error"
+			<cfset shortMessage = composeShortMessage(arguments.message, arguments.exception)>
+			<cflog type="#arguments.severityCode#"
 				   text="#shortMessage#"
 				   file="#arguments.AppName#_BugTrackingErrors">
 		</cfif>
@@ -252,7 +266,6 @@
 	<cffunction name="composeShortMessage" access="private" returntype="string" output="false">
 		<cfargument name="message" type="string" required="true">
 		<cfargument name="exception" type="any" required="false" default="#structNew()#">
-		<cfargument name="ExtraInfo" type="any" required="no" default="">
 		<cfscript>
 			var aBuffer = arrayNew(1);
 			var e = arguments.exception;
@@ -318,7 +331,7 @@
 				</tr>
 				<tr>
 					<td><b>Message:</b></td>
-							<td>#HtmlEditFormat(arguments.exception.message)#</td>
+					<td>#HtmlEditFormat(arguments.exception.message)#</td>
 				</tr>
 				<cfif structKeyExists(arguments.exception,"type")>
 					<tr>
@@ -328,7 +341,7 @@
 				</cfif>
 				<tr>
 					<td><b>Detail:</b></td>
-							<td>#HtmlEditFormat(arguments.exception.detail)#</td>
+					<td>#HtmlEditFormat(arguments.exception.detail)#</td>
 				</tr>
 				<cfif arrayLen(aTags) gt 0>
 					<tr valign="top">
@@ -419,44 +432,56 @@
 			</table>
 			<br />
 
+			<!--- Render Extra Info --->
 			<cfif not isSimpleValue(arguments.ExtraInfo) or arguments.ExtraInfo neq "">
 				<h3>Additional Info</h3>
 				<cftry>
 					#sanitizeDump(arguments.ExtraInfo, arguments.maxDumpDepth)#
 					<cfcatch>
-						<div style="margin-left:80px;">
-							<h4 style="color:red;">Failed to convert <strong>ExtraInfo</strong> into a HTML representation!</h4>
-							#sanitizeDump(CFCATCH, arguments.maxDumpDepth)#
+						<div style="margin-top:20px;">
+							<h4 style="color:red;">An error ocurred while rendering ExtraInfo!</h4>
+							<b>#cfcatch.message#</b>
+							#cfcatch.detail#
 						</div>
 					</cfcatch>
 				</cftry>
 			</cfif>
 
-			<cfset var checkpoints = getCheckpoints()>
-			<cfif arrayLen(checkpoints)>
-				<br />
-				<h3>Checkpoints</h3>
-				<table border="1" cellspacing="0" cellpadding="3">
-					<tr>
-						<th>##</th>
-						<th>Checkpoint</th>
-						<th>Delta (ms)</th>
-						<th>Elapsed (ms)</th>
-					</tr>
-					<cfset var prevTs = 0>
-					<cfloop from="1" to="#arrayLen(checkpoints)#" index="i">
-						<tr <cfif i mod 2>style="background-color:##ebebeb;"</cfif>>
-							<td style="text-align:right;">#i#.</td>
-							<td>#checkpoints[i].cp#</td>
-							<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-prevTs#<cfelse>-</cfif></td>
-							<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-checkpoints[1].ts#<cfelse>-</cfif></td>
+			<!--- Render Checkpoints --->
+			<cftry>
+				<cfif structKeyExists(request,checkpointsKey)>
+					<br />
+					<h3>Checkpoints</h3>
+					<cfset checkpoint("bugLog.notifyService() called")>
+					<cfset var checkpoints = getCheckpoints()>
+					<table border="1" cellspacing="0" cellpadding="3">
+						<tr>
+							<th>##</th>
+							<th>Checkpoint</th>
+							<th>Elapsed (ms)</th>
+							<th>Delta (ms)</th>
 						</tr>
-						<cfset prevTs = checkpoints[i].ts>
-					</cfloop>
-				</table>
-			</cfif>
+						<cfset var prevTs = 0>
+						<cfloop from="1" to="#arrayLen(checkpoints)#" index="i">
+							<tr <cfif i mod 2>style="background-color:##ebebeb;"</cfif>>
+								<td style="text-align:right;">#i#.</td>
+								<td>#checkpoints[i].cp#</td>
+								<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-checkpoints[1].ts#<cfelse>-</cfif></td>
+								<td style="text-align:right;"><cfif i gt 1>#checkpoints[i].ts-prevTs#<cfelse>-</cfif></td>
+							</tr>
+							<cfset prevTs = checkpoints[i].ts>
+						</cfloop>
+					</table>
+				</cfif>
+				<cfcatch>
+					<h4 style="color:red;">An error ocurred while rendering Checkpoints!</h4>
+					<b>#cfcatch.message#</b>
+					#cfcatch.detail#
+				</cfcatch>
+			</cftry>
 			</cfoutput>
 		</cfsavecontent>
+
 		<cfreturn tmpHTML>
 	</cffunction>
 
@@ -495,10 +520,11 @@
 		<cfreturn request[checkpointsKey]>
 	</cffunction>
 
-	<cffunction name="sanitizeDump" access="private" returntype="string" hint="Performs a sanitized dump, where JavaScript has been removed to minimize XSS risks">
+	<cffunction name="sanitizeDump" access="private" returntype="string" hint="Performs a sanitized dump, where JavaScript has been removed to minimize XSS risks as well as any required exclusions">
 		<cfargument name="data" type="any" required="true">
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 		<cfset var out = "">
+	
 		<cfif isSimpleValue(arguments.data)>
 			<cfset out = arguments.data>
 		<cfelseif isStruct(arguments.data) and structisempty(arguments.data)>
@@ -506,11 +532,41 @@
 		<cfelseif isArray(arguments.data) and not arrayLen(arguments.data)>
 			<cfset out = "<em>Empty array</em>">
 		<cfelse>
+			<!--- If this is a struct, then we may need to sanitize the keys --->
+			<cfif isStruct(arguments.data) and len(variables.sensitiveFieldNames)>
+				<cfset arguments.data = sanitizeKeyData(arguments.data) />
+			</cfif>
+
+			<!--- Now we can generate the dump --->
 			<cfsavecontent variable="out"><cfoutput><cfdump var="#arguments.data#" top="#arguments.maxDumpDepth#"></cfoutput></cfsavecontent>
-			<cfset out = reReplaceNoCase(out, "<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>", "<em>JavaScript code removed for security</em>","all")>
 			<cfset out = replace(out, "</td>", "</td>" & Chr(10) & Chr(13), "all")>
 		</cfif>
+
+		<!--- Apply any sanitization regexes --->
+		<cfloop array="#variables.sanitizeMap#" index="item">
+			<cfif isSimpleValue(item)>
+				<cfset out = reReplaceNoCase(out, item, "*** REMOVED ***", "all") />
+			<cfelse>
+				<cfset out = reReplaceNoCase(out, item.expr, item.replace, "all") />
+			</cfif>
+		</cfloop>
+
 		<cfreturn out>
+	</cffunction>
+
+	<cffunction name="sanitizeKeyData" access="private" returntype="struct" hint="removes values from structures for known fields that hold sensitive data">
+		<cfargument name="data" type="struct">
+		<cfset var local = {}>
+		<cfloop list="#structKeyList(arguments.data)#" index="local.i">
+			<cfif isStruct(arguments.data[local.i])>
+				<cfset arguments.data[local.i] = sanitizeKeyData(arguments.data[local.i])>
+			<cfelse>
+				<cfif listFindNoCase(variables.sensitiveFieldNames,local.i)>
+					<cfset arguments.data[local.i] = "*** SENSITIVE DATA REMOVED ***">
+				</cfif>
+			</cfif>
+		</cfloop>
+		<cfreturn arguments.data>
 	</cffunction>
 
 </cfcomponent>

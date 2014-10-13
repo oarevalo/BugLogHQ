@@ -124,7 +124,8 @@
 		        position: absolute;
 		        top: 0;
 		        bottom: 0;
-		        left:-25px;
+		        width:40px;
+		        left:-19px;
 		}
 		##x_axis {
 			position:relative;

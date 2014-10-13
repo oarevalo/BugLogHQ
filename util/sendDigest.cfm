@@ -1,28 +1,26 @@
 <cfparam name="instance" type="string" default="default">
 <cfsetting enablecfoutputonly="true">
 
-<!--- Handle service initialization if necessary --->
-<cfset oService = createObject("component", "bugLog.components.service").init( instanceName = instance )>
-<cfset oAppService = createObject("component","bugLog.components.hq.appService").init(instanceName = instance)>
-
-<cfset oConfig = oService.getConfig()>
-<cfset settings = oAppService.getDigestSettings()>
-
-<cfset adminEmail = oConfig.getSetting("general.adminEmail")>
-<cfset recipients = adminEmail>
-
-<cfif !settings.enabled>
-	<cfoutput>Digest report is not enabled.</cfoutput>
-	<cfabort>
-</cfif>
-<cfif adminEmail eq "" or !isValid("email",adminEmail)>
-	<cfoutput>The Administrator Email setting must be a valid email address.</cfoutput>
-	<cfabort>
-</cfif>
-
 <cfscript>
-	if(trim(settings.recipients) neq "" and find("@",settings.recipients))
-		recipients = trim(settings.recipients);
+	// Handle service initialization if necessary
+	oService = createObject("component", "bugLog.components.service").init( instanceName = instance );
+	oAppService = createObject("component","bugLog.components.hq.appService").init( instanceName = instance );
+
+	oConfig = oService.getConfig();
+	settings = oAppService.getDigestSettings();
+
+	oMailerService = createObject("component", "bugLog.components.MailerService").init( oConfig );
+
+	adminEmail = oConfig.getSetting("general.adminEmail");
+	recipients = len(trim(settings.recipients)) ? trim(settings.recipients) : adminEmail;
+
+	if( !settings.enabled ) {
+		writeOutput( "Digest report is not enabled." );
+		abort;
+	} else if( !len(adminEmail) or !isValid("email",adminEmail) ) {
+		writeOutput( "The Administrator Email setting must be a valid email address." );
+		abort;
+	}
 </cfscript>
 
 <cfsavecontent variable="tmpHTML">
@@ -36,10 +34,13 @@
 </cfsavecontent>		
 
 <cfif qrydata.recordCount gt 0 or (qryData.recordCount eq 0 and settings.sendIfEmpty)>
-	<cfmail from="#adminEmail#" 
-			to="#recipients#"
-			subject="BugLogHQ Digest"
-			type="html">#tmpHTML#</cfmail>
+	<cfset oMailerService.send(
+			from = adminEmail, 
+			to = recipients,
+			subject = "BugLogHQ Digest",
+			body = tmpHTML,
+			type="html"
+		) />
 	<cfoutput>Done. (email sent to #recipients#)</cfoutput>.
 <cfelse>
 	<cfoutput>Done. (email not sent)</cfoutput>.
