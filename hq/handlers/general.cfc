@@ -253,17 +253,21 @@
 			try {
 				var appService = getService("app");
 				var entryID = getValue("entryID");
+				var entryUUID = getValue("uuid");
 				var argsSearch = {};
 				var qryEntriesUA = queryNew("");
 				var currentUser = getValue("currentUser");
+				var oEntry = 0;
 
-				if(val(entryID) eq 0) {
+				// get requested entry object
+				if(entryID gt 0) {
+					oEntry = appService.getEntry(entryID, currentUser);
+				} else if(len(entryUUID)) {
+					oEntry = appService.getEntryByUUID(entryUUID, currentUser);
+				} else {
 					setMessage("warning","Please select an entry to view");
 					setNextEvent("main");
 				}
-
-				// get requested entry object
-				oEntry = appService.getEntry(entryID, currentUser);
 
 				// search for recent ocurrences (last 24 hours)
 				args.message = "__EMPTY__";

@@ -189,7 +189,16 @@
 			return entry;
 		</cfscript>
 	</cffunction>
-	
+
+	<cffunction name="getEntryByUUID" access="public" returntype="any">
+		<cfargument name="uuid" type="string" required="true">
+		<cfargument name="user" type="bugLog.components.user" required="false">
+		<cfscript>
+			var qryEntry = variables.oEntryDAO.search( uuid = arguments.uuid );
+			return getEntry(qryEntry.entryID, arguments.user);
+		</cfscript>
+	</cffunction>
+
 	<cffunction name="getApplications" access="public" returntype="query">
 		<cfargument name="user" type="any" required="false">
 		<cfif not structKeyExists(arguments,"user") or user.getIsAdmin() or not arrayLen(user.getAllowedApplications())>
