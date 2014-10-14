@@ -8,7 +8,6 @@
 		severity: type of error to send. Values are ERROR, FATAL, CRITICAL and INFO
 --->
 
-<cfparam name="protocol" default="rest">
 <cfparam name="pathToService" default="bugLog.client.bugLogService">
 <cfparam name="severity" default="FATAL">
 <cfparam name="apikey" default="">
@@ -22,15 +21,12 @@
 	<cfset path = "http://#cgi.HTTP_HOST#/bugLog/">
 </cfif>
 
-<cfset bugLogListener = structNew()>
 
 <cfif instance neq "default" and instance neq "">
-	<cfset bugLogListener.soap = "#path#listener.cfc?wsdl">
-	<cfset bugLogListener.rest = "#path#listener.cfm">
+	<cfset bugLogListener = "#path#listener.cfm">
 	<cfset adminPath = "">
 <cfelse>
-	<cfset bugLogListener.soap = "#path#listeners/bugLogListenerWS.cfc?wsdl">
-	<cfset bugLogListener.rest = "#path#listeners/bugLogListenerREST.cfm">
+	<cfset bugLogListener = "#path#listener/index.cfm">
 	<cfset adminPath = "hq/">
 </cfif>
 
@@ -57,12 +53,11 @@
 
 		<!--- Initializing bugLog client instance --->
 		Creating client instance... <br>
-		... Listener type is: <b>#protocol#</b><br />
-		... Listener is: <a href="#bugLogListener[protocol]#">#bugLogListener[protocol]#</a><br />
+		... Listener URL: <a href="#bugLogListener#">#bugLogListener#</a><br />
 		<cfif apikey neq "">
 		... Listener API Key is: <b>#apikey#</b><br />
 		</cfif>
-		<cfset oBugLogService = createObject("component",pathToService).init(bugLogListener = bugLogListener[protocol],
+		<cfset oBugLogService = createObject("component",pathToService).init(bugLogListener = bugLogListener,
 																			 apiKey = apiKey,
 																			 sensitiveFieldNames = "password")>
 		... Adding a checkpoint
@@ -96,11 +91,8 @@
 	
 		<br /><br />
 		
-		<strong>Send test bug report via:</strong> 
-		<cfloop collection="#bugLogListener#" item="key">
-			<a href="client.cfm?protocol=#key#&instance=#instance#&bugloghref=#bugloghref#&returnTo=#returnTo#&apiKey=#apiKey#">#key#</a>
-			&nbsp;|&nbsp;
-		</cfloop>
+		<a href="client.cfm?instance=#instance#&bugloghref=#bugloghref#&returnTo=#returnTo#&apiKey=#apiKey#">Test Again</a>
+		&nbsp;|&nbsp;
 
 		<br /><br />
 	
