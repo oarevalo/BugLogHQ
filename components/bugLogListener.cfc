@@ -18,6 +18,9 @@
 	<cfset variables.maxLogSize = 10>
 	<cfset variables.instanceName = "">
 	<cfset variables.autoCreateDefault = true>
+	<cfset variables.queue = 0>	
+	<cfset variables.schedulerIntervalSecs = 0>
+	<cfset variables.key = "123456knowthybugs654321"> <!--- this is a simple protection to avoid calling processqueue() too easily. This is NOT the apiKey setting --->
 
 	<cffunction name="init" access="public" returntype="bugLogListener" hint="This is the constructor">
 		<cfargument name="config" required="true" type="config">
@@ -62,6 +65,9 @@
 			// load the mailer service
 			variables.mailerService = createObject("component","bugLog.components.MailerService").init( variables.oConfig );
 
+			// configure the incoming queue
+			configureQueue();
+
 			// configure history purging
 			configureHistoryPurging();
 
@@ -77,7 +83,17 @@
 		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="logEntry" access="public" returntype="void" hint="This method adds a bug report entry into BugLog. Bug reports must be passed as RawEntryBeans">
+	<cffunction name="logEntry" access="public" returntype="void" hint="This method adds a bug report entry to the incoming queue. Bug reports must be passed as RawEntryBeans">
+		<cfargument name="entryBean" type="rawEntryBean" required="true">
+		<cftry>
+			<cfset variables.queue.add( arguments.entryBean ) />
+			<cfcatch type="buglog.queueFull">
+				<cfset logMessage("Queue full! Discarding entry.")>
+			</cfcatch>
+		</cftry>
+	</cffunction>
+
+	<cffunction name="addEntry" access="public" returntype="void" hint="This method adds a bug report entry into BugLog. Bug reports must be passed as RawEntryBeans">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
 
 		<cfscript>
@@ -128,12 +144,58 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="processQueue" access="public" returntype="numeric" hint="Processes all entries on the queue">
+		<cfargument name="key" type="string" required="true">
+		<cfset var i = 0>
+		<cfset var errorQueue = arrayNew(1)>
+		<cfset var count = 0>
+		<cfset var dp = variables.oDAOFactory.getDataProvider()>
+		
+		<cfif arguments.key neq variables.key>
+			<cfset logMessage("Invalid key received. Exiting.")>
+			<cfreturn 0>
+		</cfif>
+		
+		<cfset var myQueue = variables.queue.flush()> <!--- get a snapshot of the queue as of right now --->
+		<cfset variables.oRuleProcessor.processQueueStart(myQueue, dp, variables.oConfig )>
+		<cfif arrayLen(myQueue) gt 0>
+			<cfset logMessage("Processing queue. Queue size: #arrayLen(myQueue)#")>
+			<cfloop from="1" to="#arrayLen(myQueue)#" index="i">
+				<cftry>
+					<cfset addEntry(myQueue[i])>
+					<cfset count = count + 1>
+					<cfcatch type="any">
+						<!--- log error and save entry in another queue --->
+						<cfset arrayAppend(errorQueue,myQueue[i])>
+						<cfset logMessage("ERROR: #cfcatch.message# #cfcatch.detail#. Original message in entry: '#myQueue[i].getMessage()#'")>
+					</cfcatch>
+				</cftry>
+			</cfloop>
+		</cfif>
+		<cfset variables.oRuleProcessor.processQueueEnd(myQueue, dp, variables.oConfig )>
+			
+		<!--- add back all entries on the error queue to the main queue --->
+		<cfloop from="1" to="#arrayLen(errorQueue)#" index="i">
+			<cfset logEntry(errorQueue[i])>
+		</cfloop>
+		<cfif arrayLen(errorQueue) gt 0>
+			<cfset logMessage("Failed to add #arrayLen(errorQueue)# entries. Returned entries to main queue. To clear up queue and discard this entries reset the listener.")>
+		</cfif>
+		
+		<cfreturn count>
+	</cffunction>
+	
 	<cffunction name="getStartedOn" access="public" returntype="date" hint="Returns the date and time where this instance of BugLogListener was created">
 		<cfreturn variables.startedOn>
 	</cffunction>
 
 	<cffunction name="shutDown" access="public" returntype="void" hint="Performs any clean up action required">
-		<cfset logMessage("BugLogListener service stopped.")>
+		<cfset logMessage("Stopping BugLogListener (#instanceName#) service...")>
+		<cfset logMessage("Stopping ProcessQueue scheduled task...")>
+		<cfset scheduler.removeTask("bugLogProcessQueue") />
+		<cfset logMessage("Processing remaining elements in queue...")>
+		<cfset processQueue(variables.key)>
+		<cfset logMessage("BugLogListener service (#instanceName#) stopped.")>
 	</cffunction>
 
 	<cffunction name="logMessage" access="public" output="false" returntype="void" hint="this method appends an entry to the messages log as well as displays the message on the console">
@@ -212,6 +274,15 @@
 	<cffunction name="getMessageLog" access="public" returntype="array">
 		<cfreturn variables.msgLog>
 	</cffunction>
+
+	<cffunction name="getEntryQueue" access="public" returntype="array">
+		<cfreturn variables.queue.getAll()>
+	</cffunction>
+
+	<cffunction name="getKey" access="public" returntype="string">
+		<cfreturn variables.key>
+	</cffunction>
+
 
 	<!---- Private Methods ---->
 
@@ -453,6 +524,22 @@
 	<cffunction name="allowAutoCreate" returnType="boolean" access="private">
 		<cfargument name="entityType" type="string" required="true">
 		<cfreturn getConfig().getSetting("autocreate." & arguments.entityType, variables.autoCreateDefault)>
+	</cffunction>
+
+	<cffunction name="configureQueue" returnType="void" access="private" output="false">
+		<cfscript>
+			// setup queueing service
+			var queueClass = oConfig.getSetting("service.queueClass");
+			variables.queue = createObject("component",queueClass).init(oConfig, instanceName);
+
+			// create a task to process the queue periodically
+			var schedulerIntervalSecs = oConfig.getSetting("service.schedulerIntervalSecs");
+			scheduler.setupTask("bugLogProcessQueue", 
+									"util/processQueue.cfm",
+									"00:00",
+									schedulerIntervalSecs,
+									[{name="key",value=variables.KEY}]);
+		</cfscript>
 	</cffunction>
 
 </cfcomponent>
