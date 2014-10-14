@@ -23,6 +23,7 @@
 	<setting name="db.password"></setting>
 
 	<setting name="service.serviceCFC">bugLog.components.bugLogListenerAsync</setting>
+	<setting name="service.queueClass">bugLog.components.InMemoryQueue</setting>
 	<setting name="service.autoStart">true</setting>
 	<setting name="service.requireAPIKey">false</setting>
 	<setting name="service.APIKey">2CF20630-DD24-491F-BA44314842183AFC</setting>

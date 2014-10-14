@@ -1,8 +1,6 @@
 <cfcomponent extends="bugLogListener" hint="This listener modifies the standard listener so that it processes all bug in an asynchronous manner">
 	
-	<!---<cfset variables.queue = arrayNew(1)>--->
-	<cfset variables.queue = CreateObject("java","java.util.ArrayList").Init()>	
-	<cfset variables.maxQueueSize = 0>
+	<cfset variables.queue = 0>	
 	<cfset variables.schedulerIntervalSecs = 0>
 	<cfset variables.key = "123456knowthybugs654321"> <!--- this is a simple protection to avoid calling processqueue() too easily. This is NOT the apiKey setting --->
 	
@@ -11,10 +9,9 @@
 		<cfargument name="instanceName" type="string" required="true">
 		<cfscript>
 			// initialize variables and read settings
-			//variables.queue = arrayNew(1);
-			variables.queue = CreateObject("java","java.util.ArrayList").Init();	
+			var queueClass = arguments.config.getSetting("service.queueClass");
+			variables.queue = createObject("component",queueClass).init(arguments.config, arguments.instanceName);
 			variables.msgLog = arrayNew(1);
-			variables.maxQueueSize = arguments.config.getSetting("service.maxQueueSize");
 			variables.schedulerIntervalSecs = arguments.config.getSetting("service.schedulerIntervalSecs");
 
 			// do the normal initialization
@@ -29,18 +26,16 @@
 	
 	<cffunction name="logEntry" access="public" returntype="void" hint="This method adds a bug report entry into BugLog. Bug reports must be passed as RawEntryBeans">
 		<cfargument name="entryBean" type="rawEntryBean" required="true">
-		<cflock name="bugLogListenerAsync_logEntry_#variables.instanceName#" type="exclusive" timeout="10">
-			<cfif arrayLen(variables.queue) lte variables.maxQueueSize>
-				<cfset arrayAppend(variables.queue, arguments.entryBean)>
-			<cfelse>
+		<cftry>
+			<cfset variables.queue.add( arguments.entryBean ) />
+			<cfcatch type="buglog.queueFull">
 				<cfset logMessage("Queue full! Discarding entry.")>
-			</cfif>
-		</cflock>
+			</cfcatch>
+		</cftry>
 	</cffunction>	
 	
 	<cffunction name="processQueue" access="public" returntype="numeric" hint="Processes all entries on the queue">
 		<cfargument name="key" type="string" required="true">
-		<cfset var myQueue = arrayNew(1)>
 		<cfset var i = 0>
 		<cfset var errorQueue = arrayNew(1)>
 		<cfset var count = 0>
@@ -51,27 +46,23 @@
 			<cfreturn 0>
 		</cfif>
 		
-		<cflock name="bugLogListenerAsync_processQueue_#variables.instanceName#" type="exclusive" timeout="10">
-			<cfset myQueue = duplicate(variables.queue)> <!--- get a snapshot of the queue as of right now --->
-			<!---<cfset variables.queue = arrayNew(1)>	<!--- clear the queue now --->--->
-			<cfset variables.queue = CreateObject("java","java.util.ArrayList").Init()>	
-			<cfset variables.oRuleProcessor.processQueueStart(myQueue, dp, variables.oConfig )>
-			<cfif arrayLen(myQueue) gt 0>
-				<cfset logMessage("Processing queue. Queue size: #arrayLen(myQueue)#")>
-				<cfloop from="1" to="#arrayLen(myQueue)#" index="i">
-					<cftry>
-						<cfset super.logEntry(myQueue[i])>
-						<cfset count = count + 1>
-						<cfcatch type="any">
-							<!--- log error and save entry in another queue --->
-							<cfset arrayAppend(errorQueue,myQueue[i])>
-							<cfset logMessage("ERROR: #cfcatch.message# #cfcatch.detail#. Original message in entry: '#myQueue[i].getMessage()#'")>
-						</cfcatch>
-					</cftry>
-				</cfloop>
-			</cfif>
-			<cfset variables.oRuleProcessor.processQueueEnd(myQueue, dp, variables.oConfig )>
-		</cflock>
+		<cfset var myQueue = variables.queue.flush()> <!--- get a snapshot of the queue as of right now --->
+		<cfset variables.oRuleProcessor.processQueueStart(myQueue, dp, variables.oConfig )>
+		<cfif arrayLen(myQueue) gt 0>
+			<cfset logMessage("Processing queue. Queue size: #arrayLen(myQueue)#")>
+			<cfloop from="1" to="#arrayLen(myQueue)#" index="i">
+				<cftry>
+					<cfset super.logEntry(myQueue[i])>
+					<cfset count = count + 1>
+					<cfcatch type="any">
+						<!--- log error and save entry in another queue --->
+						<cfset arrayAppend(errorQueue,myQueue[i])>
+						<cfset logMessage("ERROR: #cfcatch.message# #cfcatch.detail#. Original message in entry: '#myQueue[i].getMessage()#'")>
+					</cfcatch>
+				</cftry>
+			</cfloop>
+		</cfif>
+		<cfset variables.oRuleProcessor.processQueueEnd(myQueue, dp, variables.oConfig )>
 			
 		<!--- add back all entries on the error queue to the main queue --->
 		<cfloop from="1" to="#arrayLen(errorQueue)#" index="i">
@@ -108,7 +99,7 @@
 	<!--- Getters --->
 	
 	<cffunction name="getEntryQueue" access="public" returntype="array">
-		<cfreturn variables.queue>
+		<cfreturn variables.queue.getAll()>
 	</cffunction>
 
 	<cffunction name="getKey" access="public" returntype="string">
