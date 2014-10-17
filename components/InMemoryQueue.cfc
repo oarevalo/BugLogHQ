@@ -1,4 +1,4 @@
-component {
+component implements="Queue" {
     
     variables.queue = 0;
     variables.maxQueueSize = 0;
