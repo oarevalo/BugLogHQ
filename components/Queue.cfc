@@ -8,15 +8,17 @@ interface {
         required string instanceName
     );
 
-    // adds an item to the queue
+    // Adds an item to the queue
+    // may throw "buglog.queueFull" exception if no item can be added
+    // to the queue.
     void function add(
         required rawEntryBean entryBean
     );
 
-    // retrieves all elements on the queue and leaves it empty
+    // Retrieves all elements on the queue and leaves it empty
     array function flush();
 
-    // retrieves all elements on the queue without affecting them
+    // Retrieves all elements on the queue without affecting them
     array function getAll();
 
 }
