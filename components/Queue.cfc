@@ -16,9 +16,11 @@ interface {
     );
 
     // Retrieves all elements on the queue and leaves it empty
+    // Returns an array of rawEntryBean objects
     array function flush();
 
     // Retrieves all elements on the queue without affecting them
+    // Returns an array of rawEntryBean objects
     array function getAll();
 
 }
