@@ -49,9 +49,6 @@
 			// load the rule processor
 			variables.oRuleProcessor = createObject("component","bugLog.components.ruleProcessor").init();
 
-			// load rules
-			loadRules();
-
 			// create cache instances
 			variables.oAppCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
 			variables.oHostCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, cacheTTL, false);
@@ -67,6 +64,9 @@
 
 			// configure the incoming queue
 			configureQueue();
+
+			// load rules
+			loadRules();
 
 			// configure history purging
 			configureHistoryPurging();
