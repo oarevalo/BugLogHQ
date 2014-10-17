@@ -41,24 +41,24 @@
 		<input type="hidden" name="groupByApp" value="#rs.criteria.groupByApp#">
 		<input type="hidden" name="groupByHost" value="#rs.criteria.groupByHost#">
 		<input type="hidden" name="event" value="#rs.event#" id="currentEvent">
-		
+
 		<table  width="100%" class="well" cellpadding="0" cellspacing="0">
 			<tr align="center">
 				<td style="padding-top:5px;">
-					Show for last: 
+					Show for last:
 					<select name="numDays" style="width:100px;" class="searchSelector">
 						<cfloop array="#times#" index="item">
 							<option value="#item.value#" <cfif rs.criteria.numDays eq item.value>selected</cfif>>#item.label#</option>
 						</cfloop>
-					</select>				
+					</select>
 				</td>
 				<td style="padding-top:5px;">
-					<span <cfif rs.criteria.searchTerm neq "">style="color:red;"</cfif>>Search:</span> 
+					<span <cfif rs.criteria.searchTerm neq "">style="color:red;"</cfif>>Search:</span>
 					<input type="text" name="searchTerm" value="#rs.criteria.searchTerm#" class="searchSelector">
 
 				</td>
 				<td style="padding-top:5px;">
-					<span <cfif rs.criteria.applicationID gt 0>style="color:red;"</cfif>>Application:</span> 
+					<span <cfif rs.criteria.applicationID gt 0>style="color:red;"</cfif>>Application:</span>
 					<select name="applicationID" class="searchSelector">
 						<option value="0">All</option>
 						<cfset found = false>
@@ -75,7 +75,7 @@
 					</select>
 				</td>
 				<td style="padding-top:5px;">
-					<span <cfif rs.criteria.hostID gt 0>style="color:red;"</cfif>>Host:</span> 
+					<span <cfif rs.criteria.hostID gt 0>style="color:red;"</cfif>>Host:</span>
 					<select name="hostID"  class="searchSelector">
 						<option value="0">All</option>
 						<cfset found = false>
@@ -96,13 +96,13 @@
 				<td>&nbsp;</td>
 				<td style="text-align:center;">
 					<label style="font-size:11px;">
-						<input type="checkbox" 
-								name="searchHTMLReport" 
+						<input type="checkbox"
+								name="searchHTMLReport"
 								value="true"
-								class="searchCheckbox" 
+								class="searchCheckbox"
 								<cfif rs.criteria.searchHTMLReport>checked</cfif>>
 						Search HTML Report content
-					</label>				
+					</label>
 				</td>
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
@@ -117,25 +117,17 @@
 					<div class="control-group">
 					<span <cfif rs.criteria.severityID neq "_ALL_">style="color:red;"</cfif>>Severity:</span> &nbsp;&nbsp;
 					<cfloop query="rs.qrySeverities">
-						<cfset tmpImgName = "#rs.assetsPath#images/severity/#lcase(rs.qrySeverities.name)#.png">
-						<cfset tmpDefImgName = "#rs.assetsPath#images/severity/default.png">
-
+						<cfset tmpImgURL = getSeverityIconURL(lcase(rs.qrySeverities.name))>
 						<label class="inline">
-							<input type="checkbox" 
+							<input type="checkbox"
 									class="searchSeverityCheckbox"
-									name="severityID" 
+									name="severityID"
 									value="#rs.qrySeverities.severityID#"
 									<cfif rs.criteria.severityID eq "_ALL_" or listFind(rs.criteria.severityID, rs.qrySeverities.severityID)>checked</cfif>
 									>
-							<cfif fileExists(expandPath(tmpImgName))>
-								<img src="#tmpImgName#" 
-										alt="#lcase(rs.qrySeverities.name)#" 
+								<img src="#tmpImgURL#"
+										alt="#lcase(rs.qrySeverities.name)#"
 										title="#lcase(rs.qrySeverities.name)#">
-							<cfelse>
-								<img src="#tmpDefImgName#" 
-										alt="#lcase(rs.qrySeverities.name)#" 
-										title="#lcase(rs.qrySeverities.name)#">
-							</cfif>
 							 #lcase(rs.qrySeverities.name)#
 						</label>
 						&nbsp;&nbsp;&nbsp;
