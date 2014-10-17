@@ -7,10 +7,8 @@
 		<cfset assetsPath = request.requestState.assetsPath>
 	</cfif>
 	<cfset var tmpURL = assetsPath & "images/severity/#lcase(severityCode)#.png">
-	<cfif not fileExists(expandPath(tmpURL))>
+	<cfif not fileExists(expandPath("images/severity/#lcase(severityCode)#.png"))>
 		<cfset tmpURL = assetsPath & "images/severity/default.png">
-	<cfelse>
-		<cfset tmpURL = assetsPath & "images/severity/#lcase(severityCode)#.png">
 	</cfif>
 	<cfreturn tmpURL>
 </cffunction>
@@ -42,7 +40,7 @@
 		<cfdefaultcase>
 			<cfset code = "default">
 		</cfdefaultcase>
-	</cfswitch>		
+	</cfswitch>
 	<cfreturn code />
 </cffunction>
 
