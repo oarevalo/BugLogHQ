@@ -48,11 +48,16 @@
 		<cfargument name="userAgent" type="string" required="false" default="">
 		<cfargument name="userID" type="numeric" required="false" default="0">
 		<cfargument name="UUID" type="string" required="false" default="">
+		<cfargument name="groupByMsg" type="boolean" required="false" default="false" />
+		<cfargument name="groupByApp" type="boolean" required="false" default="false" />
+		<cfargument name="groupByHost" type="boolean" required="false" default="false" />
+
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var dbType = oDataProvider.getConfig().getDBType()>
 		<cfset var qry = 0>
 		<cfset var dsn = oDataProvider.getConfig().getDSN()>
 		<cfset var tmpMessage = ''>
+		<cfset var applyGroupings = (groupByHost or groupByApp or groupByMsg) />
 
 		<cfif arguments.searchTerm neq "">
 			<cfif dbType eq "mysql">
@@ -63,6 +68,17 @@
 		</cfif>
 
 		<cfquery name="qry" datasource="#dsn#">
+			<cfif applyGroupings>
+				SELECT 
+					<cfif groupByApp>ApplicationCode, ApplicationID, </cfif>
+					<cfif groupByHost>HostName, HostID, </cfif>
+					<cfif groupByMsg>Message, </cfif>
+					COUNT(entryID) AS bugCount, 
+					MAX(createdOn) as createdOn, 
+					MAX(entryID) AS EntryID, 
+					MAX(severityCode) AS SeverityCode
+				FROM (		
+			</cfif>
 			SELECT e.entryID, e.message, e.cfid, e.cftoken, e.mydateTime, e.exceptionMessage, e.exceptionDetails, 
 					e.templatePath, e.userAgent, a.code as ApplicationCode, h.hostName, s.code AS SeverityCode,
 					src.name AS SourceName, e.applicationID, e.hostID, e.severityID, e.sourceID, e.createdOn, e.UUID,
@@ -173,7 +189,14 @@
 					<cfif arguments.UUID neq "">
 						AND e.UUID = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.UUID#">
 					</cfif>
-				ORDER BY e.createdOn DESC, entryID DESC
+			<cfif applyGroupings>
+				) a
+				GROUP BY
+					<cfif groupByApp>ApplicationCode, ApplicationID, </cfif>
+					<cfif groupByHost>HostName, HostID, </cfif>
+					<cfif groupByMsg>Message </cfif>
+			</cfif>
+			ORDER BY createdOn DESC, entryID DESC
 		</cfquery>
 
 		<cfreturn qry>
