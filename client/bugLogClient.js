@@ -1,5 +1,13 @@
 /*		BugLogHQ Javascript Notification Client   ( https://github.com/oarevalo/BugLogHQ )
  * 
+ **********
+	PLEASE NOTE... you will get errors like the following in Chrome...
+	"Resource interpreted as Script but transferred with MIME type text/html:" 
+	OR
+	"Refused to execute script from 'buglog/listeners/bugLogListenerREST.cfm?message=...' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled."
+	To get around this, create a copy of 'buglog/listeners/bugLogListenerREST.cfm' and name it 'buglog/listeners/bugLogListenerRESTjs.cfm'
+	and add the following line to the top <cfheader name="Content-type" value="application/javascript">
+ **********
  * 	Usage:
  * 		<script type="text/javascript" src="bugLogClient.js"></script>
 		<script>
