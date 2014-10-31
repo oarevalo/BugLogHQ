@@ -19,14 +19,27 @@
 			}
 			
 		// Method 2:  Within a global error handler (no stacktrace)
-			window.onerror = function(message, file, line) {
-			  	BugLog.notifyService({
-						  message: message,
-						  extraInfo: 'Error occurred in: ' + file + ':' + line,
-						  severity:"ERROR"
-				  });
-				  return true;
-			};		
+		// UPDATED. Taken from Stackoverflow user Sam. See http://stackoverflow.com/a/10556743/112680
+			window.onerror = function(msg, url, line, col, error) {
+			   // Note that col & error are new to the HTML 5 spec and may not be 
+			   // supported in every browser.  It worked for me in Chrome.
+			   var extra = !col ? '' : '\ncolumn: ' + col;
+			   extra += !error ? '' : '\nerror: ' + error;
+
+			   // You can view the information in an alert to see things working like this:
+			   alert("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
+			   
+				BugLog.notifyService({
+					message: "JS Error: "+msg,
+					error: "url: " + url + "<br>line: " + line + extra,
+					severity: "ERROR"
+				});
+				
+			   var suppressErrorAlert = true;
+			   // If you return true, then error alerts (like in older versions of 
+			   // Internet Explorer) will be suppressed.
+			   return suppressErrorAlert;
+			};	
 		</script>
  */
 
