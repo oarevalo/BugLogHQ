@@ -109,6 +109,9 @@
 				// get current filters selected
 				criteria = getValue("criteria");
 
+				// ensure that we are grouping at least by message
+				criteria.groupByMsg = true;
+
 				qryEntries = appService.searchEntries(argumentCollection = criteria);
 
 				setValue("qryEntries",qryEntries);
@@ -134,6 +137,9 @@
 
 				// get current filters selected
 				var criteria = getValue("criteria");
+
+				// ensure that we are grouping at least by message
+				criteria.groupByMsg = true;
 
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
 				var qryTriggers = appService.getExtensionsLog(criteria.startDate, getValue("currentUser"));
