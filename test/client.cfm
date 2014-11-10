@@ -4,7 +4,6 @@
 	of how to use the buglog client.
 
 	URL Parameters:
-		protocol: determines which buglog listener to use. values are cfc, soap and rest
 		severity: type of error to send. Values are ERROR, FATAL, CRITICAL and INFO
 --->
 
@@ -68,11 +67,11 @@
 			<!--- throw an error --->
 			Throwing sample error message...<br>
 			<cfset oBugLogService.checkpoint("About to throw an error...") />
-			<cfthrow message="Test message via #protocol#">	
+			<cfthrow message="This is a test error">	
 			
 			<cfcatch type="any">
 				<!--- notify bugLog of error --->
-				Notify service via  <strong>[#protocol#]</strong> using severity <strong>[#severity#]</strong>....<br>
+				Notify service using severity <strong>[#severity#]</strong>....<br>
 
 				<!--- create some sample additional info to include on the bug report --->
 				<cfset extraInfo = { 

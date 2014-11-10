@@ -406,7 +406,7 @@ component output="false" {
 				var apps = oAppFinder.findByIDList(valueList(qryUserApps.applicationID));
 				oUser.setAllowedApplications(apps);
 
-			} catch(sourceFinderException.usernameNotFound e) {
+			} catch(userFinderException.usernameNotFound e) {
 				// code does not exist, so we need to create it (if autocreate enabled)
 				throw(message="Invalid API Key",type="bugLog.invalidAPIKey");
 			}
