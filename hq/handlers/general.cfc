@@ -138,8 +138,10 @@
 				// get current filters selected
 				var criteria = getValue("criteria");
 
-				// ensure that we are grouping at least by message
-				criteria.groupByMsg = true;
+				// for the dashboard, we need the raw data to do adhoc queries
+				criteria.groupByMsg = false;
+				criteria.groupByApp = false;
+				criteria.groupByHost = false;
 
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
 				var qryTriggers = appService.getExtensionsLog(criteria.startDate, getValue("currentUser"));
