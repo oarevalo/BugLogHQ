@@ -109,6 +109,9 @@
 				// get current filters selected
 				criteria = getValue("criteria");
 
+				// ensure that we are grouping at least by message
+				criteria.groupByMsg = true;
+
 				qryEntries = appService.searchEntries(argumentCollection = criteria);
 
 				setValue("qryEntries",qryEntries);
@@ -134,6 +137,11 @@
 
 				// get current filters selected
 				var criteria = getValue("criteria");
+
+				// for the dashboard, we need the raw data to do adhoc queries
+				criteria.groupByMsg = false;
+				criteria.groupByApp = false;
+				criteria.groupByHost = false;
 
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
 				var qryTriggers = appService.getExtensionsLog(criteria.startDate, getValue("currentUser"));
@@ -163,6 +171,9 @@
 				// get current filters selected
 				var criteria = getValue("criteria");
 
+				// ensure that we are grouping at least by message
+				criteria.groupByMsg = true;
+
 				// perform search
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
 
@@ -178,9 +189,6 @@
 					setValue("pageTitle", "Summary (#lastEntryID-cookie.lastbugread#)");
 				else
 					setValue("pageTitle", "Summary");
-
-				// perform grouping for summary display
-				qryEntries = appService.applyGroupings(qryEntries, criteria.groupByApp, criteria.groupByHost);
 
 				setValue("qryEntries", qryEntries);
 				setValue("refreshSeconds",refreshSeconds);
@@ -219,6 +227,11 @@
 				} else {
 					setValue("msgFromEntryID", "");
 				}
+
+				// ensure that we are not grouping anything
+				criteria.groupByMsg = false;
+				criteria.groupByApp = false;
+				criteria.groupByHost = false;
 
 				// perform search
 				var qryEntries = appService.searchEntries(argumentCollection = criteria);
@@ -346,7 +359,9 @@
 				}
 
 				var criteria = normalizeCriteria();
-				var rssXML = appService.buildRSSFeed(criteria, summary, rssService);
+				criteria.groupByMsg = summary;
+				
+				var rssXML = appService.buildRSSFeed(criteria, rssService);
 
 				setValue("rssXML", rssXML);
 				setView("feed");

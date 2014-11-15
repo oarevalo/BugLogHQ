@@ -124,6 +124,9 @@
 		<cfargument name="userAgent" type="string" required="false" default="">
 		<cfargument name="searchHTMLReport" type="string" required="false" default="">
 		<cfargument name="user" type="any" required="false">
+		<cfargument name="groupByMsg" required="false" type="boolean" default="false">
+		<cfargument name="groupByApp" required="false" type="boolean" default="false">
+		<cfargument name="groupByHost" required="false" type="boolean" default="false"> 
 		<cfscript>
 			var oEntryFinder = 0;
 			var qry = 0;
@@ -478,7 +481,6 @@
 		
 	<cffunction name="buildRSSFeed" access="public" returntype="xml">
 		<cfargument name="criteria" type="struct" required="true">
-		<cfargument name="summary" type="boolean" required="true">
 		<cfargument name="rssService" type="any" required="true">
 		<cfscript>
 			var maxEntries = 20;
@@ -486,8 +488,6 @@
 
 			// search bug reports
 			var qryEntries = searchEntries(argumentCollection = criteria);
-			if(summary)
-				qryEntries = applyGroupings(qryEntries, criteria.groupByApp, criteria.groupByHost);
 
 			// build rss feed
 			var meta = {
@@ -498,7 +498,7 @@
 			
 			for(var i=1;i lte min(maxEntries, qryEntries.recordCount);i=i+1) {
 				queryAddRow(data,1);
-				if(summary) {
+				if(criteria.groupByMsg) {
 					querySetCell(data,"title", qryEntries.message[i] & " (" & qryEntries.bugCount[i] & ")");
 					querySetCell(data,"body", composeMessage(qryEntries.createdOn[i], 
 																					qryEntries.applicationCode[i], 
