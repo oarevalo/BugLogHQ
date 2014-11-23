@@ -112,11 +112,11 @@
 			}			
 
 			if(val(theID) eq 0) {
-				st = _insert(stTableInfo, stColumns, xmlDoc);
+				st = _insertRow(stTableInfo, stColumns, xmlDoc);
 				theID = st.ID;
 				xmlDoc = st.xmlDoc;
 			} else
-				xmlDoc = _update(theID, stColumns, xmlDoc);
+				xmlDoc = _updateRow(theID, stColumns, xmlDoc);
 
 	
 			writeXMLDoc(stTableInfo, xmlDoc);
@@ -182,7 +182,7 @@
 	</cffunction>
 	
 
-	<cffunction name="_insert" access="private" returntype="struct">
+	<cffunction name="_insertRow" access="private" returntype="struct">
 		<cfargument name="_mapTableInfo" type="struct" required="true">
 		<cfargument name="columns" required="true" type="struct">
 		<cfargument name="xmlDoc" type="xml" required="true">
@@ -230,7 +230,7 @@
 		<cfreturn stRet>
 	</cffunction>			
 
-	<cffunction name="_update" access="private">
+	<cffunction name="_updateRow" access="private">
 		<cfargument name="id" type="any" required="true">
 		<cfargument name="columns" required="true" type="struct">
 		<cfargument name="xmlDoc" type="xml" required="true">
