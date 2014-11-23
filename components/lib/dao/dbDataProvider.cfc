@@ -117,9 +117,9 @@
 			}
 
 			if(val(theID) eq 0)
-				theID = _insert(stColumns, stTableInfo);
+				theID = _insertRow(stColumns, stTableInfo);
 			else
-				_update(theID, stColumns, stTableInfo);
+				_updateRow(theID, stColumns, stTableInfo);
 		</cfscript>		
 
 		<cfreturn theID>
@@ -176,7 +176,7 @@
 	</cffunction>
 
 	<!---- Private Methods ---->			
-	<cffunction name="_insert" access="private" returntype="any">
+	<cffunction name="_insertRow" access="private" returntype="any">
 		<cfargument name="columns" required="true" type="struct">
 		<cfargument name="_mapTableInfo" type="struct" required="true">
 
@@ -285,7 +285,7 @@
 		<cfreturn newID>
 	</cffunction>			
 
-	<cffunction name="_update" access="private">
+	<cffunction name="_updateRow" access="private">
 		<cfargument name="id" type="any" required="true">
 		<cfargument name="columns" required="true" type="struct">
 		<cfargument name="_mapTableInfo" type="struct" required="true">
