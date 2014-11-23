@@ -928,7 +928,7 @@
 		
 		<cfif timezoneInfo neq "">
 			<cfset var utils = createObject("component","bugLog.components.util").init() />
-			<cfset theDateTime = util.dateConvertZ("local2zone",theDateTime,timezoneInfo)>
+			<cfset theDateTime = utils.dateConvertZ("local2zone",theDateTime,timezoneInfo)>
 		</cfif>
 		<cfset rtn = dateFormat(theDateTime, dateMask) & " " & lsTimeFormat(theDateTime)>
 		<cfreturn rtn>
