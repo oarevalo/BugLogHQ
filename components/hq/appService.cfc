@@ -484,7 +484,8 @@
 			var meta = {
 				title = "BugLog",
 				link = getBaseBugLogHREF(),
-				description = "Recently received bugs"
+				description = "Recently received bugs",
+				image = getBaseBugLogHREF() & "/hq/images/bug.png"
 			};
 			
 			for(var i=1;i lte min(maxEntries, qryEntries.recordCount);i=i+1) {
@@ -510,8 +511,8 @@
 																					qryEntries.exceptionDetails[i] ));
 				}
 				querySetCell(data,"link", getBugEntryHREF(qryEntries.entryID[i]));
-				querySetCell(data,"subject","Subject");
-				querySetCell(data,"date",now());
+				querySetCell(data,"subject", qryEntries.message[i]);
+				querySetCell(data,"date", qryEntries.createdOn[i]);
 			}
 			
 			var rssXML = rssService.generateRSS("rss1",data,meta);		
