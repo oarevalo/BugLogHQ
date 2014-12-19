@@ -1,8 +1,12 @@
 angular.module('BugLogHq', [])
+//the application to tell BugLog from where the report is coming from.
 .constant('appName', "app")
 .constant('bugLogConfig', {
+    // this is the location of the BugLog server that will be receiving the error reports (needs to be a REST/POST endpoint)
     listener: "",
+    // the hostname to tell BugLog from where the report is coming from. Leave empty to get the info from the browser.
     hostName: "",
+    // If the BugLog server requires an API Key to talk to it, then here is where you put it.
     apiKey: ""
 })
 .config(['$provide',
@@ -31,16 +35,9 @@ angular.module('BugLogHq', [])
 .factory('BugLogService', ["$window", "$document", "appName", "bugLogConfig",
     function BugLogService($window, $document, appName, bugLogConfig) {
         var BugLog = {
-            // this is the location of the BugLog server that will be receiving the error reports (needs to be a REST/POST endpoint)
             listener: bugLogConfig.listener,
-
-            // the hostname to tell BugLog from where the report is coming from. Leave empty to get the info from the browser.
             hostName: bugLogConfig.hostName,
-
-            //the application to tell BugLog from where the report is coming from.
             appName: appName,
-
-            // If the BugLog server requires an API Key to talk to it, then here is where you put it.
             apiKey: bugLogConfig.apiKey,
 
             notifyService: function(message) {
@@ -122,7 +119,6 @@ angular.module('BugLogHq', [])
                         assets.push(links[i].href);
                     }
                 }
-
                 var scripts = document.getElementsByTagName("script");
                 for(var j = 0; j < scripts.length; j++) {
                     if (scripts[j].src) {
