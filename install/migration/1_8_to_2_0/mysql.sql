@@ -5,4 +5,6 @@ ADD COLUMN `isProcessed` TINYINT NOT NULL DEFAULT 0,
 ADD INDEX `IX_Entry_isProcessed` (`isProcessed` ASC),
 ADD INDEX `IX_Entry_UUID` (`UUID` ASC);
 
+UPDATE TABLE `bl_Entry` 
+SET isProcessed = 1;
 
