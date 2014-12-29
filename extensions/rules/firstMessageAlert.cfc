@@ -33,7 +33,7 @@
 			var oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
 
 			var args = {
-				message = arguments.rawEntry.getMessage(),
+				message = arguments.entry.getMessage(),
 				startDate = dateAdd("n", variables.config.timespan * (-1), now() ),
 				endDate = now()
 			};
