@@ -33,38 +33,21 @@
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		<cfscript>
 			var matches = false;
-			var oEntryDAO = getDAOFactory().getDAO("entry");
-			var oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
 
 			// only evaluate this rule if the amount of timespan minutes has passed after the last email was sent
-			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan ) {
+			if( dateDiff("n", variables.lastEmailTimestamp, now()) > variables.config.timespan ) {
 
-				var args = {
-					startDate = dateAdd("n", variables.config.timespan * (-1), now() ),
-					endDate = now()
-				};
+				var qry = findMessages();
 
-				for(var key in structKeyArray(scope)) {
-					var ids = [];
-					for(var item in scope[key]["items"]) {
-						ids.add( scope[key]["items"][item] );
-					}
-					if(arrayLen(ids)) {
-						args[key & "id"] = (scope[key]["not_in"] ? "-" : "") & listToArray(ids)
-					}
-				}
-
-				var qry = oEntryFinder.search(argumentCollection = args);
-
-				if(qry.recordCount gt 0) {
+				if(qry.recordCount > 0) {
 					if(variables.sameMessage) {
 						qry = groupMessages(qry, variables.config.count);
 						
-						if(qry.recordCount gt 0) {
+						if(qry.recordCount > 0) {
 							matches = true;
 						}
 			
-					} else if(qry.recordCount gt variables.config.count) {
+					} else if(qry.recordCount > variables.config.count) {
 						matches = true;
 					}
 				}
@@ -77,6 +60,7 @@
 	<cffunction name="doAction" access="public" returntype="boolean" hint="Performs an action when the entry matches the scope and conditions">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		<cfscript>
+			var qry = findMessages();
 			sendEmail(qry);
 			sendAlert(qry);
 			return true;
@@ -140,6 +124,32 @@
 		</cfscript>
 	</cffunction>
 --->
+	<cffunction name="findMessages" access="private" returntype="query">
+		<cfscript>
+			var oEntryDAO = getDAOFactory().getDAO("entry");
+			var oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
+
+			var args = {
+				startDate = dateAdd("n", variables.config.timespan * (-1), now() ),
+				endDate = now()
+			};
+
+			for(var key in structKeyArray(scope)) {
+				var ids = [];
+				for(var item in scope[key]["items"]) {
+					ids.add( scope[key]["items"][item] );
+				}
+				if(arrayLen(ids)) {
+					args[key & "id"] = (scope[key]["not_in"] ? "-" : "") & listToArray(ids)
+				}
+			}
+
+			var qry = oEntryFinder.search(argumentCollection = args);
+
+			return qry;
+		</cfscript>
+	</cffunction>
+
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
 		<cfset var qryEntries = 0>

@@ -59,7 +59,7 @@
 	<cffunction name="doAction" access="public" returntype="boolean" hint="Performs an action when the entry matches the scope and conditions">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		<cfscript>
-			sendEmail(qry, entry);
+			sendEmail(entry);
 			variables.lastEmailTimestamp = now();
 			return true;
 		</cfscript>
@@ -119,10 +119,9 @@
 --->
 
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
-		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		
-		<cfset var q = arguments.data>
+		<cfset var q = arguments.entry.getMemento()>
 		<cfset var numHours = int(variables.config.timespan / 60)>
 		<cfset var numMinutes = variables.config.timespan mod 60>
 		<cfset var intro = "">
