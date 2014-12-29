@@ -7,11 +7,37 @@
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
 		<cfargument name="includeHTMLReport" type="string" required="false" default="">
-		<cfset variables.config.recipientEmail = arguments.recipientEmail>
-		<cfset variables.config.includeHTMLReport = (isBoolean(arguments.includeHTMLReport) and arguments.includeHTMLReport)>
-		<cfreturn this>
+		<cfscript>
+			arguments.includeHTMLReport = (isBoolean(arguments.includeHTMLReport) && arguments.includeHTMLReport);
+			super.init(argumentCollection = arguments);
+			return this;
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="matchScope" access="public" returntype="boolean" hint="Returns true if the entry bean matches the defined scope">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfreturn true />		
 	</cffunction>
 	
+	<cffunction name="matchCondition" access="public" returntype="boolean" hint="Returns true if the entry bean matches a custom condition">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfreturn true />		
+	</cffunction>
+
+	<cffunction name="doAction" access="public" returntype="boolean" hint="Performs an action when the entry matches the scope and conditions">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfscript>
+			sendToEmail(entry = arguments.entry, 
+						recipient = variables.config.recipientEmail,
+						subject = "BugLog: #arguments.entry.getMessage()#",
+						entryId = arguments.entry.getEntryId(),
+						includeHTMLReport = variables.config.includeHTMLReport);
+			writeToCFLog("'mailRelay' rule fired. Email sent. Msg: '#arguments.entry.getMessage()#'");
+			return true;
+		</cfscript>
+	</cffunction>
+
+<!----	
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
@@ -25,6 +51,8 @@
 		<cfset writeToCFLog("'mailRelay' rule fired. Email sent. Msg: '#arguments.rawEntry.getMessage()#'")>
 		<cfreturn true>
 	</cffunction>
+---->
+
 
 	<cffunction name="explain" access="public" returntype="string">
 		<cfset var rtn = "Sends an alert ">

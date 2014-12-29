@@ -9,6 +9,8 @@
 	<cfproperty name="severity" type="string" buglogType="severity" displayName="Severity Code" hint="The severity that will trigger the rule. Leave empty to look for all severities">
 	<cfproperty name="alertInterval" type="numeric" displayName="Alert Interval" hint="The number of minutes to wait between alert messages">
 
+	<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
+
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
 		<cfargument name="timespan" type="numeric" required="true">
@@ -16,19 +18,58 @@
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="severity" type="string" required="false" default="">
 		<cfargument name="alertInterval" type="string" required="false" default="">
-		<cfset variables.config.recipientEmail = arguments.recipientEmail>
-		<cfset variables.config.timespan = arguments.timespan>
-		<cfset variables.config.application = arguments.application>
-		<cfset variables.config.host = arguments.host>
-		<cfset variables.config.severity = arguments.severity>
-		<cfset variables.config.alertInterval = val(arguments.alertInterval)>
-		<cfset variables.applicationID = -1>
-		<cfset variables.hostID = -1>
-		<cfset variables.severityID = -1>
-		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
-		<cfreturn this>
+		<cfscript>
+			arguments.alertInterval = val(arguments.alertInterval);
+			super.init(argumentCollection = arguments);
+			return this;
+		</cfscript>		
 	</cffunction>
-	
+
+	<cffunction name="matchCondition" access="public" returntype="boolean" hint="Returns true if the entry bean matches a custom condition">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfscript>
+			var matches = false;
+			var oEntryDAO = getDAOFactory().getDAO("entry");
+			var oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
+
+			// only evaluate this rule if 'alertInterval' minutes has passed after the last email was sent
+			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.alertInterval ) {
+
+				var args = {
+					message = arguments.rawEntry.getMessage(),
+					startDate = dateAdd("n", variables.config.timespan * (-1), now() ),
+					endDate = now()
+				};
+
+				for(var key in structKeyArray(scope)) {
+					var ids = [];
+					for(var item in scope[key]["items"]) {
+						ids.add( scope[key]["items"][item] );
+					}
+					if(arrayLen(ids)) {
+						args[key & "id"] = (scope[key]["not_in"] ? "-" : "") & listToArray(ids)
+					}
+				}
+
+				var qry = oEntryFinder.search(argumentCollection = args);
+
+				matches = (qry.recordCount == 0);
+			}
+
+			return matches;
+		</cfscript>	
+	</cffunction>
+
+	<cffunction name="doAction" access="public" returntype="boolean" hint="Performs an action when the entry matches the scope and conditions">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfscript>
+			sendEmail();
+			variables.lastEmailTimestamp = now();
+			return true;
+		</cfscript>
+	</cffunction>
+
+	<!----
 	<cffunction name="processQueueEnd" access="public" returntype="boolean" hint="This method gets called AFTER each processing of the queue (only invoked when using the asynch listener)">
 		<cfargument name="queue" type="array" required="true">
 		<cfscript>
@@ -76,7 +117,8 @@
 			return true;
 		</cfscript>
 	</cffunction>
-
+	--->
+	
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
 		
 		<cfset var numHours = int(variables.config.timespan / 60)>
@@ -110,45 +152,6 @@
 							comment = intro)>
 		
 		<cfset writeToCFLog("'heartbeatMonitor' rule fired. Email sent. [#variables.config.application#][#variables.config.host#]")>
-	</cffunction>
-
-	<cffunction name="getApplicationID" access="private" returntype="numeric">
-		<cfset var oDAO = getDAOFactory().getDAO("application")>
-		<cfset var oFinder = createObject("component","bugLog.components.appFinder").init(oDAO)>
-		<cfset var o = 0>
-		<cftry>
-			<cfset o = oFinder.findByCode(variables.config.application)>
-			<cfreturn o.getApplicationID()>
-			<cfcatch type="appFinderException.ApplicationCodeNotFound">
-				<cfreturn 0>
-			</cfcatch>
-		</cftry>
-	</cffunction>
-
-	<cffunction name="getHostID" access="private" returntype="numeric">
-		<cfset var oDAO = getDAOFactory().getDAO("host")>
-		<cfset var oFinder = createObject("component","bugLog.components.hostFinder").init(oDAO)>
-		<cfset var o = 0>
-		<cftry>
-			<cfset o = oFinder.findByName(variables.config.host)>
-			<cfreturn o.getHostID()>
-			<cfcatch type="hostFinderException.HostNameNotFound">
-				<cfreturn 0>
-			</cfcatch>
-		</cftry>
-	</cffunction>
-
-	<cffunction name="getSeverityID" access="private" returntype="numeric">
-		<cfset var oDAO = getDAOFactory().getDAO("severity")>
-		<cfset var oFinder = createObject("component","bugLog.components.severityFinder").init(oDAO)>
-		<cfset var o = 0>
-		<cftry>
-			<cfset o = oFinder.findByCode(variables.config.severity)>
-			<cfreturn o.getSeverityID()>
-			<cfcatch type="severityFinderException.codeNotFound">
-				<cfreturn 0>
-			</cfcatch>
-		</cftry>
 	</cffunction>
 
 	<cffunction name="explain" access="public" returntype="string">

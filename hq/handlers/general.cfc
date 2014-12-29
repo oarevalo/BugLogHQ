@@ -321,7 +321,7 @@
 				setMessage("warning","You are not allowed to view this bug report");
 				setNextEvent("main");
 
-			} catch(any e) {
+			} catch(lock e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
 				setNextEvent("main");

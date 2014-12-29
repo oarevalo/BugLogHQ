@@ -67,6 +67,11 @@
 		<setting name="mail.useSSL"></setting>
 	-->
 
+	<!-- (Optional) Redirect email output to filesystem for debugging
+	<setting name="debug.email">true</setting>
+	<setting name="debug.emailPath">/bugLog/debug/</setting>
+	-->
+
 	<!-- Environment-specific Settings: 
 		
 		You can override any of the above settings for specific environments. 

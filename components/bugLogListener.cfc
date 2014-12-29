@@ -51,6 +51,7 @@ component output="false" {
 		variables.oSeverityFinder = createObject("component","bugLog.components.severityFinder").init( variables.oDAOFactory.getDAO("severity") );
 		variables.oSourceFinder = createObject("component","bugLog.components.sourceFinder").init( variables.oDAOFactory.getDAO("source") );
 		variables.oUserFinder = createObject("component","bugLog.components.userFinder").init( variables.oDAOFactory.getDAO("user") );
+		variables.oEntryFinder = createObject("component","bugLog.components.entryFinder").init( variables.oDAOFactory.getDAO("entry") );
 
 		// load the rule processor
 		variables.oRuleProcessor = createObject("component","bugLog.components.ruleProcessor").init();
@@ -71,14 +72,14 @@ component output="false" {
 		// configure the incoming queue
 		configureQueue();
 
-		// load rules
-		loadRules();
-
 		// configure history purging
 		configureHistoryPurging();
 
 		// configure the digest sender
 		configureDigest();
+
+		// configure the rule processor
+		configureRuleProcessor();
 
 		// record the date at which the service started
 		variables.startedOn = Now();
@@ -138,9 +139,6 @@ component output="false" {
 
 		// save entry
 		oEntry.save();
-
-		// process rules
-		variables.oRuleProcessor.processRules(bean, oEntry);
 	}
 
 	// Processes all entries on the queue
@@ -159,7 +157,6 @@ component output="false" {
 		
 		// get a snapshot of the queue as of right now
 		var myQueue = variables.queue.flush();
-		variables.oRuleProcessor.processQueueStart(myQueue, dp, variables.oConfig );
 		if(arrayLen(myQueue) gt 0) {
 			logMessage("Processing queue. Queue size: #arrayLen(myQueue)#");
 			for(var i=1;i lte arrayLen(myQueue);i++) {
@@ -173,7 +170,6 @@ component output="false" {
 				}
 			}
 		}
-		variables.oRuleProcessor.processQueueEnd(myQueue, dp, variables.oConfig );
 			
 		// add back all entries on the error queue to the main queue
 		if(arrayLen(errorQueue)) {
@@ -189,8 +185,9 @@ component output="false" {
 	// Performs any clean up action required
 	void function shutDown() {
 		logMessage("Stopping BugLogListener (#instanceName#) service...");
-		logMessage("Stopping ProcessQueue scheduled task...");
+		logMessage("Stopping scheduled tasks...");
 		scheduler.removeTask("bugLogProcessQueue");
+		scheduler.removeTask("bugLogProcessRules");
 		logMessage("Processing remaining elements in queue...");
 		processQueue(variables.key);
 		logMessage("BugLogListener service (#instanceName#) stopped.");
@@ -269,6 +266,55 @@ component output="false" {
 	array function getEntryQueue() {
 		return variables.queue.getAll();
 	}
+
+	// Processes rules for new added entries
+	numeric function processRules(
+		required string key
+	) {
+		// validate key		
+		if(arguments.key neq variables.key) {
+			logMessage("Invalid key received. Exiting.");
+			return 0;
+		}
+
+		// get rows that have not been processed yet
+		var qryEntries = variables.oEntryFinder.search(
+							isProcessed=False
+						);
+		
+		if(qryEntries.recordCount)
+			logMessage("Processing rules. Queue size: #qryEntries.recordCount#");
+
+		// convert to an array of entry beans
+		var entries = oEntryFinder.createBeansFromQuery(qryEntries);
+
+		// process 'begin' event
+		try {
+			variables.oRuleProcessor.processQueueStart( entries );
+		} catch(any e) {
+			logEntry( parseInternalException(e) );
+		}
+
+		// process rules for each entry
+		for(var oEntry in entries) {
+			try {
+				variables.oRuleProcessor.processRules( oEntry );
+				oEntry.setIsProcessed(true);
+				oEntry.save();
+			} catch(any e) {
+				logMessage("An error ocurred while processing rules for entry ###oEntry.getID()#: #e.message#");
+				logEntry( parseInternalException(e) );
+			}
+		}
+
+		// process 'end' event
+		try {
+			variables.oRuleProcessor.processQueueEnd( entries );
+		} catch(any e) {
+			logEntry( parseInternalException(e) );
+		}
+	}
+
 
 	// Getter functions
 	config function getConfig() {return variables.oConfig;}
@@ -529,6 +575,43 @@ component output="false" {
 								"00:00",
 								schedulerIntervalSecs,
 								[{name="key",value=variables.KEY}]);
+	}
+
+	private void function configureRuleProcessor() {
+		// load rule instances
+		loadRules();
+
+		// create a task to process the run the configure rules
+		var schedulerIntervalSecs = oConfig.getSetting("service.schedulerIntervalSecs");
+		scheduler.setupTask("bugLogProcessRules", 
+								"util/processRules.cfm",
+								"00:01",
+								schedulerIntervalSecs,
+								[{name="key",value=variables.KEY}]);
+	}
+
+	private any function parseInternalException(
+		required any e
+	) {
+		// parses an internal error into a raw entry bean for logging
+		var error = createObject("component", "bugLog.components.rawEntryBean");
+		error.setMessage(e.message);
+		error.setApplicationCode("BugLogListener");
+		error.setSeverityCode("ERROR");
+		error.setExceptionMessage(e.message);
+		error.setExceptionDetails(e.detail);
+		error.setHostName(CGI.SERVER_NAME);
+
+		var htmlReport = "<b>Type:</b> " & e.type & "<br><br>";
+		if(structKeyExists(e,"tagContext")) {
+			htmlReport &= "<b>Stack Trace:</b><br>";
+			for(var line in e.tagContext) {
+				htmlReport &= "#line.template# (#line.line#)<br>";
+			}
+		}
+		error.setHTMLReport(htmlReport);
+
+		return error;
 	}
 
 }

@@ -9,8 +9,7 @@
 	<cfproperty name="severity" type="string" buglogType="severity" displayName="Severity Code" hint="The severity that will trigger the rule. Leave empty to look for all severities">
 	<cfproperty name="includeHTMLReport" type="boolean" displayName="Include HTML Report?" hint="When enabled, the HTML Report section of the bug report is included in the email body">
 
-	<cfset variables.ID_NOT_SET = -9999999 />
-	<cfset variables.ID_NOT_FOUND = -9999990 />
+	<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
@@ -19,19 +18,54 @@
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="severity" type="string" required="false" default="">
 		<cfargument name="includeHTMLReport" type="string" required="false" default="">
-		<cfset variables.config.recipientEmail = arguments.recipientEmail>
-		<cfset variables.config.timespan = val(arguments.timespan)>
-		<cfset variables.config.application = arguments.application>
-		<cfset variables.config.host = arguments.host>
-		<cfset variables.config.severity = arguments.severity>
-		<cfset variables.config.includeHTMLReport = (isBoolean(arguments.includeHTMLReport) and arguments.includeHTMLReport)>
-		<cfset variables.applicationID = variables.ID_NOT_SET>
-		<cfset variables.hostID = variables.ID_NOT_SET>
-		<cfset variables.severityID = variables.ID_NOT_SET>
-		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
-		<cfreturn this>
+		<cfscript>
+			arguments.timespan = val(arguments.timespan);
+			arguments.includeHTMLReport = (isBoolean(arguments.includeHTMLReport) && arguments.includeHTMLReport);
+			super.init(argumentCollection = arguments);
+			return this;
+		</cfscript>
 	</cffunction>
 	
+	<cffunction name="matchCondition" access="public" returntype="boolean" hint="Returns true if the entry bean matches a custom condition">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfscript>
+			var oEntryDAO = getDAOFactory().getDAO("entry");
+			var oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
+
+			var args = {
+				message = arguments.rawEntry.getMessage(),
+				startDate = dateAdd("n", variables.config.timespan * (-1), now() ),
+				endDate = now()
+			};
+
+			for(var key in structKeyArray(scope)) {
+				var ids = [];
+				for(var item in scope[key]["items"]) {
+					ids.add( scope[key]["items"][item] );
+				}
+				if(arrayLen(ids)) {
+					args[key & "id"] = (scope[key]["not_in"] ? "-" : "") & listToArray(ids)
+				}
+			}
+
+			var qry = oEntryFinder.search(argumentCollection = args);
+
+			return (qry.recordCount == 1 
+					|| (qry.recordCount > 1 
+						&& dateDiff("n", variables.lastEmailTimestamp, now()) > variables.config.timespan));
+		</cfscript>		
+	</cffunction>
+
+	<cffunction name="doAction" access="public" returntype="boolean" hint="Performs an action when the entry matches the scope and conditions">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfscript>
+			sendEmail(qry, entry);
+			variables.lastEmailTimestamp = now();
+			return true;
+		</cfscript>
+	</cffunction>
+
+<!----
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
@@ -82,10 +116,11 @@
 			return true;
 		</cfscript>
 	</cffunction>
+--->
 
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
-		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		
 		<cfset var q = arguments.data>
 		<cfset var numHours = int(variables.config.timespan / 60)>
@@ -112,7 +147,7 @@
 			</cfoutput>
 		</cfsavecontent>			
 		
-		<cfset sendToEmail(rawEntryBean = arguments.rawEntry,
+		<cfset sendToEmail(entry = arguments.entry,
 							recipient = variables.config.recipientEmail,
 							subject= "BugLog: [First Message Alert][#q.ApplicationCode#][#q.hostName#] #q.message#", 
 							comment = intro,
@@ -120,45 +155,6 @@
 							includeHTMLReport = variables.config.includeHTMLReport)>
 		
 		<cfset writeToCFLog("'firstMessageAlert' rule fired. Email sent. Msg: '#q.message#'")>
-	</cffunction>
-
-	<cffunction name="getApplicationID" access="private" returntype="numeric">
-		<cfset var oDAO = getDAOFactory().getDAO("application")>
-		<cfset var oFinder = createObject("component","bugLog.components.appFinder").init(oDAO)>
-		<cfset var o = 0>
-		<cftry>
-			<cfset o = oFinder.findByCode(variables.config.application)>
-			<cfreturn o.getApplicationID()>
-			<cfcatch type="appFinderException.ApplicationCodeNotFound">
-				<cfreturn 0>
-			</cfcatch>
-		</cftry>
-	</cffunction>
-
-	<cffunction name="getHostID" access="private" returntype="numeric">
-		<cfset var oDAO = getDAOFactory().getDAO("host")>
-		<cfset var oFinder = createObject("component","bugLog.components.hostFinder").init(oDAO)>
-		<cfset var o = 0>
-		<cftry>
-			<cfset o = oFinder.findByName(variables.config.host)>
-			<cfreturn o.getHostID()>
-			<cfcatch type="hostFinderException.HostNameNotFound">
-				<cfreturn 0>
-			</cfcatch>
-		</cftry>
-	</cffunction>
-
-	<cffunction name="getSeverityID" access="private" returntype="numeric">
-		<cfset var oDAO = getDAOFactory().getDAO("severity")>
-		<cfset var oFinder = createObject("component","bugLog.components.severityFinder").init(oDAO)>
-		<cfset var o = 0>
-		<cftry>
-			<cfset o = oFinder.findByCode(variables.config.severity)>
-			<cfreturn o.getSeverityID()>
-			<cfcatch type="severityFinderException.codeNotFound">
-				<cfreturn 0>
-			</cfcatch>
-		</cftry>
 	</cffunction>
 
 	<cffunction name="explain" access="public" returntype="string">

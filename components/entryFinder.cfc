@@ -4,35 +4,55 @@
 		<cfargument name="id" type="numeric" required="true">
 		<cfscript>
 			var qry = variables.oDAO.get(arguments.id);
-			var o = 0;
+			var beans = createBeansFromQuery(qry);
 			
-			if(qry.recordCount gt 0) {
-				o = createObject("component","bugLog.components.entry").init( variables.oDAO );
-				o.setEntryID(qry.entryID);
-				o.setDateTime(qry.mydateTime);
-				o.setMessage(qry.message);
-				o.setApplicationID(qry.ApplicationID);
-				o.setSourceID(qry.SourceID);
-				o.setSeverityID(qry.SeverityID);
-				o.setHostID(qry.HostID);
-				o.setExceptionMessage(qry.exceptionMessage);
-				o.setExceptionDetails(qry.exceptionDetails);
-				o.setCFID(qry.cfid);
-				o.setCFTOKEN(qry.cftoken);
-				o.setUserAgent(qry.userAgent);
-				o.setTemplatePath(qry.templatePath);
-				o.setHTMLReport(qry.HTMLReport);
-				o.setCreatedOn(qry.createdOn);
-				o.setUUID(qry.UUID);
-				return o;
+			if(arrayLen(beans)) {
+				return beans[1];
 			} else {
 				throw("ID not found","entryFinderException.IDNotFound");
 			}
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="createBeansFromQuery" access="public" returntype="array">
+		<cfargument name="entries" type="query" required="true">
+		<cfscript>
+			var rtn = [];
+			for(var i=1;i lte entries.recordCount;i++) {
+				var o = createObject("component","bugLog.components.entry").init( variables.oDAO )
+							.setEntryID(entries.entryID[i])
+							.setDateTime(entries.mydateTime[i])
+							.setMessage(entries.message[i])
+							.setApplicationID(entries.ApplicationID[i])
+							.setSourceID(entries.SourceID[i])
+							.setSeverityID(entries.SeverityID[i])
+							.setHostID(entries.HostID[i])
+							.setExceptionMessage(entries.exceptionMessage[i])
+							.setExceptionDetails(entries.exceptionDetails[i])
+							.setCFID(entries.cfid[i])
+							.setCFTOKEN(entries.cftoken[i])
+							.setUserAgent(entries.userAgent[i])
+							.setTemplatePath(entries.templatePath[i])
+							.setCreatedOn(entries.createdOn[i])
+							.setUpdatedOn(entries.updatedOn[i])
+							.setIsProcessed(entries.isProcessed[i])
+							.setUUID(entries.UUID[i]);
+				if(structKeyExists(entries,"HTMLReport")) 
+					o.setHTMLReport(entries.HTMLReport[i]);
+				if(structKeyExists(entries,"ApplicationCode"))
+					o.setApplicationCode(entries.applicationCode[i]);
+				if(structKeyExists(entries,"SeverityCode"))
+					o.setSeverityCode(entries.severityCode[i]);
+				if(structKeyExists(entries,"HostName"))
+					o.setHostName(entries.hostName[i]);
+				rtn.add(o);
+			}
+			return rtn;
+		</cfscript>
+	</cffunction>
+
 	<cffunction name="search" returntype="query" access="public">
-		<cfargument name="searchTerm" type="string" required="true">
+		<cfargument name="searchTerm" type="string" required="false" default="">
 		<cfargument name="applicationID" type="string" required="false" default="0">
 		<cfargument name="hostID" type="string" required="false" default="0">
 		<cfargument name="severityID" type="string" required="false" default="0">
@@ -51,6 +71,7 @@
 		<cfargument name="groupByMsg" type="boolean" required="false" default="false" />
 		<cfargument name="groupByApp" type="boolean" required="false" default="false" />
 		<cfargument name="groupByHost" type="boolean" required="false" default="false" />
+		<cfargument name="isProcessed" type="boolean" required="false" />
 
 		<cfset var oDataProvider = variables.oDAO.getDataProvider()>
 		<cfset var dbType = oDataProvider.getConfig().getDBType()>
@@ -81,7 +102,8 @@
 			</cfif>
 			SELECT e.entryID, e.message, e.cfid, e.cftoken, e.mydateTime, e.exceptionMessage, e.exceptionDetails, 
 					e.templatePath, e.userAgent, a.code as ApplicationCode, h.hostName, s.code AS SeverityCode,
-					src.name AS SourceName, e.applicationID, e.hostID, e.severityID, e.sourceID, e.createdOn, e.UUID,
+					src.name AS SourceName, e.applicationID, e.hostID, e.severityID, e.sourceID, e.createdOn, 
+					e.updatedOn, e.isProcessed, e.UUID,
 					<cfswitch expression="#dbType#">
 						<cfcase value="mssql">
 							datePart(year, e.createdOn) as entry_year, 
@@ -188,6 +210,9 @@
 					</cfif>
 					<cfif arguments.UUID neq "">
 						AND e.UUID = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.UUID#">
+					</cfif>
+					<cfif structKeyExists(arguments, "isProcessed")>
+						AND e.isProcessed = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.isProcessed#">
 					</cfif>
 			<cfif applyGroupings>
 				) a

@@ -15,18 +15,17 @@
 		<cfset arrayAppend(variables.aRules, arguments.rule)>
 	</cffunction>
 	
-	<cffunction name="processRules" access="public" returnType="void" hint="Process all rules with a given raw entry bean">
-		<cfargument name="rawEntry" type="rawEntryBean" required="true">
+	<cffunction name="processRules" access="public" returnType="void" hint="Process all rules with a given entry bean">
 		<cfargument name="entry" type="entry" required="true">
 		<cfset _processRules("processRule", arguments)>
 	</cffunction>
 	
-	<cffunction name="processQueueStart" access="public" returntype="void" hint="This method gets called BEFORE each processing of the queue (only invoked when using the asynch listener)">
+	<cffunction name="processQueueStart" access="public" returntype="void" hint="This method gets called BEFORE each processing of the queue">
 		<cfargument name="queue" type="array" required="true">
 		<cfset _processRules("processQueueStart", arguments)>
 	</cffunction>
 
-	<cffunction name="processQueueEnd" access="public" returntype="void" hint="This method gets called AFTER each processing of the queue (only invoked when using the asynch listener)">
+	<cffunction name="processQueueEnd" access="public" returntype="void" hint="This method gets called AFTER each processing of the queue">
 		<cfargument name="queue" type="array" required="true">
 		<cfset _processRules("processQueueEnd", arguments)>
 	</cffunction>

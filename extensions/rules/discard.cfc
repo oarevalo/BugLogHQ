@@ -2,7 +2,7 @@
 			displayName="Discard message"
 			hint="This rule removes items from the queue that matches the given parameters">
 
-	<cfproperty name="severityCode" type="string" buglogType="severity" displayName="Severity Code" hint="The severity code (fatal,critical,error,etc) that will trigger the rule. Leave empty to look for all severity codes">
+	<cfproperty name="severity" type="string" buglogType="severity" displayName="Severity Code" hint="The severity code (fatal,critical,error,etc) that will trigger the rule. Leave empty to look for all severity codes">
 	<cfproperty name="application" type="string" buglogType="application" displayName="Application" hint="The application name that will trigger the rule. Leave empty to look for all applications">
 	<cfproperty name="host" type="string" displayName="Host Name" buglogType="host" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
 	<cfproperty name="message" type="string" displayName="Message" hint="The text of the bug report message">
@@ -14,14 +14,34 @@
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="message" type="string" required="false" default="">
 		<cfargument name="text" type="string" required="false" default="">
-		<cfset variables.config.severityCode = trim(arguments.severityCode)>
-		<cfset variables.config.application = trim(arguments.application)>
-		<cfset variables.config.host = trim(arguments.host)>
-		<cfset variables.config.message = trim(arguments.message)>
-		<cfset variables.config.text = trim(arguments.text)>
-		<cfreturn this>
+		<cfscript>
+			super.init(argumentCollection = arguments);
+			return this;
+		</cfscript>
 	</cffunction>
 
+	<cffunction name="matchCondition" access="public" returntype="boolean" hint="Returns true if the entry bean matches a custom condition">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfscript>
+			var alltext = entry.getMessage() & entry.getExceptionMessage() & entry.getExceptionDetails() & entry.getHTMLReport();
+			var rtn = (config.message eq "" or (config.message neq "" and listFindNoCase(config.message, entry.getMessage())))
+						and
+						(config.text eq "" or (config.text neq "" and findNoCase(config.text, alltext)));
+		
+			 return rtn;
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="doAction" access="public" returntype="boolean" hint="Performs an action when the entry matches the scope and conditions">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfscript>
+			var oEntryDAO = getDAOFactory().getDAO("entry");
+			oEntryDAO.delete(entry.getEntryID());
+			return false;
+		</cfscript>
+	</cffunction>
+
+<!---
 	<cffunction name="processQueueStart" access="public" returntype="boolean" hint="This method gets called BEFORE each processing of the queue (only invoked when using the asynch listener)">
 		<cfargument name="queue" type="array" required="true">
 		<cfscript>
@@ -52,7 +72,7 @@
 			 return rtn;
 		</cfscript>
 	</cffunction>
-	
+--->	
 	<cffunction name="explain" access="public" returntype="string">
 		<cfset var rtn = "Discards any bug report received">
 		<cfif variables.config.application  neq "">

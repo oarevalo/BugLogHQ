@@ -9,9 +9,9 @@
 	<cfproperty name="severity" type="string" displayName="Severity Code" buglogType="severity" hint="The severity that will trigger the rule. Leave empty to look for all severities">
 	<cfproperty name="sameMessage" type="boolean" displayName="Same Message?" hint="Set to True to counts only bug reports that have the same text on their message. Leave empty or False to count all messages">
 	<cfproperty name="oneTimeAlertRecipient" type="string" hint="An email address to receive a one time short notification. This is sent only up to once per day.">
-
-	<cfset ID_NOT_SET = -9999999 />
-	<cfset ID_NOT_FOUND = -9999990 />
+	
+	<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
+	<cfset variables.lastOneTimeEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
@@ -22,23 +22,67 @@
 		<cfargument name="severity" type="string" required="false" default="">
 		<cfargument name="sameMessage" type="string" required="false" default="">
 		<cfargument name="oneTimeAlertRecipient" type="string" required="false" default="">
-		<cfset variables.config.recipientEmail = arguments.recipientEmail>
-		<cfset variables.config.count = arguments.count>
-		<cfset variables.config.timespan = arguments.timespan>
-		<cfset variables.config.application = arguments.application>
-		<cfset variables.config.host = arguments.host>
-		<cfset variables.config.severity = arguments.severity>
-		<cfset variables.config.sameMessage = arguments.sameMessage>
-		<cfset variables.config.oneTimeAlertRecipient = arguments.oneTimeAlertRecipient>
-		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
-		<cfset variables.lastOneTimeEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
-		<cfset variables.applicationID = ID_NOT_SET>
-		<cfset variables.hostID = ID_NOT_SET>
-		<cfset variables.severityID = ID_NOT_SET>
-		<cfset variables.sameMessage = (isBoolean(variables.config.sameMessage) and variables.config.sameMessage)>
-		<cfreturn this>
+		<cfscript>
+			arguments.sameMessage = (isBoolean(arguments.sameMessage) && arguments.sameMessage);
+			super.init(argumentCollection = arguments);
+			return this;
+		</cfscript>		
 	</cffunction>
 	
+	<cffunction name="matchCondition" access="public" returntype="boolean" hint="Returns true if the entry bean matches a custom condition">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfscript>
+			var matches = false;
+			var oEntryDAO = getDAOFactory().getDAO("entry");
+			var oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
+
+			// only evaluate this rule if the amount of timespan minutes has passed after the last email was sent
+			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan ) {
+
+				var args = {
+					startDate = dateAdd("n", variables.config.timespan * (-1), now() ),
+					endDate = now()
+				};
+
+				for(var key in structKeyArray(scope)) {
+					var ids = [];
+					for(var item in scope[key]["items"]) {
+						ids.add( scope[key]["items"][item] );
+					}
+					if(arrayLen(ids)) {
+						args[key & "id"] = (scope[key]["not_in"] ? "-" : "") & listToArray(ids)
+					}
+				}
+
+				var qry = oEntryFinder.search(argumentCollection = args);
+
+				if(qry.recordCount gt 0) {
+					if(variables.sameMessage) {
+						qry = groupMessages(qry, variables.config.count);
+						
+						if(qry.recordCount gt 0) {
+							matches = true;
+						}
+			
+					} else if(qry.recordCount gt variables.config.count) {
+						matches = true;
+					}
+				}
+			}
+
+			return matches;
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="doAction" access="public" returntype="boolean" hint="Performs an action when the entry matches the scope and conditions">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfscript>
+			sendEmail(qry);
+			sendAlert(qry);
+			return true;
+		</cfscript>
+	</cffunction>
+<!----
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
@@ -95,7 +139,7 @@
 			return true;
 		</cfscript>
 	</cffunction>
-
+--->
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
 		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
 		<cfset var qryEntries = 0>
@@ -145,45 +189,6 @@
 		<cfset variables.lastEmailTimestamp = now()>
 		
 		<cfset writeToCFLog("'frequencyAlert' rule fired. Email sent.")>
-	</cffunction>
-
-	<cffunction name="getApplicationID" access="private" returntype="numeric">
-		<cfset var oDAO = getDAOFactory().getDAO("application")>
-		<cfset var oFinder = createObject("component","bugLog.components.appFinder").init(oDAO)>
-		<cfset var o = 0>
-		<cftry>
-			<cfset o = oFinder.findByCode(variables.config.application)>
-			<cfreturn o.getApplicationID()>
-			<cfcatch type="appFinderException.ApplicationCodeNotFound">
-				<cfreturn ID_NOT_FOUND>
-			</cfcatch>
-		</cftry>
-	</cffunction>
-
-	<cffunction name="getHostID" access="private" returntype="numeric">
-		<cfset var oDAO = getDAOFactory().getDAO("host")>
-		<cfset var oFinder = createObject("component","bugLog.components.hostFinder").init(oDAO)>
-		<cfset var o = 0>
-		<cftry>
-			<cfset o = oFinder.findByName(variables.config.host)>
-			<cfreturn o.getHostID()>
-			<cfcatch type="hostFinderException.HostNameNotFound">
-				<cfreturn ID_NOT_FOUND>
-			</cfcatch>
-		</cftry>
-	</cffunction>
-
-	<cffunction name="getSeverityID" access="private" returntype="numeric">
-		<cfset var oDAO = getDAOFactory().getDAO("severity")>
-		<cfset var oFinder = createObject("component","bugLog.components.severityFinder").init(oDAO)>
-		<cfset var o = 0>
-		<cftry>
-			<cfset o = oFinder.findByCode(variables.config.severity)>
-			<cfreturn o.getSeverityID()>
-			<cfcatch type="severityFinderException.codeNotFound">
-				<cfreturn ID_NOT_FOUND>
-			</cfcatch>
-		</cftry>
 	</cffunction>
 
 	<cffunction name="groupMessages" access="private" returntype="query">
