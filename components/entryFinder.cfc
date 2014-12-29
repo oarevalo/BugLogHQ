@@ -139,7 +139,9 @@
 							AND NULLIF(message,'') IS NULL
 						<cfelse>
 							<cfset tmpMessage = arguments.message>
-							<cfset tmpMessage = replace(replace(tmpMessage,"[","[[]",'all'),"''","'", "all")>
+							<cfif dbtype eq "mssql">
+								<cfset tmpMessage = replace(replace(tmpMessage,"[","[[]",'all'),"''","'", "all")>
+							</cfif>
 							AND message LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#tmpMessage#">
 						</cfif>
 					</cfif>
