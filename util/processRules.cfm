@@ -1,13 +1,22 @@
-<cfsetting requesttimeout="120">    <!--- set request timeout to 120 seconds to minimize overlapping with the next scheduler run --->
+<cfsetting requesttimeout="999999"> 
 
 <cfparam name="url.key" type="string" default="">
 <cfparam name="url.instance" type="string" default="">
 
-<!--- Handle service initialization if necessary --->
-<cfset oService = createObject("component", "bugLog.components.service").init( instanceName = url.instance )>
+<cfscript>
+    try {
+        // Handle service initialization if necessary
+        oService = createObject("component", "bugLog.components.service").init( instanceName = url.instance );
 
-<!--- process queue --->
-<cfif oService.isRunning()>
-    <cfset oBugLogListener = oService.getService()>
-    <cfset oBugLogListener.processRules( url.key )>
-</cfif>
+        // process pending queue
+        if(oService.isRunning()) {
+            oBugLogListener = oService.getService();
+            oBugLogListener.processRules( url.key );
+        }
+    
+    } catch(any e) {
+        // report the error
+        bugLogClient = createObject("component", "bugLog.client.bugLogService").init("bugLog.listeners.bugLogListenerWS");
+        bugLogClient.notifyService(e.message, e);
+    }
+</cfscript>
