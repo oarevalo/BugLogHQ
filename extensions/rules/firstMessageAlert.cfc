@@ -150,7 +150,7 @@
 							recipient = variables.config.recipientEmail,
 							subject= "BugLog: [First Message Alert][#q.ApplicationCode#][#q.hostName#] #q.message#", 
 							comment = intro,
-							entryID = q.EntryID,
+							entryID = q.id,
 							includeHTMLReport = variables.config.includeHTMLReport)>
 		
 		<cfset writeToCFLog("'firstMessageAlert' rule fired. Email sent. Msg: '#q.message#'")>
