@@ -10,9 +10,6 @@
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
-		<cfargument name="severityCode" type="string" required="false" default="">
-		<cfargument name="application" type="string" required="false" default="">
-		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="keywords" type="string" required="false" default="">
 		<cfargument name="includeHTMLReport" type="string" required="false" default="">
 		<cfscript>
@@ -31,7 +28,6 @@
 			for(var keyword in listToArray(variables.config.keywords)) {
 				matches = matches || findNoCase(keyword, stEntry.message);
 			}
-
 			return matches;
 		</cfscript>
 	</cffunction>
@@ -48,48 +44,7 @@
 			return true;
 		</cfscript>
 	</cffunction>
-<!----
-	<cffunction name="processRule" access="public" returnType="boolean">
-		<cfargument name="entry" type="bugLog.components.entry" required="true">
-		<cfscript>
-			var stEntry = arguments.entry.getMemento();
-			var evalCond1 = true;
-			var evalCond2 = true;
-			var evalCond3 = true;
-			var evalCond4 = true;
 
-			// evaluate conditions
-			evalCond1 = !len(variables.config.application)
-						or listFindNoCase(variables.config.application, stEntry.applicationCode);
-						
-			evalCond2 = !len(variables.config.severityCode)
-						or listFindNoCase(variables.config.severityCode, stEntry.severityCode);
-
-			evalCond3 = !len(variables.config.host)
-						or listFindNoCase(variables.config.host, stEntry.hostName);
-
-			for(var i=1;i lte listLen(variables.config.keywords);i=i+1) {
-				evalCond4 = evalCond3 and findNoCase(listGetAt(variables.config.keywords,i), stEntry.message);
-				if(not evalCond4) break;
-			}
-
-			// if all conditions are met, then send the alert
-			if(evalCond1 and evalCond2 and evalCond3 and evalCond4) {
-				logTrigger(entry);
-				sendToEmail(rawEntryBean = arguments.rawEntry, 
-							recipient = variables.config.recipientEmail,
-							subject = "BugLog: #arguments.rawEntry.getMessage()#",
-							comment = getAlertMessage(),
-							entryID = arguments.entry.getEntryID(),
-							includeHTMLReport = variables.config.includeHTMLReport);
-				
-				writeToCFLog("'MailAlertRule' rule fired. Email sent. Msg: '#arguments.rawEntry.getMessage()#'");
-			}
-				
-			return true;
-		</cfscript>
-	</cffunction>
----->
 	<cffunction name="explain" access="public" returntype="string">
 		<cfset var rtn = "Sends an alert ">
 		<cfif variables.config.recipientEmail  neq "">
@@ -102,8 +57,8 @@
 		<cfif variables.config.host neq "">
 			<cfset rtn &= " on host <b>#variables.config.host#</b> ">
 		</cfif>
-		<cfif variables.config.severityCode  neq "">
-			<cfset rtn &= " with a severity of <b>#variables.config.severityCode#</b>">
+		<cfif variables.config.severity  neq "">
+			<cfset rtn &= " with a severity of <b>#variables.config.severity#</b>">
 		</cfif>
 		<cfif variables.config.keywords  neq "">
 			<cfset var tmpKeywordsList = listQualify(variables.config.keywords,"'")>
@@ -113,12 +68,12 @@
 	</cffunction>	
 
 	<cffunction name="getAlertMessage" type="string" access="private">
-		<cfset var msg = "BugLog has received a bug report">
+		<cfset var msg = "BugLog has received a new bug report">
 		<cfif variables.config.application neq "">
 			<cfset msg &= " from application <b>#variables.config.application#</b>">
 		</cfif>
-		<cfif variables.config.severityCode neq "">
-			<cfset msg &= " with severity code <b>#variables.config.severityCode#</b>">
+		<cfif variables.config.severity neq "">
+			<cfset msg &= " with severity code <b>#variables.config.severity#</b>">
 		</cfif>
 		<cfif variables.config.host neq "">
 			<cfset msg &= " on host <b>#variables.config.host#</b>">

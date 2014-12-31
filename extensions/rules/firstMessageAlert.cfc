@@ -14,12 +14,9 @@
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
 		<cfargument name="timespan" type="string" required="true">
-		<cfargument name="application" type="string" required="false" default="">
-		<cfargument name="host" type="string" required="false" default="">
-		<cfargument name="severity" type="string" required="false" default="">
 		<cfargument name="includeHTMLReport" type="string" required="false" default="">
 		<cfscript>
-			arguments.timespan = val(arguments.timespan);
+			arguments.timespan = max(val(arguments.timespan),1);
 			arguments.includeHTMLReport = (isBoolean(arguments.includeHTMLReport) && arguments.includeHTMLReport);
 			super.init(argumentCollection = arguments);
 			return this;
@@ -31,11 +28,12 @@
 		<cfscript>
 			var oEntryDAO = getDAOFactory().getDAO("entry");
 			var oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
+			var createdOn = entry.getCreatedOn();
 
 			var args = {
 				message = arguments.entry.getMessage(),
-				startDate = dateAdd("n", variables.config.timespan * (-1), now() ),
-				endDate = now()
+				startDate = dateAdd("n", variables.config.timespan * (-1), createdOn ),
+				endDate = createdOn
 			};
 
 			for(var key in structKeyArray(scope)) {
@@ -64,59 +62,6 @@
 			return true;
 		</cfscript>
 	</cffunction>
-
-<!----
-	<cffunction name="processRule" access="public" returnType="boolean">
-		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
-		<cfargument name="entry" type="bugLog.components.entry" required="true">
-		<cfscript>
-			var qry = 0;
-			var oEntryFinder = 0;
-			var oEntryDAO = 0;
-			var args = structNew();
-			
-			// check fast fail conditions
-			if(variables.config.application neq "" and arguments.rawEntry.getApplicationCode() neq variables.config.application) return true;
-			if(variables.config.host neq "" and arguments.rawEntry.getHostName() neq variables.config.host) return true;
-			if(variables.config.severity neq "" and arguments.rawEntry.getSeverityCode() neq variables.config.severity) return true;
-
-			// get necessary IDs
-			if(variables.config.application neq "" and (variables.applicationID eq ID_NOT_SET or variables.applicationID eq ID_NOT_FOUND)) {
-				variables.applicationID = getApplicationID();
-			}
-			if(variables.config.host neq "" and (variables.hostID eq ID_NOT_SET or variables.hostID eq ID_NOT_FOUND)) {
-				variables.hostID = getHostID();
-			}
-			if(variables.config.severity neq "" and (variables.severityID eq ID_NOT_SET or variables.severityID eq ID_NOT_FOUND)) {
-				variables.severityID = getSeverityID();
-			}
-
-			
-			oEntryDAO = getDAOFactory().getDAO("entry");
-			oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
-
-			
-			args = structNew();
-			args.searchTerm = "";
-			args.message = arguments.rawEntry.getMessage();
-			args.startDate = dateAdd("n", variables.config.timespan * (-1), now() );
-			args.endDate = now();
-			if(variables.applicationID neq ID_NOT_SET) args.applicationID = variables.applicationID;
-			if(variables.hostID neq ID_NOT_SET) args.hostID = variables.hostID;
-			if(variables.severityID neq ID_NOT_SET) args.severityID = variables.severityID;
-
-			qry = oEntryFinder.search(argumentCollection = args);
-			
-			if(qry.recordCount eq 1 or (qry.recordCount gt 1 and dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan)) {
-				logTrigger(entry);
-				sendEmail(qry, rawEntry);
-				variables.lastEmailTimestamp = now();
-			}
-		
-			return true;
-		</cfscript>
-	</cffunction>
---->
 
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">

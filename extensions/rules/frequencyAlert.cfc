@@ -15,14 +15,13 @@
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
-		<cfargument name="count" type="numeric" required="true">
-		<cfargument name="timespan" type="numeric" required="true">
-		<cfargument name="application" type="string" required="false" default="">
-		<cfargument name="host" type="string" required="false" default="">
-		<cfargument name="severity" type="string" required="false" default="">
+		<cfargument name="count" type="string" required="true">
+		<cfargument name="timespan" type="string" required="true">
 		<cfargument name="sameMessage" type="string" required="false" default="">
 		<cfargument name="oneTimeAlertRecipient" type="string" required="false" default="">
 		<cfscript>
+			arguments.count = val(arguments.count);
+			arguments.timespan = max(val(arguments.timespan),1);
 			arguments.sameMessage = (isBoolean(arguments.sameMessage) && arguments.sameMessage);
 			super.init(argumentCollection = arguments);
 			return this;
@@ -37,10 +36,10 @@
 			// only evaluate this rule if the amount of timespan minutes has passed after the last email was sent
 			if( dateDiff("n", variables.lastEmailTimestamp, now()) > variables.config.timespan ) {
 
-				var qry = findMessages();
+				var qry = findMessages(entry);
 
 				if(qry.recordCount > 0) {
-					if(variables.sameMessage) {
+					if(variables.config.sameMessage) {
 						qry = groupMessages(qry, variables.config.count);
 						
 						if(qry.recordCount > 0) {
@@ -60,78 +59,23 @@
 	<cffunction name="doAction" access="public" returntype="boolean" hint="Performs an action when the entry matches the scope and conditions">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		<cfscript>
-			var qry = findMessages();
+			var qry = findMessages(entry);
 			sendEmail(qry);
 			sendAlert(qry);
 			return true;
 		</cfscript>
 	</cffunction>
-<!----
-	<cffunction name="processRule" access="public" returnType="boolean">
-		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
-		<cfargument name="entry" type="bugLog.components.entry" required="true">
-		<cfscript>
-			var qry = 0;
-			var oEntryFinder = 0;
-			var oEntryDAO = 0;
-			var args = structNew();
-			
-			// only evaluate this rule if the amount of timespan minutes has passed after the last email was sent
-			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan ) {
-			
-				oEntryDAO = getDAOFactory().getDAO("entry");
-				oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
-	
-				if(variables.config.application neq "" and (variables.applicationID eq ID_NOT_SET or variables.applicationID eq ID_NOT_FOUND)) {
-					variables.applicationID = getApplicationID();
-				}
-				if(variables.config.host neq "" and (variables.hostID eq ID_NOT_SET or variables.hostID eq ID_NOT_FOUND)) {
-					variables.hostID = getHostID();
-				}
-				if(variables.config.severity neq "" and (variables.severityID eq ID_NOT_SET or variables.severityID eq ID_NOT_FOUND)) {
-					variables.severityID = getSeverityID();
-				}
-				
-				args = structNew();
-				args.searchTerm = "";
-				args.startDate = dateAdd("n", variables.config.timespan * (-1), now() );
-				args.endDate = now();
-				if(variables.applicationID neq ID_NOT_SET) args.applicationID = variables.applicationID;
-				if(variables.hostID neq ID_NOT_SET) args.hostID = variables.hostID;
-				if(variables.severityID neq ID_NOT_SET) args.severityID = variables.severityID;
 
-				qry = oEntryFinder.search(argumentCollection = args);
-
-				if(qry.recordCount gt 0) {
-					if(variables.sameMessage) {
-						qry = groupMessages(qry, variables.config.count);
-						
-						if(qry.recordCount gt 0) {
-							logTrigger(entry);
-							sendEmail(qry);
-							sendAlert(qry);
-						}
-			
-					} else if(qry.recordCount gt variables.config.count) {
-						logTrigger(entry);
-						sendEmail(qry);
-						sendAlert(qry);
-					}
-				}
-			
-			}
-			return true;
-		</cfscript>
-	</cffunction>
---->
 	<cffunction name="findMessages" access="private" returntype="query">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
 		<cfscript>
 			var oEntryDAO = getDAOFactory().getDAO("entry");
 			var oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
+			var createdOn = entry.getCreatedOn();
 
 			var args = {
-				startDate = dateAdd("n", variables.config.timespan * (-1), now() ),
-				endDate = now()
+				startDate = dateAdd("n", variables.config.timespan * (-1), createdOn ),
+				endDate = createdOn
 			};
 
 			for(var key in structKeyArray(scope)) {
@@ -171,7 +115,7 @@
 		<cfsavecontent variable="intro">
 			<cfoutput>
 				BugLog has received more than <strong>#variables.config.count#</strong> bug reports 
-				<cfif variables.sameMessage>
+				<cfif variables.config.sameMessage>
 					<strong>with the same message</strong>
 				</cfif>
 				<cfif variables.config.application neq "">
@@ -187,7 +131,7 @@
 				<br /><br />
 				<cfloop query="qryEntries">
 					<cfset bugReportURL = getBugEntryHREF(qryEntries.EntryID) />
-					&bull; <a href="#bugReportURL#">[#qryEntries.severityCode#][#qryEntries.applicationCode#][#qryEntries.hostName#] #qryEntries.message# <cfif !variables.sameMessage>(#qryEntries.bugCount#)</cfif></a><br />
+					&bull; <a href="#bugReportURL#">[#qryEntries.severityCode#][#qryEntries.applicationCode#][#qryEntries.hostName#] #qryEntries.message# <cfif !variables.config.sameMessage>(#qryEntries.bugCount#)</cfif></a><br />
 				</cfloop>
 			</cfoutput>
 		</cfsavecontent>

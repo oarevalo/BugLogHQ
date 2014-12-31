@@ -13,11 +13,6 @@
 			return this;
 		</cfscript>
 	</cffunction>
-
-	<cffunction name="matchScope" access="public" returntype="boolean" hint="Returns true if the entry bean matches the defined scope">
-		<cfargument name="entry" type="bugLog.components.entry" required="true">
-		<cfreturn true />		
-	</cffunction>
 	
 	<cffunction name="matchCondition" access="public" returntype="boolean" hint="Returns true if the entry bean matches a custom condition">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
@@ -36,23 +31,6 @@
 			return true;
 		</cfscript>
 	</cffunction>
-
-<!----	
-	<cffunction name="processRule" access="public" returnType="boolean">
-		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
-		<cfargument name="entry" type="bugLog.components.entry" required="true">
-		<cfset logTrigger(entry)>
-		<cfset sendToEmail(rawEntryBean = arguments.rawEntry, 
-							recipient = variables.config.recipientEmail,
-							subject = "BugLog: #arguments.rawEntry.getMessage()#",
-							entryId = arguments.entry.getEntryId(),
-							includeHTMLReport = variables.config.includeHTMLReport)>
-							
-		<cfset writeToCFLog("'mailRelay' rule fired. Email sent. Msg: '#arguments.rawEntry.getMessage()#'")>
-		<cfreturn true>
-	</cffunction>
----->
-
 
 	<cffunction name="explain" access="public" returntype="string">
 		<cfset var rtn = "Sends an alert ">

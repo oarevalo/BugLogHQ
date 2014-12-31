@@ -13,20 +13,18 @@
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
-		<cfargument name="timespan" type="numeric" required="true">
-		<cfargument name="application" type="string" required="false" default="">
-		<cfargument name="host" type="string" required="false" default="">
-		<cfargument name="severity" type="string" required="false" default="">
+		<cfargument name="timespan" type="string" required="true">
 		<cfargument name="alertInterval" type="string" required="false" default="">
 		<cfscript>
-			arguments.alertInterval = val(arguments.alertInterval);
+			arguments.timespan = max(val(arguments.timespan),1);
+			arguments.alertInterval = max(val(arguments.alertInterval),1);
 			super.init(argumentCollection = arguments);
 			return this;
 		</cfscript>		
 	</cffunction>
 
-	<cffunction name="matchCondition" access="public" returntype="boolean" hint="Returns true if the entry bean matches a custom condition">
-		<cfargument name="entry" type="bugLog.components.entry" required="true">
+	<cffunction name="processQueueEnd" access="public" returntype="void" hint="This method gets called AFTER each processing of the queue">
+		<cfargument name="queue" type="array" required="true">
 		<cfscript>
 			var matches = false;
 			var oEntryDAO = getDAOFactory().getDAO("entry");
@@ -36,7 +34,6 @@
 			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.alertInterval ) {
 
 				var args = {
-					message = arguments.rawEntry.getMessage(),
 					startDate = dateAdd("n", variables.config.timespan * (-1), now() ),
 					endDate = now()
 				};
@@ -53,11 +50,18 @@
 
 				var qry = oEntryFinder.search(argumentCollection = args);
 
-				matches = (qry.recordCount == 0);
-			}
+				if(qry.recordCount == 0) {
+					sendEmail();
+					variables.lastEmailTimestamp = now();
+				}
 
-			return matches;
+			}
 		</cfscript>	
+	</cffunction>
+
+	<cffunction name="matchCondition" access="public" returntype="boolean" hint="Returns true if the entry bean matches a custom condition">
+		<cfargument name="entry" type="bugLog.components.entry" required="true">
+		<cfreturn false />		
 	</cffunction>
 
 	<cffunction name="doAction" access="public" returntype="boolean" hint="Performs an action when the entry matches the scope and conditions">
@@ -69,56 +73,6 @@
 		</cfscript>
 	</cffunction>
 
-	<!----
-	<cffunction name="processQueueEnd" access="public" returntype="boolean" hint="This method gets called AFTER each processing of the queue (only invoked when using the asynch listener)">
-		<cfargument name="queue" type="array" required="true">
-		<cfscript>
-			var qry = 0;
-			var oEntryFinder = 0;
-			var oEntryDAO = 0;
-			var args = structNew();
-	
-			// only evaluate this rule if 'alertInterval' minutes has passed after the last email was sent
-			if( dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.alertInterval ) {
-
-				// get necessary IDs
-				if(variables.config.application neq "" and variables.applicationID eq -1) {
-					variables.applicationID = getApplicationID();
-				}
-				if(variables.config.host neq "" and variables.hostID eq -1) {
-					variables.hostID = getHostID();
-				}
-				if(variables.config.severity neq "" and variables.severityID eq -1) {
-					variables.severityID = getSeverityID();
-				}
-	
-				
-				oEntryDAO = getDAOFactory().getDAO("entry");
-				oEntryFinder = createObject("component","bugLog.components.entryFinder").init(oEntryDAO);
-	
-				
-				args = structNew();
-				args.searchTerm = "";
-				args.startDate = dateAdd("n", variables.config.timespan * (-1), now() );
-				args.endDate = now();
-				if(variables.applicationID gt 0) args.applicationID = variables.applicationID;
-				if(variables.hostID gt 0) args.hostID = variables.hostID;
-				if(variables.severityID gt 0) args.severityID = variables.severityID;
-	
-				qry = oEntryFinder.search(argumentCollection = args);
-				
-				if(qry.recordCount eq 0) {
-					sendEmail();
-					variables.lastEmailTimestamp = now();
-				}
-				
-			}
-			
-			return true;
-		</cfscript>
-	</cffunction>
-	--->
-	
 	<cffunction name="sendEmail" access="private" returntype="void" output="true">
 		
 		<cfset var numHours = int(variables.config.timespan / 60)>
