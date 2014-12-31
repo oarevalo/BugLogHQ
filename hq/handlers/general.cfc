@@ -268,7 +268,6 @@
 				var entryID = getValue("entryID");
 				var entryUUID = getValue("uuid");
 				var argsSearch = {};
-				var qryEntriesUA = queryNew("");
 				var currentUser = getValue("currentUser");
 				var oEntry = 0;
 
@@ -281,6 +280,41 @@
 					setMessage("warning","Please select an entry to view");
 					setNextEvent("main");
 				}
+
+				// update lastread setting
+				if(structKeyExists(cookie, "lastbugread") and entryID gte cookie.lastbugread) {
+					cookie.lastbugread = entryID;
+				}
+
+				// set values
+				setValue("ruleTypes", getService("app").getRules());
+				setValue("jiraEnabled", getService("jira").getSetting("enabled"));
+				setValue("oEntry", oEntry);
+				setView("entry");
+
+			} catch(notAllowed e) {
+				setMessage("warning","You are not allowed to view this bug report");
+				setNextEvent("main");
+
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("main");
+			}
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="entryStats" access="public" returntype="void">
+		<cfscript>
+			try {
+				var appService = getService("app");
+				var entryID = getValue("entryID");
+				var argsSearch = {};
+				var qryEntriesUA = queryNew("");
+				var currentUser = getValue("currentUser");
+
+				// get requested entry object
+				var oEntry = appService.getEntry(entryID, currentUser);
 
 				// search for recent ocurrences (last 24 hours)
 				args.message = "__EMPTY__";
@@ -301,30 +335,20 @@
 															 user = currentUser);
 				}
 
-
-				// update lastread setting
-				if(structKeyExists(cookie, "lastbugread") and entryID gte cookie.lastbugread) {
-					cookie.lastbugread = entryID;
-				}
-
 				// set values
-				setValue("ruleTypes", getService("app").getRules());
-				setValue("jiraEnabled", getService("jira").getSetting("enabled"));
+				setLayout("");
 				setValue("oEntry", oEntry);
 				setValue("qryEntriesLast24", qryEntriesLast24);
 				setValue("qryEntriesAll", qryEntriesAll);
 				setValue("qryEntriesUA", qryEntriesUA);
-				setValue("oEntry", oEntry);
-				setView("entry");
+				setView("entryStats");
 
 			} catch(notAllowed e) {
 				setMessage("warning","You are not allowed to view this bug report");
-				setNextEvent("main");
 
 			} catch(lock e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
-				setNextEvent("main");
 			}
 		</cfscript>
 	</cffunction>
