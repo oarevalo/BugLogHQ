@@ -15,7 +15,15 @@
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="baseRule">
+		<cfargument name="severity" type="string" required="false" default="">
+		<cfargument name="application" type="string" required="false" default="">
+		<cfargument name="host" type="string" required="false" default="">
 		<cfscript>
+			// on buglog 1.8 rules were defined using severityCode instead of severity
+			arguments.severity = structKeyExists(arguments,"severityCode") 
+								? arguments.severityCode 
+								: arguments.severity;
+
 			// arguments to the constructor are used as the Rule configuration
 			config = duplicate(arguments);
 
@@ -48,7 +56,6 @@
 						The method returns a boolean value that can be used by the caller to determine if additional rules
 						need to be evaluated.">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
-		<!--- this method must be implemented by rules that extend the base rule --->
 		<cfscript>
 			var rtn = true;
 			updateScope();
