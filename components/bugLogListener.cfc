@@ -187,7 +187,6 @@ component output="false" {
 		logMessage("Stopping BugLogListener (#instanceName#) service...");
 		logMessage("Stopping scheduled tasks...");
 		scheduler.removeTask("bugLogProcessQueue");
-		scheduler.removeTask("bugLogProcessRules");
 		logMessage("Processing remaining elements in queue...");
 		processQueue(variables.key);
 		logMessage("BugLogListener service (#instanceName#) stopped.");
@@ -580,14 +579,6 @@ component output="false" {
 	private void function configureRuleProcessor() {
 		// load rule instances
 		loadRules();
-
-		// create a task to process the run the configure rules
-		var schedulerIntervalSecs = oConfig.getSetting("service.schedulerIntervalSecs");
-		scheduler.setupTask("bugLogProcessRules", 
-								"util/processRules.cfm",
-								"00:01",
-								schedulerIntervalSecs,
-								[{name="key",value=variables.KEY}]);
 	}
 
 	private any function parseInternalException(
