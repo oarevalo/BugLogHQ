@@ -287,31 +287,9 @@ component output="false" {
 		// convert to an array of entry beans
 		var entries = oEntryFinder.createBeansFromQuery(qryEntries);
 
-		// process 'begin' event
-		try {
-			variables.oRuleProcessor.processQueueStart( entries );
-		} catch(any e) {
-			logEntry( parseInternalException(e) );
-		}
+		// process rules for all the entries
+		variables.oRuleProcessor.processRules( entries );
 
-		// process rules for each entry
-		for(var oEntry in entries) {
-			try {
-				variables.oRuleProcessor.processRules( oEntry );
-				oEntry.setIsProcessed(true);
-				oEntry.save();
-			} catch(any e) {
-				logMessage("An error ocurred while processing rules for entry ###oEntry.getID()#: #e.message#");
-				logEntry( parseInternalException(e) );
-			}
-		}
-
-		// process 'end' event
-		try {
-			variables.oRuleProcessor.processQueueEnd( entries );
-		} catch(any e) {
-			logEntry( parseInternalException(e) );
-		}
 	}
 
 

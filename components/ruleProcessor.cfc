@@ -19,25 +19,22 @@ component {
 		arrayAppend(variables.aRules, arguments.rule);
 	}
 
-	// Process all rules with a given entry bean
+	// executes all rules for all entry bens in the given array
 	void function processRules(
-		required entry entry
+		required array entries
 	) {
-		_processRules("processRule", arguments);
-	}
+		// process 'begin' event
+		process("queueStart", entries);
 
-	// This method gets called BEFORE each processing of the queue
-	void function processQueueStart(
-		required array queue
-	) {
-		_processRules("processQueueStart", arguments);
-	}
+		// process rules for each entry
+		for(var oEntry in entries) {
+			process("rule", oEntry);
+			oEntry.setIsProcessed(true);
+			oEntry.save();
+		}
 
-	// This method gets called AFTER each processing of the queue
-	void function processQueueEnd(
-		required array queue
-	) {
-		_processRules("processQueueEnd", arguments);
+		// process 'end' event
+		process("queueEnd", entries);
 	}
 
 	// clears all the loaded rules
@@ -49,9 +46,9 @@ component {
 	/** Private Methods **/
 
 	// internal function to process all rules
-	private void function _processRules(
-		required string method,
-		required struct args
+	private void function process(
+		required string event,
+		required any arg
 	) {
 		var rtn = false;
 		var ruleName = "";
@@ -63,8 +60,18 @@ component {
 			try {
 				ruleName = getMetaData(thisRule).name;
 							
-				// process rule					
-				rtn = invokeMethod(thisRule, arguments.method, args);
+				// process rule
+				switch(arguments.event) {
+					case "queueStart":
+						rtn = thisRule.processQueueStart(arg);
+						break;
+					case "rule":
+						rtn = thisRule.processRule(arg);
+						break;
+					case "queueEnd":
+						rtn = thisRule.processQueueEnd(arg);
+						break;
+				}
 
 				// if rule returns false, then that means that no more rules will be processed, so we exit
 				if(not rtn) break;
@@ -75,16 +82,6 @@ component {
 				writeToCFLog(ruleName & ": " & e.message & e.detail);	
 			}
 		}
-	}
-
-	// dynamically calls a method on a rule instance
-	private boolean function invokeMethod(
-		required any instance,
-		required string method,
-		required struct args
-	) {
-		local.rtn = arguments.instance[arguments.method](argumentCollection = arguments.args);
-		return structKeyExists(local,"rtn") ? local.rtn : true;
 	}
 
 	// writes a message to the internal cf logs

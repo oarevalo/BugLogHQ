@@ -23,7 +23,7 @@
 		</cfscript>		
 	</cffunction>
 
-	<cffunction name="processQueueEnd" access="public" returntype="void" hint="This method gets called AFTER each processing of the queue">
+	<cffunction name="processQueueEnd" access="public" returntype="boolean" hint="This method gets called AFTER each processing of the queue">
 		<cfargument name="queue" type="array" required="true">
 		<cfscript>
 			var matches = false;
@@ -56,6 +56,8 @@
 				}
 
 			}
+
+			return true;
 		</cfscript>	
 	</cffunction>
 
