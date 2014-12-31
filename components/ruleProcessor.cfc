@@ -1,82 +1,99 @@
-<cfcomponent displayname="ruleProcessor" hint="This component is in charge of evaluating a set of rules">
+component {
+	// This component is in charge of evaluating a set of rules
 
-	<cfset variables.aRules = arrayNew(1)>
-	<cfset variables.buglogClient = 0>
-	<cfset variables.bugLogListenerEndpoint = "bugLog.listeners.bugLogListenerWS">
+	variables.aRules = [];
+	variables.buglogClient = 0;
+	variables.bugLogListenerEndpoint = "bugLog.listeners.bugLogListenerWS";
 
-	<cffunction name="init" access="public" returntype="ruleProcessor">
-		<cfset variables.aRules = arrayNew(1)>
-		<cfset variables.buglogClient = createObject("component","bugLog.client.bugLogService").init(variables.bugLogListenerEndpoint)>
-		<cfreturn this>
-	</cffunction>
-	
-	<cffunction name="addRule" access="public" returnType="void" hint="adds a rule to be processed">
-		<cfargument name="rule" type="baseRule" required="true">
-		<cfset arrayAppend(variables.aRules, arguments.rule)>
-	</cffunction>
-	
-	<cffunction name="processRules" access="public" returnType="void" hint="Process all rules with a given entry bean">
-		<cfargument name="entry" type="entry" required="true">
-		<cfset _processRules("processRule", arguments)>
-	</cffunction>
-	
-	<cffunction name="processQueueStart" access="public" returntype="void" hint="This method gets called BEFORE each processing of the queue">
-		<cfargument name="queue" type="array" required="true">
-		<cfset _processRules("processQueueStart", arguments)>
-	</cffunction>
+	// constructor
+	ruleProcessor function init() {
+		variables.aRules = [];
+		variables.buglogClient = createObject("component","bugLog.client.bugLogService").init(variables.bugLogListenerEndpoint);
+		return this;
+	}
 
-	<cffunction name="processQueueEnd" access="public" returntype="void" hint="This method gets called AFTER each processing of the queue">
-		<cfargument name="queue" type="array" required="true">
-		<cfset _processRules("processQueueEnd", arguments)>
-	</cffunction>
+	// adds a rule to be processed
+	void function addRule(
+		required baseRule rule
+	) {
+		arrayAppend(variables.aRules, arguments.rule);
+	}
 
-	<cffunction name="writeToCFLog" access="private" returntype="void" hint="writes a message to the internal cf logs">
-		<cfargument name="message" type="string" required="true">
-		<cflog application="true" file="bugLog_ruleProcessor" text="#arguments.message#">
-		<cfdump var="BugLog::RuleProcessor: #arguments.message#" output="console">
-	</cffunction>
+	// Process all rules with a given entry bean
+	void function processRules(
+		required entry entry
+	) {
+		_processRules("processRule", arguments);
+	}
 
-	<cffunction name="flushRules" access="public" returnType="void" hint="clears all the loaded rules">
-		<cfset variables.aRules = arrayNew(1)>
-	</cffunction>
+	// This method gets called BEFORE each processing of the queue
+	void function processQueueStart(
+		required array queue
+	) {
+		_processRules("processQueueStart", arguments);
+	}
+
+	// This method gets called AFTER each processing of the queue
+	void function processQueueEnd(
+		required array queue
+	) {
+		_processRules("processQueueEnd", arguments);
+	}
+
+	// clears all the loaded rules
+	void function flushRules() {
+		variables.aRules = arrayNew(1);
+	}
 
 
-	<cffunction name="_processRules" access="private" returntype="void">
-		<cfargument name="method" type="string" required="true">
-		<cfargument name="args" type="struct" required="true">
-		<cfscript>
-			var rtn = false;
-			var ruleName = "";
-			var thisRule = 0;
-			
-			for(var i=1;i lte arrayLen(variables.aRules);i=i+1) {
-				ruleName = "Rule #i#"; // a temporary name just in case the getMetaData() call fails
-				thisRule = variables.aRules[i];
-				try {
-					ruleName = getMetaData(thisRule).name;
-								
-					// process rule					
-					rtn = invokeRule(thisRule, arguments.method, args);
+	/** Private Methods **/
 
-					// if rule returns false, then that means that no more rules will be processed, so we exit
-					if(not rtn) break;
+	// internal function to process all rules
+	private void function _processRules(
+		required string method,
+		required struct args
+	) {
+		var rtn = false;
+		var ruleName = "";
+		var thisRule = 0;
+		
+		for(var i=1; i lte arrayLen(variables.aRules); i++) {
+			ruleName = "Rule #i#"; // a temporary name just in case the getMetaData() call fails
+			thisRule = variables.aRules[i];
+			try {
+				ruleName = getMetaData(thisRule).name;
+							
+				// process rule					
+				rtn = invokeMethod(thisRule, arguments.method, args);
 
-				} catch(any e) {
-					// if an error occurs while a rule executes, then write to normal log file
-					buglogClient.notifyService("RuleProcessor Error: #e.message#", e);
-					writeToCFLog(ruleName & ": " & e.message & e.detail);	
-				}
+				// if rule returns false, then that means that no more rules will be processed, so we exit
+				if(not rtn) break;
+
+			} catch(any e) {
+				// if an error occurs while a rule executes, then write to normal log file
+				buglogClient.notifyService("RuleProcessor Error: #e.message#", e);
+				writeToCFLog(ruleName & ": " & e.message & e.detail);	
 			}
-		</cfscript>
-	</cffunction>
+		}
+	}
 
-	<cffunction name="invokeRule" access="private" returntype="boolean">
-		<cfargument name="instance" type="any" required="true">
-		<cfargument name="method" type="string" required="true">
-		<cfargument name="args" type="struct" required="true">
-		<cfset var rtn = 0>
-		<cfinvoke component="#arguments.instance#" method="#arguments.method#" argumentcollection="#args#" returnvariable="rtn">
-		<cfreturn rtn>
-	</cffunction>	
+	// dynamically calls a method on a rule instance
+	private boolean function invokeMethod(
+		required any instance,
+		required string method,
+		required struct args
+	) {
+		local.rtn = arguments.instance[arguments.method](argumentCollection = arguments.args);
+		return structKeyExists(local,"rtn") ? local.rtn : true;
+	}
 
-</cfcomponent>
+	// writes a message to the internal cf logs
+	private void function writeToCFLog(
+		required string message		
+	) {
+		writeLog(type="Info", file="bugLog_ruleProcessor", text="#arguments.message#", application=true); 
+		writeDump(var="BugLog::RuleProcessor: #arguments.message#", output="console");
+	}
+
+}
+
