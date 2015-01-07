@@ -42,7 +42,7 @@
 					ids.add( scope[key]["items"][item] );
 				}
 				if(arrayLen(ids)) {
-					args[key & "id"] = (scope[key]["not_in"] ? "-" : "") & listToArray(ids)
+					args[key & "id"] = (scope[key]["not_in"] ? "-" : "") & listToArray(ids);
 				}
 			}
 
