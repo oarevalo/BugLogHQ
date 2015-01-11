@@ -166,7 +166,7 @@ component output="false" {
 				} catch(any e) {
 					// log error and save entry in another queue
 					arrayAppend(errorQueue,myQueue[i]);
-					logMessage("ERROR: #cfcatch.message# #cfcatch.detail#. Original message in entry: '#myQueue[i].getMessage()#'");
+					logMessage("ERROR: #e.message# #e.detail#. Original message in entry: '#myQueue[i].getMessage()#'");
 				}
 			}
 		}
