@@ -1,96 +1,112 @@
-component {
+import bugLog.components.rules.*;
+
+component accessors=true {
 	// This component is in charge of evaluating a set of rules
 
-	variables.aRules = [];
-	variables.buglogClient = 0;
-	variables.bugLogListenerEndpoint = "bugLog.listeners.bugLogListenerWS";
+	property name="logger";
+
+	variables.rules = [];
 
 	// constructor
 	ruleProcessor function init() {
-		variables.aRules = [];
-		variables.buglogClient = createObject("component","bugLog.client.bugLogService").init(variables.bugLogListenerEndpoint);
+		variables.rules = [];
 		return this;
 	}
 
 	// adds a rule to be processed
 	void function addRule(
-		required baseRule rule
+		required Rule rule
 	) {
-		arrayAppend(variables.aRules, arguments.rule);
+		arrayAppend(variables.rules, rule);
 	}
 
 	// executes all rules for all entry bens in the given array
 	void function processRules(
 		required array entries
 	) {
-		// process 'begin' event
-		process("queueStart", entries);
-
-		// process rules for each entry
+		// process per-entry rules
+		// (ensure each entry is processed only once)
 		for(var oEntry in entries) {
-			process("rule", oEntry);
-			oEntry.setIsProcessed(true);
-			oEntry.save();
+			if( !oEntry.getIsProcessed() ) {
+				processMessageRules(oEntry);
+				oEntry.setIsProcessed(true);
+				oEntry.save();
+			}
 		}
 
-		// process 'end' event
-		process("queueEnd", entries);
+		// process aggregate rules
+		processAggregateRules();
 	}
 
 	// clears all the loaded rules
 	void function flushRules() {
-		variables.aRules = arrayNew(1);
+		variables.rules = arrayNew(1);
+	}
+
+	// returns all rules 
+	array function getRules() {
+		return variables.rules;
 	}
 
 
 	/** Private Methods **/
 
 	// internal function to process all rules
-	private void function process(
-		required string event,
-		required any arg
+	private void function processMessageRules(
+		required any entry
 	) {
-		var rtn = false;
-		var ruleName = "";
-		var thisRule = 0;
-		
-		for(var i=1; i lte arrayLen(variables.aRules); i++) {
-			ruleName = "Rule #i#"; // a temporary name just in case the getMetaData() call fails
-			thisRule = variables.aRules[i];
-			try {
-				ruleName = getMetaData(thisRule).name;
-							
-				// process rule
-				switch(arguments.event) {
-					case "queueStart":
-						rtn = thisRule.processQueueStart(arg);
-						break;
-					case "rule":
-						rtn = thisRule.processRule(arg);
-						break;
-					case "queueEnd":
-						rtn = thisRule.processQueueEnd(arg);
-						break;
-				}
+		var rtn = {};
 
-				// if rule returns false, then that means that no more rules will be processed, so we exit
-				if(not rtn) break;
+		for(var thisRule in variables.rules) {
 
-			} catch(any e) {
-				// if an error occurs while a rule executes, then write to normal log file
-				buglogClient.notifyService("RuleProcessor Error: #e.message#", e);
-				writeToCFLog(ruleName & ": " & e.message & e.detail);	
+			// check that we only process rules with 
+			// scope of the appropriate type
+			if(!thisRule.appliesTo("message")) {
+				continue;
+			}
+
+			// ensure that we dont process an entry that has
+			// already been matched (in case this is a retry)
+			var matches = logger.getMatchedRuleIDs(entry);
+			if( arrayContains(matches, thisRule.getID()) ) {
+				continue;
+			}
+
+			// process rule
+			rtn = thisRule.process(entry);
+
+			// keep a log of when rules get triggered
+			if(rtn.matched) {
+				logger.matched(thisRule, entry);
+			}
+
+			// check if we should continue to the next rule
+			if(!rtn.next) {
+				break;
 			}
 		}
 	}
 
-	// writes a message to the internal cf logs
-	private void function writeToCFLog(
-		required string message		
-	) {
-		writeLog(type="Info", file="bugLog_ruleProcessor", text="#arguments.message#", application=true); 
-		writeDump(var="BugLog::RuleProcessor: #arguments.message#", output="console");
-	}
+	private void function processAggregateRules() {
+		var rtn = {};
 
+		for(var thisRule in variables.rules) {
+
+			// check that we only process rules with 
+			// scope of the appropriate type
+			if(!thisRule.appliesTo("aggregate")) {
+				continue;
+			}
+
+			// process rule
+			rtn = thisRule.process();
+
+			// keep a log of when rules get triggered
+			if(rtn.matched) {
+				logger.matched(thisRule);
+			}
+
+		}
+	}
 }
 

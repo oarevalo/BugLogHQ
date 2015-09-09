@@ -541,8 +541,7 @@
 		<cfquery name="qryDir" dbtype="query">
 			SELECT *
 				FROM qryDir
-				WHERE name not like '%.svn'
-					and name not like '%.cvs'
+				WHERE name like '%.cfc'
 				ORDER BY name
 		</cfquery>	
 

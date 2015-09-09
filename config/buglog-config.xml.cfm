@@ -29,7 +29,7 @@
 	<setting name="service.APIKey">2CF20630-DD24-491F-BA44314842183AFC</setting>
 	<setting name="service.maxQueueSize">1000</setting>
 	<setting name="service.maxLogSize">20</setting>
-	<setting name="service.schedulerIntervalSecs">120</setting>
+	<setting name="service.schedulerIntervalSecs">10</setting>
 
 	<setting name="jira.enabled">false</setting>
 	<setting name="jira.endpoint"></setting>
@@ -67,10 +67,10 @@
 		<setting name="mail.useSSL"></setting>
 	-->
 
-	<!-- (Optional) Redirect email output to filesystem for debugging
+	<!-- (Optional) Redirect email output to filesystem for debugging	-->
 	<setting name="debug.email">true</setting>
 	<setting name="debug.emailPath">/bugLog/debug/</setting>
-	-->
+
 
 	<!-- Environment-specific Settings: 
 		

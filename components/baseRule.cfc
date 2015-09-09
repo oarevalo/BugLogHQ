@@ -317,15 +317,10 @@
 	</cffunction>
 	
 	<cffunction name="getLastTrigger" access="public" returntype="query" hint="Returns a query object with information about the last time this rule was triggered">
-		<cfset var qry = 0>
-		<cfset var dsn = getDAOFactory().getDataProvider().getConfig().getDSN()>
-		<cfquery name="qry" datasource="#dsn#">
-			SELECT extensionLogID, extensionID, entryID, createdOn
-				FROM extensionLog
-				WHERE extensionID = <cfqueryparam cfsqltype="cf_sql_numeric" value="#getExtensionID()#">
-				ORDER BY createdOn DESC
-		</cfquery>
-		<cfreturn qry>
+		<cfscript>
+			var dao = getDAOFactory().getDAO("extensionLog");
+			return dao.getLastTrigger( getExtensionID() );	
+		</cfscript>
 	</cffunction>
 
 	<cffunction name="explain" access="public" returntype="string" hint="returns a user friendly description of this rule">

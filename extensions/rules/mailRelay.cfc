@@ -1,43 +1,49 @@
 <cfcomponent extends="bugLog.components.baseRule" 
-			hint="This rule sends an email everytime a bug is received">
+            hint="This rule sends an email everytime a bug is received">
 
-	<cfproperty name="recipientEmail" buglogType="email" displayName="Recipient Email" type="string" hint="The email address to which to send the notifications">
-	<cfproperty name="includeHTMLReport" type="boolean" displayName="Include HTML Report?" hint="When enabled, the HTML Report section of the bug report is included in the email body">
+    <cfproperty name="recipientEmail" buglogType="email" displayName="Recipient Email" type="string" hint="The email address to which to send the notifications">
+    <cfproperty name="includeHTMLReport" type="boolean" displayName="Include HTML Report?" hint="When enabled, the HTML Report section of the bug report is included in the email body">
 
-	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
-		<cfargument name="recipientEmail" type="string" required="true">
-		<cfargument name="includeHTMLReport" type="string" required="false" default="">
-		<cfscript>
-			arguments.includeHTMLReport = (isBoolean(arguments.includeHTMLReport) && arguments.includeHTMLReport);
-			super.init(argumentCollection = arguments);
-			return this;
-		</cfscript>
-	</cffunction>
-	
-	<cffunction name="matchCondition" access="public" returntype="boolean" hint="Returns true if the entry bean matches a custom condition">
-		<cfargument name="entry" type="bugLog.components.entry" required="true">
-		<cfreturn true />		
-	</cffunction>
+    <cffunction name="init" access="public" returntype="bugLog.components.rules.Rule">
+        <cfargument name="recipientEmail" type="string" required="true">
+        <cfargument name="includeHTMLReport" type="string" required="false" default="">
+        <cfscript>
+            arguments.includeHTMLReport = (isBoolean(arguments.includeHTMLReport) && arguments.includeHTMLReport);
+            super.init(argumentCollection = arguments);
+            return build();
+        </cfscript>
+    </cffunction>
 
-	<cffunction name="doAction" access="public" returntype="boolean" hint="Performs an action when the entry matches the scope and conditions">
-		<cfargument name="entry" type="bugLog.components.entry" required="true">
-		<cfscript>
-			sendToEmail(entry = arguments.entry, 
-						recipient = variables.config.recipientEmail,
-						subject = "BugLog: #arguments.entry.getMessage()#",
-						entryId = arguments.entry.getEntryId(),
-						includeHTMLReport = variables.config.includeHTMLReport);
-			writeToCFLog("'mailRelay' rule fired. Email sent. Msg: '#arguments.entry.getMessage()#'");
-			return true;
-		</cfscript>
-	</cffunction>
+    <cffunction name="buildRule" access="public" returntype="bugLog.components.rules.Rule">
+        <cfscript>
+            var r = new bugLog.components.rules.Rule( getExtensionID() );
 
-	<cffunction name="explain" access="public" returntype="string">
-		<cfset var rtn = "Sends an alert ">
-		<cfif variables.config.recipientEmail  neq "">
-			<cfset rtn &= " to <b>#variables.config.recipientEmail#</b>">
-		</cfif>
-		<cfset rtn &= " every time a bug report is received">
-		<cfreturn rtn>
-	</cffunction>
-</cfcomponent>
+            var s = new bugLog.components.rules.Scope( 
+                    application = config.application,
+                    host = config.host,
+                    severity = config.severity
+                );
+            r.setScope(s);
+
+            var a = new bugLog.components.rules.actions.SendEmail(
+                    senderEmail = getListener().getConfig().getSetting("general.adminEmail"),
+                    recipientEmail = config.recipientEmail,
+                    includeHTMLReport = config.includeHTMLReport,
+                    messageText = getAlertMessage()
+                );
+            a.setMailerService( mailerService );
+            r.addAction(a);
+
+            return r;
+        </cfscript> 
+    </cffunction>
+
+    <cffunction name="explain" access="public" returntype="string">
+        <cfset var rtn = "Sends an alert ">
+        <cfif variables.config.recipientEmail  neq "">
+            <cfset rtn &= " to <b>#variables.config.recipientEmail#</b>">
+        </cfif>
+        <cfset rtn &= " every time a bug report is received">
+        <cfreturn rtn>
+    </cffunction>
+</cfcomponent>    

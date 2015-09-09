@@ -54,7 +54,11 @@ component output="false" {
 		variables.oEntryFinder = createObject("component","bugLog.components.entryFinder").init( variables.oDAOFactory.getDAO("entry") );
 
 		// load the rule processor
+		var ruleLogger = createObject("component", "bugLog.components.rules.Logger").init();
+		var extensionLogDAO = variables.oDAOFactory.getDAO("extensionLog");
+		ruleLogger.setDAO( extensionLogDAO );
 		variables.oRuleProcessor = createObject("component","bugLog.components.ruleProcessor").init();
+		variables.oRuleProcessor.setLogger( ruleLogger );
 
 		// create cache instances
 		variables.oAppCache = createObject("component","bugLog.components.lib.cache.cacheService").init(50, variables.CACHE_TTL, false);
@@ -501,7 +505,7 @@ component output="false" {
 					.setMailerService( variables.mailerService );
 
 				// add rule to processor
-				variables.oRuleProcessor.addRule(oRule);
+				variables.oRuleProcessor.addRule(oRule.buildRule());
 			}
 		}
 	}
