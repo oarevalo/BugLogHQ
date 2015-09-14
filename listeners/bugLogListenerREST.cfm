@@ -1,3 +1,9 @@
+<!--- CROSS DOMAIN: Enables Cross Domain Access in newer Browsers --->
+<cfinvoke
+		component = "allowCors"
+		method = "allowCrossDomainAccess" >
+</cfinvoke>
+
 <cfsetting enablecfoutputonly="true">
 
 <!--- This endpoint must respond to both JSON and regular HTTP requests --->
