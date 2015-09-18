@@ -4,14 +4,14 @@
 	<cffunction name="init" access="public" returntype="listener">
 		<cfargument name="instanceName" type="string" required="true">
 		<cfset variables.instanceName = arguments.instanceName>
-        <cfset variables.serviceLoader = createObject("component", "bugLog.components.service").init( instanceName = variables.instanceName )/>
+        <cfset serviceLoader = createObject("component", "bugLog.components.service").init( instanceName = variables.instanceName )/>
 		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="getCorsSettings" access="public" returntype="struct">
-		<cfset cors = StructNew()>
-		<cfset cors.enabled = serviceLoader.getConfig().getSetting("cors.enabled")/>
-		<cfset cors.allowOrigin = serviceLoader.getConfig().getSetting("cors.allowOrigin")/>
+		<cfset var cors = StructNew()>
+		<cfset var cors.enabled = serviceLoader.getConfig().getSetting("cors.enabled")/>
+		<cfset var cors.allowOrigin = serviceLoader.getConfig().getSetting("cors.allowOrigin")/>
 		<cfreturn cors>
 	</cffunction>
 

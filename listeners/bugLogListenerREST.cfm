@@ -10,9 +10,8 @@
 
 <!--- CORS: Enables Cross Domain Access in newer Browsers --->
 <cfset requestHeaders = getHttpRequestData().headers />
-<cfset requestMethod = cgi.request_method />
 <cfset cors = listener.getCorsSettings()/>
-<cfif cors.enabled and structKeyExists( requestHeaders, "Origin" ) and requestMethod eq "OPTIONS">
+<cfif cors.enabled and structKeyExists( requestHeaders, "Origin" ) and cgi.request_method eq "OPTIONS">
     <cfheader name="Access-Control-Allow-Origin" value="#cors.allowOrigin#" />
     <cfheader name="Access-Control-Allow-Methods" value="GET, POST, OPTIONS, ACCEPT" />
     <cfheader name="Access-Control-Allow-Headers" value="Origin, Content-Type, Accept" />
@@ -28,7 +27,7 @@
     --->
     <cfcontent type="text/plain" reset="true" />
     <cfabort />
-    <cfelseif listFindNoCase("GET,POST", requestMethod)>
+    <cfelseif listFindNoCase("GET,POST", cgi.request_method)>
     <!---
     Simple GET requests:
     When the request is GET or POST, and no custom headers are sent, then no preflight check is required.
@@ -73,8 +72,6 @@
 <cfset args.source = ucase(cgi.request_method)>
 
 <!--- Log the bug --->
-<script>
-    listener.logEntry(argumentCollection = args);
-</script>
+<cfinvoke component="#listener#" method="logEntry" argumentcollection="#args#">
 
 <cfoutput>"OK"</cfoutput>
