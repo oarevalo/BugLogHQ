@@ -13,14 +13,10 @@
 <cfset cors = listener.getCorsSettings()/>
 <cfif cors.enabled and structKeyExists( requestHeaders, "Origin" ) and cgi.request_method eq "OPTIONS">
     <cfheader name="Access-Control-Allow-Origin" value="#cors.allowOrigin#" />
-    <cfheader name="Access-Control-Allow-Methods" value="GET, POST, OPTIONS, ACCEPT" />
-    <cfheader name="Access-Control-Allow-Headers" value="Origin, Content-Type, Accept" />
-    <cfheader name="Access-Control-Max-Age" value="1728000" />
-    <!---
-    If Allow Credentials (allow cookies) is true then Allow Origin CANNOT be '*'
-    we are not allowing cookies by default since this service use cookies
-    --->
-    <cfheader name="Access-Control-Allow-Credentials" value="false" />
+    <cfheader name="Access-Control-Allow-Methods" value="#cors.allowMethods#" />
+    <cfheader name="Access-Control-Allow-Headers" value="#cors.allowHeaders#" />
+    <cfheader name="Access-Control-Max-Age" value="#cors.maxAge#" />
+    <cfheader name="Access-Control-Allow-Credentials" value="#cors.allowCredentials#" />
     <!---
     Respond with these headers - the browser will cache these 'permissions'
     and immediately follow-up with the original request

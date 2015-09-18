@@ -58,6 +58,7 @@
 
 	<!-- Cross Origin Requests Settings -->
     <setting name="cors.enabled">true</setting>
+	<!-- allowOrigin is a list of domains allowed to use this service; a wildcard is also accepted-->
     <setting name="cors.allowOrigin">*</setting>
 
 	<!-- (Optional) Mail server configuration. -->
