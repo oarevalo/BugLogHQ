@@ -4,7 +4,15 @@
 	<cffunction name="init" access="public" returntype="listener">
 		<cfargument name="instanceName" type="string" required="true">
 		<cfset variables.instanceName = arguments.instanceName>
+        <cfset variables.serviceLoader = createObject("component", "bugLog.components.service").init( instanceName = variables.instanceName )/>
 		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="getCorsSettings" access="public" returntype="struct">
+		<cfset cors = StructNew()>
+		<cfset cors.enabled = serviceLoader.getConfig().getSetting("cors.enabled")/>
+		<cfset cors.allowOrigin = serviceLoader.getConfig().getSetting("cors.allowOrigin")/>
+		<cfreturn cors>
 	</cffunction>
 
 	<cffunction name="logEntry" access="public" returntype="void">
@@ -23,9 +31,6 @@
 		<cfargument name="APIKey" type="string" required="false" default="">
 		<cfargument name="source" type="string" required="false" default="Unknown">
 		<cfscript>
-			// get listener service wrapper
-			var serviceLoader = createObject("component", "bugLog.components.service").init( instanceName = variables.instanceName );
-
 			// get handle to bugLogListener service
 			var bugLogListener = serviceLoader.getService();
 
