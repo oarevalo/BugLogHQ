@@ -31,6 +31,7 @@ Contents:
 7. Acknowledgements / Thanks / Credits
 8. Bugs, suggestions
 9. Using BugLog with Non ColdFusion Applications
+10. CORS
 
 
 
@@ -265,7 +266,23 @@ Since BugLog listens for bug reports through standard protocols via HTTP (REST a
 
 On the /client folder you can find basic versions of PHP, Python and JavaScript clients that can be used to have an easier integration between your applications and BugLog. Please note that this scripts are on an "experimental" state, so they are a bit more simpler than the CFML version. They also use only the REST listener, not the SOAP one.
 
+10. CORS
+---------------------------------------------------------------------------
+When using the REST endpoint, you have the option to provide a bit of additional security by providing a <a href="http://enable-cors.org/">CORS</a> configuration.
 
+To enable CORS, you must have the following entries on your `config/buglog-config.xml.cfm` file:
+```
+	<setting name="cors.enabled">true</setting>
+	<setting name="cors.allowOrigin">*</setting>
+```
+The * in `allowOrigin` tells that any domain is accepted for requests, however you may change this to a more restrictive value if desired.
 
+Additionally, you may use the following optional settings for more specific configurations:
+```
+	<setting name="cors.allowMethods"></setting>
+	<setting name="cors.allowHeaders"></setting>
+	<setting name="cors.allowCredentials"></setting>
+	<setting name="cors.maxAge"></setting>
+```
 
 
