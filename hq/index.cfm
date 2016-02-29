@@ -23,9 +23,22 @@
 <cfset app.configDoc = "config/config.xml.cfm">
 
 
-<!--- Invoke controller --->
-<cfset app.onRequestStart()>
+<cftry>
+    <!--- Invoke controller --->
+    <cfset app.onRequestStart()>
+    
+    <!--- Render view --->
+    <cfinclude template="/bugLog/core/core.cfm">
+
+    <cfcatch type="any">
+        <cftry>
+            <cfset app.onError(cfcatch, "")>
+            <cfinclude template="/bugLog/hq/views/error.cfm">
+            <cfcatch type="any">
+                <cfinclude template="/bugLog/hq/views/error.cfm">
+            </cfcatch>
+        </cftry>
+    </cfcatch>
+</cftry>
 
 
-<!--- Render view --->
-<cfinclude template="/bugLog/core/core.cfm">
