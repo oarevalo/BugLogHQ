@@ -61,7 +61,7 @@
 			if(event eq "") event = this.defaultEvent;
 
 			// Check application reset conditions
-			resetApp = resetApp 
+			resetApp = (isBoolean(resetApp) and resetApp) 
 						or not structKeyExists(application,this.app_key) 
 						or not structKeyExists(application[this.app_key],"initFlag")
 						or (

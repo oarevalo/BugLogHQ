@@ -54,8 +54,20 @@
 	 -->
 	<setting name="autoCreate.application">true</setting>	
 	<setting name="autoCreate.host">true</setting>	
-	<setting name="autoCreate.severity">true</setting>	
-		
+	<setting name="autoCreate.severity">true</setting>
+
+	<!-- Cross Origin Requests Settings -->
+	<setting name="cors.enabled">true</setting>
+	<!-- allowOrigin is a list of domains allowed to use this service; a wildcard is also accepted-->
+	<setting name="cors.allowOrigin">*</setting>
+	<!-- (Optional) Other CORS setting -->
+	<!-- 
+		<setting name="cors.allowMethods"></setting>
+		<setting name="cors.allowHeaders"></setting>
+		<setting name="cors.allowCredentials"></setting>
+		<setting name="cors.maxAge"></setting>
+	-->
+
 	<!-- (Optional) Mail server configuration. -->
 	<!--
 		<setting name="mail.server"></setting>
