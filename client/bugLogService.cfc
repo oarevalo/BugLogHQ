@@ -1,5 +1,5 @@
 <cfcomponent>
-	<cfset variables.bugLogClientVersion = "1.8-c5">	<!--- bugloghq client version --->
+	<cfset variables.bugLogClientVersion = "1.8-c6">	<!--- bugloghq client version --->
 	<cfset variables.bugEmailSender = "">
 	<cfset variables.bugEmailRecipients = "">
 	<cfset variables.bugLogListener = "">
@@ -147,7 +147,7 @@
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 		<cfargument name="writeToCFLog" type="boolean" required="false" default="#variables.writeToCFLog#">
 		<cfargument name="AppName" type="string" required="false" default="#variables.appName#">
-		
+
 		<cfset var shortMessage = "">
 		<cfset var longMessage = "">
 		<cfset var tmpCFID = "">
@@ -166,7 +166,7 @@
 		<cfif isDefined("cftoken")>
 			<cfset tmpCFTOKEN = cftoken>
 		</cfif>
-	
+
 		<cftry>
 			<!--- compose the full report --->
 			<cfset longMessage = composeFullMessage(arguments.message, arguments.exception, arguments.extraInfo, arguments.maxDumpDepth, arguments.AppName)>
@@ -511,6 +511,7 @@
 			};
 			arrayAppend(checkpoints, item);
 		</cfscript>
+        <cfset request[checkpointsKey] = checkpoints>
 	</cffunction>
 
 	<cffunction name="getCheckpoints" access="public" returntype="array" hint="returns the checkpoints saved for the current request">
@@ -524,7 +525,7 @@
 		<cfargument name="data" type="any" required="true">
 		<cfargument name="maxDumpDepth" type="numeric" required="false" default="#variables.maxDumpDepth#">
 		<cfset var out = "">
-	
+
 		<cfif isSimpleValue(arguments.data)>
 			<cfset out = arguments.data>
 		<cfelseif isStruct(arguments.data) and structisempty(arguments.data)>
