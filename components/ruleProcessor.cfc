@@ -29,8 +29,7 @@ component {
 		// process rules for each entry
 		for(var oEntry in entries) {
 			process("rule", oEntry);
-			oEntry.setIsProcessed(true);
-			oEntry.save();
+			oEntry.flagAsProcessed();
 		}
 
 		// process 'end' event

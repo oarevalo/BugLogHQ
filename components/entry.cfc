@@ -131,4 +131,15 @@ component output="false" {
 		return this;
 	}
 
+	void function flagAsProcessed() {
+		var id = getID();
+		if(id) {
+			variables.instance.updatedOn = Now();
+			variables.oDAO.save(
+					id = id,
+					isProcessed = 1
+				);
+		}
+	}
+
 }
