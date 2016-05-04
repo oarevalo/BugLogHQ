@@ -89,7 +89,7 @@
 			switch(variables.protocol) {
 				case "SOAP":
 					try {
-						if(val(left(server.coldfusion.productVersion,1)) lte 7 or structKeyExists(server,"railo"))
+						if(val(left(server.coldfusion.productVersion,1)) lte 7 or structKeyExists(server,"lucee") or structKeyExists(server,"railo"))
 							variables.oBugLogListener = createObject("webservice", variables.bugLogListener);
 						else
 							variables.oBugLogListener = createObject("webservice", variables.bugLogListener, wsParams);
