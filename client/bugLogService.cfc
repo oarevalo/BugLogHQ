@@ -1,5 +1,5 @@
 <cfcomponent>
-	<cfset variables.bugLogClientVersion = "1.8-c6">	<!--- bugloghq client version --->
+	<cfset variables.bugLogClientVersion = "1.8-c7">	<!--- bugloghq client version --->
 	<cfset variables.bugEmailSender = "">
 	<cfset variables.bugEmailRecipients = "">
 	<cfset variables.bugLogListener = "">
@@ -559,6 +559,10 @@
 		<cfargument name="data" type="struct">
 		<cfset var local = {}>
 		<cfloop list="#structKeyList(arguments.data)#" index="local.i">
+			<!--- Fix for JSON keys with a null value in ACF 10+ 8 & 9 would set null values to "null" string --->
+	            	<cfif !StructKeyExists(arguments.data,local.i)>
+	                	<cfset arguments.data[local.i] = "null">
+	            	</cfif>				
 			<cfif isStruct(arguments.data[local.i])>
 				<cfset arguments.data[local.i] = sanitizeKeyData(arguments.data[local.i])>
 			<cfelse>
