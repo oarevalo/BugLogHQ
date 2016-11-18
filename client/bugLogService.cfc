@@ -305,7 +305,7 @@
 			// reconstruct full URL
 			tmpURL = getPageContext().getRequest().getRequestURL();
 			if(cgi.QUERY_STRING neq "")
-				tmpURL = tmpURL & "?" & cgi.QUERY_STRING;
+				tmpURL = xmlFormat(tmpURL & "?" & cgi.QUERY_STRING);
 		</cfscript>
 
 
