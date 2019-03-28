@@ -12,6 +12,8 @@
 		variables.APP_KEYS.SERVICES = "services";
 		variables.APP_KEYS.SETTINGS = "settings";
 		variables.APP_KEYS.PATHS = "paths";
+
+		variables.system = createObject("java", "java.lang.System");
 		
 		// setters and getters
 		function getView() {return variables.requestState.view;}
@@ -89,7 +91,14 @@
 		<cfif structKeyExists(application,variables.APP_KEYS.CORE)
 				and structKeyExists(application[variables.APP_KEYS.CORE],variables.APP_KEYS.SETTINGS)>
 			<cfif structKeyExists(application[variables.APP_KEYS.CORE][variables.APP_KEYS.SETTINGS],arguments.settingName)>
-				<cfreturn application[variables.APP_KEYS.CORE][variables.APP_KEYS.SETTINGS][arguments.settingName]>
+				<cfset var envVarSetting = variables.system.getenv(javaCast("string", ucase(arguments.settingName))) />
+				<cfif !isNull(envVarSetting)>
+					<!--- give preference to environment variables of the same name --->
+					<cfreturn envVarSetting />
+				<cfelse>
+					<!--- otherwise return the variable defined in the config --->
+					<cfreturn application[variables.APP_KEYS.CORE][variables.APP_KEYS.SETTINGS][arguments.settingName]>
+				</cfif>
 			<cfelse>
 				<cfthrow message="The requested application setting [#arguments.settingName#] doesn't exist">
 			</cfif>
