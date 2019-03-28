@@ -39,7 +39,7 @@
 </cfif>
 
 <!--- log entry --->
-<cfset listener = createObject("component","listener")
+<cfset listener = createObject("component","bugLog.components.listener")
 							.init( instance )
 							.logEntry(
 								argumentCollection = args

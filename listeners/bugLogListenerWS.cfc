@@ -21,7 +21,7 @@
 		<!--- See if we this is a named instance of buglog --->
 		<cfset var instance = getInstanceName()>
 
-		<cfset var listener = createObject("component","listener")
+		<cfset var listener = createObject("component","bugLog.components.listener")
 									.init( instance )
 									.logEntry(
 										argumentCollection = arguments
