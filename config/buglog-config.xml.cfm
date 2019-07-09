@@ -74,7 +74,7 @@
 		<setting name="mail.port"></setting>
 		<setting name="mail.username"></setting>
 		<setting name="mail.password"></setting>
-		<setting name="mail.useTSL"></setting>
+		<setting name="mail.useTLS"></setting>
 		<setting name="mail.useSSL"></setting>
 	-->
 
