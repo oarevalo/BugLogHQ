@@ -1,27 +1,29 @@
 <cfcomponent extends="eventHandler">
-	
+
 	<cfset variables.msgs = {
 				userNotAllowed = "You must be an administrator to access this section",
 				userNotAllowedAction = "You must be an administrator to modify application settings",
 				editingSettingsNotAllowed = "Editing of settings is currently not allowed. All configuration changes must be done directly in the config file. To allow editing settings through the UI you must enable it in your BugLogHQ config file."
 			}>
-	
+
 	<cffunction name="main" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");
 			var app = getService("app");
 			var cfg = app.getConfig();
 			var jira = getService("jira");
+			var slack = getService("slack");
 			var jiraConfig = structNew();
+			var slackConfig = structNew();
 			var panel = getValue("panel");
-			
+
 			if(panel eq "") {
 				if(user.getIsAdmin())
 					panel = "general";
 				else
-					panel = "changePassword";	
+					panel = "changePassword";
 			}
-						
+
 			try {
 				switch(panel) {
 					case "general":
@@ -75,25 +77,32 @@
 						jiraConfig.endpoint = jira.getSetting("endpoint");
 						jiraConfig.username = jira.getSetting("username");
 						jiraConfig.password = jira.getSetting("password");
-						setValue("jiraConfig",jiraConfig);				
+						setValue("jiraConfig",jiraConfig);
+						break;
+
+					case "slack":
+						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
+						slackConfig.enabled = slack.getSetting("enabled",false);
+						slackConfig.endpoint = slack.getSetting("endpoint");
+						setValue("slackConfig",slackConfig);
 						break;
 
 					case "digest":
 						if(not user.getIsAdmin()) throw(type="validation", message=variables.msgs.userNotAllowed);
 						digestConfig = app.getDigestSettings();
-						setValue("enabled", digestConfig.enabled);			
-						setValue("recipients", digestConfig.recipients);			
-						setValue("interval", digestConfig.schedulerIntervalHours);			
-						setValue("startTime", digestConfig.schedulerStartTime);			
-						setValue("sendIfEmpty", digestConfig.sendIfEmpty);			
-						setValue("app", digestConfig.application);			
-						setValue("host", digestConfig.host);			
-						setValue("severity", digestConfig.severity);			
+						setValue("enabled", digestConfig.enabled);
+						setValue("recipients", digestConfig.recipients);
+						setValue("interval", digestConfig.schedulerIntervalHours);
+						setValue("startTime", digestConfig.schedulerStartTime);
+						setValue("sendIfEmpty", digestConfig.sendIfEmpty);
+						setValue("app", digestConfig.application);
+						setValue("host", digestConfig.host);
+						setValue("severity", digestConfig.severity);
 						break;
-						
+
 					case "listeners":
 						setValue("APIKey", app.getServiceSetting("APIKey"));
-						setValue("bugLogHREF", app.getBaseBugLogHREF());	
+						setValue("bugLogHREF", app.getBaseBugLogHREF());
 						break;
 				}
 
@@ -317,15 +326,39 @@
 
 				setMessage("info","JIRA integration settings updated.");
 				setNextEvent("admin.main","panel=jira");
-							
+
 			} catch(any e) {
 				setMessage("error",e.message);
 				getService("bugTracker").notifyService(e.message, e);
 				setNextEvent("admin.main","panel=jira");
 			}
-		</cfscript>	
-	</cffunction>	
-			
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="doSaveSlackSettings" access="public" returntype="void">
+		<cfscript>
+			var user = getValue("currentUser");
+			var enabled = getValue("enabled",false);
+			var endpoint = getValue("endpoint");
+
+			try {
+				if(not user.getIsAdmin()) {setMessage("warning",variables.msgs.userNotAllowedAction); setNextEvent("admin.main","panel=slack");}
+				if(not isConfigEditingAllowed()) {setMessage("warning",variables.msgs.editingSettingsNotAllowed); setNextEvent("admin.main","panel=slack");}
+				getService("slack").setSetting("enabled", enabled)
+									.setSetting("endpoint", endpoint)
+									.reinit();
+
+				setMessage("info","Slack integration settings updated.");
+				setNextEvent("admin.main","panel=slack");
+
+			} catch(any e) {
+				setMessage("error",e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("admin.main","panel=slack");
+			}
+		</cfscript>
+	</cffunction>
+
 	<cffunction name="doSaveGeneralSettings" access="public" returntype="void">
 		<cfscript>
 			var user = getValue("currentUser");

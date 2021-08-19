@@ -134,6 +134,29 @@
 
 	</cffunction>
 
+	<cffunction name="sendToSlack" access="public" returntype="void">
+		<cfargument name="rawEntryBean" type="bugLog.components.rawEntryBean" required="false">
+		<cfargument name="comment" type="string" required="false" default="">
+		<cfargument name="entryId" type="numeric" required="false" default="0">
+
+		<cfscript>
+			var buglogHref = getBaseBugLogHREF();
+			var bugReportURL = "";
+			var text = "";
+
+			if( arguments.entryID gt 0 ){
+				bugReportURL = getBugEntryHREF(arguments.entryID);
+			}
+		</cfscript>
+
+		<!--- build contents of slack message --->
+<cfsavecontent variable="text"><cfoutput>#arguments.comment#
+Bug Report URL: #bugReportURL#
+</cfoutput></cfsavecontent>
+
+		<cfset slackService.postIssue( text = text ) />
+	</cffunction>
+
 	<cffunction name="writeToCFLog" access="private" returntype="void" hint="writes a message to the internal cf logs">
 		<cfargument name="message" type="string" required="true">
 		<cflog application="true" file="bugLog_ruleProcessor" text="#arguments.message#">
@@ -165,6 +188,12 @@
 	<cffunction name="setMailerService" access="public" returntype="baseRule" hint="Adds a reference to the mailer service">
 		<cfargument name="mailerService" type="any" required="true">
 		<cfset variables.mailerService = arguments.mailerService>
+		<cfreturn this />
+	</cffunction>
+
+	<cffunction name="setSlackService" access="public" returntype="baseRule" hint="Adds a reference to the mailer service">
+		<cfargument name="slackService" type="any" required="true">
+		<cfset variables.slackService = arguments.slackService>
 		<cfreturn this />
 	</cffunction>
 

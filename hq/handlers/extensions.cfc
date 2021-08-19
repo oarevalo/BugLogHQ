@@ -61,11 +61,15 @@
 				setValue("stRule", stRule);
 				setValue("id", id);
 				setValue("ruleName", ruleName);
-				
+				if(id eq 0 ){
+					setValue("sendEmailAlert", true);
+					setValue("sendSlackAlert", false);
+				}
+
 				if(id gt 0) {
 					setValue("aActiveRule", app.getRule(id,user));
 				}
-	
+
 				setValue("pageTitle", "Rules > Add/Edit Rule");
 				setView("extensions/edit");
 

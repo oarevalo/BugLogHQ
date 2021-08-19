@@ -1,4 +1,4 @@
-<cfcomponent extends="bugLog.components.baseRule" 
+<cfcomponent extends="bugLog.components.baseRule"
 			displayName="Heartbeat Monitor"
 			hint="This rule checks if we have received a matching message in X minutes. If not, an alert is sent.">
 
@@ -8,6 +8,8 @@
 	<cfproperty name="host" type="string" buglogType="host" displayName="Host Name" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
 	<cfproperty name="severity" type="string" buglogType="severity" displayName="Severity Code" hint="The severity that will trigger the rule. Leave empty to look for all severities">
 	<cfproperty name="alertInterval" type="numeric" displayName="Alert Interval" hint="The number of minutes to wait between alert messages">
+	<cfproperty name="sendEmailAlert" type="boolean" displayName="Send Email Alert?" hint="When enabled, the alert is sent via email" default="true">
+	<cfproperty name="sendSlackAlert" type="boolean" displayName="Send Slack Alert?" hint="When enabled, the alert is sent via slack" default="false">
 
 	<cffunction name="init" access="public" returntype="bugLog.components.baseRule">
 		<cfargument name="recipientEmail" type="string" required="true">
@@ -16,19 +18,25 @@
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="severity" type="string" required="false" default="">
 		<cfargument name="alertInterval" type="string" required="false" default="">
+		<cfargument name="sendEmailAlert" type="string" required="false" default="true">
+		<cfargument name="sendSlackAlert" type="string" required="false" default="false">
+
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.timespan = arguments.timespan>
 		<cfset variables.config.application = arguments.application>
 		<cfset variables.config.host = arguments.host>
 		<cfset variables.config.severity = arguments.severity>
 		<cfset variables.config.alertInterval = val(arguments.alertInterval)>
+		<cfset variables.config.sendEmailAlert = (isBoolean(arguments.sendEmailAlert) and arguments.sendEmailAlert)>
+		<cfset variables.config.sendSlackAlert = (isBoolean(arguments.sendSlackAlert) and arguments.sendSlackAlert)>
+
 		<cfset variables.applicationID = -1>
 		<cfset variables.hostID = -1>
 		<cfset variables.severityID = -1>
 		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 		<cfreturn this>
 	</cffunction>
-	
+
 	<cffunction name="processQueueEnd" access="public" returntype="boolean" hint="This method gets called AFTER each processing of the queue (only invoked when using the asynch listener)">
 		<cfargument name="queue" type="array" required="true">
 		<cfscript>

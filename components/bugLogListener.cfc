@@ -59,6 +59,9 @@
 			// load the mailer service
 			variables.mailerService = createObject("component","bugLog.components.MailerService").init( variables.oConfig );
 
+			// load the slack service
+			variables.slackService = createObject("component","bugLog.components.SlackService").init(variables.oConfig);
+
 			// load rules
 			loadRules();
 
@@ -412,7 +415,8 @@
 						thisRule.instance
 						.setListener(this)
 						.setDAOFactory( variables.oDAOFactory )
-						.setMailerService( variables.mailerService );
+						.setMailerService( variables.mailerService )
+						.setSlackService( variables.slackService );
 
 					// add rule to processor
 					variables.oRuleProcessor.addRule(oRule);
