@@ -1,3 +1,7 @@
 /*~
 /deploy/
 .DS_Store
+/Vagrantfile
+/vagrantscripts/
+/database/
+/.vagrant/
