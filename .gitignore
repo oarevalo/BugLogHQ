@@ -6,3 +6,4 @@
 /database/
 /.vagrant/
 /WEB-INF/
+/*.log
