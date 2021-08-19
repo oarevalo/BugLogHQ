@@ -1,13 +1,15 @@
-<cfcomponent extends="bugLog.components.baseRule" 
+<cfcomponent extends="bugLog.components.baseRule"
 			displayName="First Message Alert"
 			hint="This rule checks for the first time a given bug report is received on the last X minutes and send an email">
-	
+
 	<cfproperty name="recipientEmail" type="string" buglogType="email" displayName="Recipient Email" hint="The email address to which to send the notifications">
 	<cfproperty name="timespan" type="numeric" displayName="Timespan" hint="The number in minutes for which to count the amount of bug reports received">
 	<cfproperty name="application" type="string" buglogType="application" displayName="Application" hint="The application name that will trigger the rule. Leave empty to look for all applications">
 	<cfproperty name="host" type="string" buglogType="host" displayName="Host Name" hint="The host name that will trigger the rule. Leave empty to look for all hosts">
 	<cfproperty name="severity" type="string" buglogType="severity" displayName="Severity Code" hint="The severity that will trigger the rule. Leave empty to look for all severities">
 	<cfproperty name="includeHTMLReport" type="boolean" displayName="Include HTML Report?" hint="When enabled, the HTML Report section of the bug report is included in the email body">
+	<cfproperty name="sendEmailAlert" type="boolean" displayName="Send Email Alert?" hint="When enabled, the alert is sent via email" default="true">
+	<cfproperty name="sendSlackAlert" type="boolean" displayName="Send Slack Alert?" hint="When enabled, the alert is sent via slack" default="false">
 
 	<cfset variables.ID_NOT_SET = -9999999 />
 	<cfset variables.ID_NOT_FOUND = -9999990 />
@@ -19,19 +21,24 @@
 		<cfargument name="host" type="string" required="false" default="">
 		<cfargument name="severity" type="string" required="false" default="">
 		<cfargument name="includeHTMLReport" type="string" required="false" default="">
+		<cfargument name="sendEmailAlert" type="string" required="false" default="true">
+		<cfargument name="sendSlackAlert" type="string" required="false" default="false">
+
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.timespan = val(arguments.timespan)>
 		<cfset variables.config.application = arguments.application>
 		<cfset variables.config.host = arguments.host>
 		<cfset variables.config.severity = arguments.severity>
 		<cfset variables.config.includeHTMLReport = (isBoolean(arguments.includeHTMLReport) and arguments.includeHTMLReport)>
+		<cfset variables.config.sendEmailAlert = (isBoolean(arguments.sendEmailAlert) and arguments.sendEmailAlert)>
+		<cfset variables.config.sendSlackAlert = (isBoolean(arguments.sendSlackAlert) and arguments.sendSlackAlert)>
 		<cfset variables.applicationID = variables.ID_NOT_SET>
 		<cfset variables.hostID = variables.ID_NOT_SET>
 		<cfset variables.severityID = variables.ID_NOT_SET>
 		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 		<cfreturn this>
 	</cffunction>
-	
+
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">
@@ -72,13 +79,20 @@
 			if(variables.severityID neq ID_NOT_SET) args.severityID = variables.severityID;
 
 			qry = oEntryFinder.search(argumentCollection = args);
-			
+
 			if(qry.recordCount eq 1 or (qry.recordCount gt 1 and dateDiff("n", variables.lastEmailTimestamp, now()) gt variables.config.timespan)) {
 				logTrigger(entry);
-				sendEmail(qry, rawEntry);
+				if( variables.config.sendEmailAlert ){
+					sendEmail(qry, rawEntry);
+				}
+
+				if( variables.config.sendSlackAlert ){
+					sendSlack(qry, rawEntry);
+				}
+
 				variables.lastEmailTimestamp = now();
 			}
-		
+
 			return true;
 		</cfscript>
 	</cffunction>
@@ -104,22 +118,66 @@
 				<cfif variables.config.severity neq "">
 					with a severity of <strong>#variables.config.severity#</strong>
 				</cfif>
-				on the last 
+				on the last
 				<b>
 					<cfif numHours gt 0> #numHours# hour<cfif numHours gt 1>s</cfif> <cfif numMinutes gt 0> and </cfif></cfif>
 					<cfif numMinutes gt 0> #numMinutes# minute<cfif numMinutes gt 1>s</cfif></cfif>
 				</b>
 			</cfoutput>
-		</cfsavecontent>			
-		
+		</cfsavecontent>
+
 		<cfset sendToEmail(rawEntryBean = arguments.rawEntry,
 							recipient = variables.config.recipientEmail,
-							subject= "BugLog: [First Message Alert][#q.ApplicationCode#][#q.hostName#] #q.message#", 
+							subject= "BugLog: [First Message Alert][#q.ApplicationCode#][#q.hostName#] #q.message#",
 							comment = intro,
 							entryID = q.EntryID,
 							includeHTMLReport = variables.config.includeHTMLReport)>
-		
+
 		<cfset writeToCFLog("'firstMessageAlert' rule fired. Email sent. Msg: '#q.message#'")>
+	</cffunction>
+
+	<cffunction name="sendSlack" access="private" returntype="void" output="true">
+		<cfargument name="data" type="query" required="true" hint="query with the bug report entries">
+		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
+
+		<cfset var q = arguments.data>
+		<cfset var numHours = int(variables.config.timespan / 60)>
+		<cfset var numMinutes = variables.config.timespan mod 60>
+		<cfset var intro = "BugLog has received a new bug report">
+
+		<cfif variables.config.application neq "">
+			<cfset intro &= " for application #variables.config.application#">
+		</cfif>
+		<cfif variables.config.host neq "">
+			<cfset intro &= " on host #variables.config.host#">
+		</cfif>
+		<cfif variables.config.severity neq "">
+			<cfset intro &= " with a severity of #variables.config.severity#">
+		</cfif>
+		<cfset intro &= " in the last ">
+		<cfif numHours gt 0>
+			<cfset intro &= "#numHours# hour">
+			<cfif numHours gt 1>
+				<cfset intro &= "s">
+			</cfif>
+			<cfif numMinutes gt 0>
+				<cfset intro &= " and">
+			</cfif>
+		</cfif>
+		<cfif numMinutes gt 0>
+			<cfset intro &= " #numMinutes# minute">
+			<cfif numMinutes gt 1>
+				<cfset intro &= "s">
+			</cfif>
+		</cfif>
+
+		<cfset sendToSlack(
+			rawEntryBean = arguments.rawEntry,
+			comment = intro,
+			entryID = q.EntryID
+		)>
+
+		<cfset writeToCFLog("'firstMessageAlert' rule fired. Slack msg sent. Msg: '#q.message#'")>
 	</cffunction>
 
 	<cffunction name="getApplicationID" access="private" returntype="numeric">

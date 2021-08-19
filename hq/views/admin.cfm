@@ -12,6 +12,7 @@
 				{ id = "purgeHistory", label = "Purge History", display = isAdmin, href="admin/purgeHistory.cfm" },
 				{ id = "APISecurity", label = "API Security", display = isAdmin, href="admin/APISecurity.cfm" },
 				{ id = "jira", label = "JIRA Integration", display = isAdmin, href="admin/jira.cfm" },
+				{ id = "slack", label = "Slack Integration", display = isAdmin, href="admin/slack.cfm" },
 				{ id = "digest", label = "Digest", display = isAdmin, href="admin/digest.cfm" },
 				{ id = "listeners", label = "BugLog Listeners", display = true, href="admin/listeners.cfm" }
 			]>

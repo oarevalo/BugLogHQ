@@ -9,6 +9,9 @@
 	<cfproperty name="severity" type="string" displayName="Severity Code" buglogType="severity" hint="The severity that will trigger the rule. Leave empty to look for all severities">
 	<cfproperty name="sameMessage" type="boolean" displayName="Same Message?" hint="Set to True to counts only bug reports that have the same text on their message. Leave empty or False to count all messages">
 	<cfproperty name="oneTimeAlertRecipient" type="string" hint="An email address to receive a one time short notification. This is sent only up to once per day.">
+	<cfproperty name="sendEmailAlert" type="boolean" displayName="Send Email Alert?" hint="When enabled, the alert is sent via email" default="true">
+	<cfproperty name="sendSlackAlert" type="boolean" displayName="Send Slack Alert?" hint="When enabled, the alert is sent via slack" default="false">
+
 
 	<cfset ID_NOT_SET = -9999999 />
 	<cfset ID_NOT_FOUND = -9999990 />
@@ -22,6 +25,9 @@
 		<cfargument name="severity" type="string" required="false" default="">
 		<cfargument name="sameMessage" type="string" required="false" default="">
 		<cfargument name="oneTimeAlertRecipient" type="string" required="false" default="">
+		<cfargument name="sendEmailAlert" type="string" required="false" default="true">
+		<cfargument name="sendSlackAlert" type="string" required="false" default="false">
+
 		<cfset variables.config.recipientEmail = arguments.recipientEmail>
 		<cfset variables.config.count = arguments.count>
 		<cfset variables.config.timespan = arguments.timespan>
@@ -30,15 +36,19 @@
 		<cfset variables.config.severity = arguments.severity>
 		<cfset variables.config.sameMessage = arguments.sameMessage>
 		<cfset variables.config.oneTimeAlertRecipient = arguments.oneTimeAlertRecipient>
+		<cfset variables.config.sendEmailAlert = (isBoolean(arguments.sendEmailAlert) and arguments.sendEmailAlert)>
+		<cfset variables.config.sendSlackAlert = (isBoolean(arguments.sendSlackAlert) and arguments.sendSlackAlert)>
+
 		<cfset variables.lastEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 		<cfset variables.lastOneTimeEmailTimestamp = createDateTime(1800,1,1,0,0,0)>
 		<cfset variables.applicationID = ID_NOT_SET>
 		<cfset variables.hostID = ID_NOT_SET>
 		<cfset variables.severityID = ID_NOT_SET>
 		<cfset variables.sameMessage = (isBoolean(variables.config.sameMessage) and variables.config.sameMessage)>
+
 		<cfreturn this>
 	</cffunction>
-	
+
 	<cffunction name="processRule" access="public" returnType="boolean">
 		<cfargument name="rawEntry" type="bugLog.components.rawEntryBean" required="true">
 		<cfargument name="entry" type="bugLog.components.entry" required="true">

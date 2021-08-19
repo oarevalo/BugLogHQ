@@ -35,9 +35,12 @@
 	<setting name="jira.username"></setting>
 	<setting name="jira.password"></setting>
 
+	<setting name="slack.enabled">false</setting>
+	<setting name="slack.endpoint"></setting>
+
 	<setting name="purging.numberOfDays">90</setting>
 	<setting name="purging.enabled">false</setting>
-	
+
 	<setting name="digest.enabled">false</setting>
 	<setting name="digest.recipients"></setting>
 	<setting name="digest.schedulerIntervalHours">24</setting>

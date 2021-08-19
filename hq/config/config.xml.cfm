@@ -41,6 +41,11 @@
 			<init-param name="appService" serviceName="app" />
 		</service>
 
+		<!-- Slack service -->
+		<service name="slack" class="bugLog.components.hq.slackService">
+			<init-param name="appService" serviceName="app" />
+		</service>
+
 		<!-- RSS service -->
 		<service name="rss" class="bugLog.components.lib.rss">
 		</service>
